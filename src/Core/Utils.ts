@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
-/// <reference path="../rtti/IUnknown.ts" />
+/// <reference path="../RTTI/IUnknown.ts" />
 
 /**
 * Global helpers in utils namespace
