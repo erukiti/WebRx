@@ -13,6 +13,6 @@ Even though WebRx has quite a lot in common with KnockoutJS, the project is not 
 
 ##### Key differences
 
-- The most prominent difference is WebRx using [Rx Observables](https://github.com/Reactive-Extensions/RxJS/tree/master/doc) for change tracking, whereas Knockout uses uses it's own [custom observables](http://knockoutjs.com/documentation/observables.html). 
+- The most prominent difference is WebRx using [Rx Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md) for change tracking, whereas Knockout uses uses it's own [custom observables](http://knockoutjs.com/documentation/observables.html). 
 - Whan evaluating binding-expressions WebRx utilizes [Angular expressions](https://docs.angularjs.org/guide/expression), Knockout in contrast uses Javascript's [eval()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval). As an additional detail, Knockout supports function invocations in [binding expressions](http://knockoutjs.com/documentation/binding-syntax.html), WebRx does not.
 - WebRx has *directives*, Knockout has *binding handlers*. Though both are roughly equivalent.   
