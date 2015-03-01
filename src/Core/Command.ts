@@ -263,7 +263,7 @@ module wx {
         var args = utils.args2Array(arguments);
 
         var commands: ICommand<any>[] = args
-            .filter(x=> utils.isRxuiCommand(x));
+            .filter(x=> utils.isCommand(x));
 
         var canExecute: Rx.Observable<boolean> = args
             .filter(x => utils.isRxObservable(x))

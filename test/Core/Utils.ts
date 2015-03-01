@@ -43,24 +43,24 @@ describe("Utils",() => {
     });
 
     it("isRxuiProperty smoke-test",() => {
-        expect(wx.utils.isRxuiProperty(1)).toBeFalsy();
-        expect(wx.utils.isRxuiProperty("foo")).toBeFalsy();
-        expect(wx.utils.isRxuiProperty(new String("foo"))).toBeFalsy();
-        expect(wx.utils.isRxuiProperty(new Object())).toBeFalsy();
-        expect(wx.utils.isRxuiProperty(function () { })).toBeFalsy();
+        expect(wx.utils.isProperty(1)).toBeFalsy();
+        expect(wx.utils.isProperty("foo")).toBeFalsy();
+        expect(wx.utils.isProperty(new String("foo"))).toBeFalsy();
+        expect(wx.utils.isProperty(new Object())).toBeFalsy();
+        expect(wx.utils.isProperty(function () { })).toBeFalsy();
 
-        expect(wx.utils.isRxuiProperty(wx.property())).toBeTruthy();
-        expect(wx.utils.isRxuiProperty(Rx.Observable.return(1).toProperty())).toBeTruthy();
+        expect(wx.utils.isProperty(wx.property())).toBeTruthy();
+        expect(wx.utils.isProperty(Rx.Observable.return(1).toProperty())).toBeTruthy();
     });
 
     it("isRxuiCommand smoke-test",() => {
-        expect(wx.utils.isRxuiCommand(1)).toBeFalsy();
-        expect(wx.utils.isRxuiCommand("foo")).toBeFalsy();
-        expect(wx.utils.isRxuiCommand(new String("foo"))).toBeFalsy();
-        expect(wx.utils.isRxuiCommand(new Object())).toBeFalsy();
-        expect(wx.utils.isRxuiCommand(function () { })).toBeFalsy();
+        expect(wx.utils.isCommand(1)).toBeFalsy();
+        expect(wx.utils.isCommand("foo")).toBeFalsy();
+        expect(wx.utils.isCommand(new String("foo"))).toBeFalsy();
+        expect(wx.utils.isCommand(new Object())).toBeFalsy();
+        expect(wx.utils.isCommand(function () { })).toBeFalsy();
 
-        expect(wx.utils.isRxuiCommand(wx.command())).toBeTruthy();
+        expect(wx.utils.isCommand(wx.command())).toBeTruthy();
     });
 
     it("isRxScheduler smoke-test",() => {

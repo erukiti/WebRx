@@ -49,7 +49,7 @@ module wx {
                 });
             }
 
-            if (!utils.isRxuiCommand(cmd)) {
+            if (!utils.isCommand(cmd)) {
                 // value is not a ICommand
                 internal.throwError("Command-Directive only works when bound to a Reactive Command!");
             } else {

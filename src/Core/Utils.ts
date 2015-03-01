@@ -45,7 +45,7 @@ module wx.utils {
         * Determines if target is an instance of a IObservableProperty
         * @param {any} target
         */
-    export function isRxuiProperty(target: any): boolean {
+    export function isProperty(target: any): boolean {
         if (!isNotNull(target))
             return false;
 
@@ -56,7 +56,7 @@ module wx.utils {
     * Determines if target is an instance of a wx.ICommand
     * @param {any} target
     */
-    export function isRxuiCommand(target: any): boolean {
+    export function isCommand(target: any): boolean {
         if (!isNotNull(target))
             return false;
 
