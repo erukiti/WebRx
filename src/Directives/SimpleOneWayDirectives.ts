@@ -50,6 +50,8 @@ module wx {
             // intentionally left blank
         }
 
+        public priority = 0;
+
         ////////////////////
         // implementation
 

@@ -86,9 +86,11 @@ module wx {
             return false;
         }
 
-        configure(options): void {
+        public configure(options): void {
             // intentionally left blank
         }
+
+        public priority = 0;
 
         protected domService: IDomService;
     }

@@ -60,7 +60,7 @@ module wx {
             // intentionally left blank
         }
 
-        public priority = 100;
+        public priority = 50;
 
         ////////////////////
         // implementation
