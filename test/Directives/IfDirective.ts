@@ -62,13 +62,13 @@ describe('Directives', () => {
             var el = <HTMLElement> document.querySelector("#if-observable-boolean-dynamic");
             var prop = wx.property(true);
             expect(() => wx.applyDirectives(prop, el)).not.toThrowError();
-            expect($(el).find("span")).toHaveText("foo");
+            expect($(el).children("span")).toHaveText("foo");
 
             // try it again
             wx.cleanNode(el);
             expect(() => wx.applyDirectives(prop, el)).not.toThrowError();
-            expect($(el).find("span").length).toEqual(1);
-            expect($(el).find("span")).toHaveText("foo");
+            expect($(el).children("span").length).toEqual(1);
+            expect($(el).children("span")).toHaveText("foo");
         });
 
         it('binding to a boolean observable property using dynamic template with command', () => {
@@ -85,12 +85,12 @@ describe('Directives', () => {
             var count = 0;
             var disp = model.cmd.results.subscribe(x => count++);
             expect(count).toEqual(0);
-            $(el).find("button")[0].click();
+            $(el).children("button")[0].click();
             expect(count).toEqual(1);
 
             // try it again
             wx.cleanNode(el);
-            $(el).find("button")[0].click(); // command shouldnt fire now
+            $(el).children("button")[0].click(); // command shouldnt fire now
             expect(count).toEqual(1);
             disp.dispose();
         });
