@@ -1,5 +1,5 @@
 ﻿
-module xi {
+module wx {
     export interface IWeakMap<TKey extends Object, T> {
         set(key: TKey, value: T): void;
         get(key: TKey): T;

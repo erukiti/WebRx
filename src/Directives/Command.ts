@@ -2,7 +2,7 @@
 /// <reference path="../Services/DomService.ts" />
 /// <reference path="../Interfaces.ts" />
 
-module xi {
+module wx {
     export interface ICommandDirectiveOptions {
         command: ICommand<any>;
         parameter?: any;
@@ -18,10 +18,10 @@ module xi {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                throw new Error("** xircular: Command directive only operates on elements!");
+                utils.throwError("Command directive only operates on elements!");
 
             if (utils.isNull(options))
-                throw new Error("** xircular: invalid options for directive!");
+                utils.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
             var cmd: ICommand<any>;
@@ -51,7 +51,7 @@ module xi {
 
             if (!utils.isRxuiCommand(cmd)) {
                 // value is not a ICommand
-                throw new Error("** xircular: Command-Binding only works when bound to a Reactive Command!");
+                utils.throwError("Command-Directive only works when bound to a Reactive Command!");
             } else {
                 // initial update
                 el.disabled = !cmd.canExecute(parameter);

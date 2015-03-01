@@ -1,6 +1,6 @@
 ﻿
-module xi.res {
-    export var injector = "xi.injector";
-    export var domService = "xi.domservice";
-    export var expressionCompiler = "xi.expressioncompiler";
+module wx.res {
+    export var injector = "wx.injector";
+    export var domService = "wx.domservice";
+    export var expressionCompiler = "wx.expressioncompiler";
 }

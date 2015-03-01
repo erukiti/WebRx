@@ -1,7 +1,7 @@
 ﻿/// <reference path="Utils.ts" />
 /// <reference path="Resources.ts" />
 
-module xi {
+module wx {
     /**
     * Simple IoC & Service Locator
     */
@@ -18,7 +18,7 @@ module xi {
             var isSingleton = false;
 
             if (this.registrations.hasOwnProperty(key))
-                throw new Error(utils.formatString("xircular: '{0}' is already registered", key));
+                utils.throwError("'{0}' is already registered", key);
 
             var val = args.shift();
 
@@ -49,7 +49,7 @@ module xi {
                             try {
                                 return self.resolve(x, deps);
                             } catch (e) {
-                                throw new Error(utils.formatString("xircular: error resolving dependency '{0}' for '{1}': {2}", x, key, e));
+                                utils.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                             }
                         });
                     
@@ -71,12 +71,12 @@ module xi {
         public resolve<T>(key: string, deps?: any): T {
             deps = deps || {};
             if (deps.hasOwnProperty(key))
-                throw new Error(utils.formatString("xircular: detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key));
+                utils.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
 
             // registered?
             var registration = this.registrations[key];
             if (registration === undefined)
-                throw new Error(utils.formatString("xircular: '{0}' is not registered", key));
+                utils.throwError("'{0}' is not registered", key);
 
             // already instantiated?
             if (registration.isSingleton && registration.value)

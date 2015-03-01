@@ -1,10 +1,10 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/xircular.d.ts" />
 
-import IInjector = xi.IInjector;
+import IInjector = wx.IInjector;
 
 function getInjector() {
-    return xi.injector.resolve<IInjector>("xi.injector");
+    return wx.injector.resolve<IInjector>("wx.injector");
 }
 
 describe("Injector",() => {

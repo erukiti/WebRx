@@ -1,4 +1,4 @@
-module xi {
+module wx {
     /// <summary>
     /// In absence of usable runtime-type-information in Typescript, good ole' IUnknown is making a comeback
     /// </summary>

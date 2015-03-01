@@ -3,7 +3,7 @@
 /// <reference path="../../build/xircular.d.ts" />
 
 describe("ExpressionCompiler", function () {
-    function testImpl(compiler: xi.IExpressionCompiler, withHooks: boolean) {
+    function testImpl(compiler: wx.IExpressionCompiler, withHooks: boolean) {
 
         var readHookInvocationCount;
         var writeHookInvocationCount;
@@ -429,7 +429,7 @@ describe("ExpressionCompiler", function () {
             describe("when using filters", function() {
 
                 it("should apply the given filter", function () {
-                    var options: xi.IExpressionCompilerOptions = {
+                    var options: wx.IExpressionCompilerOptions = {
                         filters: {
                             currency: function(input, currency, digits) {
                                 input = input.toFixed(digits);
@@ -500,7 +500,7 @@ describe("ExpressionCompiler", function () {
 
         it("parse literal containing complex angular expressions",() => {
             var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
-            var input = xi.utils.formatString("foo: {0}, bar: true", exp1);
+            var input = wx.utils.formatString("foo: {0}, bar: true", exp1);
             var result = compiler.parseObjectLiteral(input);
 
             expect(result.length).toEqual(2);
@@ -518,7 +518,7 @@ describe("ExpressionCompiler", function () {
         it("parse literal containing multiple complex angular expressions",() => {
             var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
             var exp2 = "a=1;b=2;[a, ['three',b]]";
-            var input = xi.utils.formatString("foo: {0}, bar: true, baz: {1}", exp1, exp2);
+            var input = wx.utils.formatString("foo: {0}, bar: true, baz: {1}", exp1, exp2);
             var result = compiler.parseObjectLiteral(input);
 
             expect(result.length).toEqual(3);
@@ -541,7 +541,7 @@ describe("ExpressionCompiler", function () {
         });
     }
 
-    var compiler = xi.injector.resolve<xi.IExpressionCompiler>(xi.res.expressionCompiler);
+    var compiler = wx.injector.resolve<wx.IExpressionCompiler>(wx.res.expressionCompiler);
     testImpl(compiler, false);
     testImpl(compiler, true);
 });

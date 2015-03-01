@@ -1,6 +1,6 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
-module xi {
+module wx {
     var RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 
     /**
@@ -12,7 +12,7 @@ module xi {
         // initialize accessor function (read-only)
         var accessor: any = (newVal?: any): any => {
             if (arguments.length > 0) {
-                throw Error("** xircular: Attempt to write to a read-only observable property");
+                utils.throwError("attempt to write to a read-only observable property");
             }
 
             return accessor.value;

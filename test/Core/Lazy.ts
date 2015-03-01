@@ -1,7 +1,7 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/xircular.d.ts" />
 
-import Lazy = xi.Lazy;
+import Lazy = wx.Lazy;
 
 describe("Lazy",() => {
     it("should not create value in constructor",() => {

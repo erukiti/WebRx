@@ -3,38 +3,38 @@
 
 describe("ObservableProperty", () => {
     it("can be created using factory method", () => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         expect(prop).toBeDefined();
     });
 
     it("can be created using factory method with initial value",() => {
-        var prop = xi.property<number>(10);
+        var prop = wx.property<number>(10);
         expect(prop()).toEqual(10);
     });
 
     it("implements IUnknown",() => {
-        var prop = xi.property<number>();
-        expect(xi.utils.supportsQueryInterface(prop)).toBeTruthy();
+        var prop = wx.property<number>();
+        expect(wx.utils.supportsQueryInterface(prop)).toBeTruthy();
     });
 
     it("implements IObservableProperty",() => {
-        var prop = xi.property<number>();
-        expect(xi.utils.queryInterface(prop, xi.IID.IObservableProperty)).toBeTruthy();
+        var prop = wx.property<number>();
+        expect(wx.utils.queryInterface(prop, wx.IID.IObservableProperty)).toBeTruthy();
     });
 
     it("observables are set up during creation",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         expect(prop.changing !== undefined && prop.changed !== undefined).toBeTruthy();
     });
 
     it("invoking it as a function with a parameter changes the property's value",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         prop(10);
         expect(prop()).toEqual(10);
     });
 
     it("setting value to undefined works",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
 
         prop(3);
         expect(prop()).toEqual(3);
@@ -43,7 +43,7 @@ describe("ObservableProperty", () => {
     });
 
     it("type transition",() => {
-        var prop = xi.property<any>();
+        var prop = wx.property<any>();
 
         prop(3);
         expect(prop()).toEqual(3);
@@ -56,7 +56,7 @@ describe("ObservableProperty", () => {
     });
 
     it("setting a value fires change notifications",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         var changingFired = false;
         var changedFired = false;
 
@@ -68,7 +68,7 @@ describe("ObservableProperty", () => {
     });
 
     it("multiple subscribers receive notifications",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         var changingFiredCount = 0;
 
         // subscribe
@@ -83,7 +83,7 @@ describe("ObservableProperty", () => {
     });
 
     it("'changing' notification with new value is fired before 'changed' notification",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         var first = undefined;
         var valueCorrect = false;
 
@@ -108,7 +108,7 @@ describe("ObservableProperty", () => {
     });
 
     it("notifications for changes in absence of any subscribers do not get buffered",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         var changingFired = false;
         var changedFired = false;
 
@@ -120,7 +120,7 @@ describe("ObservableProperty", () => {
     });
 
     it("consecutively assigning the same value does not result in duplicate change notifications",() => {
-        var prop = xi.property<number>();
+        var prop = wx.property<number>();
         var changedFiredCount = 0;
 
         prop.changed.subscribe(x => changedFiredCount++);
@@ -135,7 +135,7 @@ describe("ObservableProperty", () => {
         var vm = new TestViewModel();
         var firedCount = 0;
 
-        var computed = xi.whenAny(vm.foo, vm.bar,(f, b) => {
+        var computed = wx.whenAny(vm.foo, vm.bar,(f, b) => {
             firedCount++;
             return (b || "") + (f || "");
         }).toProperty();

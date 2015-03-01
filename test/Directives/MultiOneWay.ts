@@ -7,11 +7,11 @@ function createCssModel() {
         constantString: "bar",
         constantBool: true,
         constantNumeric: 42,
-        observableString: xi.property("voodoo"),
-        observableString2: xi.property("magic"),
-        observableBool: xi.property(true),
-        observableBool2: xi.property(false),
-        observableNumeric: xi.property(96)
+        observableString: wx.property("voodoo"),
+        observableString2: wx.property("magic"),
+        observableBool: wx.property(true),
+        observableBool2: wx.property(false),
+        observableNumeric: wx.property(96)
     }
 };
 
@@ -24,7 +24,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
         });
 
@@ -36,7 +36,7 @@ describe('Directives', () => {
             model.constantString = 'foo';
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
         });
 
@@ -47,7 +47,7 @@ describe('Directives', () => {
             var model = createCssModel();
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
 
             // should reflect property changes
@@ -55,7 +55,7 @@ describe('Directives', () => {
             expect($(el)).not.toHaveClass('foo');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(true);
             expect($(el)).not.toHaveClass('foo');
         });
@@ -69,7 +69,7 @@ describe('Directives', () => {
             model.observableBool(false);
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             model.observableBool(true);
             expect($(el)).toHaveClass('foo');
             model.observableBool(false);
@@ -80,7 +80,7 @@ describe('Directives', () => {
             expect($(el)).toHaveClass('foo');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(false);
             expect($(el)).toHaveClass('foo');
         });
@@ -93,7 +93,7 @@ describe('Directives', () => {
 
             expect($(el)).not.toHaveClass('foo');
             expect($(el)).not.toHaveClass('bar');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
             expect($(el)).not.toHaveClass('bar');
 
@@ -114,7 +114,7 @@ describe('Directives', () => {
             expect($(el)).toHaveClass('bar');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(false);
             model.observableBool2(false);
             expect($(el)).toHaveClass('foo');
@@ -130,7 +130,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo', 'true');
         });
 
@@ -142,7 +142,7 @@ describe('Directives', () => {
             model.constantString = 'data-foo';
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo');
         });
 
@@ -153,7 +153,7 @@ describe('Directives', () => {
             var model = createCssModel();
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo');
 
             // should reflect property changes
@@ -161,7 +161,7 @@ describe('Directives', () => {
             expect($(el)).toHaveAttr('data-foo');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString('voodoo');
             expect($(el)).toHaveAttr('data-foo', '');
         });
@@ -175,7 +175,7 @@ describe('Directives', () => {
             model.observableString('');
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             model.observableString('voodoo');
             expect($(el)).toHaveAttr('data-foo', 'voodoo');
             model.observableString('');
@@ -186,7 +186,7 @@ describe('Directives', () => {
             expect($(el)).toHaveAttr('data-foo', 'magic');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString('');
             expect($(el)).toHaveAttr('data-foo', 'magic');
         });
@@ -199,7 +199,7 @@ describe('Directives', () => {
 
             expect($(el)).not.toHaveAttr('data-foo');
             expect($(el)).not.toHaveAttr('data-bar');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo', 'voodoo');
             expect($(el)).toHaveAttr('data-bar', 'magic');
 
@@ -220,7 +220,7 @@ describe('Directives', () => {
             expect($(el)).toHaveAttr('data-bar', 'magic');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString('');
             model.observableString2('');
             expect($(el)).toHaveAttr('data-foo', 'voodoo');

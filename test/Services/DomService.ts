@@ -6,7 +6,7 @@
 /// <reference path="../typings/ix.d.ts" />
 
 describe('DomService',() => {
-    var bm = xi.injector.resolve<xi.IDomService>(xi.res.domService);
+    var bm = wx.injector.resolve<wx.IDomService>(wx.res.domService);
 
     describe('getDirectives',() => {
         it('smoke-test',() => {
@@ -85,7 +85,7 @@ describe('DomService',() => {
             var el = document.querySelector("#stand-alone-non-registered");
             var model1 = new Object();
 
-            expect(() => bm.applyDirectives(model1, el)).toThrowError(/Directive.+not.+registered/);
+            expect(() => bm.applyDirectives(model1, el)).toThrowError(/directive.+not.+registered/);
         });
     });
 
@@ -156,8 +156,8 @@ describe('DomService',() => {
             var compiled: any;
 
             var model: any = {
-                foo: xi.property(42),
-                bar: xi.property("hello")
+                foo: wx.property(42),
+                bar: wx.property("hello")
             };
 
             var ctx = testutils.createModelContext(model);
@@ -193,16 +193,16 @@ describe('DomService',() => {
             var compiled: any;
 
             var grandChildModel = {
-                foo: xi.property("<span>hello</hello>")
+                foo: wx.property("<span>hello</hello>")
             };
 
             var childModel = {
-                bar: xi.property(42),
-                baz: xi.property()
+                bar: wx.property(42),
+                baz: wx.property()
             };
 
             var model: any = {
-                foo: xi.property()
+                foo: wx.property()
             };
 
             var ctx = testutils.createModelContext(model);
@@ -232,8 +232,8 @@ describe('DomService',() => {
             var compiled: any;
 
             var model: any = {
-                foo: [null, xi.property("hello")],
-                bar: { 'foo': xi.property("world") }
+                foo: [null, wx.property("hello")],
+                bar: { 'foo': wx.property("world") }
             };
 
             var ctx = testutils.createModelContext(model);
@@ -257,7 +257,7 @@ describe('DomService',() => {
             var compiled: any;
 
             var model: any = {
-                foo: xi.list([xi.property("world")])
+                foo: wx.list([wx.property("world")])
             };
 
             var ctx = testutils.createModelContext(model);
@@ -269,7 +269,7 @@ describe('DomService',() => {
             expect(text()).toEqual("world");
 
             // list.collectionChanged should be monitored
-            model.foo.insert(0, xi.property("hello"));
+            model.foo.insert(0, wx.property("hello"));
             expect(text()).toEqual("hello");
 
             // change indexed property value (write-indexer test)
@@ -285,8 +285,8 @@ describe('DomService',() => {
             var compiled: any;
 
             var model: any = {
-                foo: xi.property(42),
-                bar: xi.property("hello")
+                foo: wx.property(42),
+                bar: wx.property("hello")
             };
 
             var ctx = testutils.createModelContext(model);
@@ -316,7 +316,7 @@ describe('DomService',() => {
             var compiled: any;
 
             var model: any = {
-                foo: xi.property(<any> 3)
+                foo: wx.property(<any> 3)
             };
 
             var ctx = testutils.createModelContext(model);
@@ -345,8 +345,8 @@ describe('DomService',() => {
             var compiled: any;
 
             var model: any = {
-                foo: xi.property(42),
-                bar: xi.property("hello")
+                foo: wx.property(42),
+                bar: wx.property("hello")
             };
 
             var ctx = testutils.createModelContext(model);

@@ -4,7 +4,7 @@
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../Core/Resources.ts" />
 
-module xi {
+module wx {
     class IfDirective implements IDirective {
         constructor(domService: IDomService) {
             this.domService = domService;
@@ -15,10 +15,10 @@ module xi {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                throw new Error("** xircular: if binding only operates on elements!");
+                utils.throwError("if binding only operates on elements!");
 
             if (utils.isNull(options))
-                throw new Error("** xircular: Invalid binding options!");
+                utils.throwError("** invalid binding options!");
 
             var el = <HTMLElement> node;
             var self = this;

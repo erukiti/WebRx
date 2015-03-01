@@ -1,7 +1,7 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/xircular.d.ts" />
 
-import HashSet = xi.HashSet;
+import HashSet = wx.HashSet;
 
 describe("HashSet",() => {
     it("smoke-test",() => {

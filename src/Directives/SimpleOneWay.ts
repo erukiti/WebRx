@@ -3,7 +3,7 @@
 /// <reference path="../Services/DomService.ts" />
 /// <reference path="../Interfaces.ts" />
 
-module xi {
+module wx {
     class SingleOneWayChangeDirectiveBase implements IDirective {
         constructor(domService: IDomService) {
             this.domService = domService;
@@ -14,10 +14,10 @@ module xi {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                throw new Error("** xircular: directive only operates on elements!");
+                utils.throwError("directive only operates on elements!");
 
             if (utils.isNull(options))
-                throw new Error("** xircular: invalid options for directive!");
+                utils.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
             var self = this;
@@ -56,7 +56,7 @@ module xi {
         protected domService: IDomService;
 
         protected applyValue(el: HTMLElement, value: any): void {
-            throw new Error("** xircular: You need to override this method!");
+            utils.throwError("you need to override this method!");
         }
     }
 

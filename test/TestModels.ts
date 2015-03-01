@@ -2,34 +2,34 @@
 /// <reference path="../build/xircular.d.ts" />
 
 class TestViewModel {
-    foo = xi.property<number>();
-    bar = xi.property<string>();
+    foo = wx.property<number>();
+    bar = wx.property<string>();
 }
 
 class FakeCollectionModel {
-    isHidden = xi.property<boolean>();
-    someNumber = xi.property<number>();
+    isHidden = wx.property<boolean>();
+    someNumber = wx.property<number>();
 }
 
 class FakeCollectionViewModel {
     constructor(model: FakeCollectionModel) {
         this.model(model);
 
-        this.numberAsString = xi.whenAny(model.someNumber, x => x.toString()).toProperty();
+        this.numberAsString = wx.whenAny(model.someNumber, x => x.toString()).toProperty();
     }
 
-    numberAsString: xi.IObservableProperty<string>;
+    numberAsString: wx.IObservableProperty<string>;
     
     public get NumberAsString(): string {
         return this.numberAsString();
     }
 
-    model = xi.property<FakeCollectionModel>();
+    model = wx.property<FakeCollectionModel>();
 }
 
 class NestedTextModel {
-    text = xi.property<string>();
-    hasData = xi.property<boolean>();
+    text = wx.property<string>();
+    hasData = wx.property<boolean>();
 }
 
 class TextModel {
@@ -40,23 +40,23 @@ class TextModel {
         this.value(_vm);
     }
 
-    value = xi.property<NestedTextModel>();
-    hasData = xi.property<boolean>();
+    value = wx.property<NestedTextModel>();
+    hasData = wx.property<boolean>();
 }
 
 class TestFixture {
     constructor() {
-        var list = xi.list<number>();
+        var list = wx.list<number>();
         list.changeTrackingEnabled = true;
         this.TestCollection(list);
     }
 
-    IsNotNullString = xi.property<string>();
-    IsOnlyOneWord = xi.property<string>();
-    StackOverflowTrigger = xi.property<Array<string>>();
-    UsesExprRaiseSet = xi.property<string>();
-    PocoProperty = xi.property<string>();
-    TestCollection = xi.property<xi.IObservableList<number>>();
+    IsNotNullString = wx.property<string>();
+    IsOnlyOneWord = wx.property<string>();
+    StackOverflowTrigger = wx.property<Array<string>>();
+    UsesExprRaiseSet = wx.property<string>();
+    PocoProperty = wx.property<string>();
+    TestCollection = wx.property<wx.IObservableList<number>>();
 }
 
 class Tuple<T1, T2> {

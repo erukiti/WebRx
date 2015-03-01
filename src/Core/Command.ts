@@ -3,10 +3,10 @@
 /// <reference path="Utils.ts" />
 /// <reference path="../Services/App.ts" />
 
-module xi {
+module wx {
     class Command<T> implements ICommand<T> {
         /// <summary>
-        /// Don't use this directly, use xi.commandXYZ instead
+        /// Don't use this directly, use wx.commandXYZ instead
         /// </summary>
         constructor(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, scheduler: Rx.IScheduler = null) {
             this.scheduler = scheduler || App.mainThreadScheduler;

@@ -5,18 +5,18 @@
 
 describe("Command", () => {
     it("implements IUnknown", () => {
-        var cmd = xi.command();
-        expect(xi.utils.supportsQueryInterface(cmd)).toBeTruthy();
+        var cmd = wx.command();
+        expect(wx.utils.supportsQueryInterface(cmd)).toBeTruthy();
     });
 
     it("implements ICommand", () => {
-        var cmd = xi.command();
-        expect(xi.utils.queryInterface(cmd, xi.IID.ICommand)).toBeTruthy();
+        var cmd = wx.command();
+        expect(wx.utils.queryInterface(cmd, wx.IID.ICommand)).toBeTruthy();
     });
 
     it("completely default reactive command should fire", () => {
         var sched = new Rx.TestScheduler();
-        var fixture = xi.command(null, sched);
+        var fixture = wx.command(null, sched);
         expect(fixture.canExecute(null)).toBeTruthy();
 
         var result = null;
@@ -35,7 +35,7 @@ describe("Command", () => {
 
     it("register sync function smoke-test",() => {
         var invoked = false;
-        var fixture = xi.command(()=> invoked = true);
+        var fixture = wx.command(()=> invoked = true);
 
         var results = new Array<number>();
         fixture.results.subscribe(x => results.push(x));
@@ -49,7 +49,7 @@ describe("Command", () => {
     });
 
     it("execute with sync function doesnt throw on error",() => {
-        var fixture = xi.command(() => { throw new Error("foo"); });
+        var fixture = wx.command(() => { throw new Error("foo"); });
 
         var results = new Array<Error>();
         fixture.thrownExceptions.subscribe(x => results.push(x));
@@ -63,7 +63,7 @@ describe("Command", () => {
         var input = [true, false, false, true, false, true];
         var result = testutils.withScheduler(new Rx.TestScheduler(), sched => {
             var can_execute = new Rx.Subject<boolean>();
-            var fixture = xi.command(can_execute, sched);
+            var fixture = wx.command(can_execute, sched);
             var changes_as_observable = [];
 
             var change_event_count = 0;
@@ -92,7 +92,7 @@ describe("Command", () => {
 
     it("observable execute func should be observable and act", () => {
         var executed_params = new Array<any>();
-        var fixture = xi.command();
+        var fixture = wx.command();
         fixture.results.subscribe(x => executed_params.push(x));
 
         var observed_params = new Rx.ReplaySubject<any>();
@@ -109,7 +109,7 @@ describe("Command", () => {
     });
 
     it("observable can execute is not null after canExecute called", () => {
-        var fixture = xi.command(null);
+        var fixture = wx.command(null);
 
         fixture.canExecute(null);
 
@@ -119,7 +119,7 @@ describe("Command", () => {
     it("multiple subscribes shouldn't result in multiple notifications", () => {
         var input = [1, 2, 1, 2];
         var sched = new Rx.TestScheduler();
-        var fixture = xi.command(null, sched);
+        var fixture = wx.command(null, sched);
 
         var odd_list = new Array<number>();
         var even_list = new Array<number>();
@@ -135,7 +135,7 @@ describe("Command", () => {
 
     it("canExecute exception shouldnt perma-break commands", () => {
         var canExecute = new Rx.Subject<boolean>();
-        var fixture = xi.command(canExecute);
+        var fixture = wx.command(canExecute);
 
         var exceptions = new Array<Error>();
         var canExecuteStates = new Array<boolean>();
@@ -161,7 +161,7 @@ describe("Command", () => {
     });
 
     it("execute doesnt throw on error", () => {
-        var command = xi.asyncCommand(_ =>
+        var command = wx.asyncCommand(_ =>
             Rx.Observable.throw(new Error("Aieeeee!")));
 
         command.thrownExceptions.subscribe();
@@ -171,7 +171,7 @@ describe("Command", () => {
 
     it("register async function smoke-test", () => {
         testutils.withScheduler(new Rx.TestScheduler(), sched => {
-            var fixture = xi.asyncCommand(Rx.Observable.return(true),
+            var fixture = wx.asyncCommand(Rx.Observable.return(true),
                 _ => Rx.Observable.return(5).delay(5000, sched));
 
             var results: Array<number> = [];
@@ -196,7 +196,7 @@ describe("Command", () => {
 
     it("multiple subscribers shouldnt decrement refCount below zero", () => {
         testutils.withScheduler(new Rx.TestScheduler(), sched => {
-            var fixture = xi.asyncCommand(Rx.Observable.return(true),
+            var fixture = wx.asyncCommand(Rx.Observable.return(true),
                 _ => Rx.Observable.return(5).delay(5000, sched));
 
             var results = new Array<number>();
@@ -226,7 +226,7 @@ describe("Command", () => {
         testutils.withScheduler(new Rx.TestScheduler(), sched => {
             var latestExecuting = false;
 
-            var fixture = xi.asyncCommand(Rx.Observable.return(true),
+            var fixture = wx.asyncCommand(Rx.Observable.return(true),
                 _ => Rx.Observable.fromArray([1, 2, 3]),
                 sched);
 
@@ -254,8 +254,8 @@ describe("Command", () => {
                 testutils.recordNext(sched, 1100, false)
             );
 
-            var fixture = xi.asyncCommand(canExecute,
-                x => Rx.Observable.return(x * 5).delay(900, xi.App.mainThreadScheduler));
+            var fixture = wx.asyncCommand(canExecute,
+                x => Rx.Observable.return(x * 5).delay(900, wx.App.mainThreadScheduler));
 
             var calculatedResult = -1;
             var latestcanExecute = false;
@@ -302,7 +302,7 @@ describe("Command", () => {
 
     it("disallow concurrent execution test", () => {
         testutils.withScheduler(new Rx.TestScheduler(), sched => {
-            var fixture = xi.asyncCommand(Rx.Observable.return(true),
+            var fixture = wx.asyncCommand(Rx.Observable.return(true),
                 _ => Rx.Observable.return(4).delay(5000, sched),
                 sched);
 
@@ -330,15 +330,15 @@ describe("Command", () => {
     });
 
     it("combined commands should fire child commands", () => {
-        var cmd1 = xi.command();
-        var cmd2 = xi.command();
-        var cmd3 = xi.command();
+        var cmd1 = wx.command();
+        var cmd2 = wx.command();
+        var cmd3 = wx.command();
 
         var output = [];
         Rx.Observable.merge(cmd1.results, cmd2.results, cmd3.results)
             .subscribe(x => output.push(x));
 
-        var fixture = xi.combinedCommand(cmd1, cmd2, cmd3);
+        var fixture = wx.combinedCommand(cmd1, cmd2, cmd3);
         expect(fixture.canExecute(null)).toBeTruthy();
         expect(0).toEqual(output.length);
 
@@ -349,13 +349,13 @@ describe("Command", () => {
 
     it("combined commands should reflect canExecute of children", () => {
         var subj1 = new Rx.Subject<boolean>();
-        var cmd1 = xi.command(subj1);
+        var cmd1 = wx.command(subj1);
         var subj2 = new Rx.Subject<boolean>();
-        var cmd2 = xi.command(subj2);
-        var cmd3 = xi.command();
+        var cmd2 = wx.command(subj2);
+        var cmd3 = wx.command();
 
         // Initial state for Commands is to be executable
-        var fixture = xi.combinedCommand(cmd1, cmd2, cmd3);
+        var fixture = wx.combinedCommand(cmd1, cmd2, cmd3);
         var canExecuteOutput = [];
         fixture.canExecuteObservable.subscribe(x => canExecuteOutput.push(x));
 
@@ -388,12 +388,12 @@ describe("Command", () => {
 
     it("combined commands should be inactive on async in-flight ops", () => {
         testutils.withScheduler(new Rx.TestScheduler(), sched => {
-            var cmd1 = xi.asyncCommand(Rx.Observable.return(true),
+            var cmd1 = wx.asyncCommand(Rx.Observable.return(true),
                 x => Rx.Observable.return(x).delay(100, sched));
-            var cmd2 = xi.asyncCommand(Rx.Observable.return(true),
+            var cmd2 = wx.asyncCommand(Rx.Observable.return(true),
                 x => Rx.Observable.return(x).delay(300, sched));
 
-            var cmd3 = xi.command();
+            var cmd3 = wx.command();
 
             var result1 = [];
             cmd1.results.subscribe(x => result1.push(x));
@@ -401,7 +401,7 @@ describe("Command", () => {
             var result2 = [];
             cmd2.results.subscribe(x => result2.push(x));
 
-            var fixture = xi.combinedCommand(cmd1, cmd2, cmd3);
+            var fixture = wx.combinedCommand(cmd1, cmd2, cmd3);
             var canExecuteOutput = [];
             fixture.canExecuteObservable.subscribe(x => canExecuteOutput.push(x));
 
@@ -437,14 +437,14 @@ describe("Command", () => {
 
     it("combined commands should reflect parent canExecute", () => {
         var subj1 = new Rx.Subject<boolean>();
-        var cmd1 = xi.command(subj1);
+        var cmd1 = wx.command(subj1);
         var subj2 = new Rx.Subject<boolean>();
-        var cmd2 = xi.command(subj2);
-        var cmd3 = xi.command();
+        var cmd2 = wx.command(subj2);
+        var cmd3 = wx.command();
         var parentSubj = new Rx.Subject<boolean>();
         
         // Initial state for Commands is to be executable
-        var fixture = xi.combinedCommand(parentSubj, cmd1, cmd2, cmd3);
+        var fixture = wx.combinedCommand(parentSubj, cmd1, cmd2, cmd3);
         var canExecuteOutput = [];
         fixture.canExecuteObservable.subscribe(x => canExecuteOutput.push(x));
         expect(fixture.canExecute(null)).toBeFalsy();

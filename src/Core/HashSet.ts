@@ -1,4 +1,4 @@
-﻿module xi {
+﻿module wx {
     /**
     * Mimics .Net's HashSet<T> 
     * Note: this class intended to be used with Objects not with primitives

@@ -1,4 +1,4 @@
-﻿module xi {
+﻿module wx {
     /// <summary>
     /// Interface registry to be used with IUnknown.queryInterface
     /// </summary>

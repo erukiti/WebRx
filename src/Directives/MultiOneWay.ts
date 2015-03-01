@@ -3,7 +3,7 @@
 /// <reference path="../Services/DomService.ts" />
 /// <reference path="../Interfaces.ts" />
 
-module xi {
+module wx {
     class MultiOneWayChangeDirectiveBase implements IDirective {
         constructor(domService: IDomService) {
             this.domService = domService;
@@ -14,10 +14,10 @@ module xi {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                throw new Error("** xircular: directive only operates on elements!");
+                utils.throwError("directive only operates on elements!");
 
             if (utils.isNull(options) || typeof options !== "object")
-                throw new Error("** xircular: invalid options for directive!");
+                utils.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
             var keys = Object.keys(options);
@@ -79,7 +79,7 @@ module xi {
         }
 
         protected applyValue(el: HTMLElement, key: string, value: any): void {
-            throw new Error("** xircular: You need to override this method!");
+            utils.throwError("you need to override this method!");
         }
     }
 

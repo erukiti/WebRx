@@ -1,7 +1,7 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="Utils.ts" />
 
-module xi {
+module wx {
     /**
     * ReactiveUI's awesome ReactiveList ported to Typescript (including tests)
     * @class
@@ -157,7 +157,7 @@ module xi {
 
         public addRange(items: T[]): void {
             if (items == null) {
-                throw Error("collection");
+                utils.throwError("collection");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
@@ -213,11 +213,11 @@ module xi {
         
         public insertRange(index: number, items: T[]): void {
             if (items == null) {
-                throw Error("collection");
+                utils.throwError("collection");
             }
 
             if (index > this.inner.length) {
-                throw Error("index");
+                utils.throwError("index");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
@@ -273,7 +273,7 @@ module xi {
         
         public removeAll(items: T[]): void {
             if (items == null) {
-                throw Error("items");
+                utils.throwError("items");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ?
@@ -395,7 +395,7 @@ module xi {
             this.changeNotificationsSuppressed++;
 
             if (!this.hasWhinedAboutNoResetSub && this.resetSubCount === 0 && !utils.isInUnitTest()) {
-                console.log("** xircular: suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
+                console.log("suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
                 this.hasWhinedAboutNoResetSub = true;
             }
 

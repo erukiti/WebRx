@@ -1,4 +1,4 @@
-﻿module xi {
+﻿module wx {
     /**
     * .Net's Lazy<T>
     * @class

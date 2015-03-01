@@ -7,9 +7,9 @@ function createModel() {
         constantString: "bar",
         constantBool: true,
         constantNumeric: 42,
-        observableString: xi.property("voodoo"),
-        observableBool: xi.property(true),
-        observableNumeric: xi.property(96)
+        observableString: wx.property("voodoo"),
+        observableBool: wx.property(true),
+        observableNumeric: wx.property(96)
     }
 };
 
@@ -22,7 +22,7 @@ describe('Directives', () => {
             var model = {};
 
             expect(el.textContent).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.textContent).toEqual('foo');
         });
 
@@ -33,7 +33,7 @@ describe('Directives', () => {
             var model = {};
 
             expect(el.textContent).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.textContent).toEqual('42');
         });
 
@@ -44,7 +44,7 @@ describe('Directives', () => {
             var model = {};
 
             expect(el.textContent).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.textContent).toEqual('true');
         });
 
@@ -55,7 +55,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect(el.textContent).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.textContent).toEqual(model.constantString);
         });
 
@@ -66,7 +66,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect(el.textContent).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.textContent).toEqual(model.observableString());
 
             // should reflect property changes
@@ -75,7 +75,7 @@ describe('Directives', () => {
 
             // binding should stop updating after getting disposed
             var oldValue = model.observableString();
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString("nope");
             expect(el.textContent).toEqual(oldValue);
         });
@@ -88,7 +88,7 @@ describe('Directives', () => {
             model["changed"] = model.observableString.changed;
 
             expect(el.textContent).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             // should reflect property changes
             model.observableString("magic");
@@ -96,7 +96,7 @@ describe('Directives', () => {
 
             // binding should stop updating after getting disposed
             var oldValue = model.observableString();
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString("nope");
             expect(el.textContent).toEqual(oldValue);
         });
@@ -111,7 +111,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeVisible();
         });
 
@@ -122,7 +122,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeVisible();
         });
 
@@ -133,7 +133,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeVisible();
         });
 
@@ -144,7 +144,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeVisible();
 
             // should reflect property changes
@@ -152,7 +152,7 @@ describe('Directives', () => {
             expect($(el)).toBeHidden();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(true);
             expect($(el)).toBeHidden();
         });
@@ -165,14 +165,14 @@ describe('Directives', () => {
             model["changed"] = model.observableBool.changed;
 
             expect($(el)).toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             // should reflect property changes
             model.observableBool(false);
             expect($(el)).toBeHidden();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(true);
             expect($(el)).toBeHidden();
         });
@@ -184,9 +184,9 @@ describe('Directives', () => {
             var model = createModel();
 
             // configure handler
-            var domService = xi.injector.resolve<xi.IDomService>(xi.res.domService);
+            var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
             var handler = domService.getDirective("visible");
-            var handlerOptions: xi.IVisibleDirectiveOptions = { useCssClass: true, hiddenClass: 'hidden' };
+            var handlerOptions: wx.IVisibleDirectiveOptions = { useCssClass: true, hiddenClass: 'hidden' };
             handler.configure(handlerOptions);
 
             var disp = Rx.Disposable.create(() => {
@@ -194,9 +194,9 @@ describe('Directives', () => {
                 handler.configure(handlerOptions);
             });
 
-            xi.using(disp, () => {
+            wx.using(disp, () => {
                 expect($(el)).not.toHaveClass("hidden");
-                expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+                expect(() => wx.applyDirectives(model, el)).not.toThrowError();
                 expect($(el)).not.toHaveClass("hidden");
 
                 // should reflect property changes
@@ -206,7 +206,7 @@ describe('Directives', () => {
                 expect($(el)).not.toHaveClass("hidden");
 
                 // binding should stop updating after getting disposed
-                xi.cleanNode(el);
+                wx.cleanNode(el);
                 model.observableBool(false);
                 expect($(el)).not.toHaveClass("hidden");
             });
@@ -221,7 +221,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).not.toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeVisible();
         });
 
@@ -232,7 +232,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).not.toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeVisible();
         });
 
@@ -243,7 +243,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).not.toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeVisible();
         });
 
@@ -254,7 +254,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).not.toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeVisible();
 
             // should reflect property changes
@@ -262,7 +262,7 @@ describe('Directives', () => {
             expect($(el)).not.toBeHidden();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(true);
             expect($(el)).not.toBeHidden();
         });
@@ -275,14 +275,14 @@ describe('Directives', () => {
             model["changed"] = model.observableBool.changed;
 
             expect($(el)).not.toBeHidden();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             // should reflect property changes
             model.observableBool(false);
             expect($(el)).not.toBeHidden();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(true);
             expect($(el)).not.toBeHidden();
         });
@@ -294,9 +294,9 @@ describe('Directives', () => {
             var model = createModel();
 
             // configure handler
-            var domService = xi.injector.resolve<xi.IDomService>(xi.res.domService);
+            var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
             var handler = domService.getDirective("hidden");
-            var handlerOptions: xi.IVisibleDirectiveOptions = { useCssClass: true, hiddenClass: 'hidden' };
+            var handlerOptions: wx.IVisibleDirectiveOptions = { useCssClass: true, hiddenClass: 'hidden' };
             handler.configure(handlerOptions);
 
             var disp = Rx.Disposable.create(() => {
@@ -304,9 +304,9 @@ describe('Directives', () => {
                 handler.configure(handlerOptions);
             });
 
-            xi.using(disp, () => {
+            wx.using(disp, () => {
                 expect($(el)).toHaveClass("hidden");
-                expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+                expect(() => wx.applyDirectives(model, el)).not.toThrowError();
                 expect($(el)).toHaveClass("hidden");
 
                 // should reflect property changes
@@ -316,7 +316,7 @@ describe('Directives', () => {
                 expect($(el)).toHaveClass("hidden");
 
                 // binding should stop updating after getting disposed
-                xi.cleanNode(el);
+                wx.cleanNode(el);
                 model.observableBool(false);
                 expect($(el)).toHaveClass("hidden");
             });
@@ -331,7 +331,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeDisabled();
         });
 
@@ -342,7 +342,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeDisabled();
         });
 
@@ -353,7 +353,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeDisabled();
         });
 
@@ -364,7 +364,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).not.toBeDisabled();
 
             // should reflect property changes
@@ -374,7 +374,7 @@ describe('Directives', () => {
             expect($(el)).not.toBeDisabled();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(false);
             expect($(el)).not.toBeDisabled();
         });
@@ -387,7 +387,7 @@ describe('Directives', () => {
             model["changed"] = model.observableBool.changed;
 
             expect($(el)).toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             // should reflect property changes
             model.observableBool(false);
@@ -396,7 +396,7 @@ describe('Directives', () => {
             expect($(el)).not.toBeDisabled();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(false);
             expect($(el)).not.toBeDisabled();
         });
@@ -410,7 +410,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).not.toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeDisabled();
         });
 
@@ -421,7 +421,7 @@ describe('Directives', () => {
             var model = {};
 
             expect($(el)).not.toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeDisabled();
         });
 
@@ -432,7 +432,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).not.toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeDisabled();
         });
 
@@ -443,7 +443,7 @@ describe('Directives', () => {
             var model = createModel();
 
             expect($(el)).not.toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect($(el)).toBeDisabled();
 
             // should reflect property changes
@@ -453,7 +453,7 @@ describe('Directives', () => {
             expect($(el)).toBeDisabled();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(false);
             expect($(el)).toBeDisabled();
         });
@@ -466,7 +466,7 @@ describe('Directives', () => {
             model["changed"] = model.observableBool.changed;
 
             expect($(el)).not.toBeDisabled();
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             // should reflect property changes
             model.observableBool(false);
@@ -475,7 +475,7 @@ describe('Directives', () => {
             expect($(el)).toBeDisabled();
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableBool(false);
             expect($(el)).toBeDisabled();
         });
@@ -489,7 +489,7 @@ describe('Directives', () => {
             var model = {};
 
             expect(el.innerHTML).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.innerHTML).toEqual('<span>bla</span>');
         });
 
@@ -501,7 +501,7 @@ describe('Directives', () => {
             model.constantString = '<span>bla</span>';
 
             expect(el.innerHTML).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.innerHTML).toEqual(model.constantString);
         });
 
@@ -513,7 +513,7 @@ describe('Directives', () => {
             model.observableString('<span>bla</span>');
 
             expect(el.innerHTML).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.innerHTML).toEqual(model.observableString());
 
             // should reflect property changes
@@ -522,7 +522,7 @@ describe('Directives', () => {
 
             // binding should stop updating after getting disposed
             var oldValue = model.observableString();
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString("nope");
             expect(el.innerHTML).toEqual(oldValue);
         });
@@ -536,7 +536,7 @@ describe('Directives', () => {
             model["changed"] = model.observableString.changed;
 
             expect(el.innerHTML).toEqual('invalid');
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             // should reflect property changes
             model.observableString("magic");
@@ -544,7 +544,7 @@ describe('Directives', () => {
 
             // binding should stop updating after getting disposed
             var oldValue = model.observableString();
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             model.observableString("nope");
             expect(el.innerHTML).toEqual(oldValue);
         });

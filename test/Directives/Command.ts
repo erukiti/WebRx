@@ -3,10 +3,10 @@
 /// <reference path="../../build/xircular.d.ts" />
 
 function createCommandModel(commandAction: (any) => void) {
-    var canExecute = xi.property(false);
+    var canExecute = wx.property(false);
 
     return {
-        cmd: xi.command(commandAction, canExecute.changed),
+        cmd: wx.command(commandAction, canExecute.changed),
         canExecute: canExecute
     }
 };
@@ -19,7 +19,7 @@ describe('Directives', () => {
             var el = document.querySelector("#command-invalid-binding-target");
             var model = createCommandModel((_) => {});
 
-            expect(() => xi.applyDirectives(model, el)).toThrowError(/Reactive Command/);
+            expect(() => wx.applyDirectives(model, el)).toThrowError(/Reactive Command/);
         });
 
         function commandBindingSmokeTestImpl(sel: string) {
@@ -28,7 +28,7 @@ describe('Directives', () => {
             var model = createCommandModel((_) => executed = true);
 
             // canExecute tests
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
             expect(el.disabled).toBeTruthy();
             model.canExecute(true);
             expect(el.disabled).toBeFalsy();
@@ -38,7 +38,7 @@ describe('Directives', () => {
             expect(executed).toBeTruthy();
 
             // disposed tests
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             executed = false;
             model.canExecute(false);
             expect(el.disabled).toBeFalsy();

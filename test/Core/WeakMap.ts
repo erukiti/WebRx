@@ -3,7 +3,7 @@
 
 describe("WeakMap",() => {
     function crudSmokeTestImpl(forceEmulated: boolean) {
-        var wm = xi.weakmap<String, Object>(forceEmulated);
+        var wm = wx.weakmap<String, Object>(forceEmulated);
 
         // set/has/get
         var key = new String("foo");
@@ -19,7 +19,7 @@ describe("WeakMap",() => {
     };
 
     it("emulated: creation",() => {
-        var wm = xi.weakmap<String, Object>(true);
+        var wm = wx.weakmap<String, Object>(true);
         expect(wm).not.toBeNull();
         expect(wm.isEmulatedWeakMap).toBeTruthy();
     });
@@ -30,7 +30,7 @@ describe("WeakMap",() => {
 
     if (typeof WeakMap === "function") {
         it("native: creation",() => {
-            var wm = xi.weakmap<String, Object>();
+            var wm = wx.weakmap<String, Object>();
             expect(wm).not.toBeNull();
             expect(wm.isEmulatedWeakMap).toBeFalsy();
         });

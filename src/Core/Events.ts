@@ -1,6 +1,6 @@
 ﻿/// <reference path="../Interfaces.ts" />
 
-module xi {
+module wx {
     export class PropertyChangedEventArgs implements
         IPropertyChangedEventArgs {
         /// <summary>
@@ -58,10 +58,10 @@ module xi {
 
                         if (action === NotifyCollectionChangedAction.Add || action === NotifyCollectionChangedAction.Remove) {
                             if (changedItems == null)
-                                throw Error("changedItems");
+                                utils.throwError("changedItems");
 
                             if (startingIndex < -1)
-                                throw Error("** xircular: The value of startingIndex must be -1 or greater.");
+                                utils.throwError("the value of startingIndex must be -1 or greater.");
 
                             if (action === NotifyCollectionChangedAction.Add)
                                 result.initializeAdd(changedItems, startingIndex);
@@ -69,12 +69,12 @@ module xi {
                                 result.initializeRemove(changedItems, startingIndex);
                         } else if (action === NotifyCollectionChangedAction.Reset) {
                             if (changedItems != null)
-                                throw Error("** xircular: This constructor can only be used with the Reset action if changedItems is null");
+                                utils.throwError("this constructor can only be used with the Reset action if changedItems is null");
 
                             if (startingIndex !== -1)
-                                throw Error("** xircular: This constructor can only be used with the Reset action if startingIndex is -1");
+                                utils.throwError("this constructor can only be used with the Reset action if startingIndex is -1");
                         } else {
-                            throw Error("** xircular: This constructor can only be used with the Reset, Add, or Remove actions.");
+                            utils.throwError("this constructor can only be used with the Reset, Add, or Remove actions.");
                         }
 
                     } else if (arguments.length === 4) {
@@ -85,14 +85,14 @@ module xi {
                         oldIndex = arguments[3];
 
                         if (action !== NotifyCollectionChangedAction.Move)
-                            throw Error("** xircular: This constructor can only be used with the Move action.");
+                            utils.throwError("this constructor can only be used with the Move action.");
 
                         if (index < -1)
-                            throw Error("** xircular: The value of index must be -1 or greater.");
+                            utils.throwError("the value of index must be -1 or greater.");
 
                         result.initializeMove(changedItems, index, oldIndex);
                     } else {
-                        throw new Error("** xircular: unrecognized overload");
+                        utils.throwError("unrecognized overload");
                     }
                 } else {
                     if (arguments.length === 4) {
@@ -103,7 +103,7 @@ module xi {
                         index = arguments[3];
 
                         if (action !== NotifyCollectionChangedAction.Replace)
-                            throw Error("** xircular: This constructor can only be used with the Replace action.");
+                            utils.throwError("this constructor can only be used with the Replace action.");
 
                         result.initializeReplace([newItem], [oldItem], index);
                     } else {
@@ -120,12 +120,12 @@ module xi {
                             result.initializeRemove(changedItems, index);
                         else if (action === NotifyCollectionChangedAction.Reset) {
                             if (changedItem != null)
-                                throw Error("** xircular: This constructor can only be used with the Reset action if changedItem is null");
+                                utils.throwError("This constructor can only be used with the Reset action if changedItem is null");
 
                             if (index !== -1)
-                                throw Error("** xircular: This constructor can only be used with the Reset action if index is -1");
+                                utils.throwError("This constructor can only be used with the Reset action if index is -1");
                         } else {
-                            throw Error("** xircular: This constructor can only be used with the Reset, Add, or Remove actions.");
+                            utils.throwError("This constructor can only be used with the Reset, Add, or Remove actions.");
                         }
                     }
                 }

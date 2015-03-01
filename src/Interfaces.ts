@@ -1,6 +1,6 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
-module xi {
+module wx {
     export interface IInjector {
         register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): void;
         register(key: string, singleton: boolean, factory: () => any): void;
@@ -414,6 +414,6 @@ module xi {
 
 declare module Rx {
     export interface Observable<T> extends IObservable<T> {
-        toProperty(initialValue?: T): xi.IObservableProperty<T>;
+        toProperty(initialValue?: T): wx.IObservableProperty<T>;
     }
 }

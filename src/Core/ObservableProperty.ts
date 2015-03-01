@@ -6,7 +6,7 @@
 // currently impossible to implement a Typescript interface 
 // with a function signature in a Typescript class.
 
-module xi {
+module wx {
     /**
     * Creates an observable property with an optional default value
     * @param {T} initialValue?

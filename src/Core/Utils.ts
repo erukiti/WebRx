@@ -6,7 +6,7 @@
 * Global helpers in utils namespace
 */
 
-module xi.utils {
+module wx.utils {
     var cssClassNameRegex = /\S+/g;
     var RxObsConstructor = (<any> Rx.Observable); // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 
@@ -53,7 +53,7 @@ module xi.utils {
     }
 
     /**
-    * Determines if target is an instance of a xi.ICommand
+    * Determines if target is an instance of a wx.ICommand
     * @param {any} target
     */
     export function isRxuiCommand(target: any): boolean {
@@ -217,6 +217,15 @@ module xi.utils {
         }
 
         return result;
+    }
+
+    /**
+    * FOR INTERNAL USE ONLY
+    * Throw an error containing the specified description
+    */
+    export function throwError(fmt: string, ...args: any[]): void {
+        var msg = "WebRx: " + formatString(fmt, args);
+        throw new Error(msg);
     }
 
     /**

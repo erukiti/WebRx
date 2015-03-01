@@ -4,7 +4,7 @@
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Core/Resources.ts" />
 
-module xi {
+module wx {
     class DomService implements IDomService {
         constructor(compiler: IExpressionCompiler) {
             this.elementState = weakmap<Node, IDomElementState>();
@@ -15,10 +15,10 @@ module xi {
             rootNode = rootNode || window.document.body;
             
             if (rootNode.nodeType !== 1 || !model)  // && (node.nodeType !== 8))
-                throw new Error("** xircular: First parameter should be your model; second parameter should be a DOM node!");
+                utils.throwError("first parameter should be your model; second parameter should be a DOM node!");
 
             if (this.isNodeBound(rootNode))
-                throw Error("** xircular: An element must not be bound multiple times!");
+                utils.throwError("an element must not be bound multiple times!");
 
             // create element state for root node
             var state: IDomElementState = this.createNewElementState(model);
@@ -47,7 +47,7 @@ module xi {
             rootNode = rootNode || window.document.body;
 
             if (rootNode.nodeType !== 1)  // && (node.nodeType !== 8))
-                throw new Error("** xircular: First parameter should be a DOM node!");
+                utils.throwError("first parameter should be a DOM node!");
 
             this.cleanNodeRecursive(rootNode);
         }
@@ -280,7 +280,7 @@ module xi {
                 state = this.createNewElementState();
                 this.setElementState(node, state);
             } else if (state.isBound) {
-                throw Error("** xircular: An element must not be bound multiple times!");
+                utils.throwError("an element must not be bound multiple times!");
             }
 
             // get definitions from attribute
@@ -296,7 +296,7 @@ module xi {
                     // lookup handler
                     var handler = this.directives[directiveName];
                     if (handler === undefined)
-                        throw new Error(utils.formatString("** xircular: Directive '{0}' has not been registered.", directiveName));
+                        utils.throwError("directive '{0}' has not been registered.", directiveName);
 
                     var options = this.compileDirectiveOptions(directive.value);
 

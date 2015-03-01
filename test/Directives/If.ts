@@ -9,7 +9,7 @@ describe('Directives', () => {
 
             var el = <HTMLElement> document.querySelector("#if-constant-boolean-true");
             var backup = el.innerHTML;
-            expect(() => xi.applyDirectives({}, el)).not.toThrowError();
+            expect(() => wx.applyDirectives({}, el)).not.toThrowError();
             expect(el.innerHTML).toEqual(backup);
         });
 
@@ -18,7 +18,7 @@ describe('Directives', () => {
 
             var el = <HTMLElement> document.querySelector("#if-constant-boolean-false");
             var backup = el.innerHTML;
-            expect(() => xi.applyDirectives({}, el)).not.toThrowError();
+            expect(() => wx.applyDirectives({}, el)).not.toThrowError();
             expect(el.innerHTML).toEqual('');
         });
 
@@ -27,14 +27,14 @@ describe('Directives', () => {
 
             var el = <HTMLElement> document.querySelector("#if-observable-boolean-property");
             var backup = el.innerHTML;
-            var prop = xi.property(true);
-            expect(() => xi.applyDirectives(prop, el)).not.toThrowError();
+            var prop = wx.property(true);
+            expect(() => wx.applyDirectives(prop, el)).not.toThrowError();
             expect(el.innerHTML).toEqual(backup);
             prop(false);
             expect(el.innerHTML).toEqual('');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             prop(true);
             expect(el.innerHTML).toEqual('');
         });
@@ -45,13 +45,13 @@ describe('Directives', () => {
             var el = <HTMLElement> document.querySelector("#if-observable-boolean");
             var backup = el.innerHTML;
             var obs = new Rx.Subject<boolean>();
-            expect(() => xi.applyDirectives(obs, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(obs, el)).not.toThrowError();
             expect(el.innerHTML).toEqual(backup);
             obs.onNext(false);
             expect(el.innerHTML).toEqual('');
 
             // binding should stop updating after getting disposed
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             obs.onNext(true);
             expect(el.innerHTML).toEqual('');
         });
@@ -60,13 +60,13 @@ describe('Directives', () => {
             loadFixtures('templates/Directives/If.html');
 
             var el = <HTMLElement> document.querySelector("#if-observable-boolean-dynamic");
-            var prop = xi.property(true);
-            expect(() => xi.applyDirectives(prop, el)).not.toThrowError();
+            var prop = wx.property(true);
+            expect(() => wx.applyDirectives(prop, el)).not.toThrowError();
             expect($(el).find("span")).toHaveText("foo");
 
             // try it again
-            xi.cleanNode(el);
-            expect(() => xi.applyDirectives(prop, el)).not.toThrowError();
+            wx.cleanNode(el);
+            expect(() => wx.applyDirectives(prop, el)).not.toThrowError();
             expect($(el).find("span").length).toEqual(1);
             expect($(el).find("span")).toHaveText("foo");
         });
@@ -75,12 +75,12 @@ describe('Directives', () => {
             loadFixtures('templates/Directives/If.html');
 
             var model = {
-                show: xi.property(true),
-                cmd: xi.command(() => {})
+                show: wx.property(true),
+                cmd: wx.command(() => {})
             };
 
             var el = <HTMLElement> document.querySelector("#if-observable-boolean-command");
-            expect(() => xi.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
             var count = 0;
             var disp = model.cmd.results.subscribe(x => count++);
@@ -89,7 +89,7 @@ describe('Directives', () => {
             expect(count).toEqual(1);
 
             // try it again
-            xi.cleanNode(el);
+            wx.cleanNode(el);
             $(el).find("button")[0].click(); // command shouldnt fire now
             expect(count).toEqual(1);
             disp.dispose();

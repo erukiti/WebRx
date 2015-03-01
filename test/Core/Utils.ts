@@ -3,91 +3,91 @@
 
 describe("Utils",() => {
     it("isStrictMode should be off for this file",() => {
-        expect(xi.utils.isStrictMode()).toBeFalsy();
+        expect(wx.utils.isStrictMode()).toBeFalsy();
     });
 
     it("isInUnitTest smoke-test",() => {
-        expect(xi.utils.isInUnitTest()).toBeTruthy();
+        expect(wx.utils.isInUnitTest()).toBeTruthy();
     });
 
     it("getOid smoke-test",() => {
         var o1 = new Object();
         var o2 = new Object();
 
-        var id1 = xi.utils.getOid(o1);
-        var id2 = xi.utils.getOid(o2);
+        var id1 = wx.utils.getOid(o1);
+        var id2 = wx.utils.getOid(o2);
 
         expect(typeof id1 === "string").toBeTruthy();
         expect(typeof id2 === "string").toBeTruthy();
         expect(id1).not.toEqual(id2);
 
         // id for same object should always return the same value
-        var id1b = xi.utils.getOid(o1);
+        var id1b = wx.utils.getOid(o1);
         expect(id1).toEqual(id1b);
 
         // should not throw for primitive 
-        expect(() => xi.utils.getOid(1)).not.toThrowError();
-        expect(() => xi.utils.getOid("foo")).not.toThrowError();
-        expect(xi.utils.getOid(1)).toEqual("number:1");
-        expect(xi.utils.getOid("foo")).toEqual("string:foo");
+        expect(() => wx.utils.getOid(1)).not.toThrowError();
+        expect(() => wx.utils.getOid("foo")).not.toThrowError();
+        expect(wx.utils.getOid(1)).toEqual("number:1");
+        expect(wx.utils.getOid("foo")).toEqual("string:foo");
 
         // should not throw for primitive objects
         var n = new Number(1);
         var s = new String("foo");
-        expect(() => xi.utils.getOid(n)).not.toThrowError();
-        expect(() => xi.utils.getOid(s)).not.toThrowError();
+        expect(() => wx.utils.getOid(n)).not.toThrowError();
+        expect(() => wx.utils.getOid(s)).not.toThrowError();
 
         // should work with primitive objects
-        expect(xi.utils.getOid(n)).toEqual(xi.utils.getOid(n));
-        expect(xi.utils.getOid(s)).toEqual(xi.utils.getOid(s));
+        expect(wx.utils.getOid(n)).toEqual(wx.utils.getOid(n));
+        expect(wx.utils.getOid(s)).toEqual(wx.utils.getOid(s));
     });
 
     it("isRxuiProperty smoke-test",() => {
-        expect(xi.utils.isRxuiProperty(1)).toBeFalsy();
-        expect(xi.utils.isRxuiProperty("foo")).toBeFalsy();
-        expect(xi.utils.isRxuiProperty(new String("foo"))).toBeFalsy();
-        expect(xi.utils.isRxuiProperty(new Object())).toBeFalsy();
-        expect(xi.utils.isRxuiProperty(function () { })).toBeFalsy();
+        expect(wx.utils.isRxuiProperty(1)).toBeFalsy();
+        expect(wx.utils.isRxuiProperty("foo")).toBeFalsy();
+        expect(wx.utils.isRxuiProperty(new String("foo"))).toBeFalsy();
+        expect(wx.utils.isRxuiProperty(new Object())).toBeFalsy();
+        expect(wx.utils.isRxuiProperty(function () { })).toBeFalsy();
 
-        expect(xi.utils.isRxuiProperty(xi.property())).toBeTruthy();
-        expect(xi.utils.isRxuiProperty(Rx.Observable.return(1).toProperty())).toBeTruthy();
+        expect(wx.utils.isRxuiProperty(wx.property())).toBeTruthy();
+        expect(wx.utils.isRxuiProperty(Rx.Observable.return(1).toProperty())).toBeTruthy();
     });
 
     it("isRxuiCommand smoke-test",() => {
-        expect(xi.utils.isRxuiCommand(1)).toBeFalsy();
-        expect(xi.utils.isRxuiCommand("foo")).toBeFalsy();
-        expect(xi.utils.isRxuiCommand(new String("foo"))).toBeFalsy();
-        expect(xi.utils.isRxuiCommand(new Object())).toBeFalsy();
-        expect(xi.utils.isRxuiCommand(function () { })).toBeFalsy();
+        expect(wx.utils.isRxuiCommand(1)).toBeFalsy();
+        expect(wx.utils.isRxuiCommand("foo")).toBeFalsy();
+        expect(wx.utils.isRxuiCommand(new String("foo"))).toBeFalsy();
+        expect(wx.utils.isRxuiCommand(new Object())).toBeFalsy();
+        expect(wx.utils.isRxuiCommand(function () { })).toBeFalsy();
 
-        expect(xi.utils.isRxuiCommand(xi.command())).toBeTruthy();
+        expect(wx.utils.isRxuiCommand(wx.command())).toBeTruthy();
     });
 
     it("isRxScheduler smoke-test",() => {
-        expect(xi.utils.isRxScheduler(1)).toBeFalsy();
-        expect(xi.utils.isRxScheduler("foo")).toBeFalsy();
-        expect(xi.utils.isRxScheduler(new String("foo"))).toBeFalsy();
-        expect(xi.utils.isRxScheduler(new Object())).toBeFalsy();
-        expect(xi.utils.isRxScheduler(function () { })).toBeFalsy();
-        expect(xi.utils.isRxScheduler(xi.command())).toBeFalsy();
+        expect(wx.utils.isRxScheduler(1)).toBeFalsy();
+        expect(wx.utils.isRxScheduler("foo")).toBeFalsy();
+        expect(wx.utils.isRxScheduler(new String("foo"))).toBeFalsy();
+        expect(wx.utils.isRxScheduler(new Object())).toBeFalsy();
+        expect(wx.utils.isRxScheduler(function () { })).toBeFalsy();
+        expect(wx.utils.isRxScheduler(wx.command())).toBeFalsy();
 
-        expect(xi.utils.isRxScheduler(Rx.Scheduler.immediate)).toBeTruthy();
-        expect(xi.utils.isRxScheduler(Rx.Scheduler.currentThread)).toBeTruthy();
-        expect(xi.utils.isRxScheduler(new Rx.TestScheduler)).toBeTruthy();
+        expect(wx.utils.isRxScheduler(Rx.Scheduler.immediate)).toBeTruthy();
+        expect(wx.utils.isRxScheduler(Rx.Scheduler.currentThread)).toBeTruthy();
+        expect(wx.utils.isRxScheduler(new Rx.TestScheduler)).toBeTruthy();
     });
 
     it("isRxObservable smoke-test",() => {
-        expect(xi.utils.isRxObservable(1)).toBeFalsy();
-        expect(xi.utils.isRxObservable("foo")).toBeFalsy();
-        expect(xi.utils.isRxObservable(new String("foo"))).toBeFalsy();
-        expect(xi.utils.isRxObservable(new Object())).toBeFalsy();
-        expect(xi.utils.isRxObservable(function () { })).toBeFalsy();
-        expect(xi.utils.isRxObservable(xi.command())).toBeFalsy();
+        expect(wx.utils.isRxObservable(1)).toBeFalsy();
+        expect(wx.utils.isRxObservable("foo")).toBeFalsy();
+        expect(wx.utils.isRxObservable(new String("foo"))).toBeFalsy();
+        expect(wx.utils.isRxObservable(new Object())).toBeFalsy();
+        expect(wx.utils.isRxObservable(function () { })).toBeFalsy();
+        expect(wx.utils.isRxObservable(wx.command())).toBeFalsy();
 
-        expect(xi.utils.isRxObservable(new Rx.Subject<any>())).toBeTruthy();
-        expect(xi.utils.isRxObservable(new Rx.Subject<any>().asObservable())).toBeTruthy();
-        expect(xi.utils.isRxObservable(Rx.Observable.return(true))).toBeTruthy();
-        expect(xi.utils.isRxObservable(Rx.Observable.create(obs=> Rx.Disposable.empty))).toBeTruthy();
+        expect(wx.utils.isRxObservable(new Rx.Subject<any>())).toBeTruthy();
+        expect(wx.utils.isRxObservable(new Rx.Subject<any>().asObservable())).toBeTruthy();
+        expect(wx.utils.isRxObservable(Rx.Observable.return(true))).toBeTruthy();
+        expect(wx.utils.isRxObservable(Rx.Observable.create(obs=> Rx.Disposable.empty))).toBeTruthy();
     });
 
     it("toggleCssClass smoke-test",() => {
@@ -98,10 +98,10 @@ describe("Utils",() => {
 
         // test with single class
         expect($(el)).not.toHaveClass("hidden");
-        xi.utils.toggleCssClass(el, true, "hidden");
+        wx.utils.toggleCssClass(el, true, "hidden");
         expect($(el)).toHaveClass("hidden");
 
-        xi.utils.toggleCssClass(el, false, "hidden");
+        wx.utils.toggleCssClass(el, false, "hidden");
         expect($(el)).not.toHaveClass("hidden");
 
         // everything should be as it was when we began
@@ -109,10 +109,10 @@ describe("Utils",() => {
 
         // test with multiple classes
         expect($(el)).not.toHaveClass("bold italic");
-        xi.utils.toggleCssClass(el, true, "bold", "italic");
+        wx.utils.toggleCssClass(el, true, "bold", "italic");
         expect($(el)).toHaveClass("bold italic");
 
-        xi.utils.toggleCssClass(el, false, "bold", "italic");
+        wx.utils.toggleCssClass(el, false, "bold", "italic");
         expect($(el)).not.toHaveClass("bold italic");
 
         // everything should be as it was when we began

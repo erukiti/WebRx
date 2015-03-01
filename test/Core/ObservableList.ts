@@ -6,29 +6,29 @@
 
 describe("ObservableList", () => {
     it("implements IUnknown", () => {
-        var o = xi.list<TestViewModel>();
-        expect(xi.utils.supportsQueryInterface(o)).toBeTruthy();
+        var o = wx.list<TestViewModel>();
+        expect(wx.utils.supportsQueryInterface(o)).toBeTruthy();
     });
 
     it("count property is not ambiguous", () => {
-        var ObservableList = xi.list<number>();
+        var ObservableList = wx.list<number>();
         expect(0).toEqual(ObservableList.count);
         var list = ObservableList;
         expect(0).toEqual(list.count);
     });
 
     it("shouldn't be read-only",() => {
-        var ObservableList = xi.list<number>();
+        var ObservableList = wx.list<number>();
         expect(ObservableList.isReadOnly).toBeFalsy();
     });
 
     it("indexer is not ambiguous",() => {
-        var ObservableList = xi.list<number>([ 0, 1 ]);
+        var ObservableList = wx.list<number>([ 0, 1 ]);
         expect(0).toEqual(ObservableList.get(0));
     });
 
     it("items added and removed test",() => {
-        var fixture = xi.list<number>();
+        var fixture = wx.list<number>();
         var before_added = new Array<number>();
         var before_removed = new Array<number>();
         var added = new Array<number>();
@@ -61,7 +61,7 @@ describe("ObservableList", () => {
     });
 
     it("collection count changed test",() => {
-        var fixture = xi.list<number>();
+        var fixture = wx.list<number>();
         var before_output = new Array<number>();
         var output = new Array<number>();
 
@@ -84,7 +84,7 @@ describe("ObservableList", () => {
     });
 
     it("collection count changed fires when clearing",() => {
-        var items = xi.list<Object>([new Object()]);
+        var items = wx.list<Object>([new Object()]);
         var countChanged = false;
         items.countChanged.subscribe(_ => { countChanged = true; });
 
@@ -94,31 +94,31 @@ describe("ObservableList", () => {
     });
 
     it("when adding range of null error is thrown",() => {
-        var fixture = xi.list<number>();
+        var fixture = wx.list<number>();
 
         expect(() => fixture.addRange(null)).toThrowError();
     });
 
     it("when removing all of null error is thrown",() => {
-        var fixture = xi.list<number>();
+        var fixture = wx.list<number>();
 
         expect(() => fixture.removeAll(null)).toThrowError();
     });
 
     it("when inserting range of null error is thrown",() => {
-        var fixture = xi.list<number>();
+        var fixture = wx.list<number>();
 
         expect(() => fixture.insertRange(1, null)).toThrowError();
     });
 
     it("when inserting range out of range error is thrown",() => {
-        var fixture = xi.list<number>();
+        var fixture = wx.list<number>();
 
         expect(() => fixture.insertRange(1, [1])).toThrowError();
     });
 
     it("change-tracking should fire notifications",() => {
-        var fixture = xi.list<TestFixture>();
+        var fixture = wx.list<TestFixture>();
         fixture.changeTrackingEnabled = true;
         var before_output = new Array<Tuple<TestFixture, string>>();
         var output = new Array<Tuple<TestFixture, string>>();
@@ -157,7 +157,7 @@ describe("ObservableList", () => {
     });
 
     it("change-tracking should work when adding the same thing more than once",() => {
-        var fixture = xi.list<TestFixture>();
+        var fixture = wx.list<TestFixture>();
         fixture.changeTrackingEnabled = true;
         var output = new Array<Tuple<TestFixture, string>>();
         var item1 = new TestFixture();
@@ -198,7 +198,7 @@ describe("ObservableList", () => {
     });
 
     it("change-tracking should stop when an object is replaced and change-notification is suppressed",() => {
-        var fixture = xi.list<TestFixture>();
+        var fixture = wx.list<TestFixture>();
         fixture.changeTrackingEnabled = true;
 
         var before_output = new Array<Tuple<TestFixture, string>>();
@@ -223,7 +223,7 @@ describe("ObservableList", () => {
         item2.IsNotNullString("FooBar");
         expect(1).toEqual(output.length);
 
-        xi.using(fixture.suppressChangeNotifications(), () => {
+        wx.using(fixture.suppressChangeNotifications(), () => {
             fixture.set(0, item2);
         });
 
@@ -239,7 +239,7 @@ describe("ObservableList", () => {
 
     it("change-tracking items should be tracked even when suppressed",() => {
         var input = new TestFixture();
-        var fixture = xi.list<TestFixture>();
+        var fixture = wx.list<TestFixture>();
         fixture.changeTrackingEnabled = true;
 
         var changes = new Array<Tuple<TestFixture, string>>();
@@ -250,7 +250,7 @@ describe("ObservableList", () => {
         input.IsOnlyOneWord("foo");
         expect(0).toEqual(changes.length);
 
-        xi.using(fixture.suppressChangeNotifications(),() => {
+        wx.using(fixture.suppressChangeNotifications(),() => {
             fixture.add(input);
 
             input.IsOnlyOneWord("bar");
@@ -268,7 +268,7 @@ describe("ObservableList", () => {
     });
 
     it("change-tracking should apply on addRange'd items",() => {
-        var fixture = xi.list<TestFixture>([ new TestFixture() ]);
+        var fixture = wx.list<TestFixture>([ new TestFixture() ]);
         fixture.changeTrackingEnabled = true;
 
         var reset = [];
@@ -304,16 +304,16 @@ describe("ObservableList", () => {
     });
 
     it("sort should actually sort",() => {
-        var fixture = xi.list<number>([5, 1, 3, 2, 4]);
+        var fixture = wx.list<number>([5, 1, 3, 2, 4]);
         fixture.sort((a, b) => a - b);
 
         expect([1, 2, 3, 4, 5]).toEqual(fixture.toArray());
     });
 
     it("collections shouldnt share subscriptions",() => {
-        var fixture1 = xi.list<TestFixture>();
+        var fixture1 = wx.list<TestFixture>();
         fixture1.changeTrackingEnabled = true;
-        var fixture2 = xi.list<TestFixture>();
+        var fixture2 = wx.list<TestFixture>();
         fixture2.changeTrackingEnabled = true;
         var item1 = new TestFixture();
         item1.IsOnlyOneWord("Foo");
@@ -345,7 +345,7 @@ describe("ObservableList", () => {
     });
 
     it("get a reset when adding a lot of items",() => {
-        var fixture = xi.list<number>([1]);
+        var fixture = wx.list<number>([1]);
 
         var reset = [];
         fixture.shouldReset.subscribe(x => {
@@ -358,9 +358,9 @@ describe("ObservableList", () => {
     });
 
     it("get a range when adding an array of items",() => {
-        var fixture = xi.list<number>([ 1, 2, 3, 4, 5 ]);
+        var fixture = wx.list<number>([ 1, 2, 3, 4, 5 ]);
 
-        var changed = new Array<xi.INotifyCollectionChangedEventArgs>();
+        var changed = new Array<wx.INotifyCollectionChangedEventArgs>();
         fixture.collectionChanged.subscribe(x => {
             changed.push(x);
         });
@@ -369,7 +369,7 @@ describe("ObservableList", () => {
 
         fixture.addRange([ 6, 7 ]);
         expect(1).toEqual(changed.length);
-        expect(xi.NotifyCollectionChangedAction.Add).toEqual(changed[0].action);
+        expect(wx.NotifyCollectionChangedAction.Add).toEqual(changed[0].action);
     });
 });
 

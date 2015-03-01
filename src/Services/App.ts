@@ -3,7 +3,7 @@
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Core/Resources.ts" />
 
-module xi {
+module wx {
     export class App {
         /// <summary>
         /// This Observer is signalled whenever an object that has a
@@ -13,7 +13,7 @@ module xi {
         /// </summary>
         public static defaultExceptionHandler: Rx.Observer<Error> = Rx.Observer.create<Error>(ex => {
             if (!utils.isInUnitTest()) {
-                console.log(utils.formatString("** xircular: An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex));
+                console.log(utils.formatString("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex));
             }
         });
 

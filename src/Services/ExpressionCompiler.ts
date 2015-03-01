@@ -5,7 +5,7 @@
 
 "use strict";
 
-module xi {
+module wx {
     module compiler {
         /**
         * Knockout's object-literal parser ported to Typescript
@@ -1193,11 +1193,11 @@ module xi {
             return fn;
         }
 
-        export function getRuntimeHooks(locals: any): xi.ICompiledExpressionRuntimeHooks {
+        export function getRuntimeHooks(locals: any): wx.ICompiledExpressionRuntimeHooks {
             return locals !== undefined ? locals[hookField] : undefined;
         }
 
-        export function setRuntimeHooks(locals: any, hooks: xi.ICompiledExpressionRuntimeHooks): void {
+        export function setRuntimeHooks(locals: any, hooks: wx.ICompiledExpressionRuntimeHooks): void {
             locals[hookField] = hooks;
         }
 

@@ -5,7 +5,7 @@
 * Global helpers in project root namespace
 */
  
-module xi {
+module wx {
     /**
     * Mimics Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception (C# using statement)
     * @param {Rx.IDisposable} disp The resource to dispose after action completes
