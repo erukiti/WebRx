@@ -31,7 +31,7 @@ module wx {
     */
     export function observeObject(target: any, onChanging: boolean = false): Rx.Observable<IPropertyChangedEventArgs> {
         var thrownExceptionsSubject = utils.queryInterface(target, IID.IHandleObservableErrors) ?
-            <Rx.Observer<Error>> <any> (<IHandleObservableErrors> target).thrownExceptions : App.defaultExceptionHandler;
+            <Rx.Observer<Error>> <any> (<IHandleObservableErrors> target).thrownExceptions : app.defaultExceptionHandler;
 
         return Rx.Observable.create<IPropertyChangedEventArgs>(
             (observer: Rx.Observer<IPropertyChangedEventArgs>): Rx.IDisposable => {

@@ -16,9 +16,9 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
             if (node.nodeType !== 1)
-                internal.throwError("Command directive only operates on elements!");
+                internal.throwError("command directive only operates on elements!");
 
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");

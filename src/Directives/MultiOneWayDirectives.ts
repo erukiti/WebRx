@@ -12,7 +12,7 @@ module wx {
        ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
             if (node.nodeType !== 1)
                 internal.throwError("directive only operates on elements!");
 
@@ -63,7 +63,7 @@ module wx {
             return false;
         }
 
-        configure(options): void {
+        public configure(options): void {
             // intentionally left blank
         }
 
@@ -72,7 +72,7 @@ module wx {
 
         protected domService: IDomService;
 
-        private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: IDomElementState) {
+        private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: INodeState) {
             state.disposables.add(obs.subscribe(x => {
                 this.applyValue(el, x, key);
             }));

@@ -7,7 +7,7 @@
 module wx {
     class DomService implements IDomService {
         constructor(compiler: IExpressionCompiler) {
-            this.elementState = weakmap<Node, IDomElementState>();
+            this.elementState = weakmap<Node, INodeState>();
             this.compiler = compiler;
         }
 
@@ -20,16 +20,16 @@ module wx {
             if (this.isNodeBound(rootNode))
                 internal.throwError("an element must not be bound multiple times!");
 
-            // create element state for root node
-            var state: IDomElementState = this.createNewElementState(model);
-            this.setElementState(rootNode, state);
+            // create node state for root node
+            var state: INodeState = this.createNewElementState(model);
+            this.setNodeState(rootNode, state);
 
             // calculate resulting model-context and bind
-            var ctx = this.getModelContext(rootNode);
+            var ctx = this.getDataContext(rootNode);
             this.applyDirectivesRecursive(ctx, rootNode);
         }
 
-        public applyDirectivesToDescendants(ctx: IModelContext, node: Node): void {
+        public applyDirectivesToDescendants(ctx: IDataContext, node: Node): void {
             if (node.hasChildNodes()) {
                 for (var i = 0; i < node.childNodes.length; i++) {
                     var child = node.childNodes[i];
@@ -92,13 +92,33 @@ module wx {
             }
         }
 
-        public getModelContext(node: Node): IModelContext {
-            var models = [];
-            var state: IDomElementState;
+        public getModuleContext(node: Node): IModule {
+            var state: INodeState;
 
             // collect model hierarchy
             while (node) {
-                state = this.getElementState(node);
+                state = this.getNodeState(node);
+
+                if (utils.isNotNull(state)) {
+                    if (utils.isNotNull(state.module)) {
+                        return state.module;
+                    }
+                }
+
+                node = node.parentNode;
+            }
+
+            // default to app
+            return app;
+        }
+
+        public getDataContext(node: Node): IDataContext {
+            var models = [];
+            var state: INodeState;
+
+            // collect model hierarchy
+            while (node) {
+                state = this.getNodeState(node);
 
                 if (utils.isNotNull(state)) {
                     if (utils.isNotNull(state.model)) {
@@ -113,7 +133,7 @@ module wx {
                 return null;
 
             // create context
-            var ctx: IModelContext = {
+            var ctx: IDataContext = {
                 $data: models[0],
                 $root: models[models.length - 1],
                 $parent: models.length > 1 ? models[1] : null,
@@ -129,11 +149,11 @@ module wx {
             return state && state.isBound;
         }
 
-        public setElementState(node: Node, state: IDomElementState): void {
+        public setNodeState(node: Node, state: INodeState): void {
             this.elementState.set(node, state);
         }
 
-        public getElementState(node: Node): IDomElementState {
+        public getNodeState(node: Node): INodeState {
             return this.elementState.get(node);
         }
 
@@ -153,7 +173,7 @@ module wx {
             this.elementState.delete(node);
         }
 
-        public expressionToObservable(exp: ICompiledExpression, ctx: IModelContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
+        public expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
             var captured = new HashSet<Rx.Observable<any>>();
             var locals;
             var result: any;
@@ -167,7 +187,7 @@ module wx {
                 if (evalObs)
                     evalObs.onNext(true);
             } catch (e) {
-                App.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
 
                 return Rx.Observable.return(undefined);
             } 
@@ -208,7 +228,7 @@ module wx {
                         if (evalObs)
                             evalObs.onNext(true);
                     } catch (e) {
-                        App.defaultExceptionHandler.onNext(e);
+                        app.defaultExceptionHandler.onNext(e);
                     }
                 });
 
@@ -226,81 +246,62 @@ module wx {
                 .refCount();
         }
 
-        public registerDirective(name: string, handler: IDirective): void;
-        public registerDirective(name: string, handler: string): void;
-
-        public registerDirective(): void {
-            var args = utils.args2Array(arguments);
-            var name = args.shift();
-            var handler = args.shift();
-
-            if (typeof handler === "string")
-                handler = injector.resolve<IDirective>(handler);
-
-            this.directives[name] = handler;
-        }
-
-        public unregisterDirective(name: string): void {
-            delete this.directives[name];
-        }
-
-        public getDirective(name: string): IDirective {
-            return this.directives[name];
-        }
-
         //////////////////////////////////
         // Implementation
 
         private static directiveAttributeName = "data-bind";
-        private elementState: IWeakMap<Node, IDomElementState>;
+        private elementState: IWeakMap<Node, INodeState>;
         private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
-        private directives: { [name: string]: IDirective } = {};
         private compiler: IExpressionCompiler;
 
         private parserOptions: IExpressionCompilerOptions = {
             disallowFunctionCalls: true
         };
 
-        private createNewElementState(model?: any): IDomElementState {
+        private createNewElementState(model?: any, module?: any): INodeState {
             return {
                 isBound: false,
+                module: module || null,
                 model: model || null,
                 disposables: new Rx.CompositeDisposable()
             };
         }
 
-        private applyDirectivesInternal(ctx: IModelContext, node: Node): boolean {
+        private applyDirectivesInternal(ctx: IDataContext, node: Node, module: IModule): boolean {
             var result = false;
 
             // get or create elment-state
-            var state = this.getElementState(node);
+            var state = this.getNodeState(node);
 
             // create and set if necessary
             if (state === undefined) {
                 state = this.createNewElementState();
-                this.setElementState(node, state);
+                this.setNodeState(node, state);
             } else if (state.isBound) {
                 internal.throwError("an element must not be bound multiple times!");
             }
 
             // get definitions from attribute
-            var directives = this.getDirectives(node);
+            var _directives = this.getDirectives(node);
 
-            if (utils.isNotNull(directives) && directives.length > 0) {
-                var directiveName;
-
-                for (var i = 0; i < directives.length; i++) {
-                    var directive = directives[i];
-                    directiveName = directive.key;
-
-                    // lookup handler
-                    var handler = this.directives[directiveName];
+            if (utils.isNotNull(_directives) && _directives.length > 0) {
+                // lookup handlers
+                var directives = _directives.map(x=> {
+                    var handler = module.getDirective(x.key) || app.getDirective(x.key);
                     if (handler === undefined)
-                        internal.throwError("directive '{0}' has not been registered.", directiveName);
+                        internal.throwError("directive '{0}' has not been registered.", x.key);
 
+                    return { handler: handler, value: x.value };
+                });
+
+                // sort by priority
+                directives.sort((a, b) => (b.handler.priority || 0) - (a.handler.priority || 0));
+
+                for (var i = 0; i < _directives.length; i++) {
+                    var directive = directives[i];
                     var options = this.compileDirectiveOptions(directive.value);
 
-                    if (handler.apply(node, options, ctx, state) === true) {
+                    if (directive.handler.apply(node, options, ctx, state)) {
                         result = true;
                     }
                 }
@@ -339,8 +340,16 @@ module wx {
             return null;
         }
 
-        private applyDirectivesRecursive(ctx: IModelContext, node: Node): void {
-            if (!this.applyDirectivesInternal(ctx, node) && node.hasChildNodes()) {
+        private applyDirectivesRecursive(ctx: IDataContext, node: Node, module?: IModule): void {
+            module = module || this.getModuleContext(node);
+
+            if (!this.applyDirectivesInternal(ctx, node, module) && node.hasChildNodes()) {
+                // module directive might have updated state.module
+                var state = this.getNodeState(node);
+                if (state && state.module)
+                    module = state.module;
+
+                // iterate over descendants
                 for (var i = 0; i < node.childNodes.length; i++) {
                     var child = node.childNodes[i];
 
@@ -348,7 +357,7 @@ module wx {
                     if (child.nodeType !== 1)
                         continue;
 
-                    this.applyDirectivesRecursive(ctx, child);
+                    this.applyDirectivesRecursive(ctx, child, module);
                 }
             }
         }
@@ -370,7 +379,7 @@ module wx {
             this.clearElementState(node);
         }
 
-        private createLocals(captured: HashSet<Rx.Observable<any>>, ctx: IModelContext) {
+        private createLocals(captured: HashSet<Rx.Observable<any>>, ctx: IDataContext) {
             var locals = {};
             var list: IObservableList<any>;
             var prop: IObservableProperty<any>;
@@ -501,7 +510,7 @@ module wx {
     }
 
     /**
-    * Applies directives to the specified node and all of its children using the specified model context.
+    * Applies directives to the specified node and all of its children using the specified data context.
     * @param {any} model The model to bind to
     * @param {Node} rootNode The node to be bound
     */

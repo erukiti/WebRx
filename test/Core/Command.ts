@@ -255,7 +255,7 @@ describe("Command", () => {
             );
 
             var fixture = wx.asyncCommand(canExecute,
-                x => Rx.Observable.return(x * 5).delay(900, wx.App.mainThreadScheduler));
+                x => Rx.Observable.return(x * 5).delay(900, wx.app.mainThreadScheduler));
 
             var calculatedResult = -1;
             var latestcanExecute = false;

@@ -37,14 +37,14 @@ module testutils {
     /// schedulers.</returns>
     function _withScheduler<T extends Rx.IScheduler>(sched: T): Rx.IDisposable {
         //schedGate.WaitOne();
-        var prevDef = wx.App.mainThreadScheduler;
+        var prevDef = wx.app.mainThreadScheduler;
         //var prevTask = wx.wx.App.taskpoolScheduler;
 
-        wx.App.mainThreadScheduler = sched;
+        wx.app.mainThreadScheduler = sched;
         //wx.wx.App.TaskpoolScheduler = sched;
 
         return Rx.Disposable.create(() => {
-            wx.App.mainThreadScheduler = prevDef;
+            wx.app.mainThreadScheduler = prevDef;
             //wx.App.TaskpoolScheduler = prevTask;
             //schedGate.Set();
         });
@@ -88,7 +88,7 @@ module testutils {
     }
 
     export function createModelContext(...models: any[]) {
-        var ctx: wx.IModelContext = {
+        var ctx: wx.IDataContext = {
             $data: models[0],
             $root: models[models.length - 1],
             $parent: models.length > 1 ? models[1] : null,

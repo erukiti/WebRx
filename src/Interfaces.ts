@@ -284,7 +284,7 @@ module wx {
         invoke(func: Function, context?: any, locals?: any): any;
     }
 
-    export interface IModelContext {
+    export interface IDataContext {
         $data: any;
         $root: any;
         $parent: any;
@@ -292,8 +292,9 @@ module wx {
         $index: number;
     }
 
-    export interface IDomElementState {
+    export interface INodeState {
         isBound: boolean;   // true of this node has been touched by applyDirectives
+        module?: IModule;   // string  or function or Object identifying current module
         model: any;
         disposables: Rx.CompositeDisposable;
     }
@@ -333,19 +334,19 @@ module wx {
 
     export interface IDomService {
         /**
-        * Applies directives to the specified node and all of its children using the specified model context 
-        * @param {IModelContext} ctx The model context
+        * Applies directives to the specified node and all of its children using the specified data context 
+        * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
         */
         applyDirectives(model: any, rootNode: Node): void;
 
         /**
-        * Applies directives to all the children of the specified node but not the node itself using the specified model context.
+        * Applies directives to all the children of the specified node but not the node itself using the specified data context.
         * You generally want to use this method if you are authoring a new binding handler that handles children.
-        * @param {IModelContext} ctx The model context
+        * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
         */
-        applyDirectivesToDescendants(ctx: IModelContext, rootNode: Node): void;
+        applyDirectivesToDescendants(ctx: IDataContext, rootNode: Node): void;
 
         /**
         * Removes and cleans up any directive-related state from the specified node and its descendants.
@@ -360,33 +361,29 @@ module wx {
         cleanDescendants(rootNode: Node): void;
 
         /**
-        * Stores updated element state for the specified node
+        * Stores updated state for the specified node
         * @param {Node} node The target node
-        * @param {IBindingState} state The updated element state
+        * @param {IBindingState} state The updated node state
         */
-        setElementState(node: Node, state: IDomElementState): void;
+        setNodeState(node: Node, state: INodeState): void;
 
         /**
-        * Retrives the current element state for the specified node
+        * Retrieves the current node state for the specified node
         * @param {Node} node The target node
         */
-        getElementState(node: Node): IDomElementState;
+        getNodeState(node: Node): INodeState;
 
         /**
-        * Computes the actual model context starting at the specified node
+        * Computes the actual data context starting at the specified node
         * @param {Node} node The node to be bound
-        * @return {IModelContext} ctx The model context to evaluate the expression against
+        * @return {IDataContext} The data context to evaluate the expression against
         */
-        getModelContext(node: Node): IModelContext;
+        getDataContext(node: Node): IDataContext;
 
         isNodeBound(node: Node): boolean;
         clearElementState(node: Node);
         getDirectives(node: Node): Array<IObjectLiteralToken>;
         compileDirectiveOptions(value: string): any;
-        registerDirective(name: string, handler: IDirective): void;
-        registerDirective(name: string, handler: string): void;
-        unregisterDirective(name: string): void;
-        getDirective(name: string): IDirective;
 
         /**
         * Creates an observable that produces values representing the result of the expression.
@@ -394,9 +391,9 @@ module wx {
         * and the observable produces a new value.
         * @param {IExpressionFunc} exp The source expression 
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-        * @return {IModelContext} ctx The model context to evaluate the expression against
+        * @return {IDataContext} The data context to evaluate the expression against
         */
-        expressionToObservable(exp: ICompiledExpression, ctx: IModelContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
+        expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
     }
 
     export interface IDirective {
@@ -404,17 +401,51 @@ module wx {
         * Applies the directive to the specified element
         * @param {Node} node The target node
         * @param {any} options The options for the handler
-        * @param {IModelContext} ctx The curent model context
+        * @param {IDataContext} ctx The curent data context
         * @param {IDomElementState} state State of the target element
         * @return {boolean} Returns true if the directive will process descendants of the target element and processing should stop here.
         */
-        apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean;
+        apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean;
 
         /**
         * Configures the handler using a handler-specific options object
         * @param {any} options The handler-specific options 
         */
         configure(options: any): void;
+
+        /**
+        * When there are multiple directives defined on a single DOM element, 
+        * sometimes it is necessary to specify the order in which the directives are applied. 
+        */
+        priority?: number;
+    }
+
+    export interface IDirectiveRegistry {
+        registerDirective(name: string, handler: IDirective): void;
+        registerDirective(name: string, handler: string): void;
+        unregisterDirective(name: string): void;
+        getDirective(name: string): IDirective;
+    }
+
+    export interface IComponent {
+    }
+
+    export interface IComponentRegistry {
+        registerComponent(name: string, handler: IComponent): void;
+        registerComponent(name: string, handler: string): void;
+        unregisterComponent(name: string): void;
+        getComponent(name: string): IComponent;
+    }
+
+    export interface IModule extends
+        IComponentRegistry,
+        IDirectiveRegistry {
+        name: string;
+    }
+
+    export interface IWebRxApp extends IModule {
+        defaultExceptionHandler: Rx.Observer<Error>;
+        mainThreadScheduler: Rx.IScheduler;
     }
 }
 

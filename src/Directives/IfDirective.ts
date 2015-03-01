@@ -13,7 +13,7 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
             if (node.nodeType !== 1)
                 internal.throwError("if binding only operates on elements!");
 
@@ -56,9 +56,11 @@ module wx {
             return true;
         }
 
-        configure(options): void {
+        public configure(options): void {
             // intentionally left blank
         }
+
+        public priority = 100;
 
         ////////////////////
         // implementation
@@ -66,7 +68,7 @@ module wx {
         protected inverse: boolean = false;
         protected domService: IDomService;
 
-        protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IModelContext, initialApply: boolean): void {
+        protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext, initialApply: boolean): void {
             var i;
 
             if (initialApply) {

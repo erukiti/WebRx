@@ -1,7 +1,7 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../RTTI/IID.ts" />
 /// <reference path="Utils.ts" />
-/// <reference path="../Services/App.ts" />
+/// <reference path="../Core/Module.ts" />
 
 module wx {
     class Command<T> implements ICommand<T> {
@@ -9,7 +9,7 @@ module wx {
         /// Don't use this directly, use wx.commandXYZ instead
         /// </summary>
         constructor(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, scheduler: Rx.IScheduler = null) {
-            this.scheduler = scheduler || App.mainThreadScheduler;
+            this.scheduler = scheduler || app.mainThreadScheduler;
             this.func = executeAsync;
 
             // setup canExecute
@@ -33,7 +33,7 @@ module wx {
             this.thrownExceptions = this.exceptionsSubject.asObservable();
             this.exceptionsSubject
                 .observeOn(this.scheduler)
-                .subscribe(App.defaultExceptionHandler);
+                .subscribe(app.defaultExceptionHandler);
         }
 
         ////////////////////

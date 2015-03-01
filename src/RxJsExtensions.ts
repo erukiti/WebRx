@@ -62,7 +62,7 @@ module wx {
         // implementation
 
         var firedInitial = false;
-        accessor.thrownExceptions = Rx.Subject.create(App.defaultExceptionHandler);
+        accessor.thrownExceptions = Rx.Subject.create(app.defaultExceptionHandler);
 
         accessor.sub = this
             //.startWith(initialValue)

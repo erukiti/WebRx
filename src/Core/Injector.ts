@@ -6,6 +6,9 @@ module wx {
     * Simple IoC & Service Locator
     */
     class Injector implements IInjector {
+        //////////////////////////////////
+        // IInjector implementation
+
         public register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): void;
         public register(key: string, singleton: boolean, factory: () => any): void;
         public register(key: string, instance: any): void;
@@ -96,6 +99,9 @@ module wx {
 
             return result;
         }
+
+        //////////////////////////////////
+        // Implementation
 
         private registrations: { [exp: string]: { factory: (deps) => any; isSingleton: boolean; value?: any } } = {};
     }

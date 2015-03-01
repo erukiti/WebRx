@@ -119,7 +119,7 @@ describe('DomService',() => {
     });
 
     describe('expressionToObservable',() => {
-        it('correctly maps model context to locals',() => {
+        it('correctly maps data context to locals',() => {
             var def = "{ ctx: { data: $data, root: $root, parent: $parent, parents: $parents, index: $index } }";
             var compiled: any;
             var model: any = {

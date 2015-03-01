@@ -185,7 +185,7 @@ describe('Directives', () => {
 
             // configure handler
             var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
-            var handler = domService.getDirective("visible");
+            var handler = wx.app.getDirective("visible");
             var handlerOptions: wx.IVisibleDirectiveOptions = { useCssClass: true, hiddenClass: 'hidden' };
             handler.configure(handlerOptions);
 
@@ -295,7 +295,7 @@ describe('Directives', () => {
 
             // configure handler
             var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
-            var handler = domService.getDirective("hidden");
+            var handler = wx.app.getDirective("hidden");
             var handlerOptions: wx.IVisibleDirectiveOptions = { useCssClass: true, hiddenClass: 'hidden' };
             handler.configure(handlerOptions);
 

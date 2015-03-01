@@ -12,7 +12,7 @@ module wx {
       ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
             if (node.nodeType !== 1)
                 internal.throwError("directive only operates on elements!");
 
