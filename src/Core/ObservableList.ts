@@ -176,7 +176,7 @@ module wx {
                     }
                 }
                 // range notification
-                else if (true) /* if (XiApp.SupportsRangeNotifications) */
+                else if (true) /* if (wx.App.SupportsRangeNotifications) */
                 {
                     var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, <Array<any>> <any> items, this.inner.length /*we are appending a range*/);
 
@@ -236,7 +236,7 @@ module wx {
                     }
                 }
                 // range notification
-                else if (true) /* if (XiApp.SupportsRangeNotifications) */
+                else if (true) /* if (wx.App.SupportsRangeNotifications) */
                 {
                     var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, <Array<any>> <any> items, this.inner.length /*we are appending a range*/);
 
@@ -305,7 +305,7 @@ module wx {
                     }
                 }
                 // range notification
-                else if (true) /* if (XiApp.SupportsRangeNotifications) */
+                else if (true) /* if (wx.App.SupportsRangeNotifications) */
                 {
                     var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Remove, <Array<any>> <any> items, index);
 
@@ -450,7 +450,7 @@ module wx {
         private _itemChanged: Rx.Observable<IPropertyChangedEventArgs>;
 
         private setupRx(initialContents: Array<T>, resetChangeThreshold: number = 0.3 /* , scheduler: Rx.IScheduler = null */) {
-            //scheduler = scheduler || XiApp.mainThreadScheduler;
+            //scheduler = scheduler || wx.App.mainThreadScheduler;
 
             this.resetChangeThreshold = resetChangeThreshold;
 

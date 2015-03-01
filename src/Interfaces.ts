@@ -66,7 +66,7 @@ module wx {
     /// this property.
     ///
     /// Normally this Rx.Observable is implemented with a ScheduledSubject whose
-    /// default Observer is XiApp.DefaultExceptionHandler - this means, that if
+    /// default Observer is wx.App.DefaultExceptionHandler - this means, that if
     /// you aren't listening to ThrownExceptions and one appears, the exception
     /// will appear on the UI thread and crash the application.
     /// </summary>

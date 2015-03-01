@@ -157,7 +157,7 @@ module wx {
     * Creates a default Command that has a synchronous action.
     * @param {(any) => void} execute The action to executed when the command gets invoked
     * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
-    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to XiApp.mainThreadScheduler
+    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
     * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
     */
     export function command(execute: (any) => void, canExecute?: Rx.Observable<boolean>, scheduler?: Rx.IScheduler): ICommand<any>;
@@ -165,7 +165,7 @@ module wx {
     /**
     * Creates a default Command that has no background action.
     * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
-    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to XiApp.mainThreadScheduler
+    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
     * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
     */
     export function command(canExecute?: Rx.Observable<boolean>, scheduler?: Rx.IScheduler): ICommand<any>;
@@ -207,7 +207,7 @@ module wx {
     * Creates a Command typed to the given executeAsync Observable method. Use this method if your background method returns Rx.IObservable
     * @param {(any) => Rx.Observable<T>} executeAsync Method to call that creates an Observable representing an operation to execute in the background. The Command's canExecute will be false until this Observable completes. If this Observable terminates with OnError, the Exception is marshaled to ThrownExceptions
     * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
-    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to XiApp.mainThreadScheduler
+    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
     * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
     */
     export function asyncCommand<T>(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>,
@@ -216,7 +216,7 @@ module wx {
     /**
     * Creates a Command typed to the given executeAsync Observable method. Use this method if your background method returns Rx.IObservable
     * @param {(any) => Rx.Observable<T>} executeAsync Method to call that creates an Observable representing an operation to execute in the background. The Command's canExecute will be false until this Observable completes. If this Observable terminates with OnError, the Exception is marshaled to ThrownExceptions
-    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to XiApp.mainThreadScheduler
+    * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
     * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
     */
     export function asyncCommand<T>(executeAsync: (any) => Rx.Observable<T>, scheduler?: Rx.IScheduler): ICommand<T>;

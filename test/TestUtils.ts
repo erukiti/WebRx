@@ -38,14 +38,14 @@ module testutils {
     function _withScheduler<T extends Rx.IScheduler>(sched: T): Rx.IDisposable {
         //schedGate.WaitOne();
         var prevDef = wx.App.mainThreadScheduler;
-        //var prevTask = wx.XiApp.taskpoolScheduler;
+        //var prevTask = wx.wx.App.taskpoolScheduler;
 
         wx.App.mainThreadScheduler = sched;
-        //wx.XiApp.TaskpoolScheduler = sched;
+        //wx.wx.App.TaskpoolScheduler = sched;
 
         return Rx.Disposable.create(() => {
             wx.App.mainThreadScheduler = prevDef;
-            //XiApp.TaskpoolScheduler = prevTask;
+            //wx.App.TaskpoolScheduler = prevTask;
             //schedGate.Set();
         });
     }
