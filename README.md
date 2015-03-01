@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/oliverw/WebRx.png)](https://travis-ci.org/oliverw/WebRx)
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+
+
 # WebRx
 
 **Note**: This project is currently in proof-of-concept state. If you need something usable check back later.
