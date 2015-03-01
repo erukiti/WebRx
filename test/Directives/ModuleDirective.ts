@@ -38,7 +38,7 @@ describe('Directives', () => {
             wx.module("test2").registerDirective("bar", wx.app.getDirective("text"));
 
             var el = document.querySelector("#module-name-nested");
-            var model = { };
+            var model = {};
             expect(() => wx.applyDirectives(model, el)).not.toThrow();
 
             expect($(el).children("#content").text()).toEqual("bar");
