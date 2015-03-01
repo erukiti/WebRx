@@ -1,10 +1,6 @@
 language: node_js
-
 node_js:
-  - '^0.8'
-
-before_script:
-  - 'npm install -g bower grunt-cli karma'
-  - 'bower install'
-
-script: grunt tests
+  - "^0.8"
+before_install: npm install grunt-cli
+install: npm install
+before_script: grunt tests
