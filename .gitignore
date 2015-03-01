@@ -1,0 +1,15 @@
+*.suo
+*.user
+*.sln.docstates
+vs/bin
+vs/build
+vs/obj
+node_modules
+build
+dist
+.ntvs_analysis.dat*
+src/.baseDir.ts
+.tscache
+.grunt
+npm-debug.log
+_SpecRunner.html

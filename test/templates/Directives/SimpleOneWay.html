@@ -1,0 +1,43 @@
+﻿<style>
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div id="text-constant-string" data-bind="text: 'foo'">invalid</div>
+<div id="text-constant-numeric" data-bind="text: 42">invalid</div>
+<div id="text-constant-boolean" data-bind="text: true">invalid</div>
+<div id="text-non-observable-model-property" data-bind="text: constantString">invalid</div>
+<div id="text-observable-model-property" data-bind="text: observableString">invalid</div>
+<div id="text-observable-model" data-bind="text: changed">invalid</div>
+
+<div id="visible-constant-numeric" style="display: none;" data-bind="visible: 1">invalid</div>
+<div id="visible-constant-boolean" style="display: none;" data-bind="visible: true">invalid</div>
+<div id="visible-non-observable-model-property" style="display: none;" data-bind="visible: constantBool">invalid</div>
+<div id="visible-observable-model-property" style="display: none;" data-bind="visible: observableBool">invalid</div>
+<div id="visible-observable-model" style="display: none;" data-bind="visible: changed">invalid</div>
+<div id="visible-observable-model-property-css" data-bind="visible: observableBool">invalid</div>
+
+<div id="hidden-constant-numeric" data-bind="hidden: 1">invalid</div>
+<div id="hidden-constant-boolean" data-bind="hidden: true">invalid</div>
+<div id="hidden-non-observable-model-property" data-bind="hidden: constantBool">invalid</div>
+<div id="hidden-observable-model-property" data-bind="hidden: observableBool">invalid</div>
+<div id="hidden-observable-model" data-bind="hidden: changed">invalid</div>
+<div id="hidden-observable-model-property-css" class="hidden" data-bind="hidden: observableBool">invalid</div>
+
+<div id="html-constant-string" data-bind="html: '<span>bla</span>'">invalid</div>
+<div id="html-non-observable-model-property" data-bind="html: constantString">invalid</div>
+<div id="html-observable-model-property" data-bind="html: observableString">invalid</div>
+<div id="html-observable-model" data-bind="html: changed">invalid</div>
+
+<button id="enabled-constant-numeric" disabled="disabled" data-bind="enabled: 1">Click me</button>
+<button id="enabled-constant-boolean" disabled="disabled" data-bind="enabled: true">Click me</button>
+<button id="enabled-non-observable-model-property" disabled="disabled" data-bind="enabled: constantBool">Click me</button>
+<button id="enabled-observable-model-property" disabled="disabled" data-bind="enabled: observableBool">Click me</button>
+<button id="enabled-observable-model" disabled="disabled" data-bind="enabled: changed">Click me</button>
+
+<button id="disabled-constant-numeric" data-bind="disabled: 1">Click me</button>
+<button id="disabled-constant-boolean" data-bind="disabled: true">Click me</button>
+<button id="disabled-non-observable-model-property" data-bind="disabled: constantBool">Click me</button>
+<button id="disabled-observable-model-property" data-bind="disabled: observableBool">Click me</button>
+<button id="disabled-observable-model" data-bind="disabled: changed">Click me</button>

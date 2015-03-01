@@ -1,0 +1,8 @@
+﻿<div id="stand-alone" data-bind="text: true, css: { baz: 1, zab: 1 }"></div>
+<div id="stand-alone-non-registered" data-bind="texxt: true, css: { baz: 1, zab: 1 }"></div>
+<div id="model-relative" data-bind="text: out, css: { baz: options.declaration }"></div>
+<div id="data-relative" data-bind="text: $data.out, css: { baz: $data.options.declaration }"></div>
+<div id="parent-relative" data-bind="text: $parent.foo, xab: $parent.def(), css: { baz: $parent.bar }"></div>
+<div id="root-relative" data-bind="text: $root.foo, css: { baz: $root.bar }"></div>
+<div id="model-relative-with-parent-property-ref" data-bind="text: parent.foo, css: $data.parent.foo"></div>
+<div id="window-and-model-relative" data-bind="text: navigator.userAgent, css: window.navigator.userAgent, baz: out"></div>
