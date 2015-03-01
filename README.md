@@ -12,7 +12,7 @@ WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/), and [Reactive
 ##### Features
 
 - Extensible data-binding
-- Developers can partition larger projects into smaller units using 'modules' which are very similar to AngularJS's module concept. Using modules is completely optional.
+- Supports partitioning larger projects into 'modules' which are very similar to AngularJS's module concept. Using modules is completely optional.
 - Built-in light-weight dependency injection 
 
 ##### Key differences between WebRx and KnockoutJS
