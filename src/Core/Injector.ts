@@ -18,7 +18,7 @@ module wx {
             var isSingleton = false;
 
             if (this.registrations.hasOwnProperty(key))
-                utils.throwError("'{0}' is already registered", key);
+                internal.throwError("'{0}' is already registered", key);
 
             var val = args.shift();
 
@@ -49,7 +49,7 @@ module wx {
                             try {
                                 return self.resolve(x, deps);
                             } catch (e) {
-                                utils.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
+                                internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                             }
                         });
                     
@@ -71,12 +71,12 @@ module wx {
         public resolve<T>(key: string, deps?: any): T {
             deps = deps || {};
             if (deps.hasOwnProperty(key))
-                utils.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
+                internal.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
 
             // registered?
             var registration = this.registrations[key];
             if (registration === undefined)
-                utils.throwError("'{0}' is not registered", key);
+                internal.throwError("'{0}' is not registered", key);
 
             // already instantiated?
             if (registration.isSingleton && registration.value)

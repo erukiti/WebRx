@@ -15,10 +15,10 @@ module wx {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                utils.throwError("if binding only operates on elements!");
+                internal.throwError("if binding only operates on elements!");
 
             if (utils.isNull(options))
-                utils.throwError("** invalid binding options!");
+                internal.throwError("** invalid binding options!");
 
             var el = <HTMLElement> node;
             var self = this;
@@ -111,7 +111,7 @@ module wx {
         } 
     }
 
-    export module internals {
+    export module internal {
         export var ifDirectiveConstructor = <any> IfDirective;
         export var notifDirectiveConstructor = <any> NotIfDirective;
     }

@@ -14,10 +14,10 @@ module wx {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                utils.throwError("directive only operates on elements!");
+                internal.throwError("directive only operates on elements!");
 
             if (utils.isNull(options))
-                utils.throwError("invalid options for directive!");
+                internal.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
             var self = this;
@@ -56,7 +56,7 @@ module wx {
         protected domService: IDomService;
 
         protected applyValue(el: HTMLElement, value: any): void {
-            utils.throwError("you need to override this method!");
+            internal.throwError("you need to override this method!");
         }
     }
 
@@ -159,7 +159,7 @@ module wx {
         }
     }
 
-    export module internals {
+    export module internal {
         export var textDirectiveConstructor = <any> TextDirective;
         export var htmlDirectiveConstructor = <any> HtmlDirective;
         export var visibleDirectiveConstructor = <any> VisibleDirective;

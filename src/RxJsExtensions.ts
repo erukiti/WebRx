@@ -12,7 +12,7 @@ module wx {
         // initialize accessor function (read-only)
         var accessor: any = (newVal?: any): any => {
             if (arguments.length > 0) {
-                utils.throwError("attempt to write to a read-only observable property");
+                internal.throwError("attempt to write to a read-only observable property");
             }
 
             return accessor.value;

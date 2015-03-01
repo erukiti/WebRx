@@ -149,7 +149,7 @@ module wx {
         private canExecuteDisp: Rx.IDisposable = null;
     }
 
-    export module internals {
+    export module internal {
         export var commandConstructor = <any> Command;
     }
 

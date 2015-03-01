@@ -60,7 +60,7 @@ module wx.utils {
         if (!isNotNull(target))
             return false;
 
-        return target instanceof internals.commandConstructor ||
+        return target instanceof internal.commandConstructor ||
             queryInterface(target, IID.ICommand);
     }
 
@@ -217,15 +217,6 @@ module wx.utils {
         }
 
         return result;
-    }
-
-    /**
-    * FOR INTERNAL USE ONLY
-    * Throw an error containing the specified description
-    */
-    export function throwError(fmt: string, ...args: any[]): void {
-        var msg = "WebRx: " + formatString(fmt, args);
-        throw new Error(msg);
     }
 
     /**

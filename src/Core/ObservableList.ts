@@ -157,7 +157,7 @@ module wx {
 
         public addRange(items: T[]): void {
             if (items == null) {
-                utils.throwError("collection");
+                internal.throwError("collection");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
@@ -213,11 +213,11 @@ module wx {
         
         public insertRange(index: number, items: T[]): void {
             if (items == null) {
-                utils.throwError("collection");
+                internal.throwError("collection");
             }
 
             if (index > this.inner.length) {
-                utils.throwError("index");
+                internal.throwError("index");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
@@ -273,7 +273,7 @@ module wx {
         
         public removeAll(items: T[]): void {
             if (items == null) {
-                utils.throwError("items");
+                internal.throwError("items");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ?

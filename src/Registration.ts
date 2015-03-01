@@ -8,22 +8,22 @@
 /// <reference path="Directives/SimpleOneWay.ts" />
 
 module wx {
-    injector.register(res.expressionCompiler, internals.expressionCompilerConstructor);
+    injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
 
-    injector.register(res.domService, true, true, [res.expressionCompiler, internals.domServiceConstructor]);
+    injector.register(res.domService, true, true, [res.expressionCompiler, internal.domServiceConstructor]);
 
-    injector.register("wx.directives.command", true, true, [res.domService, internals.commandDirectiveConstructor]);
-    injector.register("wx.directives.if", true, true, [res.domService, internals.ifDirectiveConstructor]);
-    injector.register("wx.directives.notif", true, true, [res.domService, internals.notifDirectiveConstructor]);
-    injector.register("wx.directives.css", true, true, [res.domService, internals.cssDirectiveConstructor]);
-    injector.register("wx.directives.attr", true, true, [res.domService, internals.attrDirectiveConstructor]);
-    injector.register("wx.directives.style", true, true, [res.domService, internals.styleDirectiveConstructor]);
-    injector.register("wx.directives.text", true, true, [res.domService, internals.textDirectiveConstructor]);
-    injector.register("wx.directives.html", true, true, [res.domService, internals.htmlDirectiveConstructor]);
-    injector.register("wx.directives.visible", true, true, [res.domService, internals.visibleDirectiveConstructor]);
-    injector.register("wx.directives.hidden", true, true, [res.domService, internals.hiddenDirectiveConstructor]);
-    injector.register("wx.directives.enabled", true, true, [res.domService, internals.enableDirectiveConstructor]);
-    injector.register("wx.directives.disabled", true, true, [res.domService, internals.disableDirectiveConstructor]);
+    injector.register("wx.directives.command", true, true, [res.domService, internal.commandDirectiveConstructor]);
+    injector.register("wx.directives.if", true, true, [res.domService, internal.ifDirectiveConstructor]);
+    injector.register("wx.directives.notif", true, true, [res.domService, internal.notifDirectiveConstructor]);
+    injector.register("wx.directives.css", true, true, [res.domService, internal.cssDirectiveConstructor]);
+    injector.register("wx.directives.attr", true, true, [res.domService, internal.attrDirectiveConstructor]);
+    injector.register("wx.directives.style", true, true, [res.domService, internal.styleDirectiveConstructor]);
+    injector.register("wx.directives.text", true, true, [res.domService, internal.textDirectiveConstructor]);
+    injector.register("wx.directives.html", true, true, [res.domService, internal.htmlDirectiveConstructor]);
+    injector.register("wx.directives.visible", true, true, [res.domService, internal.visibleDirectiveConstructor]);
+    injector.register("wx.directives.hidden", true, true, [res.domService, internal.hiddenDirectiveConstructor]);
+    injector.register("wx.directives.enabled", true, true, [res.domService, internal.enableDirectiveConstructor]);
+    injector.register("wx.directives.disabled", true, true, [res.domService, internal.disableDirectiveConstructor]);
 
     var domService = injector.resolve<IDomService>(res.domService);
 

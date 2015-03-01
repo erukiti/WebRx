@@ -15,10 +15,10 @@ module wx {
             rootNode = rootNode || window.document.body;
             
             if (rootNode.nodeType !== 1 || !model)  // && (node.nodeType !== 8))
-                utils.throwError("first parameter should be your model; second parameter should be a DOM node!");
+                internal.throwError("first parameter should be your model; second parameter should be a DOM node!");
 
             if (this.isNodeBound(rootNode))
-                utils.throwError("an element must not be bound multiple times!");
+                internal.throwError("an element must not be bound multiple times!");
 
             // create element state for root node
             var state: IDomElementState = this.createNewElementState(model);
@@ -47,7 +47,7 @@ module wx {
             rootNode = rootNode || window.document.body;
 
             if (rootNode.nodeType !== 1)  // && (node.nodeType !== 8))
-                utils.throwError("first parameter should be a DOM node!");
+                internal.throwError("first parameter should be a DOM node!");
 
             this.cleanNodeRecursive(rootNode);
         }
@@ -280,7 +280,7 @@ module wx {
                 state = this.createNewElementState();
                 this.setElementState(node, state);
             } else if (state.isBound) {
-                utils.throwError("an element must not be bound multiple times!");
+                internal.throwError("an element must not be bound multiple times!");
             }
 
             // get definitions from attribute
@@ -296,7 +296,7 @@ module wx {
                     // lookup handler
                     var handler = this.directives[directiveName];
                     if (handler === undefined)
-                        utils.throwError("directive '{0}' has not been registered.", directiveName);
+                        internal.throwError("directive '{0}' has not been registered.", directiveName);
 
                     var options = this.compileDirectiveOptions(directive.value);
 
@@ -496,7 +496,7 @@ module wx {
         }
     }
 
-    export module internals {
+    export module internal {
         export var domServiceConstructor = <any> DomService;
     }
 

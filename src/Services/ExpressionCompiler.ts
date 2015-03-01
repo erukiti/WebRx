@@ -1231,7 +1231,7 @@ module wx {
         }
     }
 
-    export module internals {
+    export module internal {
         var exports: IExpressionCompiler = compiler; 
         export var expressionCompilerConstructor = <any> exports;
     }

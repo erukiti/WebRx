@@ -18,10 +18,10 @@ module wx {
 
         public apply(node: Node, options: any, ctx: IModelContext, state: IDomElementState): boolean {
             if (node.nodeType !== 1)
-                utils.throwError("Command directive only operates on elements!");
+                internal.throwError("Command directive only operates on elements!");
 
             if (utils.isNull(options))
-                utils.throwError("invalid options for directive!");
+                internal.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
             var cmd: ICommand<any>;
@@ -51,7 +51,7 @@ module wx {
 
             if (!utils.isRxuiCommand(cmd)) {
                 // value is not a ICommand
-                utils.throwError("Command-Directive only works when bound to a Reactive Command!");
+                internal.throwError("Command-Directive only works when bound to a Reactive Command!");
             } else {
                 // initial update
                 el.disabled = !cmd.canExecute(parameter);
@@ -93,7 +93,7 @@ module wx {
         protected domService: IDomService;
     }
 
-    export module internals {
+    export module internal {
         export var commandDirectiveConstructor = <any> CommandDirective;
     }
 }

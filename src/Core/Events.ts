@@ -58,10 +58,10 @@ module wx {
 
                         if (action === NotifyCollectionChangedAction.Add || action === NotifyCollectionChangedAction.Remove) {
                             if (changedItems == null)
-                                utils.throwError("changedItems");
+                                internal.throwError("changedItems");
 
                             if (startingIndex < -1)
-                                utils.throwError("the value of startingIndex must be -1 or greater.");
+                                internal.throwError("the value of startingIndex must be -1 or greater.");
 
                             if (action === NotifyCollectionChangedAction.Add)
                                 result.initializeAdd(changedItems, startingIndex);
@@ -69,12 +69,12 @@ module wx {
                                 result.initializeRemove(changedItems, startingIndex);
                         } else if (action === NotifyCollectionChangedAction.Reset) {
                             if (changedItems != null)
-                                utils.throwError("this constructor can only be used with the Reset action if changedItems is null");
+                                internal.throwError("this constructor can only be used with the Reset action if changedItems is null");
 
                             if (startingIndex !== -1)
-                                utils.throwError("this constructor can only be used with the Reset action if startingIndex is -1");
+                                internal.throwError("this constructor can only be used with the Reset action if startingIndex is -1");
                         } else {
-                            utils.throwError("this constructor can only be used with the Reset, Add, or Remove actions.");
+                            internal.throwError("this constructor can only be used with the Reset, Add, or Remove actions.");
                         }
 
                     } else if (arguments.length === 4) {
@@ -85,14 +85,14 @@ module wx {
                         oldIndex = arguments[3];
 
                         if (action !== NotifyCollectionChangedAction.Move)
-                            utils.throwError("this constructor can only be used with the Move action.");
+                            internal.throwError("this constructor can only be used with the Move action.");
 
                         if (index < -1)
-                            utils.throwError("the value of index must be -1 or greater.");
+                            internal.throwError("the value of index must be -1 or greater.");
 
                         result.initializeMove(changedItems, index, oldIndex);
                     } else {
-                        utils.throwError("unrecognized overload");
+                        internal.throwError("unrecognized overload");
                     }
                 } else {
                     if (arguments.length === 4) {
@@ -103,7 +103,7 @@ module wx {
                         index = arguments[3];
 
                         if (action !== NotifyCollectionChangedAction.Replace)
-                            utils.throwError("this constructor can only be used with the Replace action.");
+                            internal.throwError("this constructor can only be used with the Replace action.");
 
                         result.initializeReplace([newItem], [oldItem], index);
                     } else {
@@ -120,12 +120,12 @@ module wx {
                             result.initializeRemove(changedItems, index);
                         else if (action === NotifyCollectionChangedAction.Reset) {
                             if (changedItem != null)
-                                utils.throwError("This constructor can only be used with the Reset action if changedItem is null");
+                                internal.throwError("This constructor can only be used with the Reset action if changedItem is null");
 
                             if (index !== -1)
-                                utils.throwError("This constructor can only be used with the Reset action if index is -1");
+                                internal.throwError("This constructor can only be used with the Reset action if index is -1");
                         } else {
-                            utils.throwError("This constructor can only be used with the Reset, Add, or Remove actions.");
+                            internal.throwError("This constructor can only be used with the Reset, Add, or Remove actions.");
                         }
                     }
                 }

@@ -112,4 +112,16 @@ module wx {
 
         return (<Rx.Observable<TRet>> Rx.Observable.combineLatest.apply(this, args));
     }
+
+    export module internal {
+        /**
+        * FOR INTERNAL USE ONLY
+        * Throw an error containing the specified description
+        */
+        export function throwError(fmt: string, ...args: any[]): void {
+            var msg = "WebRx: " + utils.formatString(fmt, args);
+            throw new Error(msg);
+        }
+    }
 }
+
