@@ -9,7 +9,7 @@ module.exports = function (grunt) {
             },
             src: {
                 src: ["src/**/*.ts"],
-                out: "build/xircular.js",
+                out: "build/web.rx.js",
                 options: {
                     declaration: true,
                     fast: "never"
@@ -21,7 +21,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 src: ["src/**/*.ts"],
-                out: "dist/xircular.js",
+                out: "dist/web.rx.js",
                 options: {
                     declaration: true,
                     fast: "never"
@@ -46,7 +46,7 @@ module.exports = function (grunt) {
         
         jasmine: {
             default: {
-                src: 'build/xircular.js',
+                src: 'build/web.rx.js',
                 options: {
                     specs: 'build/test/**/*.js',
                     vendor: [
@@ -84,17 +84,17 @@ module.exports = function (grunt) {
         compress: {
             dist: {
                 options: {
-                    archive: 'dist/xircular.zip'
+                    archive: 'dist/web.rx.zip'
                 },
                 files: [
-                    { expand: true, cwd : "dist/", src: ['xircular.js', 'xircular.min.js', 'xircular.js.map', 'xircular.d.ts'] }
+                    { expand: true, cwd : "dist/", src: ['web.rx.js', 'web.rx.min.js', 'web.rx.js.map', 'web.rx.d.ts'] }
                 ]
             }
         },
         uglify: {
             dist: {
                 files: {
-                    'dist/xircular.min.js': ['dist/xircular.js']
+                    'dist/web.rx.min.js': ['dist/web.rx.js']
                 }
             }
         }
