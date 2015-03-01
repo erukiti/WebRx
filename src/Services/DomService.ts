@@ -15,7 +15,7 @@ module wx {
             rootNode = rootNode || window.document.body;
             
             if (rootNode.nodeType !== 1 || !model)  // && (node.nodeType !== 8))
-                internal.throwError("first parameter should be your model; second parameter should be a DOM node!");
+                internal.throwError("first parameter should be your model, second parameter should be a DOM node!");
 
             if (this.isNodeBound(rootNode))
                 internal.throwError("an element must not be bound multiple times!");

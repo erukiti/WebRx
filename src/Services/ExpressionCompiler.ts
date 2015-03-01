@@ -102,10 +102,13 @@ module wx {
             return result;
         }
     
+
+        /**
+        * Angular's expression compiler ported to Typescript
+        */
+
         var hookField = "___runtimeHooks";
 
-        // Angular environment stuff
-        // ------------------------------
         function noop() {}
 
         // Simplified extend() for our use-case
@@ -137,10 +140,6 @@ module wx {
 
         function lowercase(string) { return typeof string === "string" ? string.toLowerCase() : string; }
 
-        // Simplified forEach() for our use-case
-        //function forEach(arr, iterator) {
-        //    arr.forEach(iterator);
-        //}
 
         // Sandboxing Angular Expressions
         // ------------------------------
@@ -174,7 +173,7 @@ module wx {
         function ensureSafeMemberName(name, fullExpression) {
             if (name === "constructor") {
                 throw $parseMinErr("isecfld",
-                    "Referencing \"constructor\" field in Angular expressions is disallowed! Expression: {0}",
+                    "Referencing \"constructor\" field in WebRx expressions is disallowed! Expression: {0}",
                     fullExpression);
             }
             return name;
@@ -185,17 +184,17 @@ module wx {
             if (obj) {
                 if (obj.constructor === obj) {
                     throw $parseMinErr("isecfn",
-                        "Referencing Function in Angular expressions is disallowed! Expression: {0}",
+                        "Referencing Function in WebRx expressions is disallowed! Expression: {0}",
                         fullExpression);
                 } else if ( // isWindow(obj)
                     obj.document && obj.location && obj.alert && obj.setInterval) {
                     throw $parseMinErr("isecwindow",
-                        "Referencing the Window in Angular expressions is disallowed! Expression: {0}",
+                        "Referencing the Window in WebRx expressions is disallowed! Expression: {0}",
                         fullExpression);
                 } else if ( // isElement(obj)
                     obj.children && (obj.nodeName || (obj.prop && obj.attr && obj.find))) {
                     throw $parseMinErr("isecdom",
-                        "Referencing DOM nodes in Angular expressions is disallowed! Expression: {0}",
+                        "Referencing DOM nodes in WebRx expressions is disallowed! Expression: {0}",
                         fullExpression);
                 }
             }
@@ -600,7 +599,7 @@ module wx {
 
             private throwError(msg, token?) {
                 throw $parseMinErr("syntax",
-                    "Syntax Error: Token '{0}' {1} at column {2} of the expression [{3}] starting at [{4}].",
+                    "WebRx Syntax Error: Token '{0}' {1} at column {2} of the expression [{3}] starting at [{4}].",
                     token.text, msg, (token.index + 1), this.text, this.text.substring(token.index));
             }
 
