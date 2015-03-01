@@ -9,6 +9,14 @@ module wx {
         resolve<T>(key: string): T;
     }
 
+    export interface IWeakMap<TKey extends Object, T> {
+        set(key: TKey, value: T): void;
+        get(key: TKey): T;
+        has(key: TKey): boolean;
+        delete(key: TKey): void;
+        isEmulatedWeakMap: boolean;
+    }
+
     /// <summary>
     /// Represents a collection of objects that can be individually accessed by index.
     /// </summary>

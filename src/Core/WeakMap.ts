@@ -1,13 +1,5 @@
 ﻿
 module wx {
-    export interface IWeakMap<TKey extends Object, T> {
-        set(key: TKey, value: T): void;
-        get(key: TKey): T;
-        has(key: TKey): boolean;
-        delete(key: TKey): void;
-        isEmulatedWeakMap: boolean;
-    }
-
     /**
     * This class emulates the semantics of a WeakMap.
     * Even though this implementation is indeed "weak", it has the drawback of
