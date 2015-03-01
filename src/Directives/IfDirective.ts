@@ -30,14 +30,14 @@ module wx {
             var template = new Array<Node>();
 
             // subscribe
-            state.disposables.add(obs.subscribe(x => {
+            state.cleanup.add(obs.subscribe(x => {
                 self.applyValue(el, x, template, ctx, initialApply);
 
                 initialApply = false;
             }));
 
             // release closure references to GC 
-            state.disposables.add(Rx.Disposable.create(() => {
+            state.cleanup.add(Rx.Disposable.create(() => {
                 // nullify args
                 node = null;
                 options = null;

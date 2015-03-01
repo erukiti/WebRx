@@ -292,11 +292,15 @@ module wx {
         $index: number;
     }
 
+    export interface INodeStateProperties {
+        module?: any;
+        model?: any;
+    }
+
     export interface INodeState {
         isBound: boolean;   // true of this node has been touched by applyDirectives
-        module?: IModule;   // string  or function or Object identifying current module
-        model: any;
-        disposables: Rx.CompositeDisposable;
+        cleanup: Rx.CompositeDisposable;
+        properties: INodeStateProperties;
     }
 
     export interface IObjectLiteralToken {

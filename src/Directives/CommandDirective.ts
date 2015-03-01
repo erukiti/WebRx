@@ -57,18 +57,18 @@ module wx {
                 el.disabled = !cmd.canExecute(parameter);
 
                 // listen to changes
-                state.disposables.add(cmd.canExecuteObservable.subscribe(canExecute => {
+                state.cleanup.add(cmd.canExecuteObservable.subscribe(canExecute => {
                     el.disabled = !canExecute;
                 }));
 
                 // handle click event
-                state.disposables.add(Rx.Observable.fromEvent(el, "click").subscribe(e => {
+                state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(e => {
                     cmd.execute(parameter);
                 }));
             }
 
             // release closure references to GC 
-            state.disposables.add(Rx.Disposable.create(() => {
+            state.cleanup.add(Rx.Disposable.create(() => {
                 // nullify args
                 node = null;
                 options = null;

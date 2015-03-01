@@ -21,7 +21,7 @@ module wx {
                 internal.throwError("an element must not be bound multiple times!");
 
             // create node state for root node
-            var state: INodeState = this.createNewElementState(model);
+            var state: INodeState = this.createNodeState(model);
             this.setNodeState(rootNode, state);
 
             // calculate resulting model-context and bind
@@ -100,8 +100,8 @@ module wx {
                 state = this.getNodeState(node);
 
                 if (utils.isNotNull(state)) {
-                    if (utils.isNotNull(state.module)) {
-                        return state.module;
+                    if (utils.isNotNull(state.properties.module)) {
+                        return state.properties.module;
                     }
                 }
 
@@ -121,8 +121,8 @@ module wx {
                 state = this.getNodeState(node);
 
                 if (utils.isNotNull(state)) {
-                    if (utils.isNotNull(state.model)) {
-                        models.push(state.model);
+                    if (utils.isNotNull(state.properties.model)) {
+                        models.push(state.properties.model);
                     }
                 }
 
@@ -161,12 +161,16 @@ module wx {
             var state = this.elementState.get(node);
 
             if (state) {
-                if (state.disposables) {
-                    state.disposables.dispose();
+                if (state.cleanup) {
+                    state.cleanup.dispose();
                 }
 
-                if (state.model) {
-                    state.model = null;
+                if (state.properties.model) {
+                    state.properties.model = null;
+                }
+
+                if (state.properties.module) {
+                    state.properties.module = null;
                 }
             }
 
@@ -258,12 +262,11 @@ module wx {
             disallowFunctionCalls: true
         };
 
-        private createNewElementState(model?: any, module?: any): INodeState {
+        private createNodeState(model?: any, module?: any): INodeState {
             return {
                 isBound: false,
-                module: module || null,
-                model: model || null,
-                disposables: new Rx.CompositeDisposable()
+                cleanup: new Rx.CompositeDisposable(),
+                properties: { model: model, module: module }
             };
         }
 
@@ -275,7 +278,7 @@ module wx {
 
             // create and set if necessary
             if (state === undefined) {
-                state = this.createNewElementState();
+                state = this.createNodeState();
                 this.setNodeState(node, state);
             } else if (state.isBound) {
                 internal.throwError("an element must not be bound multiple times!");
@@ -346,8 +349,8 @@ module wx {
             if (!this.applyDirectivesInternal(ctx, node, module) && node.hasChildNodes()) {
                 // module directive might have updated state.module
                 var state = this.getNodeState(node);
-                if (state && state.module)
-                    module = state.module;
+                if (state && state.properties && state.properties.module)
+                    module = state.properties.module;
 
                 // iterate over descendants
                 for (var i = 0; i < node.childNodes.length; i++) {

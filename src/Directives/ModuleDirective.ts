@@ -22,15 +22,15 @@ module wx {
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // subscribe
-            state.disposables.add(obs.subscribe(x => {
+            state.cleanup.add(obs.subscribe(x => {
                 if (typeof x === "string")
                     x = module(x);
 
-                state.module = x;
+                state.properties.module = x;
             }));
 
             // release closure references to GC 
-            state.disposables.add(Rx.Disposable.create(() => {
+            state.cleanup.add(Rx.Disposable.create(() => {
                 // nullify args
                 node = null;
                 options = null;

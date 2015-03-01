@@ -45,7 +45,7 @@ module wx {
             }
 
             // release closure references to GC 
-            state.disposables.add(Rx.Disposable.create(() => {
+            state.cleanup.add(Rx.Disposable.create(() => {
                 // nullify args
                 node = null;
                 options = null;
@@ -75,7 +75,7 @@ module wx {
         protected domService: IDomService;
 
         private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: INodeState) {
-            state.disposables.add(obs.subscribe(x => {
+            state.cleanup.add(obs.subscribe(x => {
                 this.applyValue(el, x, key);
             }));
         }
