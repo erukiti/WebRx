@@ -41,8 +41,9 @@ describe('Directives', () => {
             var model = {};
             expect(() => wx.applyDirectives(model, el)).not.toThrow();
 
-            expect($(el).children("#content").text()).toEqual("bar");
+            expect($(el).children("#content1").text()).toEqual("bar");
             expect($("#child-container").children("#content").text()).toEqual("bar");
+            expect($(el).children("#content2").text()).toEqual("baz");
         });
     });
 });

@@ -7,11 +7,14 @@
 </div>
 
 <div id="module-name-nested" data-bind="module: 'test1'">
-    <div id="content" data-bind="foo: 'bar'">invalid</div>
+    <div id="content1" data-bind="foo: 'bar'">invalid</div>
 
     <div id="intermediate">
         <div id="child-container" data-bind="module: 'test2'">
             <div id="content" data-bind="bar: 'bar'">invalid</div>
         </div>
     </div>
+
+    <!-- module 'test1' should be active here, not 'test2' -->
+    <div id="content2" data-bind="foo: 'baz'">invalid</div>
 </div>
