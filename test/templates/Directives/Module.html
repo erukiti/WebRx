@@ -5,3 +5,11 @@
 <div id="module-instance" data-bind="module: module">
     <div id="content" data-bind="foo: 'bar'">invalid</div>
 </div>
+
+<div id="module-name-nested" data-bind="module: 'test1'">
+    <div id="content" data-bind="foo: 'bar'">invalid</div>
+
+    <div id="child-container" data-bind="module: 'test2'">
+        <div id="content" data-bind="bar: 'bar'">invalid</div>
+    </div>
+</div>
