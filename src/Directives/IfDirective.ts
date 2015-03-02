@@ -13,7 +13,7 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("if binding only operates on elements!");
 
@@ -52,8 +52,6 @@ module wx {
                 // nullify locals
                 template = null;
             }));
-
-            return true;
         }
 
         public configure(options): void {
@@ -61,6 +59,7 @@ module wx {
         }
 
         public priority = 50;
+        public terminal = true;
 
         ////////////////////
         // implementation

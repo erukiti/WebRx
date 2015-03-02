@@ -6,6 +6,7 @@
 /// <reference path="Directives/MultiOneWayDirectives.ts" />
 /// <reference path="Directives/SimpleOneWayDirectives.ts" />
 /// <reference path="Core/Module.ts" />
+/// <reference path="Directives/ForEachDirective.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
@@ -25,6 +26,7 @@ module wx {
     injector.register("wx.directives.hidden", true, true, [res.domService, internal.hiddenDirectiveConstructor]);
     injector.register("wx.directives.enabled", true, true, [res.domService, internal.enableDirectiveConstructor]);
     injector.register("wx.directives.disabled", true, true, [res.domService, internal.disableDirectiveConstructor]);
+    injector.register("wx.directives.foreach", true, true, [res.domService, internal.forEachDirectiveConstructor]);
 
     app.registerDirective("module", "wx.directives.module");
     app.registerDirective("css", "wx.directives.css");
@@ -39,4 +41,5 @@ module wx {
     app.registerDirective("hidden", "wx.directives.hidden");
     app.registerDirective("disabled", "wx.directives.disabled");
     app.registerDirective("enabled", "wx.directives.enabled");
+    app.registerDirective("foreach", "wx.directives.foreach");
 }

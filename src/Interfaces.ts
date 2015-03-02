@@ -21,7 +21,7 @@ module wx {
     /// Represents a collection of objects that can be individually accessed by index.
     /// </summary>
     export interface IReadOnlyList<T> {
-        count: number;
+        length: number;
         get(index: number): T;
     }
 
@@ -267,9 +267,15 @@ module wx {
         isEmpty: boolean; //  { get; }
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;
+        move(oldIndex, newIndex): void;
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
         sort(comparison: (a: T, b: T) => number): void;
+        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+        map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
+        filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
+        every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+        some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
         reset(): void;
         toArray(): Array<T>;
     }
@@ -295,6 +301,7 @@ module wx {
     export interface INodeStateProperties {
         module?: any;
         model?: any;
+        index?: any;
     }
 
     export interface INodeState {
@@ -378,6 +385,12 @@ module wx {
         getNodeState(node: Node): INodeState;
 
         /**
+        * Initializes a new node state
+        * @param {any} model The model 
+        */
+        createNodeState(model?: any): INodeState;
+
+        /**
         * Computes the actual data context starting at the specified node
         * @param {Node} node The node to be bound
         * @return {IDataContext} The data context to evaluate the expression against
@@ -407,9 +420,8 @@ module wx {
         * @param {any} options The options for the handler
         * @param {IDataContext} ctx The curent data context
         * @param {IDomElementState} state State of the target element
-        * @return {boolean} Returns true if the directive will process descendants of the target element and processing should stop here.
         */
-        apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean;
+        apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void;
 
         /**
         * Configures the handler using a handler-specific options object
@@ -421,7 +433,14 @@ module wx {
         * When there are multiple directives defined on a single DOM element, 
         * sometimes it is necessary to specify the order in which the directives are applied. 
         */
-        priority?: number;
+        priority: number;
+
+        /**
+        * If set to true then the current priority will be the last set of directives which will 
+        * execute (any directives at the current priority will still execute as the order of 
+        * execution on same priority is undefined).
+        */
+        terminal?: boolean;
     }
 
     export interface IDirectiveRegistry {

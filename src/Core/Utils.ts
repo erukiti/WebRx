@@ -65,6 +65,18 @@ module wx.utils {
     }
 
     /**
+    * Determines if target is an instance of a wx.IObservableList
+    * @param {any} target
+    */
+    export function isList(target: any): boolean {
+        if (!isNotNull(target))
+            return false;
+
+        return target instanceof internal.listConstructor ||
+            queryInterface(target, IID.IObservableList);
+    }
+
+    /**
     * Determines if target is an instance of a Rx.Scheduler
     * @param {any} target
     */

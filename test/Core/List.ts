@@ -4,27 +4,27 @@
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../TestModels.ts" />
 
-describe("ObservableList", () => {
+describe("obsList", () => {
     it("implements IUnknown", () => {
         var o = wx.list<TestViewModel>();
         expect(wx.utils.supportsQueryInterface(o)).toBeTruthy();
     });
 
     it("count property is not ambiguous", () => {
-        var ObservableList = wx.list<number>();
-        expect(0).toEqual(ObservableList.count);
-        var list = ObservableList;
-        expect(0).toEqual(list.count);
+        var obsList = wx.list<number>();
+        expect(0).toEqual(obsList.length);
+        var list = obsList;
+        expect(0).toEqual(obsList.length);
     });
 
     it("shouldn't be read-only",() => {
-        var ObservableList = wx.list<number>();
-        expect(ObservableList.isReadOnly).toBeFalsy();
+        var obsList = wx.list<number>();
+        expect(obsList.isReadOnly).toBeFalsy();
     });
 
     it("indexer is not ambiguous",() => {
-        var ObservableList = wx.list<number>([ 0, 1 ]);
-        expect(0).toEqual(ObservableList.get(0));
+        var obsList = wx.list<number>([ 0, 1 ]);
+        expect(0).toEqual(obsList.get(0));
     });
 
     it("items added and removed test",() => {

@@ -2,6 +2,13 @@
 /// <reference path="../build/web.rx.d.ts" />
 
 class TestViewModel {
+    constructor(foo?: number, bar?: string) {
+        if (foo !== undefined)
+            this.foo(foo);
+        if (bar !== undefined)
+            this.bar(bar);
+    }
+
     foo = wx.property<number>();
     bar = wx.property<string>();
 }

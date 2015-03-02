@@ -12,16 +12,14 @@ module wx {
         }
 
         public applyDirectives(model: any, rootNode: Node): void {
-            rootNode = rootNode || window.document.body;
-            
-            if (rootNode.nodeType !== 1 || !model)  // && (node.nodeType !== 8))
+            if (rootNode === undefined || rootNode.nodeType !== 1 || !model)  // && (node.nodeType !== 8))
                 internal.throwError("first parameter should be your model, second parameter should be a DOM node!");
 
             if (this.isNodeBound(rootNode))
                 internal.throwError("an element must not be bound multiple times!");
 
             // create node state for root node
-            var state: INodeState = this.createNodeState(model);
+            var state: INodeState = this.getNodeState(rootNode) || this.createNodeState(model);
             this.setNodeState(rootNode, state);
 
             // calculate resulting model-context and bind
@@ -44,8 +42,6 @@ module wx {
         }
 
         public cleanNode(rootNode: Node): void {
-            rootNode = rootNode || window.document.body;
-
             if (rootNode.nodeType !== 1)  // && (node.nodeType !== 8))
                 internal.throwError("first parameter should be a DOM node!");
 
@@ -114,11 +110,14 @@ module wx {
 
         public getDataContext(node: Node): IDataContext {
             var models = [];
-            var state: INodeState;
+            var state: INodeState = this.getNodeState(node);
+
+            // remember index present
+            var index = state ? state.properties.index : undefined;
 
             // collect model hierarchy
             while (node) {
-                state = this.getNodeState(node);
+                state = state || this.getNodeState(node);
 
                 if (utils.isNotNull(state)) {
                     if (utils.isNotNull(state.properties.model)) {
@@ -126,6 +125,7 @@ module wx {
                     }
                 }
 
+                state = undefined;
                 node = node.parentNode;
             }
 
@@ -138,10 +138,18 @@ module wx {
                 $root: models[models.length - 1],
                 $parent: models.length > 1 ? models[1] : null,
                 $parents: models.slice(1),
-                $index: undefined
+                $index: index
             };
 
             return ctx;
+        }
+
+        public createNodeState(model?: any, module?: any): INodeState {
+            return {
+                isBound: false,
+                cleanup: new Rx.CompositeDisposable(),
+                properties: { model: model, module: module }
+            };
         }
 
         public isNodeBound(node: Node): boolean {
@@ -262,14 +270,6 @@ module wx {
             disallowFunctionCalls: true
         };
 
-        private createNodeState(model?: any, module?: any): INodeState {
-            return {
-                isBound: false,
-                cleanup: new Rx.CompositeDisposable(),
-                properties: { model: model, module: module }
-            };
-        }
-
         private applyDirectivesInternal(ctx: IDataContext, node: Node, module: IModule): boolean {
             var result = false;
 
@@ -290,7 +290,9 @@ module wx {
             if (utils.isNotNull(_directives) && _directives.length > 0) {
                 // lookup handlers
                 var directives = _directives.map(x=> {
+                    // if handler is not registered with current module, fall-back to 'app' module 
                     var handler = module.getDirective(x.key) || app.getDirective(x.key);
+
                     if (handler === undefined)
                         internal.throwError("directive '{0}' has not been registered.", x.key);
 
@@ -300,14 +302,28 @@ module wx {
                 // sort by priority
                 directives.sort((a, b) => (b.handler.priority || 0) - (a.handler.priority || 0));
 
-                for (var i = 0; i < _directives.length; i++) {
+                // apply all directives
+                var prev: IDirective = undefined;
+
+                for (var i = 0; i < directives.length; i++) {
                     var directive = directives[i];
                     var options = this.compileDirectiveOptions(directive.value);
+                    var handler = directive.handler;
 
-                    if (directive.handler.apply(node, options, ctx, state)) {
+                    // check for early termination
+                    if (prev && prev.terminal && handler.priority < prev.priority) {
                         result = true;
+                        break;
                     }
+
+                    handler.apply(node, options, ctx, state);
+
+                    prev = handler;
                 }
+
+                // account for case where there was just a single terminal directive
+                if (directives.length === 1 && directives[0].handler.terminal)
+                    result = true;
             }
 
             // mark bound

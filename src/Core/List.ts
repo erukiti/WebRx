@@ -151,7 +151,7 @@ module wx {
             }
         }
 
-        public get count(): number {
+        public get length(): number {
             return this.inner.length;
         }
 
@@ -411,8 +411,31 @@ module wx {
             return this.inner[index];
         }
 
-        get isEmpty(): boolean {
+        public get isEmpty(): boolean {
             return this.inner.length === 0;
+        }
+
+        //////////////////////////
+        // Expose some array convenience members
+
+        public forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void {
+            this.inner.forEach(callbackfn, thisArg);
+        }
+
+        public map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] {
+            return this.inner.map(callbackfn, thisArg);
+        }
+
+        public filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] {
+            return this.inner.filter(callbackfn, thisArg);
+        }
+
+        public some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean {
+            return this.inner.some(callbackfn, thisArg);
+        }
+
+        public every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean {
+            return this.inner.every(callbackfn, thisArg);
         }
 
         ////////////////////
@@ -476,12 +499,8 @@ module wx {
             this.beforeItemsMovedSubject = new Lazy<Rx.Subject<IMoveInfo<T>>>(() => new Rx.Subject<IMoveInfo<T>>());
             this.itemsMovedSubject = new Lazy<Rx.Subject<IMoveInfo<T>>>(() => new Rx.Subject<IMoveInfo<T>>());
 
-            // NB: We have to do this instead of initializing this._inner so that
-            // Collection<T>'s accounting is correct
             if (initialContents) {
-                initialContents.forEach(x => {
-                    this.add(x);
-                });
+                Array.prototype.splice.apply(this.inner,(<T[]><any>[0, 0]).concat(initialContents));
             }
         }
 
@@ -523,7 +542,9 @@ module wx {
             if (!this.areChangeNotificationsEnabled()) {
                 this.inner.splice(index, 1);
 
-                if (this.changeTrackingEnabled) this.removeItemFromPropertyTracking(item);
+                if (this.changeTrackingEnabled)
+                    this.removeItemFromPropertyTracking(item);
+
                 return;
             }
 
@@ -688,6 +709,10 @@ module wx {
         movedItems: Array<T>;
         from: number;
         to: number;
+    }
+
+    export module internal {
+        export var listConstructor = <any> ObservableList;
     }
 
     /**

@@ -12,7 +12,7 @@ module wx {
        ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("directive only operates on elements!");
 
@@ -59,8 +59,6 @@ module wx {
                 // nullify locals
                 observables = null;
             }));
-
-            return false;
         }
 
         public configure(options): void {

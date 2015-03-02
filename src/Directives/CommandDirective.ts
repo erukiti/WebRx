@@ -16,7 +16,7 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): boolean {
+        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("command directive only operates on elements!");
 
@@ -82,8 +82,6 @@ module wx {
                 cmd = null;
                 parameter = null;
             }));
-
-            return false;
         }
 
         public configure(options): void {

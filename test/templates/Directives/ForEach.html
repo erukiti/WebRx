@@ -1,0 +1,22 @@
+﻿<div id="foreach-array" data-bind="foreach: src">
+    <span data-bind="text: $data">invalid</span>
+</div>
+<div id="foreach-array-with-index" data-bind="foreach: src">
+    <span data-bind="text: $index">invalid</span>
+</div>
+<div id="foreach-array-inline" data-bind="foreach: [1, 5, 7]">
+    <span data-bind="text: $data">invalid</span>
+</div>
+<div id="foreach-list-scalar" data-bind="foreach: src">
+    <span data-bind="text: $data">invalid</span>
+</div>
+<div id="foreach-list-model" data-bind="foreach: src">
+    <span class="part1" data-bind="text: foo">invalid</span>
+    <span class="part2" data-bind="text: bar">invalid</span>
+    <span class="part3" data-bind="text: (4 + 6) / 2">invalid</span>
+</div>
+<div id="foreach-list-model-with-index" data-bind="foreach: src">
+    <span class="part1" data-bind="text: foo">invalid</span>
+    <span class="part2" data-bind="text: bar">invalid</span>
+    <span class="part3" data-bind="text: $index">invalid</span>
+</div>
