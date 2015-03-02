@@ -13,8 +13,8 @@ describe("ObservableList", () => {
     it("count property is not ambiguous", () => {
         var obsList = wx.list<number>();
         expect(0).toEqual(obsList.length);
-        var list = obsList;
-        expect(0).toEqual(obsList.length);
+        var list = obsList.toArray();
+        expect(0).toEqual(list.length);
     });
 
     it("shouldn't be read-only",() => {
@@ -34,10 +34,10 @@ describe("ObservableList", () => {
         var added = new Array<number>();
         var removed = new Array<number>();
 
-        fixture.beforeItemsAdded.subscribe(x=> before_added.push(x));
-        fixture.beforeItemsRemoved.subscribe(x=> before_removed.push(x));
-        fixture.itemsAdded.subscribe(x=> added.push(x));
-        fixture.itemsRemoved.subscribe(x=> removed.push(x));
+        fixture.beforeItemsAdded.subscribe(x=> before_added.push(x.items[0]));
+        fixture.beforeItemsRemoved.subscribe(x=> before_removed.push(x.items[0]));
+        fixture.itemsAdded.subscribe(x=> added.push(x.items[0]));
+        fixture.itemsRemoved.subscribe(x=> removed.push(x.items[0]));
 
         fixture.add(10);
         fixture.add(20);
@@ -360,7 +360,7 @@ describe("ObservableList", () => {
     it("get a range when adding an array of items",() => {
         var fixture = wx.list<number>([ 1, 2, 3, 4, 5 ]);
 
-        var changed = new Array<wx.INotifyCollectionChangedEventArgs>();
+        var changed = new Array<wx.INotifyListChangedEventArgs>();
         fixture.collectionChanged.subscribe(x => {
             changed.push(x);
         });

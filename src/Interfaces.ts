@@ -59,7 +59,7 @@ module wx {
         Reset,
     }
 
-    export interface INotifyCollectionChangedEventArgs {
+    export interface INotifyListChangedEventArgs {
         action: NotifyCollectionChangedAction;
         newItems: Array<any>;
         newStartingIndex: number;
@@ -87,9 +87,14 @@ module wx {
     }
 
     export interface IMoveInfo<T> {
-        movedItems: Array<T>; // { get; }
+        items: Array<T>; // { get; }
         from: number; // { get; }
         to: number; // { get; }
+    }
+
+    export interface IAddReplaceRemoveInfo<T> {
+        items: T[]; // { get; }
+        index: number; // { get; }
     }
 
     /// <summary>
@@ -178,30 +183,30 @@ module wx {
     /// IReactiveNotifyCollectionChanged of T provides notifications when the contents
     /// of collection are changed (items are added/removed/moved).
     /// </summary>
-    export interface INotifyCollectionChanged<T> {
+    export interface INotifyListChanged<T> {
         /// <summary>
         /// Fires when items are added to the collection, once per item added.
         /// Functions that add multiple items such AddRange should fire this
         /// multiple times. The object provided is the item that was added.
         /// </summary>
-        itemsAdded: Rx.Observable<T>; //  { get; }
+        itemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
 
         /// <summary>
         /// Fires before an item is going to be added to the collection.
         /// </summary>
-        beforeItemsAdded: Rx.Observable<T>; //  { get; }
+        beforeItemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
 
         /// <summary>
         /// Fires once an item has been removed from a collection, providing the
         /// item that was removed.
         /// </summary>
-        itemsRemoved: Rx.Observable<T>; //  { get; }
+        itemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
 
         /// <summary>
         /// Fires before an item will be removed from a collection, providing
         /// the item that will be removed.
         /// </summary>
-        beforeItemsRemoved: Rx.Observable<T>; //  { get; }
+        beforeItemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
 
         /// <summary>
         /// Fires before an items moves from one position in the collection to
@@ -218,16 +223,27 @@ module wx {
         itemsMoved: Rx.Observable<IMoveInfo<T>>; //  { get; }
 
         /// <summary>
+        /// Fires before an item is replaced
+        /// indices.
+        /// </summary>
+        beforeItemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+
+        /// <summary>
+        /// Fires after an item is replaced
+        /// </summary>
+        itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+
+        /// <summary>
         /// This Observable is equivalent to the NotifyCollectionChanged event,
         /// but fires before the collection is changed
         /// </summary>
-        collectionChanging: Rx.Observable<INotifyCollectionChangedEventArgs>; //  { get; }
+        collectionChanging: Rx.Observable<INotifyListChangedEventArgs>; //  { get; }
 
         /// <summary>
         /// This Observable is equivalent to the NotifyCollectionChanged event,
         /// and fires after the collection is changed
         /// </summary>
-        collectionChanged: Rx.Observable<INotifyCollectionChangedEventArgs>; //  { get; }
+        collectionChanged: Rx.Observable<INotifyListChangedEventArgs>; //  { get; }
 
         /// <summary>
         /// Fires when the collection count changes, regardless of reason
@@ -263,7 +279,7 @@ module wx {
     /// IReactiveNotifyPropertyChanged semantically as "Fire when *anything* in
     /// the collection or any of its items have changed, in any way".
     /// </summary>
-    export interface IObservableList<T> extends IList<T>, INotifyCollectionChanged<T>, INotifyCollectionItemChanged {
+    export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyCollectionItemChanged {
         isEmpty: boolean; //  { get; }
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;

@@ -18,7 +18,7 @@ module wx {
     }
 
     export class NotifyCollectionChangedEventArgs implements
-        INotifyCollectionChangedEventArgs {
+        INotifyListChangedEventArgs {
 
         public action: NotifyCollectionChangedAction;
         public newItems: Array<any>;

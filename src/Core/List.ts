@@ -39,32 +39,46 @@ module wx {
             return false;
         }
 
-        public get itemsAdded(): Rx.Observable<T> {
+        public get itemsAdded(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
             if (!this._itemsAdded)
                 this._itemsAdded = this.itemsAddedSubject.value.asObservable();
 
             return this._itemsAdded;
         }
 
-        public get beforeItemsAdded(): Rx.Observable<T> {
+        public get beforeItemsAdded(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
             if (!this._beforeItemsAdded)
                 this._beforeItemsAdded = this.beforeItemsAddedSubject.value.asObservable();
 
             return this._beforeItemsAdded;
         }
 
-        public get itemsRemoved(): Rx.Observable<T> {
+        public get itemsRemoved(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
             if (!this._itemsRemoved)
                 this._itemsRemoved = this.itemsRemovedSubject.value.asObservable();
 
             return this._itemsRemoved;
         }
 
-        public get beforeItemsRemoved(): Rx.Observable<T> {
+        public get beforeItemsRemoved(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
             if (!this._beforeItemsRemoved)
                 this._beforeItemsRemoved = this.beforeItemsRemovedSubject.value.asObservable();
 
             return this._beforeItemsRemoved;
+        }
+
+        public get itemReplaced(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+            if (!this._itemReplaced)
+                this._itemReplaced = this.itemReplacedSubject.value.asObservable();
+
+            return this._itemReplaced;
+        }
+
+        public get beforeItemReplaced(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+            if (!this._beforeItemReplaced)
+                this._beforeItemReplaced = this.beforeItemReplacedSubject.value.asObservable();
+
+            return this._beforeItemReplaced;
         }
 
         public get beforeItemsMoved(): Rx.Observable<IMoveInfo<T>> {
@@ -81,14 +95,14 @@ module wx {
             return this._itemsMoved;
         }
 
-        public get collectionChanging(): Rx.Observable<INotifyCollectionChangedEventArgs> {
+        public get collectionChanging(): Rx.Observable<INotifyListChangedEventArgs> {
             if (!this._collectionChanging)
                 this._collectionChanging = this.changingSubject.asObservable();
 
             return this._collectionChanging;
         }
 
-        public get collectionChanged(): Rx.Observable<INotifyCollectionChangedEventArgs> {
+        public get collectionChanged(): Rx.Observable<INotifyListChangedEventArgs> {
             if (!this._collectionChanged)
                 this._collectionChanged = this.changedSubject.asObservable();
 
@@ -157,7 +171,7 @@ module wx {
 
         public addRange(items: T[]): void {
             if (items == null) {
-                internal.throwError("collection");
+                internal.throwError("items");
             }
 
             var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
@@ -176,25 +190,20 @@ module wx {
                     }
                 }
                 // range notification
-                else if (true) /* if (wx.App.SupportsRangeNotifications) */
-                {
+                else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
                     var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, <Array<any>> <any> items, this.inner.length /*we are appending a range*/);
 
                     this.changingSubject.onNext(ea);
 
                     if (this.beforeItemsAddedSubject.isValueCreated) {
-                        items.forEach(x => {
-                            this.beforeItemsAddedSubject.value.onNext(x);
-                        });
+                        this.beforeItemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
                     }
 
                     Array.prototype.splice.apply(this.inner, (<T[]><any>[this.inner.length, 0]).concat(items));
                     this.changedSubject.onNext(ea);
 
                     if (this.itemsAddedSubject.isValueCreated) {
-                        items.forEach(x => {
-                            this.itemsAddedSubject.value.onNext(x);
-                        });
+                        this.itemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
                     }
 
                     if (this.changeTrackingEnabled) {
@@ -236,15 +245,14 @@ module wx {
                     }
                 }
                 // range notification
-                else if (true) /* if (wx.App.SupportsRangeNotifications) */
-                {
+                else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
                     var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, <Array<any>> <any> items, this.inner.length /*we are appending a range*/);
 
                     this.changingSubject.onNext(ea);
 
                     if (this.beforeItemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.beforeItemsAddedSubject.value.onNext(x);
+                            this.beforeItemsAddedSubject.value.onNext({ items: items, index: index });
                         });
                     }
 
@@ -253,7 +261,7 @@ module wx {
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.itemsAddedSubject.value.onNext(x);
+                            this.itemsAddedSubject.value.onNext({ items: items, index: index });
                         });
                     }
 
@@ -305,15 +313,14 @@ module wx {
                     }
                 }
                 // range notification
-                else if (true) /* if (wx.App.SupportsRangeNotifications) */
-                {
+                else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
                     var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Remove, <Array<any>> <any> items, index);
 
                     this.changingSubject.onNext(ea);
 
                     if (this.beforeItemsRemovedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.beforeItemsRemovedSubject.value.onNext(x);
+                            this.beforeItemsRemovedSubject.value.onNext({ items: items, index: index });
                         });
                     }
 
@@ -328,7 +335,7 @@ module wx {
 
                     if (this.itemsRemovedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.itemsRemovedSubject.value.onNext(x);
+                            this.itemsRemovedSubject.value.onNext({ items: items, index: index });
                         });
                     }
                 } else {
@@ -441,13 +448,15 @@ module wx {
         ////////////////////
         // Implementation
 
-        private changingSubject: Rx.Subject<INotifyCollectionChangedEventArgs>;
-        private changedSubject: Rx.Subject<INotifyCollectionChangedEventArgs>;
+        private changingSubject: Rx.Subject<INotifyListChangedEventArgs>;
+        private changedSubject: Rx.Subject<INotifyListChangedEventArgs>;
         private inner: Array<T>;
-        private beforeItemsAddedSubject: Lazy<Rx.Subject<T>>;
-        private itemsAddedSubject: Lazy<Rx.Subject<T>>;
-        private beforeItemsRemovedSubject: Lazy<Rx.Subject<T>>;
-        private itemsRemovedSubject: Lazy<Rx.Subject<T>>;
+        private beforeItemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
+        private itemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
+        private beforeItemsRemovedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
+        private itemsRemovedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
+        private beforeItemReplacedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
+        private itemReplacedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
         private itemChangingSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
         private itemChangedSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
         private beforeItemsMovedSubject: Lazy<Rx.Subject<IMoveInfo<T>>>;
@@ -459,14 +468,16 @@ module wx {
         private hasWhinedAboutNoResetSub = false;
 
         // backing-fields for subjects exposed as observables
-        private _itemsAdded: Rx.Observable<T>;
-        private _beforeItemsAdded: Rx.Observable<T>;
-        private _itemsRemoved: Rx.Observable<T>;
-        private _beforeItemsRemoved: Rx.Observable<T>;
+        private _itemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>;
+        private _beforeItemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>;
+        private _itemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>;
+        private _beforeItemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>;
         private _beforeItemsMoved: Rx.Observable<IMoveInfo<T>>;
+        private _itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
+        private _beforeItemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
         private _itemsMoved: Rx.Observable<IMoveInfo<T>>;
-        private _collectionChanging: Rx.Observable<INotifyCollectionChangedEventArgs>;
-        private _collectionChanged: Rx.Observable<INotifyCollectionChangedEventArgs>;
+        private _collectionChanging: Rx.Observable<INotifyListChangedEventArgs>;
+        private _collectionChanged: Rx.Observable<INotifyListChangedEventArgs>;
         private _countChanging: Rx.Observable<number>;
         private _countChanged: Rx.Observable<number>;
         private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
@@ -480,13 +491,15 @@ module wx {
             if (this.inner === undefined)
                 this.inner = new Array<T>();
 
-            this.changingSubject = new Rx.Subject<INotifyCollectionChangedEventArgs>();
-            this.changedSubject = new Rx.Subject<INotifyCollectionChangedEventArgs>();
+            this.changingSubject = new Rx.Subject<INotifyListChangedEventArgs>();
+            this.changedSubject = new Rx.Subject<INotifyListChangedEventArgs>();
 
-            this.beforeItemsAddedSubject = new Lazy<Rx.Subject<T>>(() => new Rx.Subject<T>());
-            this.itemsAddedSubject = new Lazy<Rx.Subject<T>>(() => new Rx.Subject<T>());
-            this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<T>>(() => new Rx.Subject<T>());
-            this.itemsRemovedSubject = new Lazy<Rx.Subject<T>>(() => new Rx.Subject<T>());
+            this.beforeItemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.itemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.itemsRemovedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.beforeItemReplacedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.itemReplacedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
 
             this.itemChangingSubject = new Lazy<Rx.ISubject<IPropertyChangedEventArgs>>(() =>
                 <any> new Rx.Subject<IPropertyChangedEventArgs>());
@@ -523,14 +536,14 @@ module wx {
             this.changingSubject.onNext(ea);
 
             if (this.beforeItemsAddedSubject.isValueCreated)
-                this.beforeItemsAddedSubject.value.onNext(item);
+                this.beforeItemsAddedSubject.value.onNext({ items: [item], index: index });
 
             this.inner.splice(index, 0, item);
 
             this.changedSubject.onNext(ea);
 
             if (this.itemsAddedSubject.isValueCreated)
-                this.itemsAddedSubject.value.onNext(item);
+                this.itemsAddedSubject.value.onNext({ items: [item], index: index });
 
             if (this.changeTrackingEnabled)
                 this.addItemToPropertyTracking(item);
@@ -553,14 +566,14 @@ module wx {
             this.changingSubject.onNext(ea);
 
             if (this.beforeItemsRemovedSubject.isValueCreated)
-                this.beforeItemsRemovedSubject.value.onNext(item);
+                this.beforeItemsRemovedSubject.value.onNext({ items: [item], index: index });
 
             this.inner.splice(index, 1);
 
             this.changedSubject.onNext(ea);
 
             if (this.itemsRemovedSubject.isValueCreated)
-                this.itemsRemovedSubject.value.onNext(item);
+                this.itemsRemovedSubject.value.onNext({ items: [item], index: index });
 
             if (this.changeTrackingEnabled)
                 this.removeItemFromPropertyTracking(item);
@@ -606,8 +619,10 @@ module wx {
             }
 
             var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Replace, item, this.inner[index], index);
-
             this.changingSubject.onNext(ea);
+
+            if (this.beforeItemReplacedSubject.isValueCreated)
+                this.beforeItemReplacedSubject.value.onNext({ index: index, items: [item]});
 
             if (this.changeTrackingEnabled) {
                 this.removeItemFromPropertyTracking(this.inner[index]);
@@ -616,6 +631,9 @@ module wx {
 
             this.inner[index] = item;
             this.changedSubject.onNext(ea);
+
+            if (this.itemReplacedSubject.isValueCreated)
+                this.itemReplacedSubject.value.onNext({ index: index, items: [item] });
         }
 
         private clearItems(): void {
@@ -701,12 +719,12 @@ module wx {
 
     class MoveInfo<T> implements IMoveInfo<T> {
         constructor(movedItems: Array<T>, from: number, to: number) {
-            this.movedItems = movedItems;
+            this.items = movedItems;
             this.from = from;
             this.to = to;
         }
 
-        movedItems: Array<T>;
+        items: Array<T>;
         from: number;
         to: number;
     }
