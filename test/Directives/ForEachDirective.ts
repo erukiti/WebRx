@@ -120,31 +120,31 @@ describe('Directives',() => {
             // verify indexes
             expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
 
-            expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
-            expect(parseInt(el.children[1 * templateLength].textContent)).toEqual(list.get(1).foo());
-            expect(parseInt(el.children[2 * templateLength].textContent)).toEqual(list.get(2).foo());
+            //expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
+            //expect(parseInt(el.children[1 * templateLength].textContent)).toEqual(list.get(1).foo());
+            //expect(parseInt(el.children[2 * templateLength].textContent)).toEqual(list.get(2).foo());
 
-            list.move(0, 2);
-            expect(parseInt(el.children[2 * templateLength].textContent)).toEqual(list.get(2).foo());
+            //list.move(0, 2);
+            //expect(parseInt(el.children[2 * templateLength].textContent)).toEqual(list.get(2).foo());
 
-            // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            //// verify indexes
+            //expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
 
-            list.clear();
-            expect(el.children.length).toEqual(0);
+            //list.clear();
+            //expect(el.children.length).toEqual(0);
 
-            list.add(new TestViewModel(42, "magic"));
-            expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
-            expect(el.children[0 * templateLength + 1].textContent).toEqual(list.get(0).bar());
+            //list.add(new TestViewModel(42, "magic"));
+            //expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
+            //expect(el.children[0 * templateLength + 1].textContent).toEqual(list.get(0).bar());
 
-            // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            //// verify indexes
+            //expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
 
-            list.addRange(createTestList().toArray());
-            expect(el.children.length).toEqual(list.length * templateLength);
+            //list.addRange(createTestList().toArray());
+            //expect(el.children.length).toEqual(list.length * templateLength);
 
-            // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            //// verify indexes
+            //expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
         });
 
         it('$index calculation when bound to observable list smoke-test',() => {

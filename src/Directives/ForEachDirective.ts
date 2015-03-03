@@ -144,13 +144,44 @@ module wx {
         ////////////////////
         // implementation
 
+        private removedNodeClass = "wx-deleted";
+        private relevantNodeSelector = utils.formatString(" > :not(.{0})", this.removedNodeClass);
+
         protected domService: IDomService;
 
-        protected createIndexObservableForNode(parent: HTMLElement, child: Node, startIndex: number, trigger: Rx.Observable<any>, templateLength: number): Rx.Observable<number> {
+        protected queryRelevantChildNodes(parent: Element, templateLength: number, indexes: IWeakMap<Node, Rx.Observable<any>>): Array<Node> {
+            var nodes = parent.childNodes;
+            var nodesLength = nodes.length;
+            var result = [];
+
+            // step through parents childs in blocks of template-instances each
+            // check if the first node in the block has its index no longer 
+            // maintained. And if it does not, skip the whole template-instance
+
+            for (var i = 0; i < nodesLength; i+=templateLength) {
+                if (!indexes.has(nodes[i])) {
+                    continue;
+                } else {
+                    for (var j = 0; j < templateLength; j++) {
+                        result.push(nodes[i + j]);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        protected createIndexObservableForNode(parent: HTMLElement, child: Node, startIndex: number,
+            trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
             return Rx.Observable.create<number>(obs => {
-                return trigger.subscribe(x => {
+                return trigger.subscribe(_ => {
+                    var relevantNodes = this.queryRelevantChildNodes(parent, templateLength, indexes);
+
                     // recalculate index from node position within parent
-                    var index = Array.prototype.indexOf.call(parent.childNodes, child);
+                    var index = relevantNodes.indexOf(child);
+
+                    if (index === -1)
+                        console.log(utils.formatString("Nooooo {0} {1}", parent.children.length, relevantNodes.length));
                     index /= templateLength;
 
                     obs.onNext(index);
@@ -166,10 +197,10 @@ module wx {
 
                 if (node.nodeType === 1) {
                     this.domService.cleanNode(node);
-
-                    if (indexes)
-                        indexes.delete(node);
                 }
+
+                if (indexes)
+                    indexes.delete(node);
 
                 el.removeChild(node);
             }            
@@ -202,18 +233,12 @@ module wx {
                 if (hooks)
                     added.push(node);
 
+                if (recalcIndextrigger && !created) {
+                    _index = this.createIndexObservableForNode(el, node, index, recalcIndextrigger, indexes, templateLength);
+                    created = true;
+                }
+
                 if (node.nodeType === 1) {
-                    if (recalcIndextrigger && !created) {
-                        // create index observable
-                        _index = indexes.get(node);
-
-                        if (!_index) {
-                            _index = this.createIndexObservableForNode(el, node, index, recalcIndextrigger, templateLength);
-                            indexes.set(node, _index);
-                            created = true;
-                        }
-                    }
-
                     // propagate index to state
                     var state = this.domService.createNodeState(item);
                     state.properties.index = _index || index;
@@ -222,6 +247,9 @@ module wx {
                     // done
                     this.domService.applyDirectives(item, node);
                 }
+
+                if (recalcIndextrigger)
+                    indexes.set(node, _index);
             }
 
             if (hooks) {
@@ -239,7 +267,8 @@ module wx {
             var created = false;
             var templateLength = template.length;
             var node: Node;
-            var refNode = <Node> el.children[templateLength * index];
+            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
+            var refNode = relevantNodes[templateLength * index];
             var added = [];
 
             for (var i = 0; i < templateLength; i++) {
@@ -250,18 +279,12 @@ module wx {
                 if (hooks)
                     added.push(node);
 
+                if (recalcIndextrigger && !created) {
+                    _index = this.createIndexObservableForNode(el, node, index, recalcIndextrigger, indexes, templateLength);
+                    created = true;
+                }
+
                 if (node.nodeType === 1) {
-                    if (recalcIndextrigger && !created) {
-                        // create index observable
-                        _index = indexes.get(node);
-
-                        if (!_index) {
-                            _index = this.createIndexObservableForNode(el, node, index, recalcIndextrigger, templateLength);
-                            indexes.set(node, _index);
-                            created = true;
-                        }
-                    }
-
                     // propagate index to state
                     var state = this.domService.createNodeState(item);
                     state.properties.index = _index || index;
@@ -270,6 +293,9 @@ module wx {
                     // done
                     this.domService.applyDirectives(item, node);
                 }
+
+                if (recalcIndextrigger)
+                    indexes.set(node, _index);
             }
 
             if (hooks) {
@@ -284,17 +310,18 @@ module wx {
         protected removeRow(el: HTMLElement, index: number, item: any, template: Array<Node>, hooks: IForEachDirectiveHooks,
             recalcIndextrigger: Rx.Subject<any>, indexes: IWeakMap<Node, Rx.Observable<any>>): void {
             var templateLength = template.length;
+            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
             var nodexIndex = index * templateLength;
             var toBeRemoved = [];
 
             for (var i = 0; i < templateLength; i++) {
-                var node = el.childNodes[nodexIndex + i];
+                var node = relevantNodes[nodexIndex + i];
 
                 if (node.nodeType === 1) {
                     this.domService.cleanNode(node);
-                    indexes.delete(node);
                 }
 
+                indexes.delete(node);
                 toBeRemoved.push(node);
             }
 
@@ -310,11 +337,12 @@ module wx {
         protected moveRow(el: HTMLElement, from: number, to: number, item: any, template: Array<Node>, hooks: IForEachDirectiveHooks,
             recalcIndextrigger: Rx.Subject<any>, indexes: IWeakMap<Node, Rx.Observable<any>>): void {
             var templateLength = template.length;
+            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
             var nodexIndex = from * templateLength;
             var nodes = [];
 
             for (var i = 0; i < templateLength; i++) {
-                var node = el.childNodes[nodexIndex + i];
+                var node = relevantNodes[nodexIndex + i];
 
                 if (node.nodeType === 1) {
                     this.domService.cleanNode(node);
@@ -350,7 +378,7 @@ module wx {
                         _index = indexes.get(node);
 
                         if (!_index) {
-                            _index = this.createIndexObservableForNode(el, node, to, recalcIndextrigger, templateLength);
+                            _index = this.createIndexObservableForNode(el, node, to, recalcIndextrigger, indexes, templateLength);
                             indexes.set(node, _index);
                             created = true;
                         }
@@ -371,12 +399,13 @@ module wx {
             }
         }
 
-        protected rebindRow(el: HTMLElement, index: number, item: any, template: Array<Node>): void {
+        protected rebindRow(el: HTMLElement, index: number, item: any, template: Array<Node>, indexes: IWeakMap<Node, Rx.Observable<any>>): void {
             var templateLength = template.length;
+            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
             var savedIndex;
 
             for (var i = 0; i < template.length; i++) {
-                var node = el.childNodes[(index * templateLength) + i];
+                var node = relevantNodes[(index * templateLength) + i];
 
                 if (node.nodeType === 1) {
                     // save the index before cleaning
@@ -443,7 +472,7 @@ module wx {
             }));
 
             cleanup.add(list.itemReplaced.subscribe((e) => {
-                this.rebindRow(el, e.from, e.items[0], template);
+                this.rebindRow(el, e.from, e.items[0], template, indexes);
 
                 indexTrigger.onNext(true);
             }));
