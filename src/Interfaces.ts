@@ -17,17 +17,17 @@ module wx {
         isEmulatedWeakMap: boolean;
     }
 
-    /// <summary>
-    /// Represents a collection of objects that can be individually accessed by index.
-    /// </summary>
+    /**
+    * Represents a collection of objects that can be individually accessed by index.
+    **/
     export interface IReadOnlyList<T> {
         length: number;
         get(index: number): T;
     }
 
-    /// <summary>
-    /// Represents a collection of objects that can be individually accessed by index.
-    /// </summary>
+    /**
+    * Represents a collection of objects that can be individually accessed by index.
+    **/
     export interface IList<T> extends IReadOnlyList<T> {
         set(index: number, item: T);
         isReadOnly: boolean;
@@ -40,10 +40,10 @@ module wx {
         removeAt(index: number): void;
     }
 
-    /// <summary>
-    /// IObservableProperty combines a function signature for value setting and getting with
-    /// observables for monitoring value changes
-    /// </summary>
+    /**
+    * IObservableProperty combines a function signature for value setting and getting with
+    * observables for monitoring value changes
+    **/
     export interface IObservableProperty<T> extends Rx.IDisposable {
         (newValue?: T): T;
         changing: Rx.Observable<T>;
@@ -51,22 +51,22 @@ module wx {
         source?: Rx.Observable<T>;
     }
 
-    /// <summary>
-    /// This interface is implemented by RxUI objects which are given
-    /// IObservables as input - when the input IObservables OnError, instead of
-    /// disabling the RxUI object, we catch the Rx.Observable and pipe it into
-    /// this property.
-    ///
-    /// Normally this Rx.Observable is implemented with a ScheduledSubject whose
-    /// default Observer is wx.App.DefaultExceptionHandler - this means, that if
-    /// you aren't listening to ThrownExceptions and one appears, the exception
-    /// will appear on the UI thread and crash the application.
-    /// </summary>
+    /**
+    * This interface is implemented by RxUI objects which are given
+    * IObservables as input - when the input IObservables OnError, instead of
+    * disabling the RxUI object, we catch the Rx.Observable and pipe it into
+    * this property.
+    *
+    * Normally this Rx.Observable is implemented with a ScheduledSubject whose
+    * default Observer is wx.App.DefaultExceptionHandler - this means, that if
+    * you aren't listening to ThrownExceptions and one appears, the exception
+    * will appear on the UI thread and crash the application.
+    **/
     export interface IHandleObservableErrors {
-        /// <summary>
-        /// Fires whenever an exception would normally terminate ReactiveUI
-        /// internal state.
-        /// </summary>
+        /**
+        * Fires whenever an exception would normally terminate ReactiveUI
+        * internal state.
+        **/
         thrownExceptions: Rx.Observable<Error>; //  { get; }
     }
 
@@ -76,51 +76,49 @@ module wx {
         to?: number; // { get; }
     }
 
-    /// <summary>
-    /// ICommand represents an ICommand which also notifies when it is
-    /// executed (i.e. when Execute is called) via IObservable. Conceptually,
-    /// this represents an Event, so as a result this IObservable should never
-    /// OnComplete or OnError.
-    /// </summary>
+    /**
+    * ICommand represents an ICommand which also notifies when it is
+    * executed (i.e. when Execute is called) via IObservable. Conceptually,
+    * this represents an Event, so as a result this IObservable should never
+    * OnComplete or OnError.
+    **/
     export interface ICommand<T> extends
         Rx.IDisposable,
         IHandleObservableErrors {
         canExecute(parameter: any): boolean;
         execute(parameter: any): void;
 
-        /// <summary>
-        /// Gets a value indicating whether this instance can execute observable.
-        /// </summary>
-        /// <value><c>true</c> if this instance can execute observable; otherwise, <c>false</c>.</value>
+        /**
+        * Gets a value indicating whether this instance can execute observable.
+        **/
         canExecuteObservable: Rx.Observable<boolean>; //  { get; }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is executing. This
-        /// Observable is guaranteed to always return a value immediately (i.e.
-        /// it is backed by a BehaviorSubject), meaning it is safe to determine
-        /// the current state of the command via IsExecuting.First()
-        /// </summary>
-        /// <value><c>true</c> if this instance is executing; otherwise, <c>false</c>.</value>
+        /**
+        * Gets a value indicating whether this instance is executing. This
+        * Observable is guaranteed to always return a value immediately (i.e.
+        * it is backed by a BehaviorSubject), meaning it is safe to determine
+        * the current state of the command via IsExecuting.First()
+        **/
         isExecuting: Rx.Observable<boolean>; //  { get; }
 
-        /// <summary>
-        /// Gets an observable that returns command invocation results
-        /// </summary>
+        /**
+        * Gets an observable that returns command invocation results
+        **/
         results: Rx.Observable<T>;
 
-        /// <summary>
-        /// Executes a Command and returns the result asynchronously. This method
-        /// makes it *much* easier to test Command, as well as create
-        /// Commands who invoke inferior commands and wait on their results.
-        ///
-        /// Note that you **must** Subscribe to the Observable returned by
-        /// ExecuteAsync or else nothing will happen (i.e. ExecuteAsync is lazy)
-        ///
-        /// Note also that the command will be executed, irrespective of the current value
-        /// of the command's canExecute observable.
-        /// </summary>
-        /// <returns>An Observable representing a single invocation of the Command.</returns>
-        /// <param name="parameter">Don't use this.</param>
+        /**
+        * Executes a Command and returns the result asynchronously. This method
+        * makes it *much* easier to test Command, as well as create
+        * Commands who invoke inferior commands and wait on their results.
+        *
+        * Note that you **must** Subscribe to the Observable returned by
+        * ExecuteAsync or else nothing will happen (i.e. ExecuteAsync is lazy)
+        *
+        * Note also that the command will be executed, irrespective of the current value
+        * of the command's canExecute observable.
+        * @return An Observable representing a single invocation of the Command.
+        * @param parameter Don't use this.
+        **/
         executeAsync(parameter?: any): Rx.Observable<T>;
     }
 
@@ -129,139 +127,139 @@ module wx {
             propertyName: string;
     }
 
-    /// <summary>
-    /// IReactiveNotifyCollectionItemChanged provides notifications for collection item updates, ie when an object in
-    /// a collection changes.
-    /// </summary>
+    /**
+    * IReactiveNotifyCollectionItemChanged provides notifications for collection item updates, ie when an object in
+    * a collection changes.
+    **/
     export interface INotifyCollectionItemChanged {
-        /// <summary>
-        /// Provides Item Changing notifications for any item in collection that
-        /// implements IReactiveNotifyPropertyChanged. This is only enabled when
-        /// ChangeTrackingEnabled is set to True.
-        /// </summary>
+        /**
+        * Provides Item Changing notifications for any item in collection that
+        * implements IReactiveNotifyPropertyChanged. This is only enabled when
+        * ChangeTrackingEnabled is set to True.
+        **/
         itemChanging: Rx.Observable<IPropertyChangedEventArgs>; // { get; }
 
-        /// <summary>
-        /// Provides Item Changed notifications for any item in collection that
-        /// implements IReactiveNotifyPropertyChanged. This is only enabled when
-        /// ChangeTrackingEnabled is set to True.
-        /// </summary>
+        /**
+        * Provides Item Changed notifications for any item in collection that
+        * implements IReactiveNotifyPropertyChanged. This is only enabled when
+        * ChangeTrackingEnabled is set to True.
+        **/
         itemChanged: Rx.Observable<IPropertyChangedEventArgs>; //  { get; }
 
-        /// <summary>
-        /// Enables the ItemChanging and ItemChanged properties; when this is
-        /// enabled, whenever a property on any object implementing
-        /// IReactiveNotifyPropertyChanged changes, the change will be
-        /// rebroadcast through ItemChanging/ItemChanged.
-        /// </summary>
+        /**
+        * Enables the ItemChanging and ItemChanged properties; when this is
+        * enabled, whenever a property on any object implementing
+        * IReactiveNotifyPropertyChanged changes, the change will be
+        * rebroadcast through ItemChanging/ItemChanged.
+        **/
         changeTrackingEnabled: boolean; //  { get; set; }
     }
 
 
-    /// <summary>
-    /// IReactiveNotifyCollectionChanged of T provides notifications when the contents
-    /// of collection are changed (items are added/removed/moved).
-    /// </summary>
+    /**
+    * IReactiveNotifyCollectionChanged of T provides notifications when the contents
+    * of collection are changed (items are added/removed/moved).
+    **/
     export interface INotifyListChanged<T> {
-        /// <summary>
-        /// This Observable fires before the list is changing, regardless of reason
-        /// </summary>
+        /**
+        * This Observable fires before the list is changing, regardless of reason
+        **/
         listChanging: Rx.Observable<boolean>; //  { get; }
 
-        /// <summary>
-        /// This Observable fires after list has changed, regardless of reason
-        /// </summary>
+        /**
+        * This Observable fires after list has changed, regardless of reason
+        **/
         listChanged: Rx.Observable<boolean>; //  { get; }
 
-        /// <summary>
-        /// Fires when items are added to the list, once per item added.
-        /// Functions that add multiple items such addRange should fire this
-        /// multiple times. The object provided is the item that was added.
-        /// </summary>
+        /**
+        * Fires when items are added to the list, once per item added.
+        * Functions that add multiple items such addRange should fire this
+        * multiple times. The object provided is the item that was added.
+        **/
         itemsAdded: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires before an item is going to be added to the list.
-        /// </summary>
+        /**
+        * Fires before an item is going to be added to the list.
+        **/
         beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires once an item has been removed from a list, providing the
-        /// item that was removed.
-        /// </summary>
+        /**
+        * Fires once an item has been removed from a list, providing the
+        * item that was removed.
+        **/
         itemsRemoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires before an item will be removed from a list, providing
-        /// the item that will be removed.
-        /// </summary>
+        /**
+        * Fires before an item will be removed from a list, providing
+        * the item that will be removed.
+        **/
         beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires before an items moves from one position in the list to
-        /// another, providing the item(s) to be moved as well as source and destination
-        /// indices.
-        /// </summary>
+        /**
+        * Fires before an items moves from one position in the list to
+        * another, providing the item(s) to be moved as well as source and destination
+        * indices.
+        **/
         beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires once one or more items moves from one position in the list to
-        /// another, providing the item(s) that was moved as well as source and destination
-        /// indices.
-        /// </summary>
+        /**
+        * Fires once one or more items moves from one position in the list to
+        * another, providing the item(s) that was moved as well as source and destination
+        * indices.
+        **/
         itemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires before an item is replaced
-        /// indices.
-        /// </summary>
+        /**
+        * Fires before an item is replaced
+        * indices.
+        **/
         beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires after an item is replaced
-        /// </summary>
+        /**
+        * Fires after an item is replaced
+        **/
         itemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
-        /// <summary>
-        /// Fires when the list count changes, regardless of reason
-        /// </summary>
+        /**
+        * Fires when the list count changes, regardless of reason
+        **/
         countChanging: Rx.Observable<number>; //  { get; }
 
-        /// <summary>
-        /// Fires when the collection count changes, regardless of reason
-        /// </summary>
+        /**
+        * Fires when the collection count changes, regardless of reason
+        **/
         countChanged: Rx.Observable<number>; //  { get; }
 
-        /// <summary>
-        /// Fires when the empty state changes, regardless of reason
-        /// </summary>
+        /**
+        * Fires when the empty state changes, regardless of reason
+        **/
         isEmptyChanged: Rx.Observable<boolean>; //  { get; }
 
-        /// <summary>
-        /// This Observable is fired when a ShouldReset fires on the list. This
-        /// means that you should forget your previous knowledge of the state
-        /// of the collection and reread it.
-        ///
-        /// This does *not* mean Clear, and if you interpret it as such, you are
-        /// Doing It Wrong.
-        /// </summary>
+        /**
+        * This Observable is fired when a ShouldReset fires on the list. This
+        * means that you should forget your previous knowledge of the state
+        * of the collection and reread it.
+        *
+        * This does *not* mean Clear, and if you interpret it as such, you are
+        * Doing It Wrong.
+        **/
         shouldReset: Rx.Observable<any>; //  { get; }
 
-        /// <summary>
-        /// Suppresses change notification from the list until the disposable returned by this method is disposed
-        /// </summary>
+        /**
+        * Suppresses change notification from the list until the disposable returned by this method is disposed
+        **/
         suppressChangeNotifications(): Rx.IDisposable;
     }
 
-    /// <summary>
-    /// IObservableList of T represents a list that can notify when its
-    /// contents are changed (either items are added/removed, or the object
-    /// itself changes).
-    ///
-    /// It is important to implement the Changing/Changed from
-    /// IReactiveNotifyPropertyChanged semantically as "Fire when *anything* in
-    /// the collection or any of its items have changed, in any way".
-    /// </summary>
+    /**
+    * IObservableList of T represents a list that can notify when its
+    * contents are changed (either items are added/removed, or the object
+    * itself changes).
+    *
+    * It is important to implement the Changing/Changed from
+    * IReactiveNotifyPropertyChanged semantically as "Fire when *anything* in
+    * the collection or any of its items have changed, in any way".
+    **/
     export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyCollectionItemChanged {
         isEmpty: boolean; //  { get; }
         addRange(collection: Array<T>): void;

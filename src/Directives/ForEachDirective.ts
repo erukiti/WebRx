@@ -86,6 +86,7 @@ module wx {
                     // recalculate index from node position within parent
                     var index = Array.prototype.indexOf.call(parent.childNodes, child);
                     index /= templateLength;
+
                     obs.onNext(index);
                 });
             }).startWith(startIndex);
@@ -233,11 +234,11 @@ module wx {
             // setup index management
             var indexes = weakmap<Node, Rx.Observable<any>>();
             cleanup.add(Rx.Disposable.create(() => indexes = null));
-            var recalcIndextrigger = new Rx.Subject<any>();
-            cleanup.add(recalcIndextrigger);
+            var indexTrigger = new Rx.Subject<any>();
+            cleanup.add(indexTrigger);
 
             // initial insert
-            this.appendAll(el, list, ctx, template, indexes, recalcIndextrigger);
+            this.appendAll(el, list, ctx, template, indexes, indexTrigger);
 
             // track changes
             cleanup.add(list.itemsAdded.subscribe((e) => {
@@ -245,15 +246,15 @@ module wx {
 
                 if (e.from === list.length) {
                     for (i = 0; i < length; i++) {
-                        this.appendRow(el, i + e.from, e.items[i], ctx, template, recalcIndextrigger, indexes);
+                        this.appendRow(el, i + e.from, e.items[i], ctx, template, indexTrigger, indexes);
                     }
                 } else {
                     for (i = 0; i < e.items.length; i++) {
-                        this.insertRow(el, i + e.from, e.items[i], ctx, template, recalcIndextrigger, indexes);
+                        this.insertRow(el, i + e.from, e.items[i], ctx, template, indexTrigger, indexes);
                     }
                 }
 
-                recalcIndextrigger.onNext(true);
+                indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemsRemoved.subscribe((e) => {
@@ -263,27 +264,27 @@ module wx {
                     this.removeRow(el, i + e.from, template, indexes);
                 }
 
-                recalcIndextrigger.onNext(true);
+                indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemsMoved.subscribe((e) => {
                 this.removeRow(el, e.from, template, indexes);
-                this.insertRow(el, e.to, e.items[0], ctx, template, recalcIndextrigger, indexes);
+                this.insertRow(el, e.to, e.items[0], ctx, template, indexTrigger, indexes);
 
-                recalcIndextrigger.onNext(true);
+                indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemReplaced.subscribe((e) => {
                 this.rebindRow(el, e.from, e.items[0], template);
 
-                recalcIndextrigger.onNext(true);
+                indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.shouldReset.subscribe((e) => {
                 this.clear(el, indexes);
-                this.appendAll(el, list, ctx, template, indexes, recalcIndextrigger);
+                this.appendAll(el, list, ctx, template, indexes, indexTrigger);
 
-                recalcIndextrigger.onNext(true);
+                indexTrigger.onNext(true);
             }));
         }
 
