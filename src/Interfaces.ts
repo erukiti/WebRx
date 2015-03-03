@@ -489,9 +489,7 @@ module wx {
         getComponent(name: string): IComponent;
     }
 
-    export interface IModule extends
-        IComponentRegistry,
-        IDirectiveRegistry {
+    export interface IModule extends IComponentRegistry, IDirectiveRegistry {
         name: string;
     }
 
