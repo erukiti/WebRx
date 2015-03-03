@@ -1,6 +1,6 @@
 ﻿/// <reference path="../Interfaces.ts" />
 
-module wx.intenal {
+module wx.internal {
     export class PropertyChangedEventArgs implements
         IPropertyChangedEventArgs {
         /// <summary>

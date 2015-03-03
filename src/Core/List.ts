@@ -95,20 +95,6 @@ module wx {
             return this._itemsMoved;
         }
 
-        public get changing(): Rx.Observable<boolean> {
-            if (!this._changing)
-                this._changing = this.changingSubject.asObservable();
-
-            return this._changing;
-        }
-
-        public get changed(): Rx.Observable<boolean> {
-            if (!this._changed)
-                this._changed = this.changedSubject.asObservable();
-
-            return this._changed;
-        }
-
         public get countChanging(): Rx.Observable<number> {
             if (!this._countChanging)
                 this._countChanging = this.changing.select(_ => this.inner.length).distinctUntilChanged();
@@ -190,14 +176,11 @@ module wx {
                 }
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
-                    this.changingSubject.onNext(false);
-
                     if (this.beforeItemsAddedSubject.isValueCreated) {
                         this.beforeItemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
                     }
 
                     Array.prototype.splice.apply(this.inner, (<T[]><any>[this.inner.length, 0]).concat(items));
-                    this.changedSubject.onNext(false);
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         this.itemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
@@ -243,8 +226,6 @@ module wx {
                 }
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
-                    this.changingSubject.onNext(false);
-
                     if (this.beforeItemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
                             this.beforeItemsAddedSubject.value.onNext({ items: items, index: index });
@@ -252,7 +233,6 @@ module wx {
                     }
 
                     Array.prototype.splice.apply(this.inner, (<T[]><any>[index, 0]).concat(items));
-                    this.changedSubject.onNext(false);
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
@@ -309,8 +289,6 @@ module wx {
                 }
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
-                    this.changingSubject.onNext(false);
-
                     if (this.beforeItemsRemovedSubject.isValueCreated) {
                         items.forEach(x => {
                             this.beforeItemsRemovedSubject.value.onNext({ items: items, index: index });
@@ -318,7 +296,6 @@ module wx {
                     }
 
                     this.inner.splice(index, count);
-                    this.changedSubject.onNext(false);
 
                     if (this.changeTrackingEnabled) {
                         items.forEach(x => {
@@ -341,6 +318,8 @@ module wx {
         }
 
         public sort(comparison: (a: T, b: T) => number): void {
+            this.publishBeforeResetNotification();
+
             this.inner.sort(comparison);
 
             this.publishResetNotification();            
@@ -402,8 +381,10 @@ module wx {
             return Rx.Disposable.create(() => {
                 this.changeNotificationsSuppressed--;
 
-                if (this.changeNotificationsSuppressed === 0)
-                    this.publishResetNotification();
+                if (this.changeNotificationsSuppressed === 0) {
+                    this.publishBeforeResetNotification();
+                    this.publishResetNotification();                    
+                }
             });
         }
 
@@ -438,11 +419,12 @@ module wx {
             return this.inner.every(callbackfn, thisArg);
         }
 
+        public changing: Rx.Observable<boolean>;
+        public changed: Rx.Observable<boolean>;
+
         ////////////////////
         // Implementation
 
-        private changingSubject: Rx.Subject<boolean>;
-        private changedSubject: Rx.Subject<boolean>;
         private inner: Array<T>;
         private beforeItemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
         private itemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
@@ -454,6 +436,8 @@ module wx {
         private itemChangedSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
         private beforeItemsMovedSubject: Lazy<Rx.Subject<IMoveInfo<T>>>;
         private itemsMovedSubject: Lazy<Rx.Subject<IMoveInfo<T>>>;
+        private resetSubject: Rx.Subject<any>;
+        private beforeResetSubject: Rx.Subject<any>;
         private changeNotificationsSuppressed: number = 0;
         private propertyChangeWatchers: { [uniqueObjectId: string]: RefCountDisposeWrapper } = null;
         private resetChangeThreshold = 0;
@@ -469,8 +453,6 @@ module wx {
         private _itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
         private _beforeItemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
         private _itemsMoved: Rx.Observable<IMoveInfo<T>>;
-        private _changing: Rx.Observable<boolean>;
-        private _changed: Rx.Observable<boolean>;
         private _countChanging: Rx.Observable<number>;
         private _countChanged: Rx.Observable<number>;
         private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
@@ -484,15 +466,14 @@ module wx {
             if (this.inner === undefined)
                 this.inner = new Array<T>();
 
-            this.changingSubject = new Rx.Subject<boolean>();
-            this.changedSubject = new Rx.Subject<boolean>();
-
             this.beforeItemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
             this.itemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
             this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
             this.itemsRemovedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
             this.beforeItemReplacedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
             this.itemReplacedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.resetSubject = new Rx.Subject<any>();
+            this.beforeResetSubject = new Rx.Subject<any>();
 
             this.itemChangingSubject = new Lazy<Rx.ISubject<IPropertyChangedEventArgs>>(() =>
                 <any> new Rx.Subject<IPropertyChangedEventArgs>());
@@ -504,6 +485,20 @@ module wx {
 
             this.beforeItemsMovedSubject = new Lazy<Rx.Subject<IMoveInfo<T>>>(() => new Rx.Subject<IMoveInfo<T>>());
             this.itemsMovedSubject = new Lazy<Rx.Subject<IMoveInfo<T>>>(() => new Rx.Subject<IMoveInfo<T>>());
+
+            this.changed = Rx.Observable.merge(
+                this.itemsAdded.select(x => false),
+                this.itemsRemoved.select(x => false),
+                this.itemReplaced.select(x => false),
+                this.itemsMoved.select(x => false),
+                this.resetSubject.select(x => true));
+
+            this.changing = Rx.Observable.merge(
+                this.beforeItemsAdded.select(x => false),
+                this.beforeItemsRemoved.select(x => false),
+                this.beforeItemReplaced.select(x => false),
+                this.beforeItemsMoved.select(x => false),
+                this.beforeResetSubject.select(x => true));
 
             if (initialContents) {
                 Array.prototype.splice.apply(this.inner,(<T[]><any>[0, 0]).concat(initialContents));
@@ -524,14 +519,10 @@ module wx {
                 return;
             }
 
-            this.changingSubject.onNext(false);
-
             if (this.beforeItemsAddedSubject.isValueCreated)
                 this.beforeItemsAddedSubject.value.onNext({ items: [item], index: index });
 
             this.inner.splice(index, 0, item);
-
-            this.changedSubject.onNext(false);
 
             if (this.itemsAddedSubject.isValueCreated)
                 this.itemsAddedSubject.value.onNext({ items: [item], index: index });
@@ -552,14 +543,10 @@ module wx {
                 return;
             }
 
-            this.changingSubject.onNext(false);
-
             if (this.beforeItemsRemovedSubject.isValueCreated)
                 this.beforeItemsRemovedSubject.value.onNext({ items: [item], index: index });
 
             this.inner.splice(index, 1);
-
-            this.changedSubject.onNext(false);
 
             if (this.itemsRemovedSubject.isValueCreated)
                 this.itemsRemovedSubject.value.onNext({ items: [item], index: index });
@@ -578,17 +565,13 @@ module wx {
                 return;
             }
 
-             var mi = new MoveInfo<T>([item], oldIndex, newIndex);
-
-             this.changingSubject.onNext(false);
+            var mi = new MoveInfo<T>([item], oldIndex, newIndex);
 
             if (this.beforeItemsMovedSubject.isValueCreated)
                 this.beforeItemsMovedSubject.value.onNext(mi);
 
             this.inner.splice(oldIndex, 1);
             this.inner.splice(newIndex, 0, item);
-
-            this.changedSubject.onNext(false);
 
             if (this.itemsMovedSubject.isValueCreated)
                 this.itemsMovedSubject.value.onNext(mi);
@@ -606,8 +589,6 @@ module wx {
                 return;
             }
 
-            this.changingSubject.onNext(false);
-
             if (this.beforeItemReplacedSubject.isValueCreated)
                 this.beforeItemReplacedSubject.value.onNext({ index: index, items: [item]});
 
@@ -617,7 +598,6 @@ module wx {
             }
 
             this.inner[index] = item;
-            this.changedSubject.onNext(false);
 
             if (this.itemReplacedSubject.isValueCreated)
                 this.itemReplacedSubject.value.onNext({ index: index, items: [item] });
@@ -633,9 +613,9 @@ module wx {
                 return;
             }
 
-            this.changingSubject.onNext(true);
+            this.publishBeforeResetNotification();
             this.inner.length = 0;    // see http://stackoverflow.com/a/1232046/88513
-            this.changedSubject.onNext(true);
+            this.publishResetNotification();
 
             if (this.changeTrackingEnabled)
                 this.clearAllPropertyChangeWatchers();
@@ -692,8 +672,11 @@ module wx {
         }
 
         private publishResetNotification() {
-            this.changingSubject.onNext(true);
-            this.changedSubject.onNext(true);
+            this.resetSubject.onNext(true);
+        }
+
+        private publishBeforeResetNotification() {
+            this.beforeResetSubject.onNext(true);
         }
 
         private isLengthAboveResetThreshold(toChangeLength: number): boolean {
