@@ -70,15 +70,10 @@ module wx {
         thrownExceptions: Rx.Observable<Error>; //  { get; }
     }
 
-    export interface IMoveInfo<T> {
-        items: Array<T>; // { get; }
-        from: number; // { get; }
-        to: number; // { get; }
-    }
-
-    export interface IAddReplaceRemoveInfo<T> {
+    export interface IListChangeInfo<T> {
         items: T[]; // { get; }
-        index: number; // { get; }
+        from: number; // { get; }
+        to?: number; // { get; }
     }
 
     /// <summary>
@@ -169,68 +164,66 @@ module wx {
     /// </summary>
     export interface INotifyListChanged<T> {
         /// <summary>
-        /// This Observable is equivalent to the NotifyCollectionChanged event,
-        /// but fires before the collection is changed
+        /// This Observable fires before the list is changing, regardless of reason
         /// </summary>
-        changing: Rx.Observable<boolean>; //  { get; }
+        listChanging: Rx.Observable<boolean>; //  { get; }
 
         /// <summary>
-        /// This Observable is equivalent to the NotifyCollectionChanged event,
-        /// and fires after the collection is changed
+        /// This Observable fires after list has changed, regardless of reason
         /// </summary>
-        changed: Rx.Observable<boolean>; //  { get; }
+        listChanged: Rx.Observable<boolean>; //  { get; }
 
         /// <summary>
-        /// Fires when items are added to the collection, once per item added.
-        /// Functions that add multiple items such AddRange should fire this
+        /// Fires when items are added to the list, once per item added.
+        /// Functions that add multiple items such addRange should fire this
         /// multiple times. The object provided is the item that was added.
         /// </summary>
-        itemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+        itemsAdded: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
-        /// Fires before an item is going to be added to the collection.
+        /// Fires before an item is going to be added to the list.
         /// </summary>
-        beforeItemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+        beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
-        /// Fires once an item has been removed from a collection, providing the
+        /// Fires once an item has been removed from a list, providing the
         /// item that was removed.
         /// </summary>
-        itemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+        itemsRemoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
-        /// Fires before an item will be removed from a collection, providing
+        /// Fires before an item will be removed from a list, providing
         /// the item that will be removed.
         /// </summary>
-        beforeItemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+        beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
-        /// Fires before an items moves from one position in the collection to
+        /// Fires before an items moves from one position in the list to
         /// another, providing the item(s) to be moved as well as source and destination
         /// indices.
         /// </summary>
-        beforeItemsMoved: Rx.Observable<IMoveInfo<T>>; //  { get; }
+        beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
-        /// Fires once one or more items moves from one position in the collection to
+        /// Fires once one or more items moves from one position in the list to
         /// another, providing the item(s) that was moved as well as source and destination
         /// indices.
         /// </summary>
-        itemsMoved: Rx.Observable<IMoveInfo<T>>; //  { get; }
+        itemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
         /// Fires before an item is replaced
         /// indices.
         /// </summary>
-        beforeItemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+        beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
         /// Fires after an item is replaced
         /// </summary>
-        itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
+        itemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /// <summary>
-        /// Fires when the collection count changes, regardless of reason
+        /// Fires when the list count changes, regardless of reason
         /// </summary>
         countChanging: Rx.Observable<number>; //  { get; }
 
@@ -239,10 +232,13 @@ module wx {
         /// </summary>
         countChanged: Rx.Observable<number>; //  { get; }
 
+        /// <summary>
+        /// Fires when the empty state changes, regardless of reason
+        /// </summary>
         isEmptyChanged: Rx.Observable<boolean>; //  { get; }
 
         /// <summary>
-        /// This Observable is fired when a ShouldReset fires on the collection. This
+        /// This Observable is fired when a ShouldReset fires on the list. This
         /// means that you should forget your previous knowledge of the state
         /// of the collection and reread it.
         ///
@@ -251,6 +247,9 @@ module wx {
         /// </summary>
         shouldReset: Rx.Observable<any>; //  { get; }
 
+        /// <summary>
+        /// Suppresses change notification from the list until the disposable returned by this method is disposed
+        /// </summary>
         suppressChangeNotifications(): Rx.IDisposable;
     }
 
@@ -278,16 +277,6 @@ module wx {
         some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
         reset(): void;
         toArray(): Array<T>;
-    }
-
-    export interface IInjectorService {
-        annotate(fn: Function): string[];
-        annotate(inlineAnnotatedFunction: any[]): string[];
-        get(name: string): any;
-        has(name: string): boolean;
-        instantiate(typeConstructor: Function, locals?: any): any;
-        invoke(inlineAnnotatedFunction: any[]): any;
-        invoke(func: Function, context?: any, locals?: any): any;
     }
 
     export interface IDataContext {

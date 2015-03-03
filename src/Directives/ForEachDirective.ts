@@ -243,13 +243,13 @@ module wx {
             cleanup.add(list.itemsAdded.subscribe((e) => {
                 length = e.items.length;
 
-                if (e.index === list.length) {
+                if (e.from === list.length) {
                     for (i = 0; i < length; i++) {
-                        this.appendRow(el, i + e.index, e.items[i], ctx, template, recalcIndextrigger, indexes);
+                        this.appendRow(el, i + e.from, e.items[i], ctx, template, recalcIndextrigger, indexes);
                     }
                 } else {
                     for (i = 0; i < e.items.length; i++) {
-                        this.insertRow(el, i + e.index, e.items[i], ctx, template, recalcIndextrigger, indexes);
+                        this.insertRow(el, i + e.from, e.items[i], ctx, template, recalcIndextrigger, indexes);
                     }
                 }
 
@@ -260,7 +260,7 @@ module wx {
                 length = e.items.length;
 
                 for (i = 0; i < length; i++) {
-                    this.removeRow(el, i + e.index, template, indexes);
+                    this.removeRow(el, i + e.from, template, indexes);
                 }
 
                 recalcIndextrigger.onNext(true);
@@ -274,7 +274,7 @@ module wx {
             }));
 
             cleanup.add(list.itemReplaced.subscribe((e) => {
-                this.rebindRow(el, e.index, e.items[0], template);
+                this.rebindRow(el, e.from, e.items[0], template);
 
                 recalcIndextrigger.onNext(true);
             }));

@@ -39,56 +39,56 @@ module wx {
             return false;
         }
 
-        public get itemsAdded(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+        public get itemsAdded(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._itemsAdded)
                 this._itemsAdded = this.itemsAddedSubject.value.asObservable();
 
             return this._itemsAdded;
         }
 
-        public get beforeItemsAdded(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+        public get beforeItemsAdded(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._beforeItemsAdded)
                 this._beforeItemsAdded = this.beforeItemsAddedSubject.value.asObservable();
 
             return this._beforeItemsAdded;
         }
 
-        public get itemsRemoved(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+        public get itemsRemoved(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._itemsRemoved)
                 this._itemsRemoved = this.itemsRemovedSubject.value.asObservable();
 
             return this._itemsRemoved;
         }
 
-        public get beforeItemsRemoved(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+        public get beforeItemsRemoved(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._beforeItemsRemoved)
                 this._beforeItemsRemoved = this.beforeItemsRemovedSubject.value.asObservable();
 
             return this._beforeItemsRemoved;
         }
 
-        public get itemReplaced(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+        public get itemReplaced(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._itemReplaced)
                 this._itemReplaced = this.itemReplacedSubject.value.asObservable();
 
             return this._itemReplaced;
         }
 
-        public get beforeItemReplaced(): Rx.Observable<IAddReplaceRemoveInfo<T>> {
+        public get beforeItemReplaced(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._beforeItemReplaced)
                 this._beforeItemReplaced = this.beforeItemReplacedSubject.value.asObservable();
 
             return this._beforeItemReplaced;
         }
 
-        public get beforeItemsMoved(): Rx.Observable<IMoveInfo<T>> {
+        public get beforeItemsMoved(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._beforeItemsMoved)
                 this._beforeItemsMoved = this.beforeItemsMovedSubject.value.asObservable();
 
             return this._beforeItemsMoved;
         }
 
-        public get itemsMoved(): Rx.Observable<IMoveInfo<T>> {
+        public get itemsMoved(): Rx.Observable<IListChangeInfo<T>> {
             if (!this._itemsMoved)
                 this._itemsMoved = this.itemsMovedSubject.value.asObservable();
 
@@ -97,14 +97,14 @@ module wx {
 
         public get countChanging(): Rx.Observable<number> {
             if (!this._countChanging)
-                this._countChanging = this.changing.select(_ => this.inner.length).distinctUntilChanged();
+                this._countChanging = this.listChanging.select(_ => this.inner.length).distinctUntilChanged();
 
             return this._countChanging;
         }
 
         public get countChanged(): Rx.Observable<number> {
             if (!this._countChanged)
-                this._countChanged = this.changed.select(_ => this.inner.length).distinctUntilChanged();
+                this._countChanged = this.listChanged.select(_ => this.inner.length).distinctUntilChanged();
 
             return this._countChanged;
         }
@@ -126,7 +126,7 @@ module wx {
         }
 
         public get shouldReset(): Rx.Observable<any> {
-            return this.refcountSubscribers(this.changed.selectMany(x =>
+            return this.refcountSubscribers(this.listChanged.selectMany(x =>
                 !x ? Rx.Observable.empty<any>() :
                     Rx.Observable.return(null)), x => this.resetSubCount += x);
         }
@@ -177,13 +177,13 @@ module wx {
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
                     if (this.beforeItemsAddedSubject.isValueCreated) {
-                        this.beforeItemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
+                        this.beforeItemsAddedSubject.value.onNext({ items: items, from: this.inner.length });
                     }
 
                     Array.prototype.splice.apply(this.inner, (<T[]><any>[this.inner.length, 0]).concat(items));
 
                     if (this.itemsAddedSubject.isValueCreated) {
-                        this.itemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
+                        this.itemsAddedSubject.value.onNext({ items: items, from: this.inner.length });
                     }
 
                     if (this.changeTrackingEnabled) {
@@ -228,7 +228,7 @@ module wx {
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
                     if (this.beforeItemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.beforeItemsAddedSubject.value.onNext({ items: items, index: index });
+                            this.beforeItemsAddedSubject.value.onNext({ items: items, from: index });
                         });
                     }
 
@@ -236,7 +236,7 @@ module wx {
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.itemsAddedSubject.value.onNext({ items: items, index: index });
+                            this.itemsAddedSubject.value.onNext({ items: items, from: index });
                         });
                     }
 
@@ -291,7 +291,7 @@ module wx {
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
                     if (this.beforeItemsRemovedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.beforeItemsRemovedSubject.value.onNext({ items: items, index: index });
+                            this.beforeItemsRemovedSubject.value.onNext({ items: items, from: index });
                         });
                     }
 
@@ -305,7 +305,7 @@ module wx {
 
                     if (this.itemsRemovedSubject.isValueCreated) {
                         items.forEach(x => {
-                            this.itemsRemovedSubject.value.onNext({ items: items, index: index });
+                            this.itemsRemovedSubject.value.onNext({ items: items, from: index });
                         });
                     }
                 } else {
@@ -315,14 +315,6 @@ module wx {
                 }
 
             });
-        }
-
-        public sort(comparison: (a: T, b: T) => number): void {
-            this.publishBeforeResetNotification();
-
-            this.inner.sort(comparison);
-
-            this.publishResetNotification();            
         }
 
         public toArray(): Array<T> {
@@ -396,46 +388,54 @@ module wx {
             return this.inner.length === 0;
         }
 
+        public listChanging: Rx.Observable<boolean>;
+        public listChanged: Rx.Observable<boolean>;
+
         //////////////////////////
         // Expose some array convenience members
 
-        public forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void {
+        public sort(comparison: (a: T, b: T) => number): void {
+            this.publishBeforeResetNotification();
+
+            this.inner.sort(comparison);
+
+            this.publishResetNotification();
+        }
+
+        public forEach(callbackfn: (value: T, from: number, array: T[]) => void, thisArg?: any): void {
             this.inner.forEach(callbackfn, thisArg);
         }
 
-        public map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[] {
+        public map<U>(callbackfn: (value: T, from: number, array: T[]) => U, thisArg?: any): U[] {
             return this.inner.map(callbackfn, thisArg);
         }
 
-        public filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[] {
+        public filter(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): T[] {
             return this.inner.filter(callbackfn, thisArg);
         }
 
-        public some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean {
+        public some(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): boolean {
             return this.inner.some(callbackfn, thisArg);
         }
 
-        public every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean {
+        public every(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): boolean {
             return this.inner.every(callbackfn, thisArg);
         }
-
-        public changing: Rx.Observable<boolean>;
-        public changed: Rx.Observable<boolean>;
 
         ////////////////////
         // Implementation
 
         private inner: Array<T>;
-        private beforeItemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
-        private itemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
-        private beforeItemsRemovedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
-        private itemsRemovedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
-        private beforeItemReplacedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
-        private itemReplacedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
+        private beforeItemsAddedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+        private itemsAddedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+        private beforeItemsRemovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+        private itemsRemovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+        private beforeItemReplacedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+        private itemReplacedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
         private itemChangingSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
         private itemChangedSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
-        private beforeItemsMovedSubject: Lazy<Rx.Subject<IMoveInfo<T>>>;
-        private itemsMovedSubject: Lazy<Rx.Subject<IMoveInfo<T>>>;
+        private beforeItemsMovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+        private itemsMovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
         private resetSubject: Rx.Subject<any>;
         private beforeResetSubject: Rx.Subject<any>;
         private changeNotificationsSuppressed: number = 0;
@@ -445,14 +445,14 @@ module wx {
         private hasWhinedAboutNoResetSub = false;
 
         // backing-fields for subjects exposed as observables
-        private _itemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>;
-        private _beforeItemsAdded: Rx.Observable<IAddReplaceRemoveInfo<T>>;
-        private _itemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>;
-        private _beforeItemsRemoved: Rx.Observable<IAddReplaceRemoveInfo<T>>;
-        private _beforeItemsMoved: Rx.Observable<IMoveInfo<T>>;
-        private _itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
-        private _beforeItemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
-        private _itemsMoved: Rx.Observable<IMoveInfo<T>>;
+        private _itemsAdded: Rx.Observable<IListChangeInfo<T>>;
+        private _beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>;
+        private _itemsRemoved: Rx.Observable<IListChangeInfo<T>>;
+        private _beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>;
+        private _beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>;
+        private _itemReplaced: Rx.Observable<IListChangeInfo<T>>;
+        private _beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>;
+        private _itemsMoved: Rx.Observable<IListChangeInfo<T>>;
         private _countChanging: Rx.Observable<number>;
         private _countChanged: Rx.Observable<number>;
         private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
@@ -466,12 +466,12 @@ module wx {
             if (this.inner === undefined)
                 this.inner = new Array<T>();
 
-            this.beforeItemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
-            this.itemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
-            this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
-            this.itemsRemovedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
-            this.beforeItemReplacedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
-            this.itemReplacedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
+            this.beforeItemsAddedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+            this.itemsAddedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+            this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+            this.itemsRemovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+            this.beforeItemReplacedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+            this.itemReplacedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
             this.resetSubject = new Rx.Subject<any>();
             this.beforeResetSubject = new Rx.Subject<any>();
 
@@ -483,17 +483,17 @@ module wx {
                 <any> new Rx.Subject<IPropertyChangedEventArgs>());
                 //<any> new ScheduledSubject<ReactiveIPropertyChangedEventArgs>(scheduler));
 
-            this.beforeItemsMovedSubject = new Lazy<Rx.Subject<IMoveInfo<T>>>(() => new Rx.Subject<IMoveInfo<T>>());
-            this.itemsMovedSubject = new Lazy<Rx.Subject<IMoveInfo<T>>>(() => new Rx.Subject<IMoveInfo<T>>());
+            this.beforeItemsMovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+            this.itemsMovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
 
-            this.changed = Rx.Observable.merge(
+            this.listChanged = Rx.Observable.merge(
                 this.itemsAdded.select(x => false),
                 this.itemsRemoved.select(x => false),
                 this.itemReplaced.select(x => false),
                 this.itemsMoved.select(x => false),
                 this.resetSubject.select(x => true));
 
-            this.changing = Rx.Observable.merge(
+            this.listChanging = Rx.Observable.merge(
                 this.beforeItemsAdded.select(x => false),
                 this.beforeItemsRemoved.select(x => false),
                 this.beforeItemReplaced.select(x => false),
@@ -520,12 +520,12 @@ module wx {
             }
 
             if (this.beforeItemsAddedSubject.isValueCreated)
-                this.beforeItemsAddedSubject.value.onNext({ items: [item], index: index });
+                this.beforeItemsAddedSubject.value.onNext({ items: [item], from: index });
 
             this.inner.splice(index, 0, item);
 
             if (this.itemsAddedSubject.isValueCreated)
-                this.itemsAddedSubject.value.onNext({ items: [item], index: index });
+                this.itemsAddedSubject.value.onNext({ items: [item], from: index });
 
             if (this.changeTrackingEnabled)
                 this.addItemToPropertyTracking(item);
@@ -544,12 +544,12 @@ module wx {
             }
 
             if (this.beforeItemsRemovedSubject.isValueCreated)
-                this.beforeItemsRemovedSubject.value.onNext({ items: [item], index: index });
+                this.beforeItemsRemovedSubject.value.onNext({ items: [item], from: index });
 
             this.inner.splice(index, 1);
 
             if (this.itemsRemovedSubject.isValueCreated)
-                this.itemsRemovedSubject.value.onNext({ items: [item], index: index });
+                this.itemsRemovedSubject.value.onNext({ items: [item], from: index });
 
             if (this.changeTrackingEnabled)
                 this.removeItemFromPropertyTracking(item);
@@ -565,7 +565,7 @@ module wx {
                 return;
             }
 
-            var mi = new MoveInfo<T>([item], oldIndex, newIndex);
+            var mi = { items: [item], from: oldIndex, to: newIndex};
 
             if (this.beforeItemsMovedSubject.isValueCreated)
                 this.beforeItemsMovedSubject.value.onNext(mi);
@@ -590,7 +590,7 @@ module wx {
             }
 
             if (this.beforeItemReplacedSubject.isValueCreated)
-                this.beforeItemReplacedSubject.value.onNext({ index: index, items: [item]});
+                this.beforeItemReplacedSubject.value.onNext({ from: index, items: [item]});
 
             if (this.changeTrackingEnabled) {
                 this.removeItemFromPropertyTracking(this.inner[index]);
@@ -600,7 +600,7 @@ module wx {
             this.inner[index] = item;
 
             if (this.itemReplacedSubject.isValueCreated)
-                this.itemReplacedSubject.value.onNext({ index: index, items: [item] });
+                this.itemReplacedSubject.value.onNext({ from: index, items: [item] });
         }
 
         private clearItems(): void {
@@ -682,18 +682,6 @@ module wx {
         private isLengthAboveResetThreshold(toChangeLength: number): boolean {
             return toChangeLength / this.inner.length > this.resetChangeThreshold && toChangeLength > 10;
         }
-    }
-
-    class MoveInfo<T> implements IMoveInfo<T> {
-        constructor(movedItems: Array<T>, from: number, to: number) {
-            this.items = movedItems;
-            this.from = from;
-            this.to = to;
-        }
-
-        items: Array<T>;
-        from: number;
-        to: number;
     }
 
     export module internal {

@@ -361,7 +361,7 @@ describe("ObservableList", () => {
         var fixture = wx.list<number>([ 1, 2, 3, 4, 5 ]);
 
         var changed = new Array<boolean>();
-        fixture.changed.subscribe(x => {
+        fixture.listChanged.subscribe(x => {
             changed.push(x);
         });
 

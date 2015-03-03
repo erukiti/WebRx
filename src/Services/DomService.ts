@@ -449,7 +449,7 @@ module wx {
                         result = list.get(index);
 
                         // add collectionChanged to monitored observables
-                        captured.add(list.changed);
+                        captured.add(list.listChanged);
                     } else {
                         result = o[index];
                     }
@@ -476,7 +476,7 @@ module wx {
                         target = list.get(index);
 
                         // add collectionChanged to monitored observables
-                        captured.add(list.changed);
+                        captured.add(list.listChanged);
 
                         // intercept access to observable properties
                         if (utils.queryInterface(target, IID.IObservableProperty)) {
