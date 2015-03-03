@@ -360,8 +360,8 @@ describe("ObservableList", () => {
     it("get a range when adding an array of items",() => {
         var fixture = wx.list<number>([ 1, 2, 3, 4, 5 ]);
 
-        var changed = new Array<wx.INotifyListChangedEventArgs>();
-        fixture.collectionChanged.subscribe(x => {
+        var changed = new Array<boolean>();
+        fixture.changed.subscribe(x => {
             changed.push(x);
         });
 
@@ -369,7 +369,6 @@ describe("ObservableList", () => {
 
         fixture.addRange([ 6, 7 ]);
         expect(1).toEqual(changed.length);
-        expect(wx.NotifyCollectionChangedAction.Add).toEqual(changed[0].action);
     });
 });
 

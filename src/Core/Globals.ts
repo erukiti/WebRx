@@ -48,7 +48,7 @@ module wx {
                         //if (!areChangeNotificationsEnabled())
                         //    return;
 
-                        var e = new PropertyChangedEventArgs(self, x.propertyName);
+                        var e = new internal.PropertyChangedEventArgs(self, x.propertyName);
 
                         try {
                             observer.onNext(e);

@@ -111,8 +111,83 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\src\**\*.*">
-      <Link>%(RecursiveDir)%(FileName)</Link>
+    <Compile Include="..\src\Core\Command.ts">
+      <Link>Core\Command</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Events.ts">
+      <Link>Core\Events</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Globals.ts">
+      <Link>Core\Globals</Link>
+    </Compile>
+    <Compile Include="..\src\Core\HashSet.ts">
+      <Link>Core\HashSet</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Injector.ts">
+      <Link>Core\Injector</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Lazy.ts">
+      <Link>Core\Lazy</Link>
+    </Compile>
+    <Compile Include="..\src\Core\List.ts">
+      <Link>Core\List</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Module.ts">
+      <Link>Core\Module</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Property.ts">
+      <Link>Core\Property</Link>
+    </Compile>
+    <Compile Include="..\src\Core\RefCountDisposeWrapper.ts">
+      <Link>Core\RefCountDisposeWrapper</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Resources.ts">
+      <Link>Core\Resources</Link>
+    </Compile>
+    <Compile Include="..\src\Core\Utils.ts">
+      <Link>Core\Utils</Link>
+    </Compile>
+    <Compile Include="..\src\Core\WeakMap.ts">
+      <Link>Core\WeakMap</Link>
+    </Compile>
+    <Compile Include="..\src\Directives\CommandDirective.ts">
+      <Link>Directives\CommandDirective</Link>
+    </Compile>
+    <Compile Include="..\src\Directives\ForEachDirective.ts">
+      <Link>Directives\ForEachDirective</Link>
+    </Compile>
+    <Compile Include="..\src\Directives\IfDirective.ts">
+      <Link>Directives\IfDirective</Link>
+    </Compile>
+    <Compile Include="..\src\Directives\ModuleDirective.ts">
+      <Link>Directives\ModuleDirective</Link>
+    </Compile>
+    <Compile Include="..\src\Directives\MultiOneWayDirectives.ts">
+      <Link>Directives\MultiOneWayDirectives</Link>
+    </Compile>
+    <Compile Include="..\src\Directives\SimpleOneWayDirectives.ts">
+      <Link>Directives\SimpleOneWayDirectives</Link>
+    </Compile>
+    <Compile Include="..\src\Interfaces.ts">
+      <Link>Interfaces</Link>
+    </Compile>
+    <Compile Include="..\src\Registration.ts">
+      <Link>Registration</Link>
+    </Compile>
+    <Compile Include="..\src\RTTI\IID.ts">
+      <Link>RTTI\IID</Link>
+    </Compile>
+    <Compile Include="..\src\RTTI\IUnknown.ts">
+      <Link>RTTI\IUnknown</Link>
+    </Compile>
+    <Compile Include="..\src\RxJsExtensions.ts">
+      <Link>RxJsExtensions</Link>
+    </Compile>
+    <Compile Include="..\src\Services\DomService.ts">
+      <Link>Services\DomService</Link>
+    </Compile>
+    <Compile Include="..\src\Services\ExpressionCompiler.ts">
+      <Link>Services\ExpressionCompiler</Link>
     </Compile>
   </ItemGroup>
   <PropertyGroup>

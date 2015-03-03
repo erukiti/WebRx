@@ -95,30 +95,30 @@ module wx {
             return this._itemsMoved;
         }
 
-        public get collectionChanging(): Rx.Observable<INotifyListChangedEventArgs> {
-            if (!this._collectionChanging)
-                this._collectionChanging = this.changingSubject.asObservable();
+        public get changing(): Rx.Observable<boolean> {
+            if (!this._changing)
+                this._changing = this.changingSubject.asObservable();
 
-            return this._collectionChanging;
+            return this._changing;
         }
 
-        public get collectionChanged(): Rx.Observable<INotifyListChangedEventArgs> {
-            if (!this._collectionChanged)
-                this._collectionChanged = this.changedSubject.asObservable();
+        public get changed(): Rx.Observable<boolean> {
+            if (!this._changed)
+                this._changed = this.changedSubject.asObservable();
 
-            return this._collectionChanged;
+            return this._changed;
         }
 
         public get countChanging(): Rx.Observable<number> {
             if (!this._countChanging)
-                this._countChanging = this.collectionChanging.select(_ => this.inner.length).distinctUntilChanged();
+                this._countChanging = this.changing.select(_ => this.inner.length).distinctUntilChanged();
 
             return this._countChanging;
         }
 
         public get countChanged(): Rx.Observable<number> {
             if (!this._countChanged)
-                this._countChanged = this.collectionChanged.select(_ => this.inner.length).distinctUntilChanged();
+                this._countChanged = this.changed.select(_ => this.inner.length).distinctUntilChanged();
 
             return this._countChanged;
         }
@@ -140,9 +140,8 @@ module wx {
         }
 
         public get shouldReset(): Rx.Observable<any> {
-            return this.refcountSubscribers(this.collectionChanged.selectMany(x =>
-                x.action !== NotifyCollectionChangedAction.Reset ?
-                    Rx.Observable.empty<any>() :
+            return this.refcountSubscribers(this.changed.selectMany(x =>
+                !x ? Rx.Observable.empty<any>() :
                     Rx.Observable.return(null)), x => this.resetSubCount += x);
         }
 
@@ -191,16 +190,14 @@ module wx {
                 }
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
-                    var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, <Array<any>> <any> items, this.inner.length /*we are appending a range*/);
-
-                    this.changingSubject.onNext(ea);
+                    this.changingSubject.onNext(false);
 
                     if (this.beforeItemsAddedSubject.isValueCreated) {
                         this.beforeItemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
                     }
 
                     Array.prototype.splice.apply(this.inner, (<T[]><any>[this.inner.length, 0]).concat(items));
-                    this.changedSubject.onNext(ea);
+                    this.changedSubject.onNext(false);
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         this.itemsAddedSubject.value.onNext({ items: items, index: this.inner.length });
@@ -246,9 +243,7 @@ module wx {
                 }
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
-                    var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, <Array<any>> <any> items, this.inner.length /*we are appending a range*/);
-
-                    this.changingSubject.onNext(ea);
+                    this.changingSubject.onNext(false);
 
                     if (this.beforeItemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
@@ -257,7 +252,7 @@ module wx {
                     }
 
                     Array.prototype.splice.apply(this.inner, (<T[]><any>[index, 0]).concat(items));
-                    this.changedSubject.onNext(ea);
+                    this.changedSubject.onNext(false);
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         items.forEach(x => {
@@ -314,9 +309,7 @@ module wx {
                 }
                 // range notification
                 else if (true) /* if (wx.App.SupportsRangeNotifications) */ {
-                    var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Remove, <Array<any>> <any> items, index);
-
-                    this.changingSubject.onNext(ea);
+                    this.changingSubject.onNext(false);
 
                     if (this.beforeItemsRemovedSubject.isValueCreated) {
                         items.forEach(x => {
@@ -325,7 +318,7 @@ module wx {
                     }
 
                     this.inner.splice(index, count);
-                    this.changedSubject.onNext(ea);
+                    this.changedSubject.onNext(false);
 
                     if (this.changeTrackingEnabled) {
                         items.forEach(x => {
@@ -448,8 +441,8 @@ module wx {
         ////////////////////
         // Implementation
 
-        private changingSubject: Rx.Subject<INotifyListChangedEventArgs>;
-        private changedSubject: Rx.Subject<INotifyListChangedEventArgs>;
+        private changingSubject: Rx.Subject<boolean>;
+        private changedSubject: Rx.Subject<boolean>;
         private inner: Array<T>;
         private beforeItemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
         private itemsAddedSubject: Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>;
@@ -476,8 +469,8 @@ module wx {
         private _itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
         private _beforeItemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>;
         private _itemsMoved: Rx.Observable<IMoveInfo<T>>;
-        private _collectionChanging: Rx.Observable<INotifyListChangedEventArgs>;
-        private _collectionChanged: Rx.Observable<INotifyListChangedEventArgs>;
+        private _changing: Rx.Observable<boolean>;
+        private _changed: Rx.Observable<boolean>;
         private _countChanging: Rx.Observable<number>;
         private _countChanged: Rx.Observable<number>;
         private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
@@ -491,8 +484,8 @@ module wx {
             if (this.inner === undefined)
                 this.inner = new Array<T>();
 
-            this.changingSubject = new Rx.Subject<INotifyListChangedEventArgs>();
-            this.changedSubject = new Rx.Subject<INotifyListChangedEventArgs>();
+            this.changingSubject = new Rx.Subject<boolean>();
+            this.changedSubject = new Rx.Subject<boolean>();
 
             this.beforeItemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
             this.itemsAddedSubject = new Lazy<Rx.Subject<IAddReplaceRemoveInfo<T>>>(() => new Rx.Subject<IAddReplaceRemoveInfo<T>>());
@@ -531,16 +524,14 @@ module wx {
                 return;
             }
 
-            var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Add, item, index);
-
-            this.changingSubject.onNext(ea);
+            this.changingSubject.onNext(false);
 
             if (this.beforeItemsAddedSubject.isValueCreated)
                 this.beforeItemsAddedSubject.value.onNext({ items: [item], index: index });
 
             this.inner.splice(index, 0, item);
 
-            this.changedSubject.onNext(ea);
+            this.changedSubject.onNext(false);
 
             if (this.itemsAddedSubject.isValueCreated)
                 this.itemsAddedSubject.value.onNext({ items: [item], index: index });
@@ -561,16 +552,14 @@ module wx {
                 return;
             }
 
-            var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Remove, item, index);
-
-            this.changingSubject.onNext(ea);
+            this.changingSubject.onNext(false);
 
             if (this.beforeItemsRemovedSubject.isValueCreated)
                 this.beforeItemsRemovedSubject.value.onNext({ items: [item], index: index });
 
             this.inner.splice(index, 1);
 
-            this.changedSubject.onNext(ea);
+            this.changedSubject.onNext(false);
 
             if (this.itemsRemovedSubject.isValueCreated)
                 this.itemsRemovedSubject.value.onNext({ items: [item], index: index });
@@ -589,10 +578,9 @@ module wx {
                 return;
             }
 
-            var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Move, [item], newIndex, oldIndex);
-            var mi = new MoveInfo<T>([item], oldIndex, newIndex);
+             var mi = new MoveInfo<T>([item], oldIndex, newIndex);
 
-            this.changingSubject.onNext(ea);
+             this.changingSubject.onNext(false);
 
             if (this.beforeItemsMovedSubject.isValueCreated)
                 this.beforeItemsMovedSubject.value.onNext(mi);
@@ -600,7 +588,7 @@ module wx {
             this.inner.splice(oldIndex, 1);
             this.inner.splice(newIndex, 0, item);
 
-            this.changedSubject.onNext(ea);
+            this.changedSubject.onNext(false);
 
             if (this.itemsMovedSubject.isValueCreated)
                 this.itemsMovedSubject.value.onNext(mi);
@@ -618,8 +606,7 @@ module wx {
                 return;
             }
 
-            var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Replace, item, this.inner[index], index);
-            this.changingSubject.onNext(ea);
+            this.changingSubject.onNext(false);
 
             if (this.beforeItemReplacedSubject.isValueCreated)
                 this.beforeItemReplacedSubject.value.onNext({ index: index, items: [item]});
@@ -630,7 +617,7 @@ module wx {
             }
 
             this.inner[index] = item;
-            this.changedSubject.onNext(ea);
+            this.changedSubject.onNext(false);
 
             if (this.itemReplacedSubject.isValueCreated)
                 this.itemReplacedSubject.value.onNext({ index: index, items: [item] });
@@ -646,11 +633,9 @@ module wx {
                 return;
             }
 
-            var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Reset);
-
-            this.changingSubject.onNext(ea);
+            this.changingSubject.onNext(true);
             this.inner.length = 0;    // see http://stackoverflow.com/a/1232046/88513
-            this.changedSubject.onNext(ea);
+            this.changedSubject.onNext(true);
 
             if (this.changeTrackingEnabled)
                 this.clearAllPropertyChangeWatchers();
@@ -666,10 +651,10 @@ module wx {
             }
 
             var changing = observeObject(toTrack, true)
-                .select(i => new PropertyChangedEventArgs(toTrack, i.propertyName));
+                .select(i => new internal.PropertyChangedEventArgs(toTrack, i.propertyName));
 
             var changed = observeObject(toTrack, false)
-                .select(i => new PropertyChangedEventArgs(toTrack, i.propertyName));
+                .select(i => new internal.PropertyChangedEventArgs(toTrack, i.propertyName));
 
             var disp = new Rx.CompositeDisposable(
                 changing.where(_ => self.areChangeNotificationsEnabled()).subscribe(x=> self.itemChangingSubject.value.onNext(x)),
@@ -707,9 +692,8 @@ module wx {
         }
 
         private publishResetNotification() {
-            var ea = NotifyCollectionChangedEventArgs.create(NotifyCollectionChangedAction.Reset);
-            this.changingSubject.onNext(ea);
-            this.changedSubject.onNext(ea);
+            this.changingSubject.onNext(true);
+            this.changedSubject.onNext(true);
         }
 
         private isLengthAboveResetThreshold(toChangeLength: number): boolean {

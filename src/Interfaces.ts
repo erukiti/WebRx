@@ -51,22 +51,6 @@ module wx {
         source?: Rx.Observable<T>;
     }
 
-    export enum NotifyCollectionChangedAction {
-        Add,
-        Remove,
-        Replace,
-        Move,
-        Reset,
-    }
-
-    export interface INotifyListChangedEventArgs {
-        action: NotifyCollectionChangedAction;
-        newItems: Array<any>;
-        newStartingIndex: number;
-        oldItems: Array<any>;
-        oldStartingIndex: number;
-    }
-
     /// <summary>
     /// This interface is implemented by RxUI objects which are given
     /// IObservables as input - when the input IObservables OnError, instead of
@@ -185,6 +169,18 @@ module wx {
     /// </summary>
     export interface INotifyListChanged<T> {
         /// <summary>
+        /// This Observable is equivalent to the NotifyCollectionChanged event,
+        /// but fires before the collection is changed
+        /// </summary>
+        changing: Rx.Observable<boolean>; //  { get; }
+
+        /// <summary>
+        /// This Observable is equivalent to the NotifyCollectionChanged event,
+        /// and fires after the collection is changed
+        /// </summary>
+        changed: Rx.Observable<boolean>; //  { get; }
+
+        /// <summary>
         /// Fires when items are added to the collection, once per item added.
         /// Functions that add multiple items such AddRange should fire this
         /// multiple times. The object provided is the item that was added.
@@ -232,18 +228,6 @@ module wx {
         /// Fires after an item is replaced
         /// </summary>
         itemReplaced: Rx.Observable<IAddReplaceRemoveInfo<T>>; //  { get; }
-
-        /// <summary>
-        /// This Observable is equivalent to the NotifyCollectionChanged event,
-        /// but fires before the collection is changed
-        /// </summary>
-        collectionChanging: Rx.Observable<INotifyListChangedEventArgs>; //  { get; }
-
-        /// <summary>
-        /// This Observable is equivalent to the NotifyCollectionChanged event,
-        /// and fires after the collection is changed
-        /// </summary>
-        collectionChanged: Rx.Observable<INotifyListChangedEventArgs>; //  { get; }
 
         /// <summary>
         /// Fires when the collection count changes, regardless of reason
