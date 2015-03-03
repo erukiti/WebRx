@@ -2,6 +2,7 @@
 /// <reference path="Utils.ts" />
 /// <reference path="Injector.ts" />
 /// <reference path="Resources.ts" />
+/// <reference path="Globals.ts" />
 
 module wx {
     class Module implements IModule {
@@ -94,9 +95,6 @@ module wx {
             }
         });
 
-        private _mainThreadScheduler: Rx.IScheduler;
-        private static _unitTestMainThreadScheduler: Rx.IScheduler;
-
         /// <summary>
         /// MainThreadScheduler is the scheduler used to schedule work items that
         /// should be run "on the UI thread". In normal mode, this will be
@@ -104,25 +102,42 @@ module wx {
         /// to simplify writing common unit tests.
         /// </summary>
         public get mainThreadScheduler(): Rx.IScheduler {
-            return App._unitTestMainThreadScheduler || this._mainThreadScheduler
+            return this._unitTestMainThreadScheduler || this._mainThreadScheduler
                 || Rx.Scheduler.currentThread;  // OW: return a default if schedulers haven't been setup by in
         }
 
         public set mainThreadScheduler(value: Rx.IScheduler) {
             if (utils.isInUnitTest()) {
-                App._unitTestMainThreadScheduler = value;
+                this._unitTestMainThreadScheduler = value;
                 this._mainThreadScheduler = this._mainThreadScheduler || value;
             } else {
                 this._mainThreadScheduler = value;
             }
         }
+
+        public get templateEngine(): ITemplateEngine {
+            if (!this._templateEngine) {
+                this._templateEngine = injector.resolve<ITemplateEngine>(res.htmlTemplateEngine);
+            }
+
+            return this._templateEngine;
+        }
+
+        public set templateEngine(newVal: ITemplateEngine){
+            this._templateEngine = newVal;
+        }
+
+        ///////////////////////
+        // Implementation
+
+        private _templateEngine: ITemplateEngine;
+        private _mainThreadScheduler: Rx.IScheduler;
+        private _unitTestMainThreadScheduler: Rx.IScheduler;
     }
 
     export var app: IWebRxApp = new App();
 
-    var modules: { [name: string]: IModule } = {
-         'app': app
-    };
+    var modules: { [name: string]: IModule } = { 'app': app };
 
     /**
     * Defines or retrieves an application module.

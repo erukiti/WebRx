@@ -26,6 +26,14 @@ module wx {
     }
 
     /**
+    * Represents an engine responsible for converting arbitrary text fragements into a collection of Dom Nodes
+    * @interface 
+    **/
+    export interface ITemplateEngine {
+        parse(templateSource: string): Node[];
+    }
+
+    /**
     * Represents a collection of objects that can be individually accessed by index.
     * @interface 
     **/
@@ -56,7 +64,8 @@ module wx {
     * @interface 
     **/
     export interface IObservableProperty<T> extends Rx.IDisposable {
-        (newValue?: T): T;
+        (newValue: T): void;
+        (): T;
         changing: Rx.Observable<T>;
         changed: Rx.Observable<T>;
         source?: Rx.Observable<T>;
@@ -496,6 +505,7 @@ module wx {
     export interface IWebRxApp extends IModule {
         defaultExceptionHandler: Rx.Observer<Error>;
         mainThreadScheduler: Rx.IScheduler;
+        templateEngine: ITemplateEngine;
     }
 }
 

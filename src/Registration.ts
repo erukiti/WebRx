@@ -7,10 +7,11 @@
 /// <reference path="Directives/SimpleOneWayDirectives.ts" />
 /// <reference path="Core/Module.ts" />
 /// <reference path="Directives/ForEachDirective.ts" />
+/// <reference path="Services/HtmlTemplateEngine.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
-
+    injector.register(res.htmlTemplateEngine, true, true, [internal.htmlTemplateEngineConstructor]);
     injector.register(res.domService, true, true, [res.expressionCompiler, internal.domServiceConstructor]);
 
     injector.register("wx.directives.module", true, true, [res.domService, internal.moduleDirectiveConstructor]);

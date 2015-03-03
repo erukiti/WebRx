@@ -1,5 +1,6 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="Utils.ts" />
+/// <reference path="Globals.ts" />
 
 module wx {
     /**

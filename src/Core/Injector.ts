@@ -1,5 +1,6 @@
 ﻿/// <reference path="Utils.ts" />
 /// <reference path="Resources.ts" />
+/// <reference path="Globals.ts" />
 
 module wx {
     /**

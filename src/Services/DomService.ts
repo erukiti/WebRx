@@ -2,7 +2,7 @@
 /// <reference path="../Core/WeakMap.ts" />
 /// <reference path="../Core/Resources.ts" />
 /// <reference path="../Core/Injector.ts" />
-/// <reference path="../Core/Resources.ts" />
+/// <reference path="../Core/Globals.ts" />
 
 module wx {
     class DomService implements IDomService {
