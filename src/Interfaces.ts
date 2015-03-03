@@ -1,6 +1,10 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
 module wx {
+   /**
+    * Dependency Injector and service locator
+    * @interface 
+    **/
     export interface IInjector {
         register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): void;
         register(key: string, singleton: boolean, factory: () => any): void;
@@ -9,6 +13,10 @@ module wx {
         resolve<T>(key: string): T;
     }
 
+   /**
+    * The WeakMap object is a collection of key/value pairs in which the keys are objects and the values can be arbitrary values. The keys are held using weak references.
+    * @interface 
+    **/
     export interface IWeakMap<TKey extends Object, T> {
         set(key: TKey, value: T): void;
         get(key: TKey): T;
@@ -19,6 +27,7 @@ module wx {
 
     /**
     * Represents a collection of objects that can be individually accessed by index.
+    * @interface 
     **/
     export interface IReadOnlyList<T> {
         length: number;
@@ -27,6 +36,7 @@ module wx {
 
     /**
     * Represents a collection of objects that can be individually accessed by index.
+    * @interface 
     **/
     export interface IList<T> extends IReadOnlyList<T> {
         set(index: number, item: T);
@@ -43,6 +53,7 @@ module wx {
     /**
     * IObservableProperty combines a function signature for value setting and getting with
     * observables for monitoring value changes
+    * @interface 
     **/
     export interface IObservableProperty<T> extends Rx.IDisposable {
         (newValue?: T): T;
@@ -61,6 +72,7 @@ module wx {
     * default Observer is wx.App.DefaultExceptionHandler - this means, that if
     * you aren't listening to ThrownExceptions and one appears, the exception
     * will appear on the UI thread and crash the application.
+    * @interface 
     **/
     export interface IHandleObservableErrors {
         /**
@@ -70,7 +82,11 @@ module wx {
         thrownExceptions: Rx.Observable<Error>; //  { get; }
     }
 
-    export interface IListChangeInfo<T> {
+    /**
+    * Encapsulates change notifications published by various IObservableList members
+    * @interface 
+    **/
+   export interface IListChangeInfo<T> {
         items: T[]; // { get; }
         from: number; // { get; }
         to?: number; // { get; }
@@ -81,6 +97,7 @@ module wx {
     * executed (i.e. when Execute is called) via IObservable. Conceptually,
     * this represents an Event, so as a result this IObservable should never
     * OnComplete or OnError.
+    * @interface 
     **/
     export interface ICommand<T> extends
         Rx.IDisposable,
@@ -122,14 +139,19 @@ module wx {
         executeAsync(parameter?: any): Rx.Observable<T>;
     }
 
-    export interface IPropertyChangedEventArgs {
-            sender: any; //  { get; private set; }
-            propertyName: string;
+    /**
+    * Provides information about a changed property value on an object
+    * @interface 
+    **/
+   export interface IPropertyChangedEventArgs {
+        sender: any; //  { get; private set; }
+        propertyName: string;
     }
 
     /**
     * IReactiveNotifyCollectionItemChanged provides notifications for collection item updates, ie when an object in
     * a collection changes.
+    * @interface 
     **/
     export interface INotifyCollectionItemChanged {
         /**
@@ -159,6 +181,7 @@ module wx {
     /**
     * IReactiveNotifyCollectionChanged of T provides notifications when the contents
     * of collection are changed (items are added/removed/moved).
+    * @interface 
     **/
     export interface INotifyListChanged<T> {
         /**
@@ -259,6 +282,7 @@ module wx {
     * It is important to implement the Changing/Changed from
     * IReactiveNotifyPropertyChanged semantically as "Fire when *anything* in
     * the collection or any of its items have changed, in any way".
+    * @interface 
     **/
     export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyCollectionItemChanged {
         isEmpty: boolean; //  { get; }
@@ -277,6 +301,10 @@ module wx {
         toArray(): Array<T>;
     }
 
+    /**
+    * Data context used in binding operations
+    * @interface 
+    **/
     export interface IDataContext {
         $data: any;
         $root: any;
@@ -291,6 +319,10 @@ module wx {
         index?: any;
     }
 
+    /**
+    * Stored DOM Node state
+    * @interface 
+    **/
     export interface INodeState {
         isBound: boolean;   // true of this node has been touched by applyDirectives
         cleanup: Rx.CompositeDisposable;
@@ -330,6 +362,10 @@ module wx {
         parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
     }
 
+    /**
+    * The Dom services provides functionality for manipulating the browser Dom
+    * @interface 
+    **/
     export interface IDomService {
         /**
         * Applies directives to the specified node and all of its children using the specified data context 
@@ -400,6 +436,12 @@ module wx {
         expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
     }
 
+    /**
+    * Directives are markers on a DOM element (such as an attribute or comment) that tell 
+    * WebRx's Dom compiler to attach a specified behavior to that DOM element or even transform
+    * the DOM element and its children.
+    * @interface 
+    **/
     export interface IDirective {
         /**
         * Applies the directive to the specified element
