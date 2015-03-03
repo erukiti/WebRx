@@ -18,6 +18,10 @@ describe('HtmlTemplateEngine',() => {
         expect(nodes.length).toEqual(3);
         expect(Array.isArray(nodes)).toBeTruthy();
 
+        // should match jQuery.parseHTML
+        expect(engine.parse($("#fixture1")[0].innerHTML).map(x=> x.toString()).join()).toEqual(
+            jQuery["parseHTML"]($("#fixture1")[0].innerHTML).map(x=> x.toString()).join());
+
         html = "<script>undefined()</script>";  // "Ignore scripts by default" 
         expect(engine.parse(html).length).toEqual(0);
 

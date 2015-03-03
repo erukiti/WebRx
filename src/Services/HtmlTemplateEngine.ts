@@ -131,6 +131,7 @@ module wx {
 
         i = 0;
         while ((elem = nodes[i++])) {
+            // filter out scripts
             if (!elem.type && !rscriptType.test(elem.type)) {
                 fragment.appendChild(elem);
             }
