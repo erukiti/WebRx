@@ -98,4 +98,19 @@ module testutils {
 
         return ctx;
     }
+
+    export function nodeListToArray(nodes: NodeList): Node[] {
+        return Array.prototype.slice.call(nodes);
+    }
+
+    export function nodeChildrenToArray(node: Node): Node[] {
+        return nodeListToArray(node.childNodes);
+    }
+
+    export function allAttributes2String(nodes: any[], attr: string, except?: any[]) {
+        if (except)
+            nodes = nodes.filter(x => except.indexOf(x) === -1);
+
+        return nodes.map(x => x.getAttribute(attr)).join(", ");
+    }
 }

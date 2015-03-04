@@ -167,7 +167,7 @@ module wx {
                 if (!this.areChangeNotificationsEnabled()) {
 
                     // this._inner.splice(this._inner.length, 0, items)
-                    Array.prototype.splice.apply(this.inner, (<T[]><any>[this.inner.length, 0]).concat(items));
+                    Array.prototype.push.apply(this.inner, items);
 
                     if (this.changeTrackingEnabled) {
                         items.forEach(x => {
@@ -181,7 +181,7 @@ module wx {
                         this.beforeItemsAddedSubject.value.onNext({ items: items, from: this.inner.length });
                     }
 
-                    Array.prototype.splice.apply(this.inner, (<T[]><any>[this.inner.length, 0]).concat(items));
+                    Array.prototype.push.apply(this.inner, items);
 
                     if (this.itemsAddedSubject.isValueCreated) {
                         this.itemsAddedSubject.value.onNext({ items: items, from: this.inner.length });

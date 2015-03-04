@@ -42,7 +42,7 @@ describe("Utils",() => {
         expect(wx.utils.getOid(s)).toEqual(wx.utils.getOid(s));
     });
 
-    it("isRxuiProperty smoke-test",() => {
+    it("isProperty smoke-test",() => {
         expect(wx.utils.isProperty(1)).toBeFalsy();
         expect(wx.utils.isProperty("foo")).toBeFalsy();
         expect(wx.utils.isProperty(new String("foo"))).toBeFalsy();
@@ -53,7 +53,7 @@ describe("Utils",() => {
         expect(wx.utils.isProperty(Rx.Observable.return(1).toProperty())).toBeTruthy();
     });
 
-    it("isRxuiCommand smoke-test",() => {
+    it("isCommand smoke-test",() => {
         expect(wx.utils.isCommand(1)).toBeFalsy();
         expect(wx.utils.isCommand("foo")).toBeFalsy();
         expect(wx.utils.isCommand(new String("foo"))).toBeFalsy();

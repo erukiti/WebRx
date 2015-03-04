@@ -3,6 +3,7 @@
 /// <reference path="../Services/DomService.ts" />
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../Core/Resources.ts" />
+/// <reference path="../Core/NodeChildsProxy.ts" />
 
 module wx {
     export interface IForEachDirectiveOptions {
@@ -73,15 +74,26 @@ module wx {
             var cleanup: Rx.CompositeDisposable = null;
             var hooks: IForEachDirectiveHooks|string;
             var exp: ICompiledExpression;
+            var setProxyFunc: (NodeChildsProxy) => void;
 
             if (typeof options === "object" && options.hasOwnProperty("data")) {
                 var opt = <IForEachDirectiveOptions> options;
-
                 exp = opt.data;
 
-                using(this.domService.expressionToObservable(<ICompiledExpression> opt.hooks, ctx).toProperty(),(prop) => {
-                    hooks = prop();
-                });
+                if (opt.hooks) {
+                    // extract hooks
+                    using(this.domService.expressionToObservable(<ICompiledExpression> opt.hooks, ctx).toProperty(), (prop) => {
+                        hooks = prop();
+                    });
+                }
+
+                if (opt['debug']) {
+                    if (opt['debug']['setProxyFunc']) {
+                        using(this.domService.expressionToObservable(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx).toProperty(),(prop) => {
+                            setProxyFunc = prop();
+                        });
+                    }
+                }
 
                 // optionally resolve hooks if passed as string identifier
                 if (typeof hooks === "string")
@@ -111,7 +123,7 @@ module wx {
 
                 cleanup = new Rx.CompositeDisposable();
 
-                self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup);
+                self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
                 initialApply = false;
             }));
 
@@ -144,44 +156,14 @@ module wx {
         ////////////////////
         // implementation
 
-        private removedNodeClass = "wx-deleted";
-        private relevantNodeSelector = utils.formatString(" > :not(.{0})", this.removedNodeClass);
-
         protected domService: IDomService;
 
-        protected queryRelevantChildNodes(parent: Element, templateLength: number, indexes: IWeakMap<Node, Rx.Observable<any>>): Array<Node> {
-            var nodes = parent.childNodes;
-            var nodesLength = nodes.length;
-            var result = [];
-
-            // step through parents childs in blocks of template-instances each
-            // check if the first node in the block has its index no longer 
-            // maintained. And if it does not, skip the whole template-instance
-
-            for (var i = 0; i < nodesLength; i+=templateLength) {
-                if (!indexes.has(nodes[i])) {
-                    continue;
-                } else {
-                    for (var j = 0; j < templateLength; j++) {
-                        result.push(nodes[i + j]);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        protected createIndexObservableForNode(parent: HTMLElement, child: Node, startIndex: number,
+        protected createIndexObservableForNode(proxy: NodeChildsProxy, child: Node, startIndex: number,
             trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
             return Rx.Observable.create<number>(obs => {
                 return trigger.subscribe(_ => {
-                    var relevantNodes = this.queryRelevantChildNodes(parent, templateLength, indexes);
-
                     // recalculate index from node position within parent
-                    var index = relevantNodes.indexOf(child);
-
-                    if (index === -1)
-                        console.log(utils.formatString("Nooooo {0} {1}", parent.children.length, relevantNodes.length));
+                    var index = proxy.childNodes.indexOf(child);
                     index /= templateLength;
 
                     obs.onNext(index);
@@ -189,223 +171,102 @@ module wx {
             }).startWith(startIndex);
         }
 
-        protected clear(el: HTMLElement, hooks: IForEachDirectiveHooks, indexes?: IWeakMap<Node, Rx.Observable<any>>) {
-            var node: Node;
-
-            while (el.firstChild) {
-                node = el.firstChild;
-
-                if (node.nodeType === 1) {
-                    this.domService.cleanNode(node);
-                }
-
-                if (indexes)
-                    indexes.delete(node);
-
-                el.removeChild(node);
-            }            
+        protected clear(proxy: NodeChildsProxy, hooks: IForEachDirectiveHooks) {
+            proxy.clear();
         }
 
-        protected appendAll(el: HTMLElement, list: IObservableList<any>, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachDirectiveHooks, isInitial: boolean,
-            indexes: IWeakMap<Node, Rx.Observable<any>>, recalcIndextrigger: Rx.Subject<any>) {
+        protected appendAllRows(proxy: NodeChildsProxy, list: IObservableList<any>, ctx: IDataContext,
+            template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            indexTrigger: Rx.Subject<any>, isInitial: boolean) {
             var length = list.length;
 
             for (var i = 0; i < length; i++) {
-                this.appendRow(el, i, list.get(i), ctx, template, hooks, isInitial, recalcIndextrigger, indexes);
+                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexes, indexTrigger, isInitial);
             }
         }
 
-        protected appendRow(el: HTMLElement, index: number, item: any, ctx: IDataContext, template: Array<Node>,
-            hooks: IForEachDirectiveHooks, isInitial?: boolean, recalcIndextrigger?: Rx.Subject<any>,
-            indexes?: IWeakMap<Node, Rx.Observable<any>>): void {
-            var _index: any = undefined;
-            var created = false;
-            var templateLength = template.length;
-            var node: Node;
-            var added = [];            
+        protected appendRow(proxy: NodeChildsProxy, index: number, item: any, ctx: IDataContext, template: Array<Node>,
+            hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
-            for (var i = 0; i < templateLength; i++) {
-                node = template[i].cloneNode(true);
-
-                el.appendChild(node);
-
-                if (hooks)
-                    added.push(node);
-
-                if (recalcIndextrigger && !created) {
-                    _index = this.createIndexObservableForNode(el, node, index, recalcIndextrigger, indexes, templateLength);
-                    created = true;
-                }
-
-                if (node.nodeType === 1) {
-                    // propagate index to state
-                    var state = this.domService.createNodeState(item);
-                    state.properties.index = _index || index;
-                    this.domService.setNodeState(node, state);
-
-                    // done
-                    this.domService.applyDirectives(item, node);
-                }
-
-                if (recalcIndextrigger)
-                    indexes.set(node, _index);
-            }
+            var nodes = template.map(x => x.cloneNode(true));
+            var _index = indexTrigger ? <any> this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length) : index;
+            proxy.appendChilds(nodes, { index: _index, item: item });
 
             if (hooks) {
                 if (hooks.afterRender)
-                    hooks.afterRender(added, item);
+                    hooks.afterRender(nodes, item);
 
                 if (!isInitial && hooks.afterAdd)
-                    hooks.afterAdd(added, item, index);
+                    hooks.afterAdd(nodes, item, index);
             }
         }
 
-        protected insertRow(el: HTMLElement, index: number, item: any, ctx: IDataContext, template: Array<Node>,
-            hooks: IForEachDirectiveHooks, recalcIndextrigger?: Rx.Subject<any>, indexes?: IWeakMap<Node, Rx.Observable<any>>): void {
-            var _index: any = undefined;
-            var created = false;
+        protected insertRow(proxy: NodeChildsProxy, index: number, item: any, ctx: IDataContext,
+            template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
-            var node: Node;
-            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
-            var refNode = relevantNodes[templateLength * index];
-            var added = [];
 
-            for (var i = 0; i < templateLength; i++) {
-                node = template[i].cloneNode(true);
-
-                el.insertBefore(node, refNode);
-
-                if (hooks)
-                    added.push(node);
-
-                if (recalcIndextrigger && !created) {
-                    _index = this.createIndexObservableForNode(el, node, index, recalcIndextrigger, indexes, templateLength);
-                    created = true;
-                }
-
-                if (node.nodeType === 1) {
-                    // propagate index to state
-                    var state = this.domService.createNodeState(item);
-                    state.properties.index = _index || index;
-                    this.domService.setNodeState(node, state);
-
-                    // done
-                    this.domService.applyDirectives(item, node);
-                }
-
-                if (recalcIndextrigger)
-                    indexes.set(node, _index);
-            }
+            var nodes = template.map(x => x.cloneNode(true));
+            var _index = this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length);
+            proxy.insertChilds(index * templateLength, nodes, { index: _index, item: item });
 
             if (hooks) {
                 if(hooks.afterRender)
-                    hooks.afterRender(added, item);
+                    hooks.afterRender(nodes, item);
 
                 if (hooks.afterAdd)
-                    hooks.afterAdd(added, item, index);
+                    hooks.afterAdd(nodes, item, index);
             }
         }
 
-        protected removeRow(el: HTMLElement, index: number, item: any, template: Array<Node>, hooks: IForEachDirectiveHooks,
-            recalcIndextrigger: Rx.Subject<any>, indexes: IWeakMap<Node, Rx.Observable<any>>): void {
+        protected removeRow(proxy: NodeChildsProxy, index: number, item: any,
+            template: Array<Node>, hooks: IForEachDirectiveHooks): void {
             var templateLength = template.length;
-            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
-            var nodexIndex = index * templateLength;
-            var toBeRemoved = [];
-
-            for (var i = 0; i < templateLength; i++) {
-                var node = relevantNodes[nodexIndex + i];
-
-                if (node.nodeType === 1) {
-                    this.domService.cleanNode(node);
-                }
-
-                indexes.delete(node);
-                toBeRemoved.push(node);
-            }
+            var el = <Element> proxy.targetNode;
+            var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
 
             if (hooks && hooks.beforeRemove) {
-                hooks.beforeRemove(toBeRemoved, item, index);
+                hooks.beforeRemove(nodes, item, index);
             } else {
-                for (i = 0; i < toBeRemoved.length; i++) {
-                    el.removeChild(toBeRemoved[i]);
+                for (var i = 0; i < templateLength; i++) {
+                    el.removeChild(nodes[i]);
                 }
             }
         }
 
-        protected moveRow(el: HTMLElement, from: number, to: number, item: any, template: Array<Node>, hooks: IForEachDirectiveHooks,
-            recalcIndextrigger: Rx.Subject<any>, indexes: IWeakMap<Node, Rx.Observable<any>>): void {
+        protected moveRow(proxy: NodeChildsProxy, from: number, to: number, item: any,
+            template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
-            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
-            var nodexIndex = from * templateLength;
-            var nodes = [];
-
-            for (var i = 0; i < templateLength; i++) {
-                var node = relevantNodes[nodexIndex + i];
-
-                if (node.nodeType === 1) {
-                    this.domService.cleanNode(node);
-                    indexes.delete(node);
-                }
-
-                nodes.push(node);
-            }
+            var el = <Element> proxy.targetNode;
+            var nodes = proxy.removeChilds(from * templateLength, templateLength, true);
 
             if (hooks && hooks.beforeMove) {
                 hooks.beforeMove(nodes, item, from);
             }
 
-            for (i = 0; i < nodes.length; i++) {
+            for (var i = 0; i < templateLength; i++) {
                 el.removeChild(nodes[i]);
             }
 
-            var refNode = <Node> el.children[templateLength * to];
-            var _index: any = undefined;
-            var created = false;
-
-            for (i = 0; i < templateLength; i++) {
-                node = template[i].cloneNode(true);
-
-                el.insertBefore(node, refNode);
-
-                if (hooks)
-                    nodes.push(node);
-
-                if (node.nodeType === 1) {
-                    if (recalcIndextrigger && !created) {
-                        // create index observable
-                        _index = indexes.get(node);
-
-                        if (!_index) {
-                            _index = this.createIndexObservableForNode(el, node, to, recalcIndextrigger, indexes, templateLength);
-                            indexes.set(node, _index);
-                            created = true;
-                        }
-                    }
-
-                    // propagate index to state
-                    var state = this.domService.createNodeState(item);
-                    state.properties.index = _index || to;
-                    this.domService.setNodeState(node, state);
-
-                    // done
-                    this.domService.applyDirectives(item, node);
-                }
-            }
-
+            // create new row
+            nodes = template.map(x => x.cloneNode(true));
+            var _index = this.createIndexObservableForNode(proxy, nodes[0], from, indexTrigger, indexes, template.length);
+            proxy.insertChilds(templateLength * to, nodes, { index: _index, item: item });
+            
             if (hooks && hooks.afterMove) {
                 hooks.afterMove(nodes, item, from);
             }
         }
 
-        protected rebindRow(el: HTMLElement, index: number, item: any, template: Array<Node>, indexes: IWeakMap<Node, Rx.Observable<any>>): void {
+        protected rebindRow(proxy: NodeChildsProxy, index: number, item: any, template: Array<Node>,
+            indexes: IWeakMap<Node, Rx.Observable<any>>): void {
             var templateLength = template.length;
-            var relevantNodes = this.queryRelevantChildNodes(el, templateLength, indexes);
             var savedIndex;
 
             for (var i = 0; i < template.length; i++) {
-                var node = relevantNodes[(index * templateLength) + i];
+                var node = proxy.childNodes[(index * templateLength) + i];
 
                 if (node.nodeType === 1) {
                     // save the index before cleaning
@@ -424,19 +285,16 @@ module wx {
             }
         }
         
-        protected monitorList(el: HTMLElement, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
-            list: IObservableList<any>, hooks: IForEachDirectiveHooks) {
+        protected observeList(proxy: NodeChildsProxy, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
+            list: IObservableList<any>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            indexTrigger: Rx.Subject<any>) {
             var i: number;
             var length: number;
 
-            // setup index management
-            var indexes = weakmap<Node, Rx.Observable<any>>();
-            cleanup.add(Rx.Disposable.create(() => indexes = null));
-            var indexTrigger = new Rx.Subject<any>();
             cleanup.add(indexTrigger);
 
             // initial insert
-            this.appendAll(el, list, ctx, template, hooks, true, indexes, indexTrigger);
+            this.appendAllRows(proxy, list, ctx, template, hooks, indexes, indexTrigger, true);
 
             // track changes
             cleanup.add(list.itemsAdded.subscribe((e) => {
@@ -444,11 +302,11 @@ module wx {
 
                 if (e.from === list.length) {
                     for (i = 0; i < length; i++) {
-                        this.appendRow(el, i + e.from, e.items[i], ctx, template, hooks, false, indexTrigger, indexes);
+                        this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexes, indexTrigger, false);
                     }
                 } else {
                     for (i = 0; i < e.items.length; i++) {
-                        this.insertRow(el, i + e.from, e.items[i], ctx, template, hooks, indexTrigger, indexes);
+                        this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexes, indexTrigger);
                     }
                 }
 
@@ -459,34 +317,34 @@ module wx {
                 length = e.items.length;
 
                 for (i = 0; i < length; i++) {
-                    this.removeRow(el, i + e.from, e.items[i], template, hooks, indexTrigger, indexes);
+                    this.removeRow(proxy, i + e.from, e.items[i], template, hooks);
                 }
 
                 indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemsMoved.subscribe((e) => {
-                this.moveRow(el, e.from, e.to, e.items[0], template, hooks, indexTrigger, indexes);
+                this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, indexes, indexTrigger);
  
                 indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemReplaced.subscribe((e) => {
-                this.rebindRow(el, e.from, e.items[0], template, indexes);
+                this.rebindRow(proxy, e.from, e.items[0], template, indexes);
 
                 indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.shouldReset.subscribe((e) => {
-                this.clear(el, hooks, indexes);
-                this.appendAll(el, list, ctx, template, hooks, false, indexes, indexTrigger);
+                this.clear(proxy, hooks);
+                this.appendAllRows(proxy, list, ctx, template, hooks, indexes, indexTrigger, false);
 
                 indexTrigger.onNext(true);
             }));
         }
 
         protected applyValue(el: HTMLElement, value: any, hooks: IForEachDirectiveHooks, template: Array<Node>,
-            ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable): void {
+            ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable, setProxyFunc: (NodeChildsProxy) => void): void {
             var i, length;
 
             if (initialApply) {
@@ -498,7 +356,51 @@ module wx {
                 }
             }
 
-            this.clear(el, hooks);
+            // perform initial clear
+            while (el.firstChild) {
+                el.removeChild(el.firstChild);
+            }
+
+            var proxy: NodeChildsProxy;
+            var indexes: IWeakMap<Node, Rx.Observable<any>>;
+            var self = this;
+            var recalcIndextrigger: Rx.Subject<any>;
+
+            function nodeInsertCB(node: Node, callbackData?: any): void {
+                var item: any = callbackData.item;
+                var index: Rx.Observable<any> = callbackData.index;
+
+                if (node.nodeType === 1) {
+                    if (recalcIndextrigger) {
+                        indexes.set(node, index);
+                    }
+
+                    // propagate index to state
+                    var state = self.domService.createNodeState(item);
+                    state.properties.index = index;
+                    self.domService.setNodeState(node, state);
+
+                    // done
+                    self.domService.applyDirectives(item, node);
+                }
+            }
+
+            function nodeRemoveCB(node: Node): void {
+                if (node.nodeType === 1) {
+                    self.domService.cleanNode(node);
+                    indexes.delete(node);
+                }
+            }
+
+            proxy = new NodeChildsProxy(el, false, nodeInsertCB, nodeRemoveCB);
+
+            if (setProxyFunc)
+                setProxyFunc(proxy);
+
+            cleanup.add(Rx.Disposable.create(() => {
+                indexes = null;
+                proxy = null;
+            }));
 
             if (Array.isArray(value)) {
                 var arr = <Array<any>> value;
@@ -507,12 +409,14 @@ module wx {
                 length = arr.length;
 
                 for (i = 0; i < length; i++) {
-                    this.appendRow(el, i, arr[i], ctx, template, hooks);
+                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, undefined, undefined, true);
                 }
             } else if(utils.isList(value)) {
                 var list = <IObservableList<any>> value;
+                indexes = weakmap<Node, Rx.Observable<any>>();
+                recalcIndextrigger = new Rx.Subject<any>();
 
-                this.monitorList(el, ctx, template, cleanup, list, hooks);
+                this.observeList(proxy, ctx, template, cleanup, list, hooks, indexes, recalcIndextrigger);
             } else {
                 internal.throwError("forEach binding only operates on IObservableList or standard Javascript-Arrays");
             }
