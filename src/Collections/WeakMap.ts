@@ -48,7 +48,6 @@ module wx {
     * @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
     */
     export function createWeakMap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T> {
-        // test for native support
         if (disableNativeSupport || !hasNativeSupport) {
             return new WeakMapEmulated<TKey, T>();
         }

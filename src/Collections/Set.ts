@@ -71,7 +71,6 @@
     * @return {ISet<T>} A new instance of a suitable ISet implementation
     */
     export function createSet<T>(disableNativeSupport?: boolean): ISet<T> {
-        // test for native support
         if (disableNativeSupport || !hasNativeSupport) {
             return new SetEmulated<T>();
         }
