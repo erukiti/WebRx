@@ -22,7 +22,21 @@ module wx {
         get(key: TKey): T;
         has(key: TKey): boolean;
         delete(key: TKey): void;
-        isEmulatedWeakMap: boolean;
+        isEmulated: boolean;
+    }
+
+   /**
+    * The Set object lets you store unique values of any type, whether primitive values or object references.
+    * @interface 
+    **/
+    export interface ISet<T> {
+        add(value: T): ISet<T>;
+        has(key: T): boolean;
+        delete(key: T): boolean;
+        clear(): void;
+        forEach(callback: (T) => void, thisArg?): void;
+        size: number;
+        isEmulated: boolean;
     }
 
     /**

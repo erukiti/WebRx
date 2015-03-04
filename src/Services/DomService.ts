@@ -1,13 +1,14 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/WeakMap.ts" />
+/// <reference path="../Collections/WeakMap.ts" />
 /// <reference path="../Core/Resources.ts" />
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Core/Globals.ts" />
+/// <reference path="../Collections/Set.ts" />
 
 module wx {
     class DomService implements IDomService {
         constructor(compiler: IExpressionCompiler) {
-            this.elementState = weakmap<Node, INodeState>();
+            this.elementState = createWeakMap<Node, INodeState>();
             this.compiler = compiler;
         }
 
@@ -186,7 +187,7 @@ module wx {
         }
 
         public expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
-            var captured = new HashSet<Rx.Observable<any>>();
+            var captured = createSet<Rx.Observable<any>>();
             var locals;
             var result: any;
 
@@ -206,7 +207,7 @@ module wx {
 
             // Optimization: If we didn't capture any observables during 
             // initial evaluation, it is treated as a constant expression
-            if (captured.length === 0) {
+            if (captured.size === 0) {
                 if (utils.isRxObservable(result))
                     return result;
 
@@ -217,7 +218,7 @@ module wx {
             var obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
                 var innerDisp = Rx.Observable.defer(() => {
                     // construct observable that represents the first change of any of the expression's dependencies
-                    return Rx.Observable.merge(captured.values).take(1);
+                    return Rx.Observable.merge(utils.getSetValues(captured)).take(1);
                 })
                 .repeat()
                 .subscribe(trigger => {
@@ -398,7 +399,7 @@ module wx {
             this.clearElementState(node);
         }
 
-        private createLocals(captured: HashSet<Rx.Observable<any>>, ctx: IDataContext) {
+        private createLocals(captured: ISet<Rx.Observable<any>>, ctx: IDataContext) {
             var locals = {};
             var list: IObservableList<any>;
             var prop: IObservableProperty<any>;

@@ -1,9 +1,9 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe("WeakMap",() => {
+describe("IWeakMap",() => {
     function crudSmokeTestImpl(forceEmulated: boolean) {
-        var wm = wx.weakmap<String, Object>(forceEmulated);
+        var wm = wx.createWeakMap<String, Object>(forceEmulated);
 
         // set/has/get
         var key = new String("foo");
@@ -16,23 +16,25 @@ describe("WeakMap",() => {
         wm.delete(key);
         expect(wm.has(key)).toBeFalsy();
         expect(wm.get(key)).toBe(undefined);
-    };
+    }
 
     it("emulated: creation",() => {
-        var wm = wx.weakmap<String, Object>(true);
+        var wm = wx.createWeakMap<String, Object>(true);
         expect(wm).not.toBeNull();
-        expect(wm.isEmulatedWeakMap).toBeTruthy();
+        expect(wm.isEmulated).toBeTruthy();
     });
 
     it("emulated: crud smoke-test",() => {
         crudSmokeTestImpl(true);
     });
 
-    if (typeof WeakMap === "function") {
+    var hasNativeSupport = typeof WeakMap === "function";
+
+    if (hasNativeSupport) {
         it("native: creation",() => {
-            var wm = wx.weakmap<String, Object>();
+            var wm = wx.createWeakMap<String, Object>();
             expect(wm).not.toBeNull();
-            expect(wm.isEmulatedWeakMap).toBeFalsy();
+            expect(wm.isEmulated).toBeFalsy();
         });
 
         it("native: crud smoke-test",() => {

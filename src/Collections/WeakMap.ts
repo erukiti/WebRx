@@ -30,7 +30,7 @@ module wx {
             return delete this.inner[oid];
         }
 
-        public get isEmulatedWeakMap(): boolean {
+        public get isEmulated(): boolean {
             return true;
         }
 
@@ -40,14 +40,16 @@ module wx {
         private inner: { [key: string]: T } = {};
     }
 
+    var hasNativeSupport = typeof WeakMap === "function";
+
     /**
     * Creates a new WeakMap instance
     * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
-    * @return {WeakMap<TKey, T>} A new WeakMap instance
+    * @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
     */
-    export function weakmap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T> {
+    export function createWeakMap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T> {
         // test for native support
-        if (disableNativeSupport || typeof WeakMap !== "function") {
+        if (disableNativeSupport || !hasNativeSupport) {
             return new WeakMapEmulated<TKey, T>();
         }
 

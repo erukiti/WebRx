@@ -116,6 +116,15 @@ module wx.utils {
     }
 
     /**
+    * Extracts the values of a Set by invoking its forEach method and capturing the output
+    */
+    export function getSetValues<T>(src: ISet<T>): Array<T> {
+        var result = new Array<T>();
+        src.forEach(x => result.push(x));
+        return result;
+    }
+
+    /**
     * Transforms the current method's arguments into an array
     */
     export function args2Array(args: IArguments): Array<any> {

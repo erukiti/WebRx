@@ -1,8 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
 /// <reference path="../Services/DomService.ts" />
-/// <reference path="../Interfaces.ts" />
-/// <reference path="../Core/Resources.ts" />
 /// <reference path="../Core/NodeChildsProxy.ts" />
 
 module wx {
@@ -417,7 +415,7 @@ module wx {
                 }
             } else if(utils.isList(value)) {
                 var list = <IObservableList<any>> value;
-                indexes = weakmap<Node, Rx.Observable<any>>();
+                indexes = createWeakMap<Node, Rx.Observable<any>>();
                 recalcIndextrigger = new Rx.Subject<any>();
 
                 this.observeList(proxy, ctx, template, cleanup, list, hooks, indexes, recalcIndextrigger);
