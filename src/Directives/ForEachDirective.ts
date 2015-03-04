@@ -160,15 +160,17 @@ module wx {
 
         protected createIndexObservableForNode(proxy: NodeChildsProxy, child: Node, startIndex: number,
             trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
-            return Rx.Observable.create<number>(obs => {
-                return trigger.subscribe(_ => {
-                    // recalculate index from node position within parent
-                    var index = proxy.childNodes.indexOf(child);
-                    index /= templateLength;
+                return Rx.Observable.defer(()=> {
+                    return Rx.Observable.create<number>(obs => {
+                        return trigger.subscribe(_ => {
+                        // recalculate index from node position within parent
+                        var index = proxy.childNodes.indexOf(child);
+                        index /= templateLength;
 
-                    obs.onNext(index);
+                        obs.onNext(index);
+                    });
                 });
-            }).startWith(startIndex);
+            }).startWith(startIndex).publish().refCount();
         }
 
         protected clear(proxy: NodeChildsProxy, hooks: IForEachDirectiveHooks) {
