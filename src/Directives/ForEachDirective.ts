@@ -149,7 +149,7 @@ module wx {
         }
 
         public priority = 40;
-        public terminal = true;
+        public descendants = true;
 
         ////////////////////
         // implementation

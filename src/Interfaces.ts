@@ -492,7 +492,7 @@ module wx {
         * execute (any directives at the current priority will still execute as the order of 
         * execution on same priority is undefined).
         */
-        terminal?: boolean;
+        descendants?: boolean;
     }
 
     export interface IDirectiveRegistry {

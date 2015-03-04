@@ -15,10 +15,10 @@ module wx {
 
         public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("if binding only operates on elements!");
+                internal.throwError("if directive only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("** invalid binding options!");
+                internal.throwError("** invalid directive options!");
 
             var el = <HTMLElement> node;
             var self = this;
@@ -59,7 +59,7 @@ module wx {
         }
 
         public priority = 50;
-        public terminal = true;
+        public descendants = true;
 
         ////////////////////
         // implementation

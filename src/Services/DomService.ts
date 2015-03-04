@@ -303,28 +303,22 @@ module wx {
                 // sort by priority
                 directives.sort((a, b) => (b.handler.priority || 0) - (a.handler.priority || 0));
 
-                // apply all directives
-                var prev: IDirective = undefined;
+                // check if there is more than one handler handling descendants which is illegal
+                var hd = directives.filter(x => x.handler.descendants).map(x => "'" + x.value + "'");
+                if (hd.length > 1) {
+                    internal.throwError("directives {0} are competing for descendants of target element!", hd.join(", "));
+                } 
 
+                result = hd.length > 0;
+
+                // apply all directives
                 for (var i = 0; i < directives.length; i++) {
                     var directive = directives[i];
                     var options = this.compileDirectiveOptions(directive.value);
                     var handler = directive.handler;
 
-                    // check for early termination
-                    if (prev && prev.terminal && handler.priority < prev.priority) {
-                        result = true;
-                        break;
-                    }
-
                     handler.apply(node, options, ctx, state);
-
-                    prev = handler;
                 }
-
-                // account for case where there was just a single terminal directive
-                if (directives.length === 1 && directives[0].handler.terminal)
-                    result = true;
             }
 
             // mark bound

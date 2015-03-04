@@ -17,6 +17,7 @@ module wx {
     injector.register("wx.directives.module", true, true, [res.domService, internal.moduleDirectiveConstructor]);
     injector.register("wx.directives.command", true, true, [res.domService, internal.commandDirectiveConstructor]);
     injector.register("wx.directives.if", true, true, [res.domService, internal.ifDirectiveConstructor]);
+    injector.register("wx.directives.with", true, true, [res.domService, internal.withDirectiveConstructor]);
     injector.register("wx.directives.notif", true, true, [res.domService, internal.notifDirectiveConstructor]);
     injector.register("wx.directives.css", true, true, [res.domService, internal.cssDirectiveConstructor]);
     injector.register("wx.directives.attr", true, true, [res.domService, internal.attrDirectiveConstructor]);
@@ -35,6 +36,7 @@ module wx {
     app.registerDirective("style", "wx.directives.style");
     app.registerDirective("command", "wx.directives.command");
     app.registerDirective("if", "wx.directives.if");
+    app.registerDirective("with", "wx.directives.with");
     app.registerDirective("ifnot", "wx.directives.notif");
     app.registerDirective("text", "wx.directives.text");
     app.registerDirective("html", "wx.directives.html");
