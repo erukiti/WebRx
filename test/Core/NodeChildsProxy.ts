@@ -14,7 +14,7 @@ describe("NodeChildsProxy",() => {
         loadFixtures('templates/Core/NodeChildsProxy.html');
 
         var el = <HTMLElement> document.querySelector("#empty-node");
-        var proxy = new wx.NodeChildsProxy(el, false);
+        var proxy = new wx.internal.NodeChildsProxy(el, false);
 
         expect(proxy.childNodes.length).toEqual(el.childNodes.length);
 
@@ -59,7 +59,7 @@ describe("NodeChildsProxy",() => {
         loadFixtures('templates/Core/NodeChildsProxy.html');
 
         var el = <HTMLElement> document.querySelector("#empty-node");
-        var proxy = new wx.NodeChildsProxy(el, false);
+        var proxy = new wx.internal.NodeChildsProxy(el, false);
         var aliens = [];
         var alien: Node;
 

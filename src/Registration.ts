@@ -1,13 +1,14 @@
 ﻿/// <reference path="Core/Injector.ts" />
 /// <reference path="Services/ExpressionCompiler.ts" />
 /// <reference path="Services/DomService.ts" />
+/// <reference path="Core/Module.ts" />
+/// <reference path="Services/HtmlTemplateEngine.ts" />
 /// <reference path="Directives/CommandDirective.ts" />
 /// <reference path="Directives/IfDirective.ts" />
 /// <reference path="Directives/MultiOneWayDirectives.ts" />
 /// <reference path="Directives/SimpleOneWayDirectives.ts" />
-/// <reference path="Core/Module.ts" />
 /// <reference path="Directives/ForEachDirective.ts" />
-/// <reference path="Services/HtmlTemplateEngine.ts" />
+/// <reference path="Directives/EventDirective.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
@@ -29,6 +30,7 @@ module wx {
     injector.register("wx.directives.enabled", true, true, [res.domService, internal.enableDirectiveConstructor]);
     injector.register("wx.directives.disabled", true, true, [res.domService, internal.disableDirectiveConstructor]);
     injector.register("wx.directives.foreach", true, true, [res.domService, internal.forEachDirectiveConstructor]);
+    injector.register("wx.directives.event", true, true, [res.domService, internal.eventDirectiveConstructor]);
 
     app.registerDirective("module", "wx.directives.module");
     app.registerDirective("css", "wx.directives.css");
@@ -45,4 +47,5 @@ module wx {
     app.registerDirective("disabled", "wx.directives.disabled");
     app.registerDirective("enabled", "wx.directives.enabled");
     app.registerDirective("foreach", "wx.directives.foreach");
+    app.registerDirective("event", "wx.directives.event");
 }

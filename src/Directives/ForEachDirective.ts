@@ -156,7 +156,7 @@ module wx {
 
         protected domService: IDomService;
 
-        protected createIndexObservableForNode(proxy: NodeChildsProxy, child: Node, startIndex: number,
+        protected createIndexObservableForNode(proxy: internal.NodeChildsProxy, child: Node, startIndex: number,
             trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
                 return Rx.Observable.defer(()=> {
                     return Rx.Observable.create<number>(obs => {
@@ -174,7 +174,7 @@ module wx {
             .refCount();
         }
 
-        protected appendAllRows(proxy: NodeChildsProxy, list: IObservableList<any>, ctx: IDataContext,
+        protected appendAllRows(proxy: internal.NodeChildsProxy, list: IObservableList<any>, ctx: IDataContext,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
             var length = list.length;
@@ -184,7 +184,7 @@ module wx {
             }
         }
 
-        protected appendRow(proxy: NodeChildsProxy, index: number, item: any, ctx: IDataContext, template: Array<Node>,
+        protected appendRow(proxy: internal.NodeChildsProxy, index: number, item: any, ctx: IDataContext, template: Array<Node>,
             hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
@@ -201,7 +201,7 @@ module wx {
             }
         }
 
-        protected insertRow(proxy: NodeChildsProxy, index: number, item: any, ctx: IDataContext,
+        protected insertRow(proxy: internal.NodeChildsProxy, index: number, item: any, ctx: IDataContext,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
@@ -219,7 +219,7 @@ module wx {
             }
         }
 
-        protected removeRow(proxy: NodeChildsProxy, index: number, item: any,
+        protected removeRow(proxy: internal.NodeChildsProxy, index: number, item: any,
             template: Array<Node>, hooks: IForEachDirectiveHooks): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
@@ -234,7 +234,7 @@ module wx {
             }
         }
 
-        protected moveRow(proxy: NodeChildsProxy, from: number, to: number, item: any,
+        protected moveRow(proxy: internal.NodeChildsProxy, from: number, to: number, item: any,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
@@ -259,7 +259,7 @@ module wx {
             }
         }
 
-        protected rebindRow(proxy: NodeChildsProxy, index: number, item: any, template: Array<Node>,
+        protected rebindRow(proxy: internal.NodeChildsProxy, index: number, item: any, template: Array<Node>,
             indexes: IWeakMap<Node, Rx.Observable<any>>): void {
             var templateLength = template.length;
             var savedIndex;
@@ -284,7 +284,7 @@ module wx {
             }
         }
         
-        protected observeList(proxy: NodeChildsProxy, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
+        protected observeList(proxy: internal.NodeChildsProxy, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
             list: IObservableList<any>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>) {
             var i: number;
@@ -363,7 +363,7 @@ module wx {
             if (template.length === 0)
                 return; // nothing to do
 
-            var proxy: NodeChildsProxy;
+            var proxy: internal.NodeChildsProxy;
             var indexes: IWeakMap<Node, Rx.Observable<any>>;
             var self = this;
             var recalcIndextrigger: Rx.Subject<any>;
@@ -382,8 +382,9 @@ module wx {
                     state.properties.index = index;
                     self.domService.setNodeState(node, state);
 
-                    // done
-                    self.domService.applyDirectives(item, node);
+                    if (item) {
+                        self.domService.applyDirectives(item, node);
+                    }
                 }
             }
 
@@ -394,7 +395,7 @@ module wx {
                 }
             }
 
-            proxy = new NodeChildsProxy(el, false, nodeInsertCB, nodeRemoveCB);
+            proxy = new internal.NodeChildsProxy(el, false, nodeInsertCB, nodeRemoveCB);
 
             if (setProxyFunc)
                 setProxyFunc(proxy);

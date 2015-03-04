@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-module wx {
+module wx.internal {
     /**
     * NodeChildsProxy allows for manipulation of the childNodes of a DOM element
     * in correlation to an internally maintained reference-list of valid nodes
@@ -115,5 +115,4 @@ module wx {
         private insertCB: (node: Node, callbackData: any) => void;
         private removeCB: (node: Node) => void;
     }
-
 }
