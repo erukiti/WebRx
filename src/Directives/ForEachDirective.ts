@@ -170,7 +170,10 @@ module wx {
                         obs.onNext(index);
                     });
                 });
-            }).startWith(startIndex).publish().refCount();
+            })
+            .startWith(startIndex)
+            .publish()
+            .refCount();
         }
 
         protected clear(proxy: NodeChildsProxy, hooks: IForEachDirectiveHooks) {
