@@ -488,9 +488,9 @@ module wx {
         priority: number;
 
         /**
-        * If set to true then the current priority will be the last set of directives which will 
-        * execute (any directives at the current priority will still execute as the order of 
-        * execution on same priority is undefined).
+        * If set to true then directives won't be applied to children
+        * of the element such directive is encountered on. Instead
+        * the handler will be responsible for that.
         */
         descendants?: boolean;
     }
