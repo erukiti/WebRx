@@ -176,10 +176,6 @@ module wx {
             .refCount();
         }
 
-        protected clear(proxy: NodeChildsProxy, hooks: IForEachDirectiveHooks) {
-            proxy.clear();
-        }
-
         protected appendAllRows(proxy: NodeChildsProxy, list: IObservableList<any>, ctx: IDataContext,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
@@ -341,7 +337,7 @@ module wx {
             }));
 
             cleanup.add(list.shouldReset.subscribe((e) => {
-                this.clear(proxy, hooks);
+                proxy.clear();
                 this.appendAllRows(proxy, list, ctx, template, hooks, indexes, indexTrigger, false);
 
                 indexTrigger.onNext(true);
@@ -365,6 +361,9 @@ module wx {
             while (el.firstChild) {
                 el.removeChild(el.firstChild);
             }
+
+            if (template.length === 0)
+                return; // nothing to do
 
             var proxy: NodeChildsProxy;
             var indexes: IWeakMap<Node, Rx.Observable<any>>;
