@@ -4,7 +4,7 @@
 
 describe('Directives', () => {
     describe('Event',() => {
-        it('binds to a single event',() => {
+        it('binds a single event to a handler function',() => {
             loadFixtures('templates/Directives/Event.html');
 
             var el = document.querySelector("#event-single");
@@ -52,7 +52,7 @@ describe('Directives', () => {
             expect(called).toBeFalsy();
         });
 
-        it('binds to a muliple events',() => {
+        it('binds multiple events to handler functions',() => {
             loadFixtures('templates/Directives/Event.html');
 
             var el = document.querySelector("#event-multiple");
@@ -68,6 +68,45 @@ describe('Directives', () => {
                     focusCallCount++;
                 }
             };
+
+            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+
+            expect(clickCallCount).toEqual(0);
+            expect(focusCallCount).toEqual(0);
+
+            $(el).click();
+            expect(clickCallCount).toEqual(1);
+
+            $(el).focus();
+            expect(focusCallCount).toEqual(1);
+
+            wx.cleanNode(el);
+            clickCallCount = 0;
+            focusCallCount = 0;
+
+            // should no longer fire
+            $(el).click();
+            expect(clickCallCount).toEqual(0);
+
+            $(el).focus();
+            expect(focusCallCount).toEqual(0);
+        });
+
+        it('binds multiple events to observers',() => {
+            loadFixtures('templates/Directives/Event.html');
+
+            var el = document.querySelector("#event-multiple-observer");
+
+            var clickCallCount = 0;
+            var focusCallCount = 0;
+
+            var model = {
+                clickObserver: new Rx.Subject<Event>(),
+                focusObserver: new Rx.Subject<Event>()
+            };
+
+            model.clickObserver.subscribe(x => clickCallCount++);
+            model.focusObserver.subscribe(x => focusCallCount++);
 
             expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 

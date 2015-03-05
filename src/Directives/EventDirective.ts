@@ -4,7 +4,7 @@
 
 module wx {
     export interface IEventDirectiveOptions {
-        [eventName: string]: (ctx: IDataContext, event: Event) => any;
+        [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>;
     }
 
     class EventDirective implements IDirective {
@@ -23,28 +23,35 @@ module wx {
                 internal.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
-            debugger;
 
             // create an observable for each event handler value
             var tokens = this.domService.getObjectLiteralTokens(options);
             var eventDisposables: { [eventName: string]: Rx.Disposable } = {};
             var eventHandlers = tokens.map(token =>
-                <Rx.Observable<(ctx: IDataContext, event: Event) => any>> <any> this.domService.fieldAccessToObservable(token.value, ctx, false));
+                <Rx.Observable<any>> <any> this.domService.fieldAccessToObservable(token.value, ctx, false));
 
             // subscribe to all events
             for (var i = 0; i < tokens.length; i++) {
                 ((_i => {
-                    state.cleanup.add(eventHandlers[_i].subscribe(handlerFunc => {
+                    state.cleanup.add(eventHandlers[_i].subscribe(handler => {
                         // unwire previous event subscription
                         if (eventDisposables[tokens[_i].key]) {
                             eventDisposables[tokens[_i].key].dispose();
                         }
 
                         // wire up event observable
-                        eventDisposables[tokens[_i].key] = Rx.Observable.fromEvent<Event>(el, tokens[_i].key).subscribe(e => {
-                            // call handler
-                            handlerFunc(ctx, e);
-                        });
+                        if (typeof handler === "function") {
+                            eventDisposables[tokens[_i].key] = Rx.Observable.fromEvent<Event>(el, tokens[_i].key).subscribe(e => {
+                                // call handler
+                                handler(ctx, e);
+                            });
+                        } else {
+                            // assumed to be an Rx.Observer
+                            var observer = <Rx.Observer<Event>> handler;
+
+                            // subscribe event directly to observer
+                            eventDisposables[tokens[_i].key] = Rx.Observable.fromEvent<Event>(el, tokens[_i].key).subscribe(observer);
+                        }
                     }));
                 })(i));
             }
