@@ -20,6 +20,8 @@ module wx {
             if (utils.isNull(options))
                 internal.throwError("** invalid directive options!");
 
+            options = this.domService.compileDirectiveOptions(options);
+
             var el = <HTMLElement> node;
             var self = this;
             var exp = <ICompiledExpression> options;

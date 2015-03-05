@@ -23,6 +23,8 @@ module wx {
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");
 
+            options = this.domService.compileDirectiveOptions(options);
+
             var el = <HTMLElement> node;
             var cmd: ICommand<any>;
             var parameter: any;

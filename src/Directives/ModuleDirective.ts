@@ -18,6 +18,8 @@ module wx {
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");
 
+            options = this.domService.compileDirectiveOptions(options);
+
             var exp = <ICompiledExpression> options;
             var obs = this.domService.expressionToObservable(exp, ctx);
 

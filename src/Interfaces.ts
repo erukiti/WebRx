@@ -512,12 +512,6 @@ module wx {
         * the handler will be responsible for that.
         */
         controlsDescendants?: boolean;
-
-        /**
-        * If set to true, then options for the directive will be passed in text form
-        * to the apply method instead of being pre-compiled to expressions
-        */
-        needsRawOptions?: boolean;
     }
 
     export interface IDirectiveRegistry {

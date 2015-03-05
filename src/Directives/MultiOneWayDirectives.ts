@@ -16,6 +16,8 @@ module wx {
             if (node.nodeType !== 1)
                 internal.throwError("directive only operates on elements!");
 
+            options = this.domService.compileDirectiveOptions(options);
+
             if (utils.isNull(options) || typeof options !== "object")
                 internal.throwError("invalid options for directive!");
 

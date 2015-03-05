@@ -321,9 +321,8 @@ module wx {
                 for (var i = 0; i < directives.length; i++) {
                     var directive = directives[i];
                     var handler = directive.handler;
-                    var options = !handler.needsRawOptions ? this.compileDirectiveOptions(directive.value) : directive.value;
 
-                    handler.apply(node, options, ctx, state);
+                    handler.apply(node, directive.value, ctx, state);
                 }
             }
 
