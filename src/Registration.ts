@@ -9,6 +9,7 @@
 /// <reference path="Directives/SimpleOneWayDirectives.ts" />
 /// <reference path="Directives/ForEachDirective.ts" />
 /// <reference path="Directives/EventDirective.ts" />
+/// <reference path="Directives/TextInputDirective.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
@@ -31,6 +32,7 @@ module wx {
     injector.register("wx.directives.disabled", true, true, [res.domService, internal.disableDirectiveConstructor]);
     injector.register("wx.directives.foreach", true, true, [res.domService, internal.forEachDirectiveConstructor]);
     injector.register("wx.directives.event", true, true, [res.domService, internal.eventDirectiveConstructor]);
+    injector.register("wx.directives.textInput", true, true, [res.domService, internal.textInputDirectiveConstructor]);
 
     app.registerDirective("module", "wx.directives.module");
     app.registerDirective("css", "wx.directives.css");
@@ -48,4 +50,5 @@ module wx {
     app.registerDirective("enabled", "wx.directives.enabled");
     app.registerDirective("foreach", "wx.directives.foreach");
     app.registerDirective("event", "wx.directives.event");
+    app.registerDirective("textInput", "wx.directives.textInput");
 }
