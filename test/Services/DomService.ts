@@ -441,12 +441,12 @@ describe('DomService',() => {
             });
 
             wx.using(domService.fieldAccessToObservable(exp6, ctx, false).toProperty(),(prop) => {
-                expect(prop()).toBe(childModel.foo());
+                expect(prop()).toEqual(childModel.foo());
 
                 // change an observable model property
                 model.foo(childModel2);
 
-                expect(prop()).toBe(childModel2.foo());
+                expect(prop()).toEqual(childModel2.foo());
             });
 
             // reset model
