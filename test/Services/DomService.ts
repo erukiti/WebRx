@@ -362,7 +362,7 @@ describe('DomService',() => {
             obs.subscribe(x => { val = x });
             model.foo(3);
 
-            expect(evalCount).toEqual(1 + 1);   // + 1 for initial evalutation
+            expect(evalCount).toEqual(1 + 1);   // + 1 for initial evaluation
         });
     });
 
@@ -451,6 +451,42 @@ describe('DomService',() => {
 
             // reset model
             model.foo(childModel);
+        });
+
+        it('returned observable shares subscriptions',() => {
+            var childModel = {
+                foo: wx.property("foo")
+            };
+
+            var model = {
+                foo: wx.property(childModel),
+                bar: wx.property(42),
+                baz: 3
+            };
+
+            // create context
+            var ctx: wx.IDataContext = {
+                $data: model,
+                $root: model,
+                $parent: null,
+                $parents: [],
+                $index: 0
+            };
+
+            var evalCount = 0;
+            var evalObs = Rx.Observer.create<any>(x => evalCount++);
+            var obs: Rx.Observable<any>;
+
+            expect(() => obs = domService.fieldAccessToObservable("foo.foo", ctx, false, evalObs)).not.toThrow();
+
+            // count evals
+            var val;
+            obs.subscribe(x => { val = x });
+            obs.subscribe(x => { val = x });
+            model.foo().foo("bar");
+
+            expect(val).toEqual(model.foo().foo());
+            expect(evalCount).toEqual(1 + 1);   // + 1 for initial evaluation
         });
     });
 });
