@@ -463,7 +463,8 @@ module wx {
         * and the observable produces a new value.
         * @param {IExpressionFunc} exp The source expression 
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-        * @return {IDataContext} The data context to evaluate the expression against
+        * @param {IDataContext} The data context to evaluate the expression against
+        * @return {Rx.Observable<any>} A sequence of values representing the result of the last evaluation of the expression
         */
         expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
 
@@ -473,9 +474,11 @@ module wx {
         * and the observable produces a new value.
         * @param {IExpressionFunc} exp The source expression 
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-        * @return {IDataContext} The data context to evaluate the expression against
+        * @param {boolean} preserveFinalObservableProperty If the final field access of the path is an 
+        * observable property, return the property instance, instead of its value
+        * @return {Rx.Observable<any>} A sequence of values representing the result of the last evaluation of the field access 
         */
-        fieldAccessToObservable(path: string, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<Rx.Observable<any>>;
+        fieldAccessToObservable(path: string, ctx: IDataContext, preserveFinalObservableProperty: boolean, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
     }
 
     /**
