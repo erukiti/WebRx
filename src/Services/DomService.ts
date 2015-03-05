@@ -259,6 +259,12 @@ module wx {
                 .refCount();
         }
 
+        public fieldAccessToObservable(path: string, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
+            var captured = createSet<any>();
+
+            return null;
+        }
+
         //////////////////////////////////
         // Implementation
 
@@ -303,8 +309,8 @@ module wx {
                 // sort by priority
                 directives.sort((a, b) => (b.handler.priority || 0) - (a.handler.priority || 0));
 
-                // check if there is more than one handler handling descendants which is illegal
-                var hd = directives.filter(x => x.handler.descendants).map(x => "'" + x.value + "'");
+                // check if there's directive-handler competition for descendants (which is illegal)
+                var hd = directives.filter(x => x.handler.controlsDescendants).map(x => "'" + x.value + "'");
                 if (hd.length > 1) {
                     internal.throwError("directives {0} are competing for descendants of target element!", hd.join(", "));
                 } 
@@ -314,8 +320,8 @@ module wx {
                 // apply all directives
                 for (var i = 0; i < directives.length; i++) {
                     var directive = directives[i];
-                    var options = this.compileDirectiveOptions(directive.value);
                     var handler = directive.handler;
+                    var options = !handler.needsRawOptions ? this.compileDirectiveOptions(directive.value) : directive.value;
 
                     handler.apply(node, options, ctx, state);
                 }
@@ -404,7 +410,7 @@ module wx {
                     result = o[field];
                     
                     // intercept access to observable properties
-                    if (utils.queryInterface(result, IID.IObservableProperty)) {
+                    if (utils.isProperty(result)) {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable
@@ -421,7 +427,7 @@ module wx {
                     target = o[field];
 
                     // intercept access to observable properties
-                    if (utils.queryInterface(target, IID.IObservableProperty)) {
+                    if (utils.isProperty(target)) {
                         var prop = <IObservableProperty<any>> target;
 
                         // register observable

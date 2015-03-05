@@ -383,6 +383,15 @@ module wx {
         getRuntimeHooks(locals: any): ICompiledExpressionRuntimeHooks;
         setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void;
         parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
+
+        /**
+        * Evaluates a field access expression against a data context.
+        * Captures any observable properties touched along the way. 
+        * @param {IExpressionFunc} exp The source expression 
+        * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
+        * @return {IDataContext} The data context to evaluate the expression against
+        */
+        evaluateFieldAccess(path: string, ctx: IDataContext, captured: ISet<Rx.Observable<any>>, preserveFinalProperty: boolean): any;
     }
 
     /**
@@ -457,6 +466,16 @@ module wx {
         * @return {IDataContext} The data context to evaluate the expression against
         */
         expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
+
+        /**
+        * Creates an observable that produces values representing the result of the field lookup.
+        * If any observable input of the expression changes, the expression gets re-evaluated
+        * and the observable produces a new value.
+        * @param {IExpressionFunc} exp The source expression 
+        * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
+        * @return {IDataContext} The data context to evaluate the expression against
+        */
+        fieldAccessToObservable(path: string, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<Rx.Observable<any>>;
     }
 
     /**
@@ -492,7 +511,13 @@ module wx {
         * of the element such directive is encountered on. Instead
         * the handler will be responsible for that.
         */
-        descendants?: boolean;
+        controlsDescendants?: boolean;
+
+        /**
+        * If set to true, then options for the directive will be passed in text form
+        * to the apply method instead of being pre-compiled to expressions
+        */
+        needsRawOptions?: boolean;
     }
 
     export interface IDirectiveRegistry {

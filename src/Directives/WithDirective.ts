@@ -52,7 +52,7 @@ module wx {
         }
 
         public priority = 50;
-        public descendants = true;
+        public controlsDescendants = true;
 
         ////////////////////
         // implementation

@@ -471,77 +471,141 @@ describe("ExpressionCompiler", function () {
             });
 
         });
-
-        it("parse literal containing comma in string value",() => {
-            var input = "foo: ',', bar: true";
-            var result = compiler.parseObjectLiteral(input);
-
-            expect(result.length).toEqual(2);
-            expect(result[0].value).toEqual("','");
-            expect(result[1].value).toEqual('true');
-        });
-
-        it("parse literal containing curly brace in string value",() => {
-            var input = "foo: '{', bar: true";
-            var result = compiler.parseObjectLiteral(input);
-
-            expect(result.length).toEqual(2);
-            expect(result[0].value).toEqual("'{'");
-            expect(result[1].value).toEqual('true');
-        });
-
-        it("parse invalid literal",() => {
-            var input = ", bar: true";
-            var result = compiler.parseObjectLiteral(input);
-
-            expect(result.length).toEqual(1);
-            expect(result[0].value).toEqual('true');
-        });
-
-        it("parse literal containing complex angular expressions",() => {
-            var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
-            var input = wx.utils.formatString("foo: {0}, bar: true", exp1);
-            var result = compiler.parseObjectLiteral(input);
-
-            expect(result.length).toEqual(2);
-            expect(result[0].key).toEqual('foo');
-            expect(result[0].value.replace(/ +?/g, '')).toEqual(exp1.replace(/ +?/g, '')); // should equal minus whitespaces
-
-            // ultimate test, compile expression and validate result
-            var scope = {};
-            expect(compiler.compileExpression(result[0].value)(scope, scope)).toEqual(3); // should equal minus whitespaces
-
-            expect(result[1].key).toEqual('bar');
-            expect(result[1].value).toEqual('true');
-        });
-
-        it("parse literal containing multiple complex angular expressions",() => {
-            var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
-            var exp2 = "a=1;b=2;[a, ['three',b]]";
-            var input = wx.utils.formatString("foo: {0}, bar: true, baz: {1}", exp1, exp2);
-            var result = compiler.parseObjectLiteral(input);
-
-            expect(result.length).toEqual(3);
-            expect(result[0].key).toEqual('foo');
-            expect(result[0].value.replace(/ +?/g, '')).toEqual(exp1.replace(/ +?/g, '')); // should equal minus whitespaces
-
-            // ultimate test, compile expression and validate result
-            var scope = {};
-            expect(compiler.compileExpression(result[0].value)(scope, scope)).toEqual(3); // should equal minus whitespaces
-
-            expect(result[1].key).toEqual('bar');
-            expect(result[1].value).toEqual('true');
-
-            expect(result[2].key).toEqual('baz');
-            expect(result[2].value.replace(/ +?/g, '')).toEqual(exp2.replace(/ +?/g, '')); // should equal minus whitespaces
-
-            // ultimate test, compile expression and validate result
-            scope = {};
-            expect(compiler.compileExpression(result[2].value)(scope, scope)).toEqual([1, ['three', 2]]); // should equal minus whitespaces
-        });
     }
 
     var compiler = wx.injector.resolve<wx.IExpressionCompiler>(wx.res.expressionCompiler);
     testImpl(compiler, false);
     testImpl(compiler, true);
+
+    it("parse literal containing comma in string value",() => {
+        var input = "foo: ',', bar: true";
+        var result = compiler.parseObjectLiteral(input);
+
+        expect(result.length).toEqual(2);
+        expect(result[0].value).toEqual("','");
+        expect(result[1].value).toEqual('true');
+    });
+
+    it("parse literal containing curly brace in string value",() => {
+        var input = "foo: '{', bar: true";
+        var result = compiler.parseObjectLiteral(input);
+
+        expect(result.length).toEqual(2);
+        expect(result[0].value).toEqual("'{'");
+        expect(result[1].value).toEqual('true');
+    });
+
+    it("parse invalid literal",() => {
+        var input = ", bar: true";
+        var result = compiler.parseObjectLiteral(input);
+
+        expect(result.length).toEqual(1);
+        expect(result[0].value).toEqual('true');
+    });
+
+    it("parse literal containing complex angular expressions",() => {
+        var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
+        var input = wx.utils.formatString("foo: {0}, bar: true", exp1);
+        var result = compiler.parseObjectLiteral(input);
+
+        expect(result.length).toEqual(2);
+        expect(result[0].key).toEqual('foo');
+        expect(result[0].value.replace(/ +?/g, '')).toEqual(exp1.replace(/ +?/g, '')); // should equal minus whitespaces
+
+        // ultimate test, compile expression and validate result
+        var scope = {};
+        expect(compiler.compileExpression(result[0].value)(scope, scope)).toEqual(3); // should equal minus whitespaces
+
+        expect(result[1].key).toEqual('bar');
+        expect(result[1].value).toEqual('true');
+    });
+
+    it("parse literal containing multiple complex angular expressions",() => {
+        var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
+        var exp2 = "a=1;b=2;[a, ['three',b]]";
+        var input = wx.utils.formatString("foo: {0}, bar: true, baz: {1}", exp1, exp2);
+        var result = compiler.parseObjectLiteral(input);
+
+        expect(result.length).toEqual(3);
+        expect(result[0].key).toEqual('foo');
+        expect(result[0].value.replace(/ +?/g, '')).toEqual(exp1.replace(/ +?/g, '')); // should equal minus whitespaces
+
+        // ultimate test, compile expression and validate result
+        var scope = {};
+        expect(compiler.compileExpression(result[0].value)(scope, scope)).toEqual(3); // should equal minus whitespaces
+
+        expect(result[1].key).toEqual('bar');
+        expect(result[1].value).toEqual('true');
+
+        expect(result[2].key).toEqual('baz');
+        expect(result[2].value.replace(/ +?/g, '')).toEqual(exp2.replace(/ +?/g, '')); // should equal minus whitespaces
+
+        // ultimate test, compile expression and validate result
+        scope = {};
+        expect(compiler.compileExpression(result[2].value)(scope, scope)).toEqual([1, ['three', 2]]); // should equal minus whitespaces
+    });
+
+    it("evaluateFieldAccess smoke-test",() => {
+        var childModel = {
+            foo: wx.property("foo")
+        };
+
+        var model = {
+            foo: wx.property(childModel),
+            bar: wx.property(42),
+            baz: 3
+        };
+
+        // create context
+        var ctx: wx.IDataContext = {
+            $data: model,
+            $root: model,
+            $parent: null,
+            $parents: [],
+            $index: 0
+        };
+
+        var exp1 = "baz";
+        var exp2 = "$data.baz";
+        var exp3 = "bar";
+        var exp4 = "foo";
+        var exp5 = "$data.foo";
+        var exp6 = "foo.foo";
+
+        var captured = wx.createSet<Rx.Observable<any>>();
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp1, ctx, captured, true)).toEqual(3);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp2, ctx, captured, true)).toEqual(3);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp3, ctx, captured, false)).toEqual(42);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp3, ctx, captured, true)).toBe(model.bar);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp4, ctx, captured, false)).toBe(childModel);
+        expect(wx.utils.getSetValues(captured)).toEqual([model.foo.changed]);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp4, ctx, captured, true)).toBe(model.foo);
+        expect(wx.utils.getSetValues(captured)).toEqual([]);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp5, ctx, captured, false)).toBe(childModel);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp5, ctx, captured, true)).toBe(model.foo);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp6, ctx, captured, false)).toEqual(childModel.foo());
+        expect(wx.utils.getSetValues(captured)).toEqual([model.foo.changed, childModel.foo.changed]);
+
+        captured.clear();
+        expect(compiler.evaluateFieldAccess(exp6, ctx, captured, true)).toBe(childModel.foo);
+        expect(wx.utils.getSetValues(captured)).toEqual([model.foo.changed]);
+    });
 });
