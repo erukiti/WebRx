@@ -22,51 +22,37 @@ module wx {
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");
 
-            options = this.domService.compileDirectiveOptions(options);
-
             var el = <HTMLElement> node;
-            var cmd: ICommand<any>;
-            var parameter: any;
-            var exp: ICompiledExpression;
+            debugger;
 
-            if (typeof options === "function") {
-                exp = <ICompiledExpression> options;
+            // create an observable for each event handler value
+            var tokens = this.domService.getObjectLiteralTokens(options);
+            var eventDisposables: { [eventName: string]: Rx.Disposable } = {};
+            var eventHandlers = tokens.map(token =>
+                <Rx.Observable<(ctx: IDataContext, event: Event) => any>> <any> this.domService.fieldAccessToObservable(token.value, ctx, false));
 
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    cmd = prop();
-                    parameter = null;
-                });
-            } else {
-                var opt = <ICommandDirectiveOptions> options;
+            // subscribe to all events
+            for (var i = 0; i < tokens.length; i++) {
+                ((_i => {
+                    state.cleanup.add(eventHandlers[_i].subscribe(handlerFunc => {
+                        // unwire previous event subscription
+                        if (eventDisposables[tokens[_i].key]) {
+                            eventDisposables[tokens[_i].key].dispose();
+                        }
 
-                exp = <ICompiledExpression> <any> opt.command;
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    cmd = prop();
-                });
-
-                exp = <ICompiledExpression> <any> opt.parameter;
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    parameter = prop();
-                });
+                        // wire up event observable
+                        eventDisposables[tokens[_i].key] = Rx.Observable.fromEvent<Event>(el, tokens[_i].key).subscribe(e => {
+                            // call handler
+                            handlerFunc(ctx, e);
+                        });
+                    }));
+                })(i));
             }
 
-            if (!utils.isCommand(cmd)) {
-                // value is not a ICommand
-                internal.throwError("Command-Directive only works when bound to a Reactive Command!");
-            } else {
-                // initial update
-                el.disabled = !cmd.canExecute(parameter);
-
-                // listen to changes
-                state.cleanup.add(cmd.canExecuteObservable.subscribe(canExecute => {
-                    el.disabled = !canExecute;
-                }));
-
-                // handle click event
-                state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(e => {
-                    cmd.execute(parameter);
-                }));
-            }
+            // release event handlers
+            state.cleanup.add(Rx.Disposable.create(() => {
+                Object.keys(eventDisposables).forEach(x => eventDisposables[x].dispose());
+            }));
 
             // release closure references to GC 
             state.cleanup.add(Rx.Disposable.create(() => {
@@ -80,8 +66,8 @@ module wx {
                 el = null;
 
                 // nullify locals
-                cmd = null;
-                parameter = null;
+                eventDisposables = null;
+                eventHandlers = null;
             }));
         }
 

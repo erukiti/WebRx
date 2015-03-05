@@ -2,17 +2,17 @@
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-function createCommandModel(commandAction: (any) => void) {
-    var canExecute = wx.property(false);
-
-    return {
-        cmd: wx.command(commandAction, canExecute.changed),
-        canExecute: canExecute
-    }
-};
-
 describe('Directives', () => {
-    describe('Command', () => {
+    function createCommandModel(commandAction: (any) => void) {
+        var canExecute = wx.property(false);
+
+        return {
+            cmd: wx.command(commandAction, canExecute.changed),
+            canExecute: canExecute
+        }
+    };
+
+    describe('Command',() => {
         it('binding to non-command source should throw', () => {
             loadFixtures('templates/Directives/Command.html');
 

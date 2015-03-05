@@ -456,6 +456,7 @@ module wx {
         clearElementState(node: Node);
         getDirectives(node: Node): Array<IObjectLiteralToken>;
         compileDirectiveOptions(value: string): any;
+        getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
 
         /**
         * Creates an observable that produces values representing the result of the expression.

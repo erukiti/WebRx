@@ -67,6 +67,16 @@ module wx {
             return this.extractDirectivesFromDataAttribute(node);
         }
 
+        public getObjectLiteralTokens(value: string): Array<IObjectLiteralToken> {
+            value = utils.trimString(value);
+
+            if (value !== '' && this.isObjectLiteralString(value)) {
+                return this.compiler.parseObjectLiteral(value);
+            } 
+
+            return [];
+        }
+
         public compileDirectiveOptions(value: string): any {
             value = utils.trimString(value);
             if (value === '') {
