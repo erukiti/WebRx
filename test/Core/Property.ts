@@ -12,6 +12,17 @@ describe("ObservableProperty", () => {
         expect(prop()).toEqual(10);
     });
 
+    it("falsy initial values are not coerced to undefined", () => {
+        var prop = wx.property(0);
+        expect(prop()).toEqual(0);
+
+        var prop2 = wx.property(false);
+        expect(prop2()).toEqual(false);
+
+        var prop3 = wx.property(null);
+        expect(prop3()).toEqual(null);
+    });
+
     it("implements IUnknown",() => {
         var prop = wx.property<number>();
         expect(wx.utils.supportsQueryInterface(prop)).toBeTruthy();

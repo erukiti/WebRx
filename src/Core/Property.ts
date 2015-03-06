@@ -45,7 +45,8 @@ module wx {
         //////////////////////////////////
         // IObservableProperty<T> implementation
 
-        accessor.value = initialValue || undefined;
+        if (initialValue !== undefined)
+            accessor.value = initialValue;
 
         // setup observables
         accessor.changedSubject = new Rx.Subject<T>();

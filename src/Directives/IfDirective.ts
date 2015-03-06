@@ -64,7 +64,7 @@ module wx {
         public controlsDescendants = true;
 
         ////////////////////
-        // implementation
+        // Implementation
 
         protected inverse: boolean = false;
         protected domService: IDomService;

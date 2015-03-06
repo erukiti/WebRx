@@ -1,18 +1,23 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="Utils.ts" />
+/// <reference path="../Collections/WeakMap.ts" />
 
 module wx.env {
     var _window = <any> window;
     var userAgent = _window.navigator.userAgent;
 
-    export interface IBrowserInformation {
+    export interface IBrowserProperties {
         version: number;
     }
 
-    export var ie: IBrowserInformation;
-    export var opera: IBrowserInformation;
-    export var safari: IBrowserInformation;
-    export var firefox: IBrowserInformation;
+    export interface IIEIBrowserProperties extends IBrowserProperties {
+        getSelectionChangeObservable(el: HTMLElement): Rx.Observable<Document>;
+    }
+
+    export var ie: IIEIBrowserProperties;
+    export var opera: IBrowserProperties;
+    export var safari: IBrowserProperties;
+    export var firefox: IBrowserProperties;
 
     var parseVersion = matches => {
         if (matches) {
@@ -43,7 +48,31 @@ module wx.env {
     })());
 
     if (version) {
-        ie = { version: version };
+        ie = <IIEIBrowserProperties> { version: version };
+
+        if (version < 10) {
+            // for IE9 and lower, provide an accessor for document scoped
+            // observables which allow monitoring the selectionchange event
+            var map = wx.createWeakMap<Document, Rx.Observable<Document>>();
+
+            ie.getSelectionChangeObservable = (el: HTMLElement) => {
+                var doc = el.ownerDocument;
+                var result = map.get(doc);
+
+                if (result)
+                    return result;
+
+                result = Rx.Observable.defer(() => {
+                        return Rx.Observable.fromEvent(doc, 'selectionchange');
+                    })
+                    .select(x => doc)
+                    .publish()
+                    .refCount();
+
+                map.set(doc, result);
+                return result;
+            };
+        }
     }
 
     // Detect Safari (not Chrome or WebKit)

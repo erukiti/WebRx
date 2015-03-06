@@ -70,7 +70,7 @@ module wx {
         public priority = 0;
 
         ////////////////////
-        // implementation
+        // Implementation
 
         protected domService: IDomService;
 

@@ -13,7 +13,7 @@ module wx {
         }
 
         public applyDirectives(model: any, rootNode: Node): void {
-            if (rootNode === undefined || rootNode.nodeType !== 1 || !model)  // && (node.nodeType !== 8))
+            if (rootNode === undefined || rootNode.nodeType !== 1)  // && (node.nodeType !== 8))
                 internal.throwError("first parameter should be your model, second parameter should be a DOM node!");
 
             if (this.isNodeBound(rootNode))
