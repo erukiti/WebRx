@@ -92,5 +92,25 @@ module wx.env {
         (!firefox || firefox.version >= 4);
 
     export var jQueryInstance = window["jQuery"];
+
+
+    /**
+    * Strips any external data associated with the node from it
+    * @param {Node} node The node to clean
+    */
+    export declare function cleanExternalData(node: Node);
+
+    if (env.jQueryInstance && (typeof env.jQueryInstance['cleanData'] == "function")) {
+        env.cleanExternalData = (node: Node) => {
+            // Special support for jQuery here because it's so commonly used.
+            // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
+            // so notify it to tear down any resources associated with the node & descendants here.
+            jQueryInstance['cleanData']([node]);
+        };
+    } else {
+        env.cleanExternalData = (node: Node) => {
+            // deliberately left blank
+        };
+    }
 }
 

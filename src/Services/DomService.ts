@@ -195,7 +195,7 @@ module wx {
 
             this.elementState.delete(node);
 
-            utils.cleanExternalData(node);
+            env.cleanExternalData(node);
         }
 
         public expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
