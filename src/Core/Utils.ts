@@ -273,4 +273,16 @@ module wx.utils {
             node.className = currentClassNames.join(" ");
         }
     }
+
+    /**
+    * Strips any external associated with the node from it
+    * @param {Node} node The node to clean
+    */
+    export function cleanExternalData(node: Node) {
+        // Special support for jQuery here because it's so commonly used.
+        // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
+        // so notify it to tear down any resources associated with the node & descendants here.
+        if (env.jQueryInstance && (typeof env.jQueryInstance['cleanData'] == "function"))
+            env.jQueryInstance['cleanData']([node]);
+    }
 }
