@@ -18,7 +18,7 @@ describe('Directives', () => {
         });
 
         it('Should treat null values as empty strings', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='textInput:myProp' />";
@@ -27,7 +27,7 @@ describe('Directives', () => {
         });
 
         it('Should assign an empty string as value if the model value is null', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='textInput:(null)' />";
@@ -36,7 +36,7 @@ describe('Directives', () => {
         });
 
         it('Should assign an empty string as value if the model value is undefined', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='textInput:undefined' />";
@@ -45,7 +45,7 @@ describe('Directives', () => {
         });
 
         it('For observable values, should unwrap the value and update on change', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
@@ -57,7 +57,7 @@ describe('Directives', () => {
         });
 
         it('For observable values, should update on change if new value is \'strictly\' different from previous value', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property("+123");
@@ -69,7 +69,7 @@ describe('Directives', () => {
         });
 
         it('For writeable observable values, should catch the node\'s onchange and write values back to the observable', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
@@ -81,7 +81,7 @@ describe('Directives', () => {
         });
 
         it('Should ignore node changes when bound to a read-only observable', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             var computedValue = Rx.Observable.return('zzz').toProperty();
@@ -99,7 +99,7 @@ describe('Directives', () => {
         });
 
         it('Should update observable on input event (on supported browsers) or propertychange event (on old IE)', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
@@ -115,7 +115,7 @@ describe('Directives', () => {
         });
 
         it('Should write only changed values to observable', () => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             var model = { writtenValue: wx.property('') };

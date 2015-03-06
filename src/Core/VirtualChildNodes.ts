@@ -8,8 +8,7 @@ module wx.internal {
     **/
     export class VirtualChildNodes {
         constructor(targetNode: Node, initialSyncToTarget: boolean,
-            insertCB?: (node: Node, callbackData: any) => void,
-            removeCB?: (node: Node) => void) {
+            insertCB?: (node: Node, callbackData: any) => void, removeCB?: (node: Node) => void) {
             this.targetNode = targetNode;
             this.insertCB = insertCB;
             this.removeCB = removeCB;

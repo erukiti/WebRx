@@ -33,6 +33,7 @@ module wx {
     injector.register("wx.directives.foreach", true, true, [res.domService, internal.forEachDirectiveConstructor]);
     injector.register("wx.directives.event", true, true, [res.domService, internal.eventDirectiveConstructor]);
     injector.register("wx.directives.textInput", true, true, [res.domService, internal.textInputDirectiveConstructor]);
+    injector.register("wx.directives.checked", true, true, [res.domService, internal.checkedDirectiveConstructor]);
 
     app.registerDirective("module", "wx.directives.module");
     app.registerDirective("css", "wx.directives.css");
@@ -51,4 +52,5 @@ module wx {
     app.registerDirective("foreach", "wx.directives.foreach");
     app.registerDirective("event", "wx.directives.event");
     app.registerDirective("textInput", "wx.directives.textInput");
+    app.registerDirective("checked", "wx.directives.checked");
 }
