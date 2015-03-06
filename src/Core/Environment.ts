@@ -35,15 +35,11 @@ module wx.env {
     // Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
     // Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
     // Currently this is by design, since IE 10+ behaves correctly when treated as a standard browser.
-    // If there is a future need to detect specific versions of IE10+, we will amend this.
     var version = document && ((() => {
         var version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
 
         // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
-        while (
-            div.innerHTML === "<!--[if gt IE " + (++version) + "]><i></i><![endif]-->",
-            iElems[0]
-        ) { }
+        while (div.innerHTML === "<!--[if gt IE " + (++version) + "]><i></i><![endif]-->", iElems[0]) { }
         return version > 4 ? version : undefined;
     })());
 
@@ -91,8 +87,8 @@ module wx.env {
         (!safari || safari.version >= 5) ||
         (!firefox || firefox.version >= 4);
 
+    // jquery stuff
     export var jQueryInstance = window["jQuery"];
-
 
     /**
     * Strips any external data associated with the node from it
@@ -100,7 +96,7 @@ module wx.env {
     */
     export declare function cleanExternalData(node: Node);
 
-    if (env.jQueryInstance && (typeof env.jQueryInstance['cleanData'] == "function")) {
+    if (env.jQueryInstance && (typeof env.jQueryInstance['cleanData'] === "function")) {
         env.cleanExternalData = (node: Node) => {
             // Special support for jQuery here because it's so commonly used.
             // Many jQuery plugins (including jquery.tmpl) store data using jQuery's equivalent of domData
@@ -113,4 +109,3 @@ module wx.env {
         };
     }
 }
-
