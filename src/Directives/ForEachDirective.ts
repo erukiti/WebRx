@@ -1,7 +1,7 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
 /// <reference path="../Services/DomService.ts" />
-/// <reference path="../Core/NodeChildsProxy.ts" />
+/// <reference path="../Core/VirtualChildNodes.ts" />
 
 module wx {
     export interface IForEachDirectiveOptions {
@@ -74,7 +74,7 @@ module wx {
             var cleanup: Rx.CompositeDisposable = null;
             var hooks: IForEachDirectiveHooks|string;
             var exp: ICompiledExpression;
-            var setProxyFunc: (NodeChildsProxy) => void;
+            var setProxyFunc: (VirtualChildNodes) => void;
 
             if (typeof options === "object" && options.hasOwnProperty("data")) {
                 var opt = <IForEachDirectiveOptions> options;
@@ -158,7 +158,7 @@ module wx {
 
         protected domService: IDomService;
 
-        protected createIndexObservableForNode(proxy: internal.NodeChildsProxy, child: Node, startIndex: number,
+        protected createIndexObservableForNode(proxy: internal.VirtualChildNodes, child: Node, startIndex: number,
             trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
                 return Rx.Observable.defer(()=> {
                     return Rx.Observable.create<number>(obs => {
@@ -176,7 +176,7 @@ module wx {
             .refCount();
         }
 
-        protected appendAllRows(proxy: internal.NodeChildsProxy, list: IObservableList<any>, ctx: IDataContext,
+        protected appendAllRows(proxy: internal.VirtualChildNodes, list: IObservableList<any>, ctx: IDataContext,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
             var length = list.length;
@@ -186,7 +186,7 @@ module wx {
             }
         }
 
-        protected appendRow(proxy: internal.NodeChildsProxy, index: number, item: any, ctx: IDataContext, template: Array<Node>,
+        protected appendRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext, template: Array<Node>,
             hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
@@ -203,7 +203,7 @@ module wx {
             }
         }
 
-        protected insertRow(proxy: internal.NodeChildsProxy, index: number, item: any, ctx: IDataContext,
+        protected insertRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
@@ -221,7 +221,7 @@ module wx {
             }
         }
 
-        protected removeRow(proxy: internal.NodeChildsProxy, index: number, item: any,
+        protected removeRow(proxy: internal.VirtualChildNodes, index: number, item: any,
             template: Array<Node>, hooks: IForEachDirectiveHooks): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
@@ -236,7 +236,7 @@ module wx {
             }
         }
 
-        protected moveRow(proxy: internal.NodeChildsProxy, from: number, to: number, item: any,
+        protected moveRow(proxy: internal.VirtualChildNodes, from: number, to: number, item: any,
             template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
@@ -261,7 +261,7 @@ module wx {
             }
         }
 
-        protected rebindRow(proxy: internal.NodeChildsProxy, index: number, item: any, template: Array<Node>,
+        protected rebindRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>,
             indexes: IWeakMap<Node, Rx.Observable<any>>): void {
             var templateLength = template.length;
             var savedIndex;
@@ -286,7 +286,7 @@ module wx {
             }
         }
         
-        protected observeList(proxy: internal.NodeChildsProxy, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
+        protected observeList(proxy: internal.VirtualChildNodes, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
             list: IObservableList<any>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>) {
             var i: number;
@@ -345,7 +345,7 @@ module wx {
         }
 
         protected applyValue(el: HTMLElement, value: any, hooks: IForEachDirectiveHooks, template: Array<Node>,
-            ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable, setProxyFunc: (NodeChildsProxy) => void): void {
+            ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable, setProxyFunc: (VirtualChildNodes) => void): void {
             var i, length;
 
             if (initialApply) {
@@ -365,7 +365,7 @@ module wx {
             if (template.length === 0)
                 return; // nothing to do
 
-            var proxy: internal.NodeChildsProxy;
+            var proxy: internal.VirtualChildNodes;
             var indexes: IWeakMap<Node, Rx.Observable<any>>;
             var self = this;
             var recalcIndextrigger: Rx.Subject<any>;
@@ -397,7 +397,7 @@ module wx {
                 }
             }
 
-            proxy = new internal.NodeChildsProxy(el, false, nodeInsertCB, nodeRemoveCB);
+            proxy = new internal.VirtualChildNodes(el, false, nodeInsertCB, nodeRemoveCB);
 
             if (setProxyFunc)
                 setProxyFunc(proxy);

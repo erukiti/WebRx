@@ -3,7 +3,7 @@
 /// <reference path="../../build/web.rx.d.ts" />
 /// <reference path="../TestUtils.ts" />
 
-describe("NodeChildsProxy",() => {
+describe("VirtualChildNodes",() => {
     function createChild(id: string): Element {
         var child = document.createElement("div");
         child.setAttribute("id", id);
@@ -11,10 +11,10 @@ describe("NodeChildsProxy",() => {
     }
 
     it("smoke-test",() => {
-        loadFixtures('templates/Core/NodeChildsProxy.html');
+        loadFixtures('templates/Core/VirtualChildNodes.html');
 
         var el = <HTMLElement> document.querySelector("#empty-node");
-        var proxy = new wx.internal.NodeChildsProxy(el, false);
+        var proxy = new wx.internal.VirtualChildNodes(el, false);
 
         expect(proxy.childNodes.length).toEqual(el.childNodes.length);
 
@@ -56,10 +56,10 @@ describe("NodeChildsProxy",() => {
     });
 
     it("smoke-test - with aliens",() => {
-        loadFixtures('templates/Core/NodeChildsProxy.html');
+        loadFixtures('templates/Core/VirtualChildNodes.html');
 
         var el = <HTMLElement> document.querySelector("#empty-node");
-        var proxy = new wx.internal.NodeChildsProxy(el, false);
+        var proxy = new wx.internal.VirtualChildNodes(el, false);
         var aliens = [];
         var alien: Node;
 
