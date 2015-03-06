@@ -85,7 +85,7 @@ module wx.env {
 
     export var isSupported = (!ie || ie.version >= 9) ||
         (!safari || safari.version >= 5) ||
-        (!firefox || firefox.version >= 4);
+        (!firefox || firefox.version >= 5);
 
     // Special support for jQuery here because it's so commonly used.
     export var jQueryInstance = window["jQuery"];
