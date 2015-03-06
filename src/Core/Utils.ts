@@ -273,4 +273,18 @@ module wx.utils {
             node.className = currentClassNames.join(" ");
         }
     }
+
+    /**
+    * Returns an array of clones of the nodes in the source array
+    */
+    export function cloneNodeArray(nodes: Array<Node>): Array<Node> {
+        var length = nodes.length;
+        var result = new Array<Node>(length);
+
+        for (var i = 0; i < length; i++) {
+            result[i] = nodes[i].cloneNode(true);
+        }
+
+        return result;
+    }
 }

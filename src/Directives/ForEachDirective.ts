@@ -190,7 +190,7 @@ module wx {
             hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
-            var nodes = template.map(x => x.cloneNode(true));
+            var nodes = utils.cloneNodeArray(template);
             var _index = indexTrigger ? <any> this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length) : index;
             proxy.appendChilds(nodes, { index: _index, item: item });
 
@@ -208,7 +208,7 @@ module wx {
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
 
-            var nodes = template.map(x => x.cloneNode(true));
+            var nodes = utils.cloneNodeArray(template);
             var _index = this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length);
             proxy.insertChilds(index * templateLength, nodes, { index: _index, item: item });
 
@@ -252,7 +252,7 @@ module wx {
             }
 
             // create new row
-            nodes = template.map(x => x.cloneNode(true));
+            nodes = utils.cloneNodeArray(template);
             var _index = this.createIndexObservableForNode(proxy, nodes[0], from, indexTrigger, indexes, template.length);
             proxy.insertChilds(templateLength * to, nodes, { index: _index, item: item });
             

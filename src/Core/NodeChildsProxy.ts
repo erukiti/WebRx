@@ -25,7 +25,10 @@ module wx.internal {
             var length = nodes.length;
 
             // append to proxy array
-            Array.prototype.push.apply(this.childNodes, nodes);
+            if (nodes.length > 1)
+                Array.prototype.push.apply(this.childNodes, nodes);
+            else
+                this.childNodes.push(nodes[0]);
 
             // callback
             if (this.insertCB) {
