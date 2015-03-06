@@ -3,8 +3,8 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Directives', () => {
-    describe('with', () => {
-        it('binding to a non-observable property', () => {
+    describe('With', () => {
+        it('bound to a non-observable property', () => {
             loadFixtures('templates/Directives/With.html');
 
             var childModel = {
@@ -18,17 +18,17 @@ describe('Directives', () => {
             var el = <HTMLElement> document.querySelector("#fixture1");
             expect(() => wx.applyDirectives(model, el)).not.toThrowError();
 
-            expect($(el).find("span")[0].innerText).toEqual(model.childModel.foo());
+            expect($(el).find("span")[0].textContent).toEqual(model.childModel.foo());
             model.childModel.foo("foo");
-            expect($(el).find("span")[0].innerText).toEqual(model.childModel.foo());
+            expect($(el).find("span")[0].textContent).toEqual(model.childModel.foo());
 
             // try it again
             wx.cleanNode(el);
             model.childModel.foo("baz");
-            expect($(el).find("span")[0].innerText).not.toEqual(model.childModel.foo());
+            expect($(el).find("span")[0].textContent).not.toEqual(model.childModel.foo());
         });
 
-        it('binding to a observable property',() => {
+        it('bound to an observable property',() => {
             loadFixtures('templates/Directives/With.html');
 
             var childModel1 = {
@@ -45,20 +45,20 @@ describe('Directives', () => {
 
             var el = <HTMLElement> document.querySelector("#fixture1");
             expect(() => wx.applyDirectives(model, el)).not.toThrowError();
-            expect($(el).find("span")[0].innerText).toEqual("undefined");
+            expect($(el).find("span")[0].textContent).toEqual("");
 
             model.childModel(childModel1);
-            expect($(el).find("span")[0].innerText).toEqual(childModel1.foo());
+            expect($(el).find("span")[0].textContent).toEqual(childModel1.foo());
             model.childModel().foo("foo");
-            expect($(el).find("span")[0].innerText).toEqual(childModel1.foo());
+            expect($(el).find("span")[0].textContent).toEqual(childModel1.foo());
 
             model.childModel(childModel2);
-            expect($(el).find("span")[0].innerText).toEqual(childModel2.foo());
+            expect($(el).find("span")[0].textContent).toEqual(childModel2.foo());
 
             // try it again
             wx.cleanNode(el);
             model.childModel().foo("baz");
-            expect($(el).find("span")[0].innerText).not.toEqual(childModel2.foo());
+            expect($(el).find("span")[0].textContent).not.toEqual(childModel2.foo());
         });
     });
 });

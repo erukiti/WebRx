@@ -34,15 +34,16 @@ module wx {
             for (var i = 0; i < tokens.length; i++) {
                 ((_i => {
                     state.cleanup.add(eventHandlers[_i].subscribe(handler => {
+                        var eventName = tokens[_i].key;
+
                         // unwire previous event subscription
-                        if (eventDisposables[tokens[_i].key]) {
-                            eventDisposables[tokens[_i].key].dispose();
+                        if (eventDisposables[eventName]) {
+                            eventDisposables[eventName].dispose();
                         }
 
                         // wire up event observable
                         if (typeof handler === "function") {
-                            eventDisposables[tokens[_i].key] = Rx.Observable.fromEvent<Event>(el, tokens[_i].key).subscribe(e => {
-                                // call handler
+                            eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(e => {
                                 handler(ctx, e);
                             });
                         } else {
@@ -50,7 +51,7 @@ module wx {
                             var observer = <Rx.Observer<Event>> handler;
 
                             // subscribe event directly to observer
-                            eventDisposables[tokens[_i].key] = Rx.Observable.fromEvent<Event>(el, tokens[_i].key).subscribe(observer);
+                            eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(observer);
                         }
                     }));
                 })(i));
@@ -58,7 +59,10 @@ module wx {
 
             // release event handlers
             state.cleanup.add(Rx.Disposable.create(() => {
-                Object.keys(eventDisposables).forEach(x => eventDisposables[x].dispose());
+                Object.keys(eventDisposables).forEach(x => {
+                    if (eventDisposables[x])
+                        eventDisposables[x].dispose();
+                });
             }));
 
             // release closure references to GC 

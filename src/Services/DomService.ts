@@ -343,7 +343,7 @@ module wx {
             var state = this.getNodeState(node);
 
             // create and set if necessary
-            if (state === undefined) {
+            if (!state) {
                 state = this.createNodeState();
                 this.setNodeState(node, state);
             } else if (state.isBound) {

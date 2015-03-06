@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Services/DomService.ts" />
-/// <reference path="../Interfaces.ts" />
+/// <reference path="../Core/Environment.ts" />
 
 module wx {
     class TextInputDirective implements IDirective {
@@ -14,7 +14,7 @@ module wx {
         public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("textInput directive only operates on elements!");
-
+            
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");
 

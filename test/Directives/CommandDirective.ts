@@ -42,7 +42,7 @@ describe('Directives', () => {
             executed = false;
             model.canExecute(false);
             expect(el.disabled).toBeFalsy();
-            $(el).click();
+            el.click();
             expect(executed).toBeFalsy();
         }
 

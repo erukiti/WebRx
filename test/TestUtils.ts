@@ -113,4 +113,18 @@ module testutils {
 
         return nodes.map(x => x.getAttribute(attr)).join(", ");
     }
+
+    export function triggerEvent(element: HTMLElement, event: string) {
+        if (document.createEventObject) {
+            // dispatch for IE
+            var e1 = document.createEventObject();
+            return element.fireEvent('on' + event, e1);
+        }
+        else {
+            // dispatch for firefox + others
+            var e2 = document.createEvent("HTMLEvents");
+            e2.initEvent(event, true, true); // event type,bubbling,cancelable
+            return !element.dispatchEvent(e2);
+        }
+    }
 }

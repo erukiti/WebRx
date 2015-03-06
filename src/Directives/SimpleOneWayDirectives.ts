@@ -71,6 +71,9 @@ module wx {
         } 
 
         protected applyValue(el: HTMLElement, value: any): void {
+            if ((value === null) || (value === undefined))
+                value = "";
+
             el.textContent = value;
         }
     }
@@ -130,6 +133,9 @@ module wx {
         } 
 
         protected applyValue(el: HTMLElement, value: any): void {
+            if ((value === null) || (value === undefined))
+                value = "";
+
             el.innerHTML = value;
         }
     }
