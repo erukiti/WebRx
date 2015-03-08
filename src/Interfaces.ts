@@ -528,7 +528,6 @@ module wx {
         registerDirective(name: string, handler: string): void;
         unregisterDirective(name: string): void;
         getDirective(name: string): IDirective;
-        getAllDirectives(): IDirective[];
     }
 
     export interface IComponent {
