@@ -142,7 +142,7 @@ describe("ObservableProperty", () => {
         expect(changedFiredCount).toEqual(2);
     });
 
-    it("computed property using whyAny always has correct value",() => {
+    it("computed property using whenAny always has correct value",() => {
         var vm = new TestViewModel();
         var firedCount = 0;
 
