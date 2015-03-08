@@ -353,7 +353,7 @@ module wx {
 
             // check if tag itself is a directive
             var tagName = el.tagName.toLowerCase();
-            if (tagName.indexOf(DomService.elementPrefix) === 0) {
+            if (tagName.indexOf(DomService.elementPrefix + "-") === 0) {
                 // transform element attributes into pseudo-object literal
                 var options: string[] = [];
 
@@ -361,7 +361,7 @@ module wx {
                     options.push(el.attributes[i].name + " = " + el.attributes[i].value);
                 }
 
-                _directives = [{ key: tagName.substr(DomService.elementPrefix.length), value: options.join(", ") }];
+                _directives = [{ key: tagName.substr(DomService.elementPrefix.length + 1), value: options.join(", ") }];
             } else {
                 // get definitions from attribute
                 _directives = this.extractDirectivesFromDataAttribute(el);
