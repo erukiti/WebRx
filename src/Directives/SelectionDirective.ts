@@ -58,7 +58,58 @@ module wx {
         }
     }
 
+    class OptionSingleSelectionImpl implements ISelectionDirectiveImpl {
+        public supports(el: HTMLElement, model: any): boolean {
+            return el.tagName.toLowerCase() === 'select' &&
+                !utils.isList(model);
+        }
+
+        public observeElement(el: HTMLElement): Rx.Observable<any> {
+            return <Rx.Observable<any>> <any> Rx.Observable.merge(
+                Rx.Observable.fromEvent(el, 'change'));
+        }
+
+        public observeModel(model: any): Rx.Observable<any> {
+            if (utils.isProperty(model)) {
+                var prop = <IObservableProperty<any>> model;
+                return prop.changed;
+            }
+
+            return Rx.Observable.never<any>();
+        }
+
+        public updateElement(el: HTMLElement, model: any) {
+            var option = <HTMLSelectElement> el;
+
+            if (utils.isProperty(model)) {
+                var prop = <IObservableProperty<any>> model;
+
+                if (prop() === undefined) {
+                    option.selectedIndex = -1;
+                } else {
+                    option.value = prop();
+                }
+            } else {
+                if (model === undefined) {
+                    option.selectedIndex = -1;
+                } else {
+                    option.value = model;
+                }
+            }
+        }
+
+        public updateModel(el: HTMLElement, model: any, e: any) {
+            var option = <HTMLSelectElement> el;
+
+            if (utils.isProperty(model)) {
+                var prop = <IObservableProperty<any>> model;
+                prop(option.value);
+            }
+        }
+    }
+
     impls.push(new RadioSingleSelectionImpl());
+    impls.push(new OptionSingleSelectionImpl());
 
     class SelectionDirective implements IDirective {
         constructor(domService: IDomService) {
@@ -100,7 +151,7 @@ module wx {
                     }
                 }
 
-                if (!impls)
+                if (!impl)
                     internal.throwError("Selection directive does not support this combination of bound element and model!");
 
                 implCleanup = new Rx.CompositeDisposable();

@@ -56,7 +56,7 @@ describe('Directives', () => {
                 container.children[0].click();
                 container.children[0].click();
                 container.children[0].click();
-                testutils.triggerEvent(container.children[0], "changed");
+                testutils.triggerEvent(container.children[0], "change");
                 expect(model.selected()).toEqual('0');
 
                 expect(notificationCount).toEqual(2);
@@ -73,6 +73,72 @@ describe('Directives', () => {
                 // none of the radios should be checked initially
                 expect(testutils.nodeListToArray(container.children).map((element) =>
                     (<HTMLInputElement> element).checked)).toEqual([false, false, false]);
+            });
+        });
+
+        describe('Select (single-selection)',() => {
+            it("Should be able to control an option's selectedIndex",() => {
+                loadFixtures('templates/Directives/Selection.html');
+                var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
+
+                // first option should be selected by default
+                expect(container.selectedIndex).toEqual(0);
+
+                var selected = wx.property('1');
+                var model = { selected: selected };
+                wx.applyDirectives(model, container);
+
+                // only middle element should be selected
+                expect(container.selectedIndex).toEqual(1);
+
+                selected('2');
+
+                // only last element should be selected
+                expect(container.selectedIndex).toEqual(2);
+
+                selected('0');
+
+                // first element should be selected
+                expect(container.selectedIndex).toEqual(0);
+            });
+
+            it("Selecting an option should reflect back to model",() => {
+                loadFixtures('templates/Directives/Selection.html');
+                var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
+
+                // first option should be selected by default
+                expect(container.selectedIndex).toEqual(0);
+
+                var selected = wx.property();
+                var model = { selected: selected };
+                wx.applyDirectives(model, container);
+
+                var notificationCount = 0;
+                model.selected.changed.subscribe(x => notificationCount++);
+
+                container.selectedIndex = 1;
+                testutils.triggerEvent(container, "change");
+                expect(model.selected()).toEqual('1');
+
+                container.selectedIndex = 0;
+                testutils.triggerEvent(container, "change");
+                testutils.triggerEvent(container, "change");
+                testutils.triggerEvent(container, "change");
+                expect(model.selected()).toEqual('0');
+
+                expect(notificationCount).toEqual(2);
+            });
+
+            it("If initial model value is undefined none of the options should be checked",() => {
+                loadFixtures('templates/Directives/Selection.html');
+                var container = <any> document.querySelector("#fixture1");
+
+                var selected = wx.property(undefined);
+                var model = { selected: selected };
+                wx.applyDirectives(model, container);
+
+                // none of the radios should be checked initially
+                expect(container.selectedIndex).not.toBeDefined();
             });
         });
     });
