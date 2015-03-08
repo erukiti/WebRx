@@ -77,7 +77,7 @@ describe('Directives', () => {
         });
 
         describe('Select (single-selection)',() => {
-            it("Should be able to control an option's selectedIndex",() => {
+            it("Should be able to control a Select's selectedIndex",() => {
                 loadFixtures('templates/Directives/Selection.html');
                 var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
 
@@ -102,7 +102,7 @@ describe('Directives', () => {
                 expect(container.selectedIndex).toEqual(0);
             });
 
-            it("Selecting an option should reflect back to model",() => {
+            it("Selecting an option should reflect selection back to model",() => {
                 loadFixtures('templates/Directives/Selection.html');
                 var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
 
@@ -129,7 +129,7 @@ describe('Directives', () => {
                 expect(notificationCount).toEqual(2);
             });
 
-            it("If initial model value is undefined none of the options should be checked",() => {
+            it("If initial model value is undefined, selectedIndex should be undefined as well",() => {
                 loadFixtures('templates/Directives/Selection.html');
                 var container = <any> document.querySelector("#fixture1");
 
