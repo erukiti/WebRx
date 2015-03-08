@@ -69,6 +69,10 @@ module wx {
             return this.directives[name];
         }
 
+        public getAllDirectives(): IDirective[] {
+            return Object.keys(this.directives).map(x => this.getDirective(x));
+        }
+
         public name: string;
 
         //////////////////////////////////

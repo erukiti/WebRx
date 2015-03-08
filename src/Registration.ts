@@ -10,6 +10,7 @@
 /// <reference path="Directives/ForEachDirective.ts" />
 /// <reference path="Directives/EventDirective.ts" />
 /// <reference path="Directives/TextInputDirective.ts" />
+/// <reference path="Directives/SelectionDirective.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
@@ -34,6 +35,7 @@ module wx {
     injector.register("wx.directives.event", true, true, [res.domService, internal.eventDirectiveConstructor]);
     injector.register("wx.directives.textInput", true, true, [res.domService, internal.textInputDirectiveConstructor]);
     injector.register("wx.directives.checked", true, true, [res.domService, internal.checkedDirectiveConstructor]);
+    injector.register("wx.directives.selection", true, true, [res.domService, internal.selectionDirectiveConstructor]);
 
     app.registerDirective("module", "wx.directives.module");
     app.registerDirective("css", "wx.directives.css");
@@ -53,4 +55,5 @@ module wx {
     app.registerDirective("event", "wx.directives.event");
     app.registerDirective("textInput", "wx.directives.textInput");
     app.registerDirective("checked", "wx.directives.checked");
+    app.registerDirective("selection", "wx.directives.selection");
 }

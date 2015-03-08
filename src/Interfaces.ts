@@ -516,6 +516,11 @@ module wx {
         * the handler will be responsible for that.
         */
         controlsDescendants?: boolean;
+
+        /**
+        * If set to true then the directive can be only used as tagname
+        */
+        isTag?: boolean;
     }
 
     export interface IDirectiveRegistry {
@@ -523,6 +528,7 @@ module wx {
         registerDirective(name: string, handler: string): void;
         unregisterDirective(name: string): void;
         getDirective(name: string): IDirective;
+        getAllDirectives(): IDirective[];
     }
 
     export interface IComponent {

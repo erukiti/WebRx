@@ -46,15 +46,15 @@ module wx {
             }
 
             // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(src => {
-                if (!utils.isProperty(src)) {
+            state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(model => {
+                if (!utils.isProperty(model)) {
                     // initial and final update
-                    updateElement(src);
+                    updateElement(model);
                 } else {
                     cleanup();
 
                     // update on property change
-                    prop = src;
+                    prop = model;
 
                     propertySubscription = prop.changed.subscribe(x => {
                         updateElement(x);
