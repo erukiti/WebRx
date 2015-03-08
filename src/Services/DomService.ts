@@ -25,7 +25,7 @@ module wx {
 
             // calculate resulting model-context and bind
             var ctx = this.getDataContext(rootNode);
-            this.applyDirectivesRecursive(ctx, rootNode);
+            this.applyDirectivesRecursive(ctx, <HTMLElement> rootNode);
         }
 
         public applyDirectivesToDescendants(ctx: IDataContext, node: Node): void {
@@ -37,7 +37,7 @@ module wx {
                     if (child.nodeType !== 1)
                         continue;
 
-                    this.applyDirectivesRecursive(ctx, child);
+                    this.applyDirectivesRecursive(ctx, <HTMLElement> child);
                 }
             }
         }
@@ -61,10 +61,6 @@ module wx {
                     this.clearElementState(child);
                 }
             }
-        }
-
-        public getDirectives(node: Node): Array<{key: string; value: string }> {
-            return this.extractDirectivesFromDataAttribute(node);
         }
 
         public getObjectLiteralTokens(value: string): Array<IObjectLiteralToken> {
@@ -330,6 +326,7 @@ module wx {
         // Implementation
 
         private static directiveAttributeName = "data-bind";
+        private static elementPrefix = "wx-";
         private elementState: IWeakMap<Node, INodeState>;
         private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
         private compiler: IExpressionCompiler;
@@ -338,22 +335,37 @@ module wx {
             disallowFunctionCalls: true
         };
 
-        private applyDirectivesInternal(ctx: IDataContext, node: Node, module: IModule): boolean {
+        private applyDirectivesInternal(ctx: IDataContext, el: HTMLElement, module: IModule): boolean {
             var result = false;
 
             // get or create elment-state
-            var state = this.getNodeState(node);
+            var state = this.getNodeState(el);
 
             // create and set if necessary
             if (!state) {
                 state = this.createNodeState();
-                this.setNodeState(node, state);
+                this.setNodeState(el, state);
             } else if (state.isBound) {
                 internal.throwError("an element must not be bound multiple times!");
             }
 
-            // get definitions from attribute
-            var _directives = this.getDirectives(node);
+            var _directives: Array<{ key: string; value: string }>;
+
+            // check if tag itself is a directive
+            var tagName = el.tagName.toLowerCase();
+            if (tagName.indexOf(DomService.elementPrefix) === 0) {
+                // transform element attributes into pseudo-object literal
+                var options: string[] = [];
+
+                for (var i = 0; i < el.attributes.length; i++) {
+                    options.push(el.attributes[i].name + " = " + el.attributes[i].value);
+                }
+
+                _directives = [{ key: tagName.substr(DomService.elementPrefix.length), value: options.join(", ") }];
+            } else {
+                // get definitions from attribute
+                _directives = this.extractDirectivesFromDataAttribute(el);
+            }
 
             if (utils.isNotNull(_directives) && _directives.length > 0) {
                 // lookup handlers
@@ -379,11 +391,11 @@ module wx {
                 result = hd.length > 0;
 
                 // apply all directives
-                for (var i = 0; i < directives.length; i++) {
+                for (i = 0; i < directives.length; i++) {
                     var directive = directives[i];
                     var handler = directive.handler;
 
-                    handler.apply(node, directive.value, ctx, state);
+                    handler.apply(el, directive.value, ctx, state);
                 }
             }
 
@@ -397,7 +409,7 @@ module wx {
             return str[0] === "{" && str[str.length - 1] === "}";
         }
 
-        private extractDirectivesFromDataAttribute(node: Node): Array<{ key: string; value: string }> {
+        public extractDirectivesFromDataAttribute(node: Node): Array<{ key: string; value: string }> {
             var directiveText = null;
 
             if (node.nodeType === 1) {  // element
@@ -420,24 +432,24 @@ module wx {
             return null;
         }
 
-        private applyDirectivesRecursive(ctx: IDataContext, node: Node, module?: IModule): void {
-            module = module || this.getModuleContext(node);
+        private applyDirectivesRecursive(ctx: IDataContext, el: HTMLElement, module?: IModule): void {
+            module = module || this.getModuleContext(el);
 
-            if (!this.applyDirectivesInternal(ctx, node, module) && node.hasChildNodes()) {
+            if (!this.applyDirectivesInternal(ctx, el, module) && el.hasChildNodes()) {
                 // module directive might have updated state.module
-                var state = this.getNodeState(node);
+                var state = this.getNodeState(el);
                 if (state && state.properties && state.properties.module)
                     module = state.properties.module;
 
                 // iterate over descendants
-                for (var i = 0; i < node.childNodes.length; i++) {
-                    var child = node.childNodes[i];
+                for (var i = 0; i < el.childNodes.length; i++) {
+                    var child = el.childNodes[i];
 
                     // only elements
                     if (child.nodeType !== 1)
                         continue;
 
-                    this.applyDirectivesRecursive(ctx, child, module);
+                    this.applyDirectivesRecursive(ctx, <HTMLElement> child, module);
                 }
             }
         }
