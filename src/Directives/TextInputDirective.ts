@@ -12,9 +12,7 @@ module wx {
         // IDirective
 
         public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
-            debugger;
-
-            if (node.nodeType !== 1)
+             if (node.nodeType !== 1)
                 internal.throwError("textInput directive only operates on elements!");
             
             if (utils.isNull(options))
@@ -79,7 +77,7 @@ module wx {
                     if (!prop.source) {
                         // wire change-events depending on browser and version
                         var events = this.getTextInputEventObservables(el, isTextArea);
-                        eventSubscription = Rx.Observable.merge(events).take(1).subscribe(e => {
+                        eventSubscription = Rx.Observable.merge(events).subscribe(e => {
                             prop(el.value);
                         });
                     }
