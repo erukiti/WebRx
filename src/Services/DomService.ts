@@ -326,7 +326,7 @@ module wx {
         // Implementation
 
         private static directiveAttributeName = "data-bind";
-        private static elementPrefix = "wx-";
+        private static elementPrefix = "wx";
         private elementState: IWeakMap<Node, INodeState>;
         private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
         private compiler: IExpressionCompiler;
@@ -352,6 +352,7 @@ module wx {
             var _directives: Array<{ key: string; value: string }>;
 
             // check if tag itself is a directive
+            debugger;
             var tagName = el.tagName.toLowerCase();
             if (tagName.indexOf(DomService.elementPrefix + "-") === 0) {
                 // transform element attributes into pseudo-object literal
