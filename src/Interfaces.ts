@@ -527,15 +527,17 @@ module wx {
     }
 
     export interface IComponentTemplateDescriptor {
-        require?: string;   // AMD loading
-        resolve?: string;   // DI
+        require?: string;       // Async AMD
+        promise?: Rx.IPromise<Node[]>;  // Async Promise
+        resolve?: string;       // DI
         element?: string|Node;  // Selector or Node instance
     }
 
     export interface IComponentViewModelDescriptor {
-        require?: string;   // AMD loading
-        resolve?: string;   // DI
-        instance?: any;     // pre-constructed instance
+        require?: string;       // Async AMD loading
+        promise?: Rx.IPromise<string>;  // Async Promise
+        resolve?: string;       // DI
+        instance?: any;         // pre-constructed instance
     }
 
     export interface IComponent {

@@ -25,7 +25,7 @@ module wx {
         }
     }
 
-    declare function require(module: string, successCB: (any) => any, errCB: (err) => any): void;
+    declare function require(modules: string[], successCB: (any) => any, errCB: (err) => any): void;
 
     /**
     * Turns an AMD-Style require call into an observable
@@ -35,8 +35,8 @@ module wx {
     export function observableRequire(module: string): Rx.Observable<any> {
         return Rx.Observable.create<any>(observer => {
             try {
-                require(module,(result) => {
-                    observer.onNext(result);
+                require([module], (m) => {
+                    observer.onNext(m);
                     observer.onCompleted();
                 },(err) => {
                     observer.onError(err);

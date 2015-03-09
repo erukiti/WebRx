@@ -21,3 +21,11 @@ if (window._phantom) {
     };
   }
 }
+
+requirejs.config({
+    baseUrl: "test",
+    paths: {
+    }
+  });
+
+console.log("done");

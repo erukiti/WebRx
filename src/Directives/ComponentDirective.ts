@@ -112,29 +112,33 @@ module wx {
 
             if (typeof template === "string") {
                 syncResult = app.templateEngine.parse(<string> template);
+                return Rx.Observable.return(syncResult);
             } else if (Array.isArray(template)) {
                 syncResult = <Node[]> template;
+                return Rx.Observable.return(syncResult);
             } else if(typeof template === "object") {
                 var options = <IComponentTemplateDescriptor> template;
 
                 if (options.resolve) {
                     syncResult = injector.resolve<Node[]>(options.resolve);
+                    return Rx.Observable.return(syncResult);
+                } else if (options.promise) {
+                    var promise = <Rx.IPromise<Node[]>> <any> options.promise;
+                    return Rx.Observable.fromPromise(promise);
                 } else if (options.require) {
                     return observableRequire(options.require).select(x=> app.templateEngine.parse(x));
                 } else if (options.element) {
                     if (typeof options.element === "string") {
                         syncResult = [document.querySelector(<string> options.element)];
+                        return Rx.Observable.return(syncResult);
                     } else {
                         syncResult = [<Node> <any> options.element];
+                        return Rx.Observable.return(syncResult);
                     }
                 }
             }
 
-            if (syncResult) {
-                return Rx.Observable.return(syncResult);
-            }
-
-            return Rx.Observable.throwError<Node[]>(new Error("invalid template descriptor"));
+            internal.throwError("invalid template descriptor");
         }
 
         protected loadViewModel(vm: any, componentParams: Object): Rx.Observable<any> {
@@ -142,23 +146,25 @@ module wx {
 
             if (typeof vm === "function") {
                 syncResult = vm(componentParams);
+                return Rx.Observable.return(syncResult);
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;
 
                 if (options.resolve) {
                     syncResult = injector.resolve<any>(options.resolve, componentParams);
+                    return Rx.Observable.return(syncResult);
+                } else if (options.promise) {
+                    var promise = <Rx.IPromise<any>> <any> options.promise;
+                    return Rx.Observable.fromPromise(promise);
                 } else if (options.require) {
                     return observableRequire(options.require);
                 } else if (options.instance) {
                     syncResult = options.instance;
+                    return Rx.Observable.return(syncResult);
                 }
             }
 
-            if (syncResult) {
-                return Rx.Observable.return(syncResult);
-            }
-
-            return Rx.Observable.throwError<any>(new Error("invalid view-model descriptor"));
+            internal.throwError("invalid view-model descriptor");
         }
 
         protected applyTemplate(el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {

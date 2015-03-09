@@ -137,7 +137,7 @@ module wx {
             }
 
             var ctx: IDataContext;
-
+            
             if (models.length > 0) {
                 ctx = {
                     $data: models[0],
@@ -360,8 +360,6 @@ module wx {
             var _directives: Array<{ key: string; value: string; fromTag?: boolean }>;
             var tagName = el.tagName.toLowerCase();
             var i;
-
-            debugger;
 
             // check if tag represents a component
             if (module.isComponentRegistered(tagName) || app.isComponentRegistered(tagName)) {

@@ -50,6 +50,7 @@ module.exports = function (grunt) {
                 options: {
                     specs: 'build/test/**/*.js',
                     vendor: [
+                        "node_modules/rsvp/dist/rsvp.js",
                         "node_modules/rx/dist/rx.lite.js",
                         "node_modules/rx/dist/rx.lite.extras.js",
                         "node_modules/rx/dist/rx.virtualtime.js",
@@ -58,6 +59,7 @@ module.exports = function (grunt) {
                         "node_modules/jasmine-jquery/lib/jasmine-jquery.js",
                         "node_modules/ix/l2o.js",
                         "node_modules/ix/ix.js",
+                        "node_modules/requirejs/require.js",
                         "test/test-setup.js",
                         "build/test/TestUtils.js",
                         "build/test/TestModels.js"

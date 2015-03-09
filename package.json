@@ -17,10 +17,13 @@
     "grunt-ts": "^3.0.0",
     "ix": "^1.0.6",
     "jasmine-node": "^2.0.0-beta4",
-	"jasmine-jquery": "^2.0.6",
-	"browser-jquery": "^1.10.2",
+    "jasmine-jquery": "^2.0.6",
+    "browser-jquery": "^1.10.2",
     "rx": "^2.3.25",
-    "typescript": "^1.4.1"
-  },
+    "typescript": "^1.4.1",
+    "rsvp": "^3.0.17",
+    "requirejs": "^2.1.16",
+    "requirejs-text": "^2.0.12"
+},
   "dependencies": {}
 }
