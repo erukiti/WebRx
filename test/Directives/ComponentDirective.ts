@@ -219,5 +219,45 @@ describe('Directives', () => {
                 done();
             }, 1000);
         });
+
+        it("Params get passed to view-model constructor",() => {
+            loadFixtures('templates/Directives/Component.html');
+
+            var template = '<span>foo</span>';
+            var fooVal: number;
+
+            wx.module("test").registerComponent("test1", <wx.IComponent> <any> {
+                template: template,
+                viewModel: (params) => {
+                    fooVal = params.foo;
+                    return { foo: 'bar' };
+                }
+            });
+
+            var el = <HTMLElement> document.querySelector("#fixture4");
+            expect(() => wx.applyDirectives(undefined, el)).not.toThrow();
+
+            expect(fooVal).toEqual(42);
+        });
+
+        it("Params get passed to view-model constructor when component is used as tag",() => {
+            loadFixtures('templates/Directives/Component.html');
+
+            var template = '<span>foo</span>';
+            var fooVal: number;
+
+            wx.app.registerComponent("test1", <wx.IComponent> <any> {
+                template: template,
+                viewModel: (params) => {
+                    fooVal = params.foo;
+                    return { foo: 'bar' };
+                }
+            });
+
+            var el = <HTMLElement> document.querySelector("#fixture5");
+            expect(() => wx.applyDirectives(undefined, el)).not.toThrow();
+
+            expect(fooVal).toEqual(42);
+        });
     });
 });

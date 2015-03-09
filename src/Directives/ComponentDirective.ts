@@ -45,9 +45,12 @@ module wx {
                 });
 
                 if (opt.params) {
-                    exp = <ICompiledExpression> <any> opt.params;
-                    using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                        componentParams = prop();
+                    componentParams = {};
+
+                    Object.keys(opt.params).forEach(x => {
+                        using(this.domService.expressionToObservable(opt.params[x], ctx).toProperty(),(prop) => {
+                            componentParams[x] = prop();
+                        });
                     });
                 }
             }

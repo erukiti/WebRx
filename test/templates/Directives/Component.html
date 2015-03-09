@@ -2,4 +2,5 @@
 <div id="fixture1" data-bind="module: 'test', component: 'test1'"></div>
 <div id="fixture2" data-bind="module: 'test', component: { name: 'test1' }"></div>
 <test1 id="fixture3"></test1>
-
+<div id="fixture4" data-bind="module: 'test', component: { name: 'test1', params: { foo: 42 } }"></div>
+<test1 id="fixture5" params="foo: 42"></test1>
