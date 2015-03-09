@@ -326,7 +326,7 @@ module wx {
         // Implementation
 
         private static directiveAttributeName = "data-bind";
-        private static elementPrefix = "wx";
+        private static paramsAttributename = "params";
         private elementState: IWeakMap<Node, INodeState>;
         private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
         private compiler: IExpressionCompiler;
@@ -349,20 +349,21 @@ module wx {
                 internal.throwError("an element must not be bound multiple times!");
             }
 
-            var _directives: Array<{ key: string; value: string }>;
-
-            // check if tag itself is a directive
-            debugger;
+            var _directives: Array<{ key: string; value: string; fromTag?: boolean }>;
             var tagName = el.tagName.toLowerCase();
-            if (tagName.indexOf(DomService.elementPrefix + "-") === 0) {
-                // transform element attributes into pseudo-object literal
-                var options: string[] = [];
+            var i;
 
-                for (var i = 0; i < el.attributes.length; i++) {
-                    options.push(el.attributes[i].name + " = " + el.attributes[i].value);
-                }
+            debugger;
 
-                _directives = [{ key: tagName.substr(DomService.elementPrefix.length + 1), value: options.join(", ") }];
+            // check if tag represents a component
+            if (module.isComponentRegistered(tagName) || app.isComponentRegistered(tagName)) {
+                // when a component is referenced by element, we just apply a virtual 'component' directive
+                var value: any = { name: tagName, params: el.getAttribute(DomService.paramsAttributename) };
+
+                // convert to string, strip curly braces and trim
+                value = utils.trimString(JSON.stringify(value).substring(1, value.length - 1));
+
+                _directives = [{ key: 'component', value: value }];
             } else {
                 // get definitions from attribute
                 _directives = this.extractDirectivesFromDataAttribute(el);
@@ -373,8 +374,8 @@ module wx {
                 var directives = _directives.map(x=> {
                     // if handler is not registered with current module, fall-back to 'app' module 
                     var handler = module.getDirective(x.key) || app.getDirective(x.key);
-
-                    if (handler === undefined)
+                    
+                    if (!handler)
                         internal.throwError("directive '{0}' has not been registered.", x.key);
 
                     return { handler: handler, value: x.value };

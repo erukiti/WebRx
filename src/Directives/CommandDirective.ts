@@ -16,29 +16,29 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("command directive only operates on elements!");
 
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");
 
-            options = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileDirectiveOptions(options);
 
             var el = <HTMLElement> node;
             var cmd: ICommand<any>;
             var parameter: any;
             var exp: ICompiledExpression;
 
-            if (typeof options === "function") {
-                exp = <ICompiledExpression> options;
+            if (typeof compiled === "function") {
+                exp = <ICompiledExpression> compiled;
 
                 using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
                     cmd = prop();
                     parameter = null;
                 });
             } else {
-                var opt = <ICommandDirectiveOptions> options;
+                var opt = <ICommandDirectiveOptions> compiled;
 
                 exp = <ICompiledExpression> <any> opt.command;
                 using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {

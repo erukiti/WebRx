@@ -11,16 +11,14 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("module directive only operates on elements!");
 
             if (utils.isNull(options))
                 internal.throwError("invalid options for directive!");
 
-            options = this.domService.compileDirectiveOptions(options);
-
-            var exp = <ICompiledExpression> options;
+            var exp = this.domService.compileDirectiveOptions(options);
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // subscribe
@@ -50,6 +48,7 @@ module wx {
         }
 
         public priority = 100;
+        public allowElement = true;
 
         ////////////////////
         // Implementation

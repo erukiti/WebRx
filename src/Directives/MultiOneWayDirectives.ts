@@ -12,25 +12,25 @@ module wx {
        ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("directive only operates on elements!");
 
-            options = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileDirectiveOptions(options);
 
-            if (utils.isNull(options) || typeof options !== "object")
+            if (utils.isNull(compiled) || typeof compiled !== "object")
                 internal.throwError("invalid options for directive!");
 
             var el = <HTMLElement> node;
-            var keys = Object.keys(options);
             var observables = new Array<[string, Rx.Observable<any>]>();
             var obs: Rx.Observable<any>;
             var exp: ICompiledExpression;
+            var keys = Object.keys(compiled);
             var i;
 
             for (i = 0; i < keys.length; i++) {
                 var key = keys[i];
-                var value = options[key];
+                var value = compiled[key];
 
                 exp = <ICompiledExpression> value;
                 obs = this.domService.expressionToObservable(exp, ctx);

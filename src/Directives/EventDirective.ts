@@ -15,7 +15,7 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("event directive only operates on elements!");
 

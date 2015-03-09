@@ -5,6 +5,10 @@
 /// <reference path="../Core/Resources.ts" />
 
 module wx {
+    export interface IIfDirectiveOptions {
+        condition: string;
+    }
+
     class IfDirective implements IDirective {
         constructor(domService: IDomService) {
             this.domService = domService;
@@ -13,19 +17,17 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("if directive only operates on elements!");
 
             if (utils.isNull(options))
                 internal.throwError("** invalid directive options!");
 
-            options = this.domService.compileDirectiveOptions(options);
-
             var el = <HTMLElement> node;
             var self = this;
             var initialApply = true;
-            var exp = <ICompiledExpression> options;
+            var exp = this.domService.compileDirectiveOptions(options);
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // backup inner HTML
@@ -62,6 +64,8 @@ module wx {
 
         public priority = 50;
         public controlsDescendants = true;
+        public allowElement = true;
+        public elementAttributes = ["condition"];
 
         ////////////////////
         // Implementation

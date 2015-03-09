@@ -59,14 +59,14 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("forEach binding only operates on elements!");
 
             if (utils.isNull(options))
                 internal.throwError("** invalid binding options!");
 
-            options = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileDirectiveOptions(options);
 
             var el = <HTMLElement> node;
             var self = this;
@@ -76,8 +76,8 @@ module wx {
             var exp: ICompiledExpression;
             var setProxyFunc: (VirtualChildNodes) => void;
 
-            if (typeof options === "object" && options.hasOwnProperty("data")) {
-                var opt = <IForEachDirectiveOptions> options;
+            if (typeof compiled === "object" && compiled.hasOwnProperty("data")) {
+                var opt = <IForEachDirectiveOptions> compiled;
                 exp = opt.data;
 
                 if (opt.hooks) {
@@ -99,7 +99,7 @@ module wx {
                 if (typeof hooks === "string")
                     hooks = injector.resolve<IForEachDirectiveHooks>(<string> hooks);
             } else {
-                exp = options;
+                exp = compiled;
             }
 
             var obs = this.domService.expressionToObservable(exp, ctx);

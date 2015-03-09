@@ -496,7 +496,7 @@ module wx {
         * @param {IDataContext} ctx The curent data context
         * @param {IDomElementState} state State of the target element
         */
-        apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void;
+        apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void;
 
         /**
         * Configures the handler using a handler-specific options object
@@ -518,15 +518,16 @@ module wx {
         controlsDescendants?: boolean;
 
         /**
-        * If set to true then the directive can be only used as tagname
+        * If set to true then the directive can alternatively referenced by using its name as element
         */
-        isTag?: boolean;
+        allowElement?: boolean;
     }
 
     export interface IDirectiveRegistry {
         registerDirective(name: string, handler: IDirective): void;
         registerDirective(name: string, handler: string): void;
         unregisterDirective(name: string): void;
+        isDirectiveRegistered(name: string): boolean;
         getDirective(name: string): IDirective;
     }
 
@@ -537,6 +538,7 @@ module wx {
         registerComponent(name: string, handler: IComponent): void;
         registerComponent(name: string, handler: string): void;
         unregisterComponent(name: string): void;
+        isComponentRegistered(name: string): boolean;
         getComponent(name: string): IComponent;
     }
 

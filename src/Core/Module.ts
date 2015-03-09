@@ -28,6 +28,10 @@ module wx {
             delete this.components[name];
         }
 
+        public isComponentRegistered(name: string): boolean {
+            return this.components[name] !== undefined;
+        }
+
         public getComponent(name: string): IComponent {
             var component = this.components[name];
 
@@ -54,6 +58,10 @@ module wx {
 
         public unregisterDirective(name: string): void {
             delete this.directives[name];
+        }
+
+        public isDirectiveRegistered(name: string): boolean {
+            return this.directives[name] !== undefined;
         }
 
         public getDirective(name: string): IDirective {

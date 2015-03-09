@@ -13,18 +13,16 @@ module wx {
         ////////////////////
         // IDirective
 
-        public apply(node: Node, options: any, ctx: IDataContext, state: INodeState): void {
+        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("with directive only operates on elements!");
 
             if (utils.isNull(options))
                 internal.throwError("** invalid directive options!");
 
-            options = this.domService.compileDirectiveOptions(options);
-
             var el = <HTMLElement> node;
             var self = this;
-            var exp = <ICompiledExpression> options;
+            var exp = this.domService.compileDirectiveOptions(options);
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // subscribe
