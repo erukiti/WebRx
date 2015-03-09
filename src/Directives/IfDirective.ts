@@ -64,8 +64,6 @@ module wx {
 
         public priority = 50;
         public controlsDescendants = true;
-        public allowElement = true;
-        public elementAttributes = ["condition"];
 
         ////////////////////
         // Implementation

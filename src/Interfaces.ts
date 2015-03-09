@@ -10,7 +10,7 @@ module wx {
         register(key: string, singleton: boolean, factory: () => any): void;
         register(key: string, instance:any): void;
 
-        resolve<T>(key: string): T;
+        resolve<T>(key: string, args?: any): T;
     }
 
    /**
@@ -337,7 +337,7 @@ module wx {
     }
 
     export interface INodeStateProperties {
-        module?: any;
+        module?: IModule;
         model?: any;
         index?: any;
     }
@@ -516,11 +516,6 @@ module wx {
         * the handler will be responsible for that.
         */
         controlsDescendants?: boolean;
-
-        /**
-        * If set to true then the directive can alternatively referenced by using its name as element
-        */
-        allowElement?: boolean;
     }
 
     export interface IDirectiveRegistry {
@@ -531,7 +526,21 @@ module wx {
         getDirective(name: string): IDirective;
     }
 
+    export interface IComponentTemplateDescriptor {
+        require?: string;   // AMD loading
+        resolve?: string;   // DI
+        element?: string|Node;  // Selector or Node instance
+    }
+
+    export interface IComponentViewModelDescriptor {
+        require?: string;   // AMD loading
+        resolve?: string;   // DI
+        instance?: any;     // pre-constructed instance
+    }
+
     export interface IComponent {
+        template: string|Node[]|IComponentTemplateDescriptor;
+        viewModel?: (Object)=> any|IComponentViewModelDescriptor;
     }
 
     export interface IComponentRegistry {

@@ -17,7 +17,7 @@ module wx {
         public register() {
             var args = utils.args2Array(arguments);
             var key = args.shift();
-            var factory: (deps: any) => any;
+            var factory: (deps: any, args: any) => any;
             var isConstructor = false;
             var isSingleton = false;
 
@@ -29,7 +29,7 @@ module wx {
             if (typeof val !== "boolean") {
                 // third overload
                 // singleton
-                factory = (deps) => val;
+                factory = (args: any, deps) => val;
             } else {
                 isSingleton = val;
                 val = args.shift();
@@ -37,7 +37,18 @@ module wx {
                 if (typeof val !== "boolean") {
                     // second overload
                     // it's a factory function
-                    factory = (deps) => val();
+                    var constructorArgs: Array<any>;
+                    if (args) {
+                        if (Array.isArray(args)) {
+                            constructorArgs = args;
+                        } else {
+                            constructorArgs = [args];
+                        }
+                    } else {
+                        constructorArgs = [];
+                    }
+
+                    factory = (args: any, deps) => val.apply(null, constructorArgs);
                 } else {
                     // first overload
                     // array assumed to be inline array notation
@@ -47,22 +58,34 @@ module wx {
                     var _constructor = args.pop();
                     var dependencies = args;
 
-                    factory = (deps) => {
+                    factory = (args: any, deps) => {
                         // resolve dependencies
                         var resolved = dependencies.map(x => {
                             try {
-                                return self.resolve(x, deps);
+                                return self.resolve(x, undefined, deps);
                             } catch (e) {
                                 internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                             }
                         });
                     
                         // invoke constructor
-                        if (!isConstructor)
-                            return _constructor.apply(null, resolved);
+                        var constructorArgs: Array<any>;
+                        if (args) {
+                            if (Array.isArray(args)) {
+                                constructorArgs = args;
+                            } else {
+                                constructorArgs = [args];
+                            }
+                        } else {
+                            constructorArgs = [];
+                        }
+
+                        if (!isConstructor) {
+                            return _constructor.apply(null, resolved.concat(constructorArgs));
+                        }
                         else {
-                            var args = [null].concat(resolved);
-                            var factoryFunction = _constructor.bind.apply(_constructor, args);
+                            var _args = [null].concat(resolved).concat(constructorArgs);
+                            var factoryFunction = _constructor.bind.apply(_constructor, _args);
                             return new factoryFunction();
                         }
                     };
@@ -72,7 +95,7 @@ module wx {
             this.registrations[key] = { factory: factory, isSingleton: isSingleton };
         }
 
-        public resolve<T>(key: string, deps?: any): T {
+        public resolve<T>(key: string, args: any, deps?: any): T {
             deps = deps || {};
             if (deps.hasOwnProperty(key))
                 internal.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
@@ -92,7 +115,7 @@ module wx {
             utils.extend(deps, newDeps);
 
             // create it
-            var result = registration.factory(newDeps);
+            var result = registration.factory(args, newDeps);
 
             // cache if singleton
             if (registration.isSingleton)
@@ -104,7 +127,7 @@ module wx {
         //////////////////////////////////
         // Implementation
 
-        private registrations: { [exp: string]: { factory: (deps) => any; isSingleton: boolean; value?: any } } = {};
+        private registrations: { [exp: string]: { factory: (args: any, deps) => any; isSingleton: boolean; value?: any } } = {};
     }
 
     export var injector: IInjector = new Injector();

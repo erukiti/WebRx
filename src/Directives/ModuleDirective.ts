@@ -48,7 +48,6 @@ module wx {
         }
 
         public priority = 100;
-        public allowElement = true;
 
         ////////////////////
         // Implementation

@@ -7,7 +7,8 @@
  
 module wx {
     /**
-    * Mimics Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception (C# using statement)
+    * Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception 
+    * (mimics C# using statement)
     * @param {Rx.IDisposable} disp The resource to dispose after action completes
     * @param {() => void} action The action to wrap
     */
@@ -22,6 +23,29 @@ module wx {
         } finally {
             disp.dispose();
         }
+    }
+
+    declare function require(module: string, successCB: (any) => any, errCB: (err) => any): void;
+
+    /**
+    * Turns an AMD-Style require call into an observable
+    * @param {string} Module The module to load
+    * @return {Rx.Observable<any>} An observable that yields a value as soon as the module has been loaded
+    */
+    export function observableRequire(module: string): Rx.Observable<any> {
+        return Rx.Observable.create<any>(observer => {
+            try {
+                require(module,(result) => {
+                    observer.onNext(result);
+                    observer.onCompleted();
+                },(err) => {
+                    observer.onError(err);
+                });
+            } catch (e) {
+                observer.onError(e);
+            } 
+            return Rx.Disposable.empty;
+        });
     }
 
     /**

@@ -79,6 +79,30 @@ describe("Injector",() => {
         expect(val).toEqual("baz");
     });
 
+    it("resolve inline array notation registration with additional args",() => {
+        var injector = getInjector();
+        var val;
+        var arg1: any;
+
+        var bar = { key: "baz" };
+        injector.register("bar", false, () => bar);
+
+        // foo factory method expecting dependency
+        var foo = (_bar: any, _arg1: any) => {
+            val = _bar.key;
+            arg1 = _arg1;
+
+            return "done";
+        };
+
+        injector.register("foo", false, false, ["bar", foo]);
+
+        var result;
+        expect(() => result = injector.resolve("foo", ["test"])).not.toThrowError();
+        expect(result).toEqual("done");
+        expect(arg1).toEqual("test");
+    });
+
     it("resolve inline array notation registration for constructor",() => {
         var injector = getInjector();
 

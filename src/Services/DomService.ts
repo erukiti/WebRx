@@ -23,7 +23,7 @@ module wx {
             var state: INodeState = this.getNodeState(rootNode) || this.createNodeState(model);
             this.setNodeState(rootNode, state);
 
-            // calculate resulting model-context and bind
+            // calculate resulting data-context and apply directives
             var ctx = this.getDataContext(rootNode);
             this.applyDirectivesRecursive(ctx, <HTMLElement> rootNode);
         }
@@ -136,17 +136,25 @@ module wx {
                 node = node.parentNode;
             }
 
-            if (models.length === 0)
-                return null;
+            var ctx: IDataContext;
 
-            // create context
-            var ctx: IDataContext = {
-                $data: models[0],
-                $root: models[models.length - 1],
-                $parent: models.length > 1 ? models[1] : null,
-                $parents: models.slice(1),
-                $index: index
-            };
+            if (models.length > 0) {
+                ctx = {
+                    $data: models[0],
+                    $root: models[models.length - 1],
+                    $parent: models.length > 1 ? models[1] : null,
+                    $parents: models.slice(1),
+                    $index: index
+                };
+            } else {
+                ctx = {
+                    $data: null,
+                    $root: null,
+                    $parent: null,
+                    $parents: [],
+                    $index: null
+                };
+            }
 
             return ctx;
         }

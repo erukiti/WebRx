@@ -45,10 +45,12 @@ module wx {
                     cmd = prop();
                 });
 
-                exp = <ICompiledExpression> <any> opt.parameter;
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    parameter = prop();
-                });
+                if (opt.parameter) {
+                    exp = <ICompiledExpression> <any> opt.parameter;
+                    using(this.domService.expressionToObservable(exp, ctx).toProperty(), (prop) => {
+                        parameter = prop();
+                    });
+                }
             }
 
             if (!utils.isCommand(cmd)) {
