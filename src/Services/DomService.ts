@@ -364,10 +364,7 @@ module wx {
             // check if tag represents a component
             if (module.isComponentRegistered(tagName) || app.isComponentRegistered(tagName)) {
                 // when a component is referenced by element, we just apply a virtual 'component' directive
-                var value: any = { name: tagName, params: el.getAttribute(DomService.paramsAttributename) };
-
-                // convert to string, strip curly braces and trim
-                value = utils.trimString(JSON.stringify(value).substring(1, value.length - 1));
+                var value: any = "{ name: '" + tagName + "', params: " + el.getAttribute(DomService.paramsAttributename) + " }";
 
                 _directives = [{ key: 'component', value: value }];
             } else {

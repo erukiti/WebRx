@@ -3,7 +3,7 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Directives', () => {
-    describe('if', () => {
+    describe('If', () => {
         it('binding to a boolean constant (true) using static template', () => {
             loadFixtures('templates/Directives/If.html');
 

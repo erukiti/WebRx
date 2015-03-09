@@ -34,6 +34,21 @@ describe('Directives', () => {
             expect(el.innerHTML).toEqual(template);
         });
 
+        it('Loads a component using its name as tag',() => {
+            loadFixtures('templates/Directives/Component.html');
+
+            var template = "<span data-bind='text: foo'>invalid</span>";
+
+            wx.app.registerComponent("test1", <wx.IComponent> {
+                template: template
+            });
+
+            var el = <HTMLElement> document.querySelector("#fixture3");
+            expect(() => wx.applyDirectives({ foo: 'bar' }, el)).not.toThrow();
+
+            expect(el.children[0].textContent).toEqual('bar');
+        });
+
         it('Loads a template from a string',() => {
             loadFixtures('templates/Directives/Component.html');
 
@@ -106,7 +121,7 @@ describe('Directives', () => {
             expect(el.innerHTML).toEqual(template);
         });
 
-        it("Loads a template through module loader",(done) => {
+        it("Loads a template through an AMD module loader",(done) => {
             loadFixtures('templates/Directives/Component.html');
 
             wx.module("test").registerComponent("test1", <wx.IComponent> {
@@ -186,7 +201,7 @@ describe('Directives', () => {
             expect(el.childNodes[0].textContent).toEqual('bar');
         });
 
-        it("Loads a view-model through module loader",(done) => {
+        it("Loads a view-model through an AMD module loader",(done) => {
             loadFixtures('templates/Directives/Component.html');
 
             var template = "<span data-bind='text: foo'>invalid</span>";
