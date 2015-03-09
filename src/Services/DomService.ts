@@ -365,14 +365,14 @@ module wx {
             if (module.isComponentRegistered(tagName) || app.isComponentRegistered(tagName)) {
                 // when a component is referenced by element, we just apply a virtual 'component' directive
                 var params = el.getAttribute(DomService.paramsAttributename);
-                var value: any;
+                var componentReference: any;
 
                 if (params)
-                    value = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomService.paramsAttributename) + "} }";
+                    componentReference = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomService.paramsAttributename) + "} }";
                 else
-                    value = "{ name: '" + tagName + "' }";
+                    componentReference = "{ name: '" + tagName + "' }";
 
-                _directives = [{ key: 'component', value: value }];
+                _directives = [{ key: 'component', value: componentReference }];
             } else {
                 // get definitions from attribute
                 _directives = this.extractDirectivesFromDataAttribute(el);
