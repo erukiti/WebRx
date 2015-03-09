@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/oliverw/WebRx.png)](https://travis-ci.org/oliverw/WebRx)
-[![Inline docs](http://inch-ci.org/github/oliverw/WebRx.svg?branch=master)](http://inch-ci.org/github/oliverw/WebRx)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 
