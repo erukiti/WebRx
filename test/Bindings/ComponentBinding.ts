@@ -240,24 +240,67 @@ describe('Bindings', () => {
             expect(fooVal).toEqual(42);
         });
 
-        it("Params get passed to view-model constructor function when component is used as tag",() => {
+        it("invokes preBindingInit",() => {
             loadFixtures('templates/Bindings/Component.html');
 
             var template = '<span>foo</span>';
-            var fooVal: number;
+            var invoked = false;
+            var __this: any;
+            var elementArg = false;
+            var vm: any;
+
+            vm = {
+                init: function (el: HTMLElement) {
+                    invoked = true;
+                    __this = this;
+                    elementArg = el instanceof HTMLElement;
+                }
+            };
 
             wx.app.registerComponent("test1", <wx.IComponent> <any> {
                 template: template,
-                viewModel: (params) => {
-                    fooVal = params.foo;
-                    return { foo: 'bar' };
-                }
+                viewModel: { instance: vm },
+                preBindingInit: "init"
             });
 
             var el = <HTMLElement> document.querySelector("#fixture5");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(fooVal).toEqual(42);
+            expect(invoked).toBeTruthy();
+            expect(__this).toBe(vm);
+            expect(elementArg).toBeTruthy();
+        });
+
+        it("invokes postBindingInit",() => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = '<span>foo</span>';
+            var invoked = false;
+            var __this: any;
+            var elementArg = false;
+
+            var vm: any;
+            
+            vm = {
+                init: function(el: HTMLElement) {
+                    invoked = true;
+                    __this = this;
+                    elementArg = el instanceof HTMLElement;
+                }
+            };
+
+            wx.app.registerComponent("test1", <wx.IComponent> <any> {
+                template: template,
+                viewModel: { instance: vm },
+                postBindingInit: "init"
+            });
+
+            var el = <HTMLElement> document.querySelector("#fixture5");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            expect(invoked).toBeTruthy();
+            expect(__this).toBe(vm);
+            expect(elementArg).toBeTruthy();
         });
     });
 });

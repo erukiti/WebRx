@@ -540,6 +540,9 @@ module wx {
     export interface IComponent {
         template: string|Node[]|IComponentTemplateDescriptor;
         viewModel?: IComponentViewModelDescriptor;
+
+        preBindingInit?: string;   // name of method on view-model to invoke before bindings get applied
+        postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
     }
 
     export interface IComponentRegistry {

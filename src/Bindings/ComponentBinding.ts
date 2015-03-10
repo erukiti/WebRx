@@ -85,12 +85,12 @@ module wx {
                              return { template: t, viewModel: vm }
                         }).subscribe(x => {
                             // done
-                            this.applyTemplate(el, ctx, state, x.template, x.viewModel);
+                            this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
                         }, (err) => app.defaultExceptionHandler.onNext(err)));
             } else {
                 state.cleanup.add(this.loadTemplate(component.template).subscribe((t) => {
                     // done
-                    this.applyTemplate(el, ctx, state, t);
+                    this.applyTemplate(component, el, ctx, state, t);
                 },(err) => app.defaultExceptionHandler.onNext(err)));
             }
 
@@ -177,7 +177,7 @@ module wx {
             internal.throwError("invalid view-model descriptor");
         }
 
-        protected applyTemplate(el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
+        protected applyTemplate(component: IComponent, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
             // clear
             while (el.firstChild) {
                 this.domService.cleanNode(el.firstChild);
@@ -198,8 +198,18 @@ module wx {
                 ctx = this.domService.getDataContext(el);
             }
 
+            // invoke preBindingInit 
+            if (vm && component.preBindingInit && vm.hasOwnProperty(component.preBindingInit)) {
+                vm[component.preBindingInit].call(vm, el);
+            }
+
             // done
             this.domService.applyBindingsToDescendants(ctx, el);
+
+            // invoke postBindingInit 
+            if (vm && component.postBindingInit && vm.hasOwnProperty(component.postBindingInit)) {
+                vm[component.postBindingInit].call(vm, el);
+            }
         }
     }
 
