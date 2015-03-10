@@ -97,7 +97,7 @@ module wx {
             // intentionally left blank
         }
 
-        public priority = 0;
+        public priority = 5;
 
         ////////////////////
         // Implementation
