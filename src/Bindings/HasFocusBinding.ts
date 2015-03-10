@@ -29,34 +29,21 @@ module wx {
                 }
             }
 
-            var hasfocusUpdatingProperty = '__wx_hasfocusUpdating';
-            var hasfocusLastValue = '__wx_hasfocusLastValue';
-
             function handleElementFocusChange(isFocused: boolean) {
-                // Where possible, ignore which event was raised and determine focus state using activeElement,
+                // Ignore which event was raised and determine focus state using activeElement,
                 // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
-                // However, not all KO-targeted browsers (Firefox 2) support activeElement. For those browsers,
-                // prevent a loss of focus when changing tabs/windows by setting a flag that prevents hasfocus
-                // from calling 'blur()' on the element when it loses focus.
-                // Discussion at https://github.com/SteveSanderson/knockout/pull/352
-                el[hasfocusUpdatingProperty] = true;
                 var ownerDoc = el.ownerDocument;
-                if ("activeElement" in ownerDoc) {
-                    var active;
-                    try {
-                        active = ownerDoc.activeElement;
-                    } catch (e) {
-                        // IE9 throws if you access activeElement during page load (see issue #703)
-                        active = ownerDoc.body;
-                    }
-                    isFocused = (active === el);
+                var active;
+
+                try {
+                    active = ownerDoc.activeElement;
+                } catch (e) {
+                    // IE9 throws if you access activeElement during page load (see issue #703)
+                    active = ownerDoc.body;
                 }
 
+                isFocused = (active === el);
                 prop(isFocused);
-
-                // cache the latest value, so we can avoid unnecessarily calling focus/blur in the update function
-                el[hasfocusLastValue] = isFocused;
-                el[hasfocusUpdatingProperty] = false;
             }
 
             function updateElement(value: any) {
