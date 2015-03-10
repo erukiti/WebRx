@@ -4,7 +4,7 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Bindings', () => {
-    describe('Selection', () => {
+    describe('SelectedValue', () => {
         describe('Radio (single-selection)',() => {
             it("Should be able to control a radio's checked state",() => {
                 loadFixtures('templates/Bindings/SelectedValue.html');

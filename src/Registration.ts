@@ -38,6 +38,7 @@ module wx {
     injector.register("wx.bindings.checked", true, true, [res.domService, internal.checkedBindingConstructor]);
     injector.register("wx.bindings.selectedValue", true, true, [res.domService, internal.selectedValueBindingConstructor]);
     injector.register("wx.bindings.component", true, true, [res.domService, internal.componentBindingConstructor]);
+    injector.register("wx.bindings.value", true, true, [res.domService, internal.valueBindingConstructor]);
 
     app.registerBinding("module", "wx.bindings.module");
     app.registerBinding("css", "wx.bindings.css");
@@ -59,4 +60,5 @@ module wx {
     app.registerBinding("checked", "wx.bindings.checked");
     app.registerBinding("selectedValue", "wx.bindings.selectedValue");
     app.registerBinding("component", "wx.bindings.component");
+    app.registerBinding("value", "wx.bindings.value");
 }

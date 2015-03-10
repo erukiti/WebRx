@@ -1254,6 +1254,9 @@ module wx {
                 for (var i = 0; i < length; i++) {
                     field = parts[i];
 
+                    if (/\(|\)/.test(field))
+                        internal.throwError("field-access expression '{0}' attempts to invoke a function, which is not supported", path);
+
                     if (!value.hasOwnProperty(field)) {
                         return undefined;
                     }
