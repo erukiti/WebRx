@@ -98,6 +98,8 @@ module wx {
     class AttrBinding extends MultiOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
+
+            this.priority = 5;
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {

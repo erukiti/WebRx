@@ -1,6 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Services/DomService.ts" />
-/// <reference path="../Core/Environment.ts" />
 
 module wx {
     class CheckedBinding implements IBindingHandler {
