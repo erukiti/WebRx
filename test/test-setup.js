@@ -27,5 +27,3 @@ requirejs.config({
     paths: {
     }
   });
-
-console.log("done");

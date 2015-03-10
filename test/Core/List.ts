@@ -10,6 +10,11 @@ describe("ObservableList", () => {
         expect(wx.utils.supportsQueryInterface(o)).toBeTruthy();
     });
 
+    it("is correctly initialized from default value",() => {
+        var obsList = wx.list<number>([3, 2, 1]);
+        expect(obsList.toArray()).toEqual([3, 2, 1]);
+    });
+
     it("count property is not ambiguous", () => {
         var obsList = wx.list<number>();
         expect(0).toEqual(obsList.length);

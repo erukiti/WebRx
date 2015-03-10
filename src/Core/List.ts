@@ -502,7 +502,7 @@ module wx {
                 this.beforeResetSubject.select(x => true));
 
             if (initialContents) {
-                Array.prototype.splice.apply(this.inner,(<T[]><any>[0, 0]).concat(initialContents));
+                Array.prototype.splice.apply(this.inner, (<T[]><any>[0, 0]).concat(initialContents));
             }
         }
 
