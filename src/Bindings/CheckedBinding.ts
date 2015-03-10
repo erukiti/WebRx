@@ -3,27 +3,27 @@
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
-    class CheckedDirective implements IDirective {
+    class CheckedBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("Checked directive only operates on elements!");
+                internal.throwError("checked-binding only operates on elements!");
             
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLInputElement> node;
             var tag = el.tagName.toLowerCase();
             var isRadioButton = el.type === 'radio';
 
             if (tag !== 'input' || el.type !== 'checkbox')
-                internal.throwError("Checked directive only operates on checkboxes and radio-buttons");
+                internal.throwError("checked-binding only operates on checkboxes and radio-buttons");
 
             var prop: IObservableProperty<any>;
             var propertySubscription: Rx.Disposable;
@@ -120,6 +120,6 @@ module wx {
     }
 
     export module internal {
-        export var checkedDirectiveConstructor = <any> CheckedDirective;
+        export var checkedBindingConstructor = <any> CheckedBinding;
     }
 }

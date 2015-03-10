@@ -2,10 +2,10 @@
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('Event',() => {
         it('binds a single event to a handler function',() => {
-            loadFixtures('templates/Directives/Event.html');
+            loadFixtures('templates/Bindings/Event.html');
 
             var el = document.querySelector("#event-single");
 
@@ -29,7 +29,7 @@ describe('Directives', () => {
                 }
             };
 
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
 
             expect(called).not.toBeTruthy();
             expect(eventName).not.toEqual("click");
@@ -53,7 +53,7 @@ describe('Directives', () => {
         });
 
         it('binds multiple events to handler functions',() => {
-            loadFixtures('templates/Directives/Event.html');
+            loadFixtures('templates/Bindings/Event.html');
 
             var el = <HTMLInputElement> document.querySelector("#event-multiple");
 
@@ -69,7 +69,7 @@ describe('Directives', () => {
                 }
             };
 
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
 
             expect(clickCallCount).toEqual(0);
             expect(inputCallCount).toEqual(0);
@@ -95,7 +95,7 @@ describe('Directives', () => {
         });
 
         it('binds multiple events to observers',() => {
-            loadFixtures('templates/Directives/Event.html');
+            loadFixtures('templates/Bindings/Event.html');
 
             var el = <HTMLInputElement> document.querySelector("#event-multiple-observer");
 
@@ -110,7 +110,7 @@ describe('Directives', () => {
             model.clickObserver.subscribe(x => clickCallCount++);
             model.inputObserver.subscribe(x => inputCallCount++);
 
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
 
             expect(clickCallCount).toEqual(0);
             expect(inputCallCount).toEqual(0);

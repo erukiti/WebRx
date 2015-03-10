@@ -15,39 +15,39 @@ function createCssModel() {
     }
 };
 
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('Css', () => {
         it('binding to a string constant', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#css-constant-string");
             var model = {};
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
         });
 
         it('binding to a non-observable model property', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#css-non-observable-model-property");
             var model = createCssModel();
             model.constantString = 'foo';
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
         });
 
         it('binding to a observable model property', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#css-observable-model-property");
             var model = createCssModel();
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
 
             // should reflect property changes
@@ -61,7 +61,7 @@ describe('Directives', () => {
         });
 
         it('binding to a model observable', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#css-observable-model");
             var model = createCssModel();
@@ -69,7 +69,7 @@ describe('Directives', () => {
             model.observableBool(false);
 
             expect($(el)).not.toHaveClass('foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             model.observableBool(true);
             expect($(el)).toHaveClass('foo');
             model.observableBool(false);
@@ -86,14 +86,14 @@ describe('Directives', () => {
         });
 
         it('binding multiple css classes to multiple observable model properties', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#css-observable-model-property2");
             var model = createCssModel();
 
             expect($(el)).not.toHaveClass('foo');
             expect($(el)).not.toHaveClass('bar');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('foo');
             expect($(el)).not.toHaveClass('bar');
 
@@ -124,36 +124,36 @@ describe('Directives', () => {
 
     describe('Attr', () => {
         it('binding to a string constant', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#attr-constant-string");
             var model = {};
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo', 'true');
         });
 
         it('binding to a non-observable model property', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#attr-non-observable-model-property");
             var model = createCssModel();
             model.constantString = 'data-foo';
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo');
         });
 
         it('binding to a observable model property', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#attr-observable-model-property");
             var model = createCssModel();
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo');
 
             // should reflect property changes
@@ -167,7 +167,7 @@ describe('Directives', () => {
         });
 
         it('binding to a model observable', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#attr-observable-model");
             var model = createCssModel();
@@ -175,7 +175,7 @@ describe('Directives', () => {
             model.observableString('');
 
             expect($(el)).not.toHaveAttr('data-foo');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             model.observableString('voodoo');
             expect($(el)).toHaveAttr('data-foo', 'voodoo');
             model.observableString('');
@@ -192,14 +192,14 @@ describe('Directives', () => {
         });
 
         it('binding multiple attr classes to multiple observable model properties', () => {
-            loadFixtures('templates/Directives/MultiOneWay.html');
+            loadFixtures('templates/Bindings/MultiOneWay.html');
 
             var el = <HTMLElement> document.querySelector("#attr-observable-model-property2");
             var model = createCssModel();
 
             expect($(el)).not.toHaveAttr('data-foo');
             expect($(el)).not.toHaveAttr('data-bar');
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveAttr('data-foo', 'voodoo');
             expect($(el)).toHaveAttr('data-bar', 'magic');
 

@@ -2,10 +2,10 @@
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('With', () => {
         it('bound to a non-observable property', () => {
-            loadFixtures('templates/Directives/With.html');
+            loadFixtures('templates/Bindings/With.html');
 
             var childModel = {
                 foo: wx.property("bar")
@@ -16,7 +16,7 @@ describe('Directives', () => {
             };
 
             var el = <HTMLElement> document.querySelector("#fixture1");
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
 
             expect($(el).find("span")[0].textContent).toEqual(model.childModel.foo());
             model.childModel.foo("foo");
@@ -29,7 +29,7 @@ describe('Directives', () => {
         });
 
         it('bound to an observable property',() => {
-            loadFixtures('templates/Directives/With.html');
+            loadFixtures('templates/Bindings/With.html');
 
             var childModel1 = {
                 foo: wx.property("bar")
@@ -44,7 +44,7 @@ describe('Directives', () => {
             };
 
             var el = <HTMLElement> document.querySelector("#fixture1");
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el).find("span")[0].textContent).toEqual("");
 
             model.childModel(childModel1);

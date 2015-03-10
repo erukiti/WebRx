@@ -3,27 +3,27 @@
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
-    class TextInputDirective implements IDirective {
+    class TextInputBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
              if (node.nodeType !== 1)
-                internal.throwError("textInput directive only operates on elements!");
+                 internal.throwError("textInput-binding only operates on elements!");
             
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLInputElement> node;
             var tag = el.tagName.toLowerCase();
             var isTextArea = tag === "textarea";
 
             if (tag !== 'input' && tag !== 'textarea')
-                internal.throwError("textInput directive can only be applied to input[type='text'] or textarea elements");
+                internal.throwError("textInput-binding can only be applied to input or textarea elements");
 
             var prop: IObservableProperty<any>;
             var propertySubscription: Rx.Disposable;
@@ -162,6 +162,6 @@ module wx {
     }
 
     export module internal {
-        export var textInputDirectiveConstructor = <any> TextInputDirective;
+        export var textInputBindingConstructor = <any> TextInputBinding;
     }
 }

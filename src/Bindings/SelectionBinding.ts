@@ -3,7 +3,7 @@
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
-    interface ISelectionDirectiveImpl {
+    interface ISelectionBindingImpl {
         supports(el: HTMLElement, model: any): boolean;
         observeElement(el: HTMLElement): Rx.Observable<any>;
         observeModel(model: any): Rx.Observable<any>;
@@ -11,9 +11,9 @@ module wx {
         updateModel(el: HTMLElement, model: any, e: any);
     }
 
-    var impls = new Array<ISelectionDirectiveImpl>();
+    var impls = new Array<ISelectionBindingImpl>();
 
-    class RadioSingleSelectionImpl implements ISelectionDirectiveImpl {
+    class RadioSingleSelectionImpl implements ISelectionBindingImpl {
         public supports(el: HTMLElement, model: any): boolean {
             return (el.tagName.toLowerCase() === 'input' &&
                 el.getAttribute("type") === 'radio') &&
@@ -58,7 +58,7 @@ module wx {
         }
     }
 
-    class OptionSingleSelectionImpl implements ISelectionDirectiveImpl {
+    class OptionSingleSelectionImpl implements ISelectionBindingImpl {
         public supports(el: HTMLElement, model: any): boolean {
             return el.tagName.toLowerCase() === 'select' &&
                 !utils.isList(model);
@@ -111,24 +111,24 @@ module wx {
     impls.push(new RadioSingleSelectionImpl());
     impls.push(new OptionSingleSelectionImpl());
 
-    class SelectionDirective implements IDirective {
+    class SelectionBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("Selection directive only operates on elements!");
+                internal.throwError("selection-binding only operates on elements!");
             
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLInputElement> node;
 
-            var impl: ISelectionDirectiveImpl;
+            var impl: ISelectionBindingImpl;
             var implCleanup: Rx.CompositeDisposable;
             
             function cleanupImpl() {
@@ -152,7 +152,7 @@ module wx {
                 }
 
                 if (!impl)
-                    internal.throwError("Selection directive does not support this combination of bound element and model!");
+                    internal.throwError("selection-binding does not support this combination of bound element and model!");
 
                 implCleanup = new Rx.CompositeDisposable();
 
@@ -203,6 +203,6 @@ module wx {
     }
 
     export module internal {
-        export var selectionDirectiveConstructor = <any> SelectionDirective;
+        export var selectionBindingConstructor = <any> SelectionBinding;
     }
 }

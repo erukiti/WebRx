@@ -4,14 +4,14 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 /*
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('Value', () => {
         it('Should assign the value to the node', ()=> {
             loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='value:123' />";
-            wx.applyDirectives(null, testNode);
+            wx.applyBindings(null, testNode);
             expect(testNode.childNodes[0].value).toEqual("123");
         });
 
@@ -20,7 +20,7 @@ describe('Directives', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='value:myProp' />";
-            wx.applyDirectives({ myProp: wx.property(0) }, testNode);
+            wx.applyBindings({ myProp: wx.property(0) }, testNode);
             expect(testNode.childNodes[0].value).toEqual("0");
         });
 
@@ -29,7 +29,7 @@ describe('Directives', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='value:(null)' />";
-            wx.applyDirectives(null, testNode);
+            wx.applyBindings(null, testNode);
             expect(testNode.childNodes[0].value).toEqual("");
         });
 
@@ -38,7 +38,7 @@ describe('Directives', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='value:undefined' />";
-            wx.applyDirectives(null, testNode);
+            wx.applyBindings(null, testNode);
             expect(testNode.childNodes[0].value).toEqual("");
         });
 
@@ -48,7 +48,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='value:someProp' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].value).toEqual("123");
             myobservable(456);
             expect(testNode.childNodes[0].value).toEqual("456");
@@ -60,7 +60,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property<any>("+123");
             testNode.innerHTML = "<input data-bind='value:someProp' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].value).toEqual("+123");
             myobservable(123);
             expect(testNode.childNodes[0].value).toEqual("123");
@@ -72,7 +72,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='value:someProp' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
             testNode.childNodes[0].value = "some user-entered value";
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(myobservable()).toEqual("some user-entered value");
@@ -86,7 +86,7 @@ describe('Directives', () => {
             var vm = { prop: computedValue };
 
             testNode.innerHTML = "<input data-bind='value: prop' />";
-            wx.applyDirectives(vm, testNode);
+            wx.applyBindings(vm, testNode);
             expect(testNode.childNodes[0].value).toEqual("zzz");
 
             // Change the input value and trigger change event; verify that the view model wasn't changed
@@ -102,7 +102,7 @@ describe('Directives', () => {
 
             var model = { modelProperty123: 456 };
             testNode.innerHTML = "<input data-bind='value: modelProperty123' />";
-            wx.applyDirectives(model, testNode);
+            wx.applyBindings(model, testNode);
             expect(testNode.childNodes[0].value).toEqual("456");
 
             testNode.childNodes[0].value = 789;
@@ -124,7 +124,7 @@ describe('Directives', () => {
             "<input data-bind='value: getSetter().set' />" +
             "<input data-bind='value: getSetter()[\"set\"]' />" +
             "<input data-bind=\"value: getSetter()['set']\" />";
-            wx.applyDirectives(model, testNode);
+            wx.applyBindings(model, testNode);
             expect(testNode.childNodes[0].value).toEqual('666');
             expect(testNode.childNodes[1].value).toEqual('666');
             expect(testNode.childNodes[2].value).toEqual('666');
@@ -156,7 +156,7 @@ describe('Directives', () => {
 
             // Set up a text box whose value is linked to the subproperty of the observable's current value
             testNode.innerHTML = "<input data-bind='value: myprop().subproperty' />";
-            wx.applyDirectives(model, testNode);
+            wx.applyBindings(model, testNode);
             expect(testNode.childNodes[0].value).toEqual("original value");
 
             model.myprop({ subproperty: newSubproperty }); // Note that myprop (and hence its subproperty) is changed *after* the bindings are applied
@@ -178,7 +178,7 @@ describe('Directives', () => {
             expect(notifiedValues.length).toEqual(0);
 
             testNode.innerHTML = "<input data-bind='value:someProp' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Implicitly observe the number of handlers by seeing how many times "myobservable"
             // receives a new value for each onchange on the text box. If there's just one handler,
@@ -198,7 +198,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"keyup\"' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
             testNode.childNodes[0].value = "some user-entered value";
             testutils.triggerEvent(testNode.childNodes[0], "keyup");
             expect(myobservable()).toEqual("some user-entered value");
@@ -211,7 +211,7 @@ describe('Directives', () => {
             // Represents issue #102 (https://github.com/SteveSanderson/knockout/issues/102)
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='value:someProp, valueUpdate: \"keyup\"' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
             testNode.childNodes[0].value = "some user-entered value";
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(myobservable()).toEqual("some user-entered value");
@@ -224,7 +224,7 @@ describe('Directives', () => {
             it('Should update selectedIndex when the model changes (options specified before value)', ()=> {
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 expect(testNode.childNodes[0].selectedIndex).toEqual(1);
                 expect(observable()).toEqual('B');
 
@@ -239,7 +239,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='value:myObservable, options:[\"A\", \"B\"]'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 expect(testNode.childNodes[0].selectedIndex).toEqual(1);
                 expect(observable()).toEqual('B');
 
@@ -254,7 +254,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
 
                 // Caption is selected when observable changed to undefined
                 expect(testNode.childNodes[0].selectedIndex).toEqual(2);
@@ -281,7 +281,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='value:myObservable'><option value=''>Select...</option><option>A</option><option>B</option></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
 
                 // Caption is selected when observable changed to undefined
                 expect(testNode.childNodes[0].selectedIndex).toEqual(2);
@@ -307,7 +307,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select size='2' data-bind='options:[\"A\", \"B\"], value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
 
                 // Nothing is selected when observable changed to undefined
                 expect(testNode.childNodes[0].selectedIndex).toEqual(1);
@@ -333,7 +333,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 var dropdown = testNode.childNodes[0];
 
                 dropdown.selectedIndex = 1;
@@ -353,7 +353,7 @@ describe('Directives', () => {
                 var selectedValue = wx.property(y);
                 testNode.innerHTML = "<select data-bind='options: myOptions, value: selectedValue'></select>";
                 var dropdown = testNode.childNodes[0];
-                wx.applyDirectives({ myOptions: [x, y], selectedValue: selectedValue }, testNode);
+                wx.applyBindings({ myOptions: [x, y], selectedValue: selectedValue }, testNode);
 
                 // Check the UI displays the entry corresponding to the chosen value
                 expect(dropdown.selectedIndex).toEqual(1);
@@ -380,7 +380,7 @@ describe('Directives', () => {
 
                 // Should work with options specified before value
                 testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 expect(observable()).toEqual("A");
 
                 // ... and with value specified before options
@@ -388,7 +388,7 @@ describe('Directives', () => {
                 testNode.innerHTML = "<select data-bind='value:myObservable, options:[\"A\", \"B\"]'></select>";
                 observable(undefined);
                 expect(observable()).toEqual(undefined);
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 expect(observable()).toEqual("A");
             });
 
@@ -398,7 +398,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\", \"C\"], value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 expect(testNode.childNodes[0].selectedIndex).toEqual(1);
 
                 observable('D'); // This change should be rejected, as there's no corresponding option in the UI
@@ -414,7 +414,7 @@ describe('Directives', () => {
 
                 var observable = wx.property(30);
                 testNode.innerHTML = "<select data-bind='options:[10,20,30,40], value:myObservable'></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
 
                 // First check that numerical model values will match a dropdown option
                 expect(testNode.childNodes[0].selectedIndex).toEqual(2); // 3rd element, zero-indexed
@@ -432,7 +432,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('A');
                 testNode.innerHTML = "<select data-bind='value:myObservable'><option value=''>A</option><option value='A'>B</option></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 var dropdown = testNode.childNodes[0];
                 expect(dropdown.selectedIndex).toEqual(1);
 
@@ -447,7 +447,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<select data-bind='value:myObservable'><option>A</option><option>B</option><option>C</option></select>";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
                 var dropdown = testNode.childNodes[0];
                 expect(dropdown.selectedIndex).toEqual(1);
 
@@ -466,7 +466,7 @@ describe('Directives', () => {
 
                     var observable = wx.property('B');
                     testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], optionsCaption:\"Select...\", value:myObservable, valueAllowUnset:true'></select>";
-                    wx.applyDirectives({ myObservable: observable }, testNode);
+                    wx.applyBindings({ myObservable: observable }, testNode);
                     var select = testNode.childNodes[0];
 
                     select.selectedIndex = 2;
@@ -488,7 +488,7 @@ describe('Directives', () => {
 
                     var observable = wx.property('B');
                     testNode.innerHTML = "<select data-bind='value:myObservable, valueAllowUnset:true'><option value=''>Select...</option><option>A</option><option>B</option></select>";
-                    wx.applyDirectives({ myObservable: observable }, testNode);
+                    wx.applyBindings({ myObservable: observable }, testNode);
                     var select = testNode.childNodes[0];
 
                     select.selectedIndex = 2;
@@ -510,7 +510,7 @@ describe('Directives', () => {
 
                     var observable = wx.property();
                     testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\"], value:myObservable, valueAllowUnset:true'></select>";
-                    wx.applyDirectives({ myObservable: observable }, testNode);
+                    wx.applyBindings({ myObservable: observable }, testNode);
 
                     expect(testNode.childNodes[0].selectedIndex).toEqual(-1);
                     expect(observable()).toEqual(undefined);
@@ -522,7 +522,7 @@ describe('Directives', () => {
 
                     var observable = wx.property('B');
                     testNode.innerHTML = "<select data-bind='options:[\"A\", \"B\", \"C\"], value:myObservable, valueAllowUnset:true'></select>";
-                    wx.applyDirectives({ myObservable: observable }, testNode);
+                    wx.applyBindings({ myObservable: observable }, testNode);
                     expect(testNode.childNodes[0].selectedIndex).toEqual(1);
 
                     observable('D');
@@ -536,7 +536,7 @@ describe('Directives', () => {
                     var observable = wx.property("D");
                     var options = wx.list(["A", "B"]);
                     testNode.innerHTML = "<select data-bind='options:myOptions, value:myObservable, valueAllowUnset:true'></select>";
-                    wx.applyDirectives({ myObservable: observable, myOptions: options }, testNode);
+                    wx.applyBindings({ myObservable: observable, myOptions: options }, testNode);
 
                     // Initially nothing is selected because the value isn't in the options list
                     expect(testNode.childNodes[0].selectedIndex).toEqual(-1);
@@ -567,7 +567,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<input type='checkbox' data-bind='value: myObservable' />";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
 
                 var checkbox = testNode.childNodes[0];
                 expect(checkbox.value).toEqual('B');
@@ -588,7 +588,7 @@ describe('Directives', () => {
 
                 var observable = wx.property('B');
                 testNode.innerHTML = "<input type='radio' data-bind='value: myObservable' />";
-                wx.applyDirectives({ myObservable: observable }, testNode);
+                wx.applyBindings({ myObservable: observable }, testNode);
 
                 var radio = testNode.childNodes[0];
                 expect(radio.value).toEqual('B');

@@ -3,7 +3,7 @@
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('Checked', () => {
         it('Triggering a click should toggle a checkbox\'s checked state before the event handler fires', ()=> {
             loadFixtures('templates/Generic.html');
@@ -35,7 +35,7 @@ describe('Directives', () => {
             var myobservable = wx.property(true);
             testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
 
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].checked).toEqual(true);
 
             myobservable(false);
@@ -48,7 +48,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(false);
             testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
 
             testNode.childNodes[0].click();
             expect(myobservable()).toEqual(true);
@@ -62,7 +62,7 @@ describe('Directives', () => {
             var timesNotified = 0;
             myobservable.changed.subscribe(()=> { timesNotified++ });
             testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
-            wx.applyDirectives({ someProp: myobservable }, testNode);
+            wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Multiple events only cause one notification...
             testNode.childNodes[0].click();

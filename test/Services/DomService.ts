@@ -8,63 +8,63 @@
 describe('DomService',() => {
     var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
 
-    describe('extractDirectivesFromDataAttribute',() => {
+    describe('extractBindingsFromDataAttribute',() => {
         it('smoke-test',() => {
             loadFixtures('templates/Services/DomService.html');
             
              // stand-alone (no context- or model-references)
             var el = document.querySelector("#stand-alone");
             var def: any = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // model-relative
             el = document.querySelector("#model-relative");
             def = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // data-relative (same as model just with $data. qualifier)
             el = document.querySelector("#data-relative");
             def = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // parent-relative
             el = document.querySelector("#parent-relative");
             def = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[2].key).toEqual("css");
 
             // root-relative
             el = document.querySelector("#root-relative");
             def = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // model-relative-with-parent-property-ref
             el = document.querySelector("#model-relative-with-parent-property-ref");
             def = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // window-and-model-relative
             el = document.querySelector("#window-and-model-relative");
             def = null;
-            expect(() => def = domService.extractDirectivesFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
             expect(def[2].key).toEqual("baz");
         });
     });
 
-    describe('applyDirectives',() => {
+    describe('applyBindings',() => {
         it('invoking multiple on same node times throws error',() => {
             loadFixtures('templates/Services/DomService.html');
 
@@ -72,31 +72,31 @@ describe('DomService',() => {
             var model1 = new Object();
             var model2 = new Object();
 
-            expect(() => domService.applyDirectives(model1, el)).not.toThrow();
+            expect(() => domService.applyBindings(model1, el)).not.toThrow();
 
             // attempt to re-bind should throw regardless of model
-            expect(() => domService.applyDirectives(model1, el)).toThrow();
-            expect(() => domService.applyDirectives(model2, el)).toThrow();
+            expect(() => domService.applyBindings(model1, el)).toThrow();
+            expect(() => domService.applyBindings(model2, el)).toThrow();
         });
 
-        it('invoking on a node with a directive-definition referencing a non-registered directive throws an error',() => {
+        it('invoking on a node with a binding-definition referencing a non-registered directive throws an error',() => {
             loadFixtures('templates/Services/DomService.html');
 
             var el = document.querySelector("#stand-alone-non-registered");
             var model1 = new Object();
 
-            expect(() => domService.applyDirectives(model1, el)).toThrowError(/directive.+not.+registered/);
+            expect(() => domService.applyBindings(model1, el)).toThrowError(/binding.+not.+registered/);
         });
     });
 
-    describe('compileDirectiveOptions',() => {
+    describe('compileBindingOptions',() => {
         var def = "{ text: 'foo', css: { foo: numVal > 3, bar: boolVal, baz: numVal, options: { enable: boolVal } }, visible: 8*4 }";
 
         it('handles nested definitions',() => {
             var compiled: any;
             var scope = {};
 
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             expect(compiled).not.toBeNull();
             expect(compiled.hasOwnProperty("text")).toBeTruthy();
@@ -114,7 +114,7 @@ describe('DomService',() => {
             var def = "{ text: $scope.foo() }";
             var compiled: any;
 
-            expect(() => compiled = domService.compileDirectiveOptions(def)).toThrowError();
+            expect(() => compiled = domService.compileBindingOptions(def)).toThrowError();
         });
     });
 
@@ -126,7 +126,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             expect(domService.expressionToObservable(compiled.ctx.data, ctx).toProperty()()).toBe(ctx.$data);
             expect(domService.expressionToObservable(compiled.ctx.root, ctx).toProperty()()).toBe(ctx.$root);
@@ -142,7 +142,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var value;
             var obs = domService.expressionToObservable(compiled, ctx);
@@ -161,7 +161,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var prop = domService.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(prop()).toEqual("42hello");
@@ -182,7 +182,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var prop = domService.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(prop.source).toBe(model.foo);
@@ -207,7 +207,7 @@ describe('DomService',() => {
 
             var ctx = testutils.createModelContext(model);
 
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var text = domService.expressionToObservable(compiled['text'], ctx).toProperty();
             var html = domService.expressionToObservable(compiled['html'], ctx).toProperty();
@@ -237,7 +237,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var text = domService.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(text()).toEqual("hello");
@@ -261,7 +261,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var text = domService.expressionToObservable(compiled['text'], ctx).toProperty();
 
@@ -290,7 +290,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             // count evals
             var evalCount = 0;
@@ -320,7 +320,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             var prop = domService.expressionToObservable(compiled['text'], ctx).toProperty();
 
@@ -350,7 +350,7 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileDirectiveOptions(def)).not.toThrow();
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
 
             // count evals
             var evalCount = 0;

@@ -4,22 +4,22 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    class MultiOneWayChangeDirectiveBase implements IDirective {
+    class MultiOneWayChangeBindingBase implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
  
        ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("directive only operates on elements!");
+                internal.throwError("binding only operates on elements!");
 
-            var compiled = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileBindingOptions(options);
 
             if (utils.isNull(compiled) || typeof compiled !== "object")
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLElement> node;
             var observables = new Array<[string, Rx.Observable<any>]>();
@@ -85,7 +85,7 @@ module wx {
         }
     }
 
-    class CssDirective extends MultiOneWayChangeDirectiveBase {
+    class CssBinding extends MultiOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
         }
@@ -95,7 +95,7 @@ module wx {
         }
     }
 
-    class AttrDirective extends MultiOneWayChangeDirectiveBase {
+    class AttrBinding extends MultiOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
         }
@@ -113,7 +113,7 @@ module wx {
         }
     }
 
-    class StyleDirective extends MultiOneWayChangeDirectiveBase {
+    class StyleBinding extends MultiOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
         }
@@ -129,8 +129,8 @@ module wx {
     }
 
     export module internal {
-        export var cssDirectiveConstructor = <any> CssDirective;
-        export var attrDirectiveConstructor = <any> AttrDirective;
-        export var styleDirectiveConstructor = <any> StyleDirective;
+        export var cssBindingConstructor = <any> CssBinding;
+        export var attrBindingConstructor = <any> AttrBinding;
+        export var styleBindingConstructor = <any> StyleBinding;
     }
 }

@@ -347,7 +347,7 @@ module wx {
     * @interface 
     **/
     export interface INodeState {
-        isBound: boolean;   // true of this node has been touched by applyDirectives
+        isBound: boolean;   // true of this node has been touched by applyBindings
         cleanup: Rx.CompositeDisposable;
         properties: INodeStateProperties;
     }
@@ -400,28 +400,28 @@ module wx {
     **/
     export interface IDomService {
         /**
-        * Applies directives to the specified node and all of its children using the specified data context 
+        * Applies bindings to the specified node and all of its children using the specified data context 
         * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
         */
-        applyDirectives(model: any, rootNode: Node): void;
+        applyBindings(model: any, rootNode: Node): void;
 
         /**
-        * Applies directives to all the children of the specified node but not the node itself using the specified data context.
+        * Applies bindings to all the children of the specified node but not the node itself using the specified data context.
         * You generally want to use this method if you are authoring a new binding handler that handles children.
         * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
         */
-        applyDirectivesToDescendants(ctx: IDataContext, rootNode: Node): void;
+        applyBindingsToDescendants(ctx: IDataContext, rootNode: Node): void;
 
         /**
-        * Removes and cleans up any directive-related state from the specified node and its descendants.
+        * Removes and cleans up any binding-related state from the specified node and its descendants.
         * @param {Node} rootNode The node to be cleaned
         */
         cleanNode(rootNode: Node): void;
 
         /**
-        * Removes and cleans up any directive-related state from all the children of the specified node but not the node itself.
+        * Removes and cleans up any binding-related state from all the children of the specified node but not the node itself.
         * @param {Node} rootNode The node to be cleaned
         */
         cleanDescendants(rootNode: Node): void;
@@ -454,9 +454,9 @@ module wx {
 
         isNodeBound(node: Node): boolean;
         clearElementState(node: Node);
-        compileDirectiveOptions(value: string): any;
+        compileBindingOptions(value: string): any;
         getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
-        extractDirectivesFromDataAttribute(node: Node): Array<{ key: string; value: string }>;
+        extractBindingsFromDataAttribute(node: Node): Array<{ key: string; value: string }>;
 
         /**
         * Creates an observable that produces values representing the result of the expression.
@@ -483,14 +483,14 @@ module wx {
     }
 
     /**
-    * Directives are markers on a DOM element (such as an attribute or comment) that tell 
+    * Bindings are markers on a DOM element (such as an attribute or comment) that tell 
     * WebRx's Dom compiler to attach a specified behavior to that DOM element or even transform
     * the DOM element and its children.
     * @interface 
     **/
-    export interface IDirective {
+    export interface IBinding {
         /**
-        * Applies the directive to the specified element
+        * Applies the binding to the specified element
         * @param {Node} node The target node
         * @param {any} options The options for the handler
         * @param {IDataContext} ctx The curent data context
@@ -505,25 +505,25 @@ module wx {
         configure(options: any): void;
 
         /**
-        * When there are multiple directives defined on a single DOM element, 
-        * sometimes it is necessary to specify the order in which the directives are applied. 
+        * When there are multiple bindings defined on a single DOM element, 
+        * sometimes it is necessary to specify the order in which the bindings are applied. 
         */
         priority: number;
 
         /**
-        * If set to true then directives won't be applied to children
-        * of the element such directive is encountered on. Instead
+        * If set to true then bindings won't be applied to children
+        * of the element such binding is encountered on. Instead
         * the handler will be responsible for that.
         */
         controlsDescendants?: boolean;
     }
 
-    export interface IDirectiveRegistry {
-        registerDirective(name: string, handler: IDirective): void;
-        registerDirective(name: string, handler: string): void;
-        unregisterDirective(name: string): void;
-        isDirectiveRegistered(name: string): boolean;
-        getDirective(name: string): IDirective;
+    export interface IBindingRegistry {
+        registerBinding(name: string, handler: IBinding): void;
+        registerBinding(name: string, handler: string): void;
+        unregisterBinding(name: string): void;
+        isBindingRegistered(name: string): boolean;
+        getBinding(name: string): IBinding;
     }
 
     export interface IComponentTemplateDescriptor {
@@ -553,7 +553,7 @@ module wx {
         getComponent(name: string): IComponent;
     }
 
-    export interface IModule extends IComponentRegistry, IDirectiveRegistry {
+    export interface IModule extends IComponentRegistry, IBindingRegistry {
         name: string;
     }
 

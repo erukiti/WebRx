@@ -4,12 +4,12 @@
 /// <reference path="../Core/VirtualChildNodes.ts" />
 
 module wx {
-    export interface IForEachDirectiveOptions {
+    export interface IForEachBindingOptions {
         data: any;
-        hooks?: IForEachDirectiveHooks|string;
+        hooks?: IForEachBindingHooks|string;
     }
 
-    export interface IForEachDirectiveHooks {
+    export interface IForEachBindingHooks {
         /** 
         * Is invoked each time the foreach block is duplicated and inserted into the document, 
         * both when foreach first initializes, and when new entries are added to the associated 
@@ -51,13 +51,13 @@ module wx {
         afterMove? (nodes: Node[], data: any, index: number): void;
     }
 
-    class ForEachDirective implements IDirective {
+    class ForEachBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
  
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
@@ -66,18 +66,18 @@ module wx {
             if (utils.isNull(options))
                 internal.throwError("** invalid binding options!");
 
-            var compiled = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileBindingOptions(options);
 
             var el = <HTMLElement> node;
             var self = this;
             var initialApply = true;
             var cleanup: Rx.CompositeDisposable = null;
-            var hooks: IForEachDirectiveHooks|string;
+            var hooks: IForEachBindingHooks|string;
             var exp: ICompiledExpression;
             var setProxyFunc: (VirtualChildNodes) => void;
 
             if (typeof compiled === "object" && compiled.hasOwnProperty("data")) {
-                var opt = <IForEachDirectiveOptions> compiled;
+                var opt = <IForEachBindingOptions> compiled;
                 exp = opt.data;
 
                 if (opt.hooks) {
@@ -97,7 +97,7 @@ module wx {
 
                 // optionally resolve hooks if passed as string identifier
                 if (typeof hooks === "string")
-                    hooks = injector.resolve<IForEachDirectiveHooks>(<string> hooks);
+                    hooks = injector.resolve<IForEachBindingHooks>(<string> hooks);
             } else {
                 exp = compiled;
             }
@@ -177,7 +177,7 @@ module wx {
         }
 
         protected appendAllRows(proxy: internal.VirtualChildNodes, list: IObservableList<any>, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
             var length = list.length;
 
@@ -187,7 +187,7 @@ module wx {
         }
 
         protected appendRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext, template: Array<Node>,
-            hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
             var nodes = utils.cloneNodeArray(template);
@@ -204,7 +204,7 @@ module wx {
         }
 
         protected insertRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
 
@@ -222,7 +222,7 @@ module wx {
         }
 
         protected removeRow(proxy: internal.VirtualChildNodes, index: number, item: any,
-            template: Array<Node>, hooks: IForEachDirectiveHooks): void {
+            template: Array<Node>, hooks: IForEachBindingHooks): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
             var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
@@ -237,7 +237,7 @@ module wx {
         }
 
         protected moveRow(proxy: internal.VirtualChildNodes, from: number, to: number, item: any,
-            template: Array<Node>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
@@ -281,13 +281,13 @@ module wx {
                     state.properties.index = savedIndex;
                     this.domService.setNodeState(node, state);
 
-                    this.domService.applyDirectives(item, node);
+                    this.domService.applyBindings(item, node);
                 }
             }
         }
         
         protected observeList(proxy: internal.VirtualChildNodes, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
-            list: IObservableList<any>, hooks: IForEachDirectiveHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            list: IObservableList<any>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>) {
             var i: number;
             var length: number;
@@ -344,7 +344,7 @@ module wx {
             }));
         }
 
-        protected applyValue(el: HTMLElement, value: any, hooks: IForEachDirectiveHooks, template: Array<Node>,
+        protected applyValue(el: HTMLElement, value: any, hooks: IForEachBindingHooks, template: Array<Node>,
             ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable, setProxyFunc: (VirtualChildNodes) => void): void {
             var i, length;
 
@@ -385,7 +385,7 @@ module wx {
                     self.domService.setNodeState(node, state);
 
                     if (item) {
-                        self.domService.applyDirectives(item, node);
+                        self.domService.applyBindings(item, node);
                     }
                 }
             }
@@ -429,6 +429,6 @@ module wx {
     }
 
     export module internal {
-        export var forEachDirectiveConstructor = <any> ForEachDirective;
+        export var forEachBindingConstructor = <any> ForEachBinding;
     }
 }

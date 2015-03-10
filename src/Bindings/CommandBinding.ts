@@ -3,27 +3,27 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    export interface ICommandDirectiveOptions {
+    export interface ICommandBindingOptions {
         command: ICommand<any>;
         parameter?: any;
     }
 
-    class CommandDirective implements IDirective {
+    class CommandBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("command directive only operates on elements!");
+                internal.throwError("command-binding only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
-            var compiled = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileBindingOptions(options);
 
             var el = <HTMLElement> node;
             var cmd: ICommand<any>;
@@ -38,7 +38,7 @@ module wx {
                     parameter = null;
                 });
             } else {
-                var opt = <ICommandDirectiveOptions> compiled;
+                var opt = <ICommandBindingOptions> compiled;
 
                 exp = <ICompiledExpression> <any> opt.command;
                 using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
@@ -55,7 +55,7 @@ module wx {
 
             if (!utils.isCommand(cmd)) {
                 // value is not a ICommand
-                internal.throwError("Command-Directive only works when bound to a Reactive Command!");
+                internal.throwError("Command-Binding only works when bound to a Reactive Command!");
             } else {
                 // initial update
                 el.disabled = !cmd.canExecute(parameter);
@@ -101,6 +101,6 @@ module wx {
     }
 
     export module internal {
-        export var commandDirectiveConstructor = <any> CommandDirective;
+        export var commandBindingConstructor = <any> CommandBinding;
     }
 }

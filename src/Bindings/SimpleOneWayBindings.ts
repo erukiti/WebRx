@@ -4,24 +4,24 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    class SingleOneWayChangeDirectiveBase implements IDirective {
+    class SingleOneWayChangeBindingBase implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
  
       ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("directive only operates on elements!");
+                internal.throwError("binding only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLElement> node;
             var self = this;
-            var exp = this.domService.compileDirectiveOptions(options);
+            var exp = this.domService.compileBindingOptions(options);
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // subscribe
@@ -63,7 +63,7 @@ module wx {
     ////////////////////
     // Bindings
 
-    class TextDirective extends SingleOneWayChangeDirectiveBase {
+    class TextBinding extends SingleOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
         } 
@@ -76,12 +76,12 @@ module wx {
         }
     }
 
-    export interface IVisibleDirectiveOptions {
+    export interface IVisibleBindingOptions {
         useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css class rather than modifying the elements style property
         hiddenClass: string;    // the css class to apply when the object is hidden
     }
 
-    class VisibleDirective extends SingleOneWayChangeDirectiveBase {
+    class VisibleBinding extends SingleOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
 
@@ -89,10 +89,10 @@ module wx {
         }
 
         public configure(_options): void {
-            var options = <IVisibleDirectiveOptions> _options;
+            var options = <IVisibleBindingOptions> _options;
 
-            VisibleDirective.useCssClass = options.useCssClass;
-            VisibleDirective.hiddenClass = options.hiddenClass;
+            VisibleBinding.useCssClass = options.useCssClass;
+            VisibleBinding.hiddenClass = options.hiddenClass;
         }
 
         ////////////////////
@@ -101,14 +101,14 @@ module wx {
         protected applyValue(el: HTMLElement, value: any): void {
             value = this.inverse ? !value : value;
 
-            if (!VisibleDirective.useCssClass) {
+            if (!VisibleBinding.useCssClass) {
                 if (!value) {
                     el.style.display = "none";
                 } else {
                     el.style.display = "";
                 }
             } else {
-                utils.toggleCssClass(el, !value, VisibleDirective.hiddenClass);
+                utils.toggleCssClass(el, !value, VisibleBinding.hiddenClass);
             }
         }
 
@@ -117,7 +117,7 @@ module wx {
         private static hiddenClass: string;    // the css class to apply when the object is hidden
     }
 
-    class HiddenDirective extends VisibleDirective {
+    class HiddenBinding extends VisibleBinding {
         constructor(domService: IDomService) {
             super(domService);
 
@@ -125,7 +125,7 @@ module wx {
         } 
     }
 
-    class HtmlDirective extends SingleOneWayChangeDirectiveBase {
+    class HtmlBinding extends SingleOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
         } 
@@ -138,7 +138,7 @@ module wx {
         }
     }
 
-    class DisableDirective extends SingleOneWayChangeDirectiveBase {
+    class DisableBinding extends SingleOneWayChangeBindingBase {
         constructor(domService: IDomService) {
             super(domService);
 
@@ -157,7 +157,7 @@ module wx {
         protected inverse: boolean = false;
     }
 
-    class EnableDirective extends DisableDirective {
+    class EnableBinding extends DisableBinding {
         constructor(domService: IDomService) {
             super(domService);
 
@@ -166,11 +166,11 @@ module wx {
     }
 
     export module internal {
-        export var textDirectiveConstructor = <any> TextDirective;
-        export var htmlDirectiveConstructor = <any> HtmlDirective;
-        export var visibleDirectiveConstructor = <any> VisibleDirective;
-        export var hiddenDirectiveConstructor = <any> HiddenDirective;
-        export var disableDirectiveConstructor = <any> DisableDirective;
-        export var enableDirectiveConstructor = <any> EnableDirective;
+        export var textBindingConstructor = <any> TextBinding;
+        export var htmlBindingConstructor = <any> HtmlBinding;
+        export var visibleBindingConstructor = <any> VisibleBinding;
+        export var hiddenBindingConstructor = <any> HiddenBinding;
+        export var disableBindingConstructor = <any> DisableBinding;
+        export var enableBindingConstructor = <any> EnableBinding;
     }
 }

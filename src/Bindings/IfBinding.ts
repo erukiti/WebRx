@@ -5,29 +5,29 @@
 /// <reference path="../Core/Resources.ts" />
 
 module wx {
-    export interface IIfDirectiveOptions {
+    export interface IIfBindingOptions {
         condition: string;
     }
 
-    class IfDirective implements IDirective {
+    class IfBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
  
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("if directive only operates on elements!");
+                internal.throwError("if-binding only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("** invalid directive options!");
+                internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
             var self = this;
             var initialApply = true;
-            var exp = this.domService.compileDirectiveOptions(options);
+            var exp = this.domService.compileBindingOptions(options);
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // backup inner HTML
@@ -103,12 +103,12 @@ module wx {
                     el.appendChild(node);
                 }
 
-                this.domService.applyDirectivesToDescendants(ctx, el);
+                this.domService.applyBindingsToDescendants(ctx, el);
             }
         }
     }
 
-    class NotIfDirective extends IfDirective {
+    class NotIfBinding extends IfBinding {
         constructor(domService: IDomService) {
             super(domService);
 
@@ -117,7 +117,7 @@ module wx {
     }
 
     export module internal {
-        export var ifDirectiveConstructor = <any> IfDirective;
-        export var notifDirectiveConstructor = <any> NotIfDirective;
+        export var ifBindingConstructor = <any> IfBinding;
+        export var notifBindingConstructor = <any> NotIfBinding;
     }
 }

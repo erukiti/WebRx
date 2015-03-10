@@ -3,10 +3,10 @@
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('TextInput',() => {
         it('attempting to bind to other elements than input and textarea throws',() => {
-            loadFixtures('templates/Directives/TextInput.html');
+            loadFixtures('templates/Bindings/TextInput.html');
 
             var model = {
                 text: wx.property("foo")
@@ -14,7 +14,7 @@ describe('Directives', () => {
 
             var el = <HTMLInputElement> document.querySelector("#fixture3");
 
-            expect(() => wx.applyDirectives(model, el)).toThrowError(/textInput directive can only be applied/);
+            expect(() => wx.applyBindings(model, el)).toThrowError(/textInput-binding can only be applied/);
         });
 
         it('Should treat null values as empty strings', () => {
@@ -22,7 +22,7 @@ describe('Directives', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='textInput:myProp' />";
-            expect(() => wx.applyDirectives({ myProp: wx.property(0) }, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings({ myProp: wx.property(0) }, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("0");
         });
 
@@ -31,7 +31,7 @@ describe('Directives', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='textInput:(null)' />";
-            expect(() => wx.applyDirectives(null, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings(null, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("");
         });
 
@@ -40,7 +40,7 @@ describe('Directives', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='textInput:undefined' />";
-            expect(() => wx.applyDirectives(null, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings(null, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("");
         });
 
@@ -50,7 +50,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='textInput:someProp' />";
-            expect(() => wx.applyDirectives({ someProp: myobservable }, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings({ someProp: myobservable }, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("123");
             myobservable(456);
             expect(testNode.childNodes[0].value).toEqual("456");
@@ -62,7 +62,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property("+123");
             testNode.innerHTML = "<input data-bind='textInput:someProp' />";
-            expect(() => wx.applyDirectives({ someProp: myobservable }, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings({ someProp: myobservable }, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("+123");
             myobservable(<any> 123);
             expect(testNode.childNodes[0].value).toEqual("123");
@@ -74,7 +74,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='textInput:someProp' />";
-            expect(() => wx.applyDirectives({ someProp: myobservable }, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings({ someProp: myobservable }, testNode)).not.toThrowError();
             testNode.childNodes[0].value = "some user-entered value";
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(myobservable()).toEqual("some user-entered value");
@@ -88,7 +88,7 @@ describe('Directives', () => {
             var vm = { prop: computedValue };
 
             testNode.innerHTML = "<input data-bind='textInput: prop' />";
-            expect(() => wx.applyDirectives(vm, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings(vm, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("zzz");
 
             // Change the input value and trigger change event; verify that the view model wasn't changed
@@ -104,7 +104,7 @@ describe('Directives', () => {
 
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='textInput: someProp' />";
-            expect(() => wx.applyDirectives({ someProp: myobservable }, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings({ someProp: myobservable }, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("123");
 
             testNode.childNodes[0].value = "some user-entered value";   // setting the value triggers the propertychange event on IE
@@ -121,7 +121,7 @@ describe('Directives', () => {
             var model = { writtenValue: wx.property('') };
 
             testNode.innerHTML = "<input data-bind='textInput: writtenValue' />";
-            expect(() => wx.applyDirectives(model, testNode)).not.toThrowError();
+            expect(() => wx.applyBindings(model, testNode)).not.toThrowError();
 
             testNode.childNodes[0].value = "1234";
             testutils.triggerEvent(testNode.childNodes[0], "change");

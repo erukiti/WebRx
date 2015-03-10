@@ -3,11 +3,11 @@
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe('Directives', () => {
+describe('Bindings', () => {
     describe('Selection', () => {
         describe('Radio (single-selection)',() => {
             it("Should be able to control a radio's checked state",() => {
-                loadFixtures('templates/Directives/Selection.html');
+                loadFixtures('templates/Bindings/Selection.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 // none of the radios should be checked initially
@@ -16,7 +16,7 @@ describe('Directives', () => {
 
                 var selected = wx.property('1');
                 var model = { selected: selected };
-                wx.applyDirectives(model, container);
+                wx.applyBindings(model, container);
 
                 // only middle element should be checked
                 expect(testutils.nodeListToArray(container.children).map((element) =>
@@ -36,7 +36,7 @@ describe('Directives', () => {
             });
 
             it("Clicking a radio should reflect back to model",() => {
-                loadFixtures('templates/Directives/Selection.html');
+                loadFixtures('templates/Bindings/Selection.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 // none of the radios should be checked initially
@@ -45,7 +45,7 @@ describe('Directives', () => {
 
                 var selected = wx.property();
                 var model = { selected: selected };
-                wx.applyDirectives(model, container);
+                wx.applyBindings(model, container);
 
                 var notificationCount = 0;
                 model.selected.changed.subscribe(x => notificationCount++);
@@ -63,12 +63,12 @@ describe('Directives', () => {
             });
 
             it("If initial model value is undefined none of the radios should be checked",() => {
-                loadFixtures('templates/Directives/Selection.html');
+                loadFixtures('templates/Bindings/Selection.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 var selected = wx.property(undefined);
                 var model = { selected: selected };
-                wx.applyDirectives(model, container);
+                wx.applyBindings(model, container);
 
                 // none of the radios should be checked initially
                 expect(testutils.nodeListToArray(container.children).map((element) =>
@@ -78,7 +78,7 @@ describe('Directives', () => {
 
         describe('Select (single-selection)',() => {
             it("Should be able to control a Select's selectedIndex",() => {
-                loadFixtures('templates/Directives/Selection.html');
+                loadFixtures('templates/Bindings/Selection.html');
                 var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
 
                 // first option should be selected by default
@@ -86,7 +86,7 @@ describe('Directives', () => {
 
                 var selected = wx.property('1');
                 var model = { selected: selected };
-                wx.applyDirectives(model, container);
+                wx.applyBindings(model, container);
 
                 // only middle element should be selected
                 expect(container.selectedIndex).toEqual(1);
@@ -103,7 +103,7 @@ describe('Directives', () => {
             });
 
             it("Selecting an option should reflect selection back to model",() => {
-                loadFixtures('templates/Directives/Selection.html');
+                loadFixtures('templates/Bindings/Selection.html');
                 var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
 
                 // first option should be selected by default
@@ -111,7 +111,7 @@ describe('Directives', () => {
 
                 var selected = wx.property();
                 var model = { selected: selected };
-                wx.applyDirectives(model, container);
+                wx.applyBindings(model, container);
 
                 var notificationCount = 0;
                 model.selected.changed.subscribe(x => notificationCount++);
@@ -130,12 +130,12 @@ describe('Directives', () => {
             });
 
             it("If initial model value is undefined, selectedIndex should be undefined as well",() => {
-                loadFixtures('templates/Directives/Selection.html');
+                loadFixtures('templates/Bindings/Selection.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 var selected = wx.property(undefined);
                 var model = { selected: selected };
-                wx.applyDirectives(model, container);
+                wx.applyBindings(model, container);
 
                 // none of the radios should be checked initially
                 expect(container.selectedIndex).not.toBeDefined();

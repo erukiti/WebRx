@@ -1,32 +1,33 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
 /// <reference path="../Services/DomService.ts" />
 /// <reference path="../Interfaces.ts" />
+/// <reference path="../Core/Resources.ts" />
 
 module wx {
-    class ModuleDirective implements IDirective {
+    class WithBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
-
+ 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("module directive only operates on elements!");
+                internal.throwError("with-binding only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-options!");
 
-            var exp = this.domService.compileDirectiveOptions(options);
+            var el = <HTMLElement> node;
+            var self = this;
+            var exp = this.domService.compileBindingOptions(options);
             var obs = this.domService.expressionToObservable(exp, ctx);
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
-                if (typeof x === "string")
-                    x = module(x);
-
-                state.properties.module = x;
+                self.applyValue(el, x, state);
             }));
 
             // release closure references to GC 
@@ -39,7 +40,10 @@ module wx {
 
                 // nullify common locals
                 obs = null;
+                el = null;
                 self = null;
+
+                // nullify locals
             }));
         }
 
@@ -47,15 +51,24 @@ module wx {
             // intentionally left blank
         }
 
-        public priority = 100;
+        public priority = 50;
+        public controlsDescendants = true;
 
         ////////////////////
-        // Implementation
+        // implementation
 
         protected domService: IDomService;
+
+        protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
+            state.properties.model = value;
+            var ctx = this.domService.getDataContext(el);
+
+            this.domService.cleanDescendants(el);
+            this.domService.applyBindingsToDescendants(ctx, el);
+        }
     }
 
     export module internal {
-        export var moduleDirectiveConstructor = <any> ModuleDirective;
+        export var withBindingConstructor = <any> WithBinding;
     }
 }

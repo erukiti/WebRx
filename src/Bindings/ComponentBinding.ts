@@ -3,29 +3,29 @@
 /// <reference path="../Core/Module.ts" />
 
 module wx {
-    export interface IComponentDirectiveOptions {
+    export interface IComponentBindingOptions {
         name: string;
         params?: Object;
     }
 
-    class ComponentDirective implements IDirective {
+    class ComponentBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             debugger;
             if (node.nodeType !== 1)
-                internal.throwError("component directive only operates on elements!");
+                internal.throwError("component-binding only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLElement> node;
-            var compiled = this.domService.compileDirectiveOptions(options);
+            var compiled = this.domService.compileBindingOptions(options);
             var exp: ICompiledExpression;
             var componentName: string;
             var componentParams: Object = undefined;
@@ -37,7 +37,7 @@ module wx {
                     componentName = prop();
                 });
             } else {
-                var opt = <IComponentDirectiveOptions> compiled;
+                var opt = <IComponentBindingOptions> compiled;
 
                 exp = <ICompiledExpression> <any> opt.name;
                 using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
@@ -199,11 +199,11 @@ module wx {
             }
 
             // done
-            this.domService.applyDirectivesToDescendants(ctx, el);
+            this.domService.applyBindingsToDescendants(ctx, el);
         }
     }
 
     export module internal {
-        export var componentDirectiveConstructor = <any> ComponentDirective;
+        export var componentBindingConstructor = <any> ComponentBinding;
     }
 }

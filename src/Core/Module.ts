@@ -37,7 +37,7 @@ module wx {
 
             // if the component has been registered as resource, resolve it now and update registry
             if (typeof component === "string") {
-                component = injector.resolve<IDirective>(component);
+                component = injector.resolve<IBinding>(component);
                 this.components[name] = component;
                 return component;
             }
@@ -45,36 +45,36 @@ module wx {
             return this.components[name];
         }
 
-        public registerDirective(name: string, handler: IDirective): void;
-        public registerDirective(name: string, handler: string): void;
+        public registerBinding(name: string, handler: IBinding): void;
+        public registerBinding(name: string, handler: string): void;
 
-        public registerDirective(): void {
+        public registerBinding(): void {
             var args = utils.args2Array(arguments);
             var name = args.shift();
             var handler = args.shift();
 
-            this.directives[name] = handler;
+            this.bindings[name] = handler;
         }
 
-        public unregisterDirective(name: string): void {
-            delete this.directives[name];
+        public unregisterBinding(name: string): void {
+            delete this.bindings[name];
         }
 
-        public isDirectiveRegistered(name: string): boolean {
-            return this.directives[name] !== undefined;
+        public isBindingRegistered(name: string): boolean {
+            return this.bindings[name] !== undefined;
         }
 
-        public getDirective(name: string): IDirective {
-            var directive = this.directives[name];
+        public getBinding(name: string): IBinding {
+            var directive = this.bindings[name];
 
             // if the component has been registered as resource, resolve it now and update registry
             if (typeof directive === "string") {
-                directive = injector.resolve<IDirective>(directive);
-                this.directives[name] = directive;
+                directive = injector.resolve<IBinding>(directive);
+                this.bindings[name] = directive;
                 return directive;
             }
 
-            return this.directives[name];
+            return this.bindings[name];
         }
 
         public name: string;
@@ -82,7 +82,7 @@ module wx {
         //////////////////////////////////
         // Implementation
 
-        private directives: { [name: string]: any } = {};
+        private bindings: { [name: string]: any } = {};
         private components: { [name: string]: any } = {};
     }
 

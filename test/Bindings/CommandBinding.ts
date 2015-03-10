@@ -2,7 +2,7 @@
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe('Directives', () => {
+describe('Bindings', () => {
     function createCommandModel(commandAction: (any) => void) {
         var canExecute = wx.property(false);
 
@@ -14,12 +14,12 @@ describe('Directives', () => {
 
     describe('Command',() => {
         it('binding to non-command source should throw', () => {
-            loadFixtures('templates/Directives/Command.html');
+            loadFixtures('templates/Bindings/Command.html');
 
             var el = document.querySelector("#command-invalid-binding-target");
             var model = createCommandModel((_) => {});
 
-            expect(() => wx.applyDirectives(model, el)).toThrowError(/Reactive Command/);
+            expect(() => wx.applyBindings(model, el)).toThrowError(/Reactive Command/);
         });
 
         function commandBindingSmokeTestImpl(sel: string) {
@@ -28,7 +28,7 @@ describe('Directives', () => {
             var model = createCommandModel((_) => executed = true);
 
             // canExecute tests
-            expect(() => wx.applyDirectives(model, el)).not.toThrowError();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect(el.disabled).toBeTruthy();
             model.canExecute(true);
             expect(el.disabled).toBeFalsy();
@@ -47,25 +47,25 @@ describe('Directives', () => {
         }
 
         it('button smoke-test - bound to options', () => {
-            loadFixtures('templates/Directives/Command.html');
+            loadFixtures('templates/Bindings/Command.html');
 
             commandBindingSmokeTestImpl("#command-button-options");
         });
 
         it('hyperlink smoke-test - bound to options', () => {
-            loadFixtures('templates/Directives/Command.html');
+            loadFixtures('templates/Bindings/Command.html');
 
             commandBindingSmokeTestImpl("#command-link-options");
         });
 
         it('button smoke-test - bound to command', () => {
-            loadFixtures('templates/Directives/Command.html');
+            loadFixtures('templates/Bindings/Command.html');
 
             commandBindingSmokeTestImpl("#command-button");
         });
 
         it('hyperlink smoke-test - bound to command', () => {
-            loadFixtures('templates/Directives/Command.html');
+            loadFixtures('templates/Bindings/Command.html');
 
             commandBindingSmokeTestImpl("#command-link");
         });

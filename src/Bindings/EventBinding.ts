@@ -3,24 +3,24 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    export interface IEventDirectiveOptions {
+    export interface IEventBindingOptions {
         [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>;
     }
 
-    class EventDirective implements IDirective {
+    class EventBinding implements IBinding {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
 
         ////////////////////
-        // IDirective
+        // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("event directive only operates on elements!");
+                internal.throwError("event-binding only operates on elements!");
 
             if (utils.isNull(options))
-                internal.throwError("invalid options for directive!");
+                internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLElement> node;
 
@@ -95,6 +95,6 @@ module wx {
     }
 
     export module internal {
-        export var eventDirectiveConstructor = <any> EventDirective;
+        export var eventBindingConstructor = <any> EventBinding;
     }
 }
