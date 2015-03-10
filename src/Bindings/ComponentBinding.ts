@@ -61,8 +61,8 @@ module wx {
 
             // lookup component
             var component: IComponent = undefined;
-            if (state.properties.module)
-                component = state.properties.module.getComponent(componentName);
+            if (state.data.module)
+                component = state.data.module.getComponent(componentName);
 
             // fallback to "app" module if unknown to module
             if (!component)
@@ -191,7 +191,7 @@ module wx {
             }
 
             if (vm) {
-                state.properties.model = vm;
+                state.data.model = vm;
                 this.domService.setNodeState(el, state);
 
                 // refresh context

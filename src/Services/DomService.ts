@@ -105,8 +105,8 @@ module wx {
                 state = this.getNodeState(node);
 
                 if (utils.isNotNull(state)) {
-                    if (utils.isNotNull(state.properties.module)) {
-                        return state.properties.module;
+                    if (utils.isNotNull(state.data.module)) {
+                        return state.data.module;
                     }
                 }
 
@@ -122,15 +122,15 @@ module wx {
             var state: INodeState = this.getNodeState(node);
 
             // remember index present
-            var index = state ? state.properties.index : undefined;
+            var index = state ? state.data.index : undefined;
 
             // collect model hierarchy
             while (node) {
                 state = state || this.getNodeState(node);
 
                 if (utils.isNotNull(state)) {
-                    if (utils.isNotNull(state.properties.model)) {
-                        models.push(state.properties.model);
+                    if (utils.isNotNull(state.data.model)) {
+                        models.push(state.data.model);
                     }
                 }
 
@@ -163,15 +163,14 @@ module wx {
 
         public createNodeState(model?: any, module?: any): INodeState {
             return {
-                isBound: false,
                 cleanup: new Rx.CompositeDisposable(),
-                properties: { model: model, module: module }
+                data: { model: model, module: module, isBound: false }
             };
         }
 
         public isNodeBound(node: Node): boolean {
             var state = this.elementState.get(node);
-            return state && state.isBound;
+            return state && state.data.isBound;
         }
 
         public setNodeState(node: Node, state: INodeState): void {
@@ -190,12 +189,12 @@ module wx {
                     state.cleanup.dispose();
                 }
 
-                if (state.properties.model) {
-                    state.properties.model = null;
+                if (state.data.model) {
+                    state.data.model = null;
                 }
 
-                if (state.properties.module) {
-                    state.properties.module = null;
+                if (state.data.module) {
+                    state.data.module = null;
                 }
             }
 
@@ -355,7 +354,7 @@ module wx {
             if (!state) {
                 state = this.createNodeState();
                 this.setNodeState(el, state);
-            } else if (state.isBound) {
+            } else if (state.data.isBound) {
                 internal.throwError("an element must not be bound multiple times!");
             }
 
@@ -413,7 +412,7 @@ module wx {
             }
 
             // mark bound
-            state.isBound = true;
+            state.data.isBound = true;
 
             return result;
         }
@@ -451,8 +450,8 @@ module wx {
             if (!this.applyBindingsInternal(ctx, el, module) && el.hasChildNodes()) {
                 // module binding might have updated state.module
                 var state = this.getNodeState(el);
-                if (state && state.properties && state.properties.module)
-                    module = state.properties.module;
+                if (state && state.data && state.data.module)
+                    module = state.data.module;
 
                 // iterate over descendants
                 for (var i = 0; i < el.childNodes.length; i++) {

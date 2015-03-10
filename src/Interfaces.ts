@@ -336,10 +336,15 @@ module wx {
         $index: number;
     }
 
-    export interface INodeStateProperties {
-        module?: IModule;
-        model?: any;
-        index?: any;
+    /**
+    * Extensible node state data
+    * @interface 
+    **/
+    export interface INodeStateData {
+        isBound: boolean;   // true of this node has been touched by applyBindings
+        module?: IModule;   // scope module 
+        model?: any;        // scope model 
+        index?: any;        // scope index
     }
 
     /**
@@ -347,9 +352,8 @@ module wx {
     * @interface 
     **/
     export interface INodeState {
-        isBound: boolean;   // true of this node has been touched by applyBindings
         cleanup: Rx.CompositeDisposable;
-        properties: INodeStateProperties;
+        data: INodeStateData;
     }
 
     export interface IObjectLiteralToken {

@@ -60,7 +60,7 @@ module wx {
         protected domService: IDomService;
 
         protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
-            state.properties.model = value;
+            state.data.model = value;
             var ctx = this.domService.getDataContext(el);
 
             this.domService.cleanDescendants(el);

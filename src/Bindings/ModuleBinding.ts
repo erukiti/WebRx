@@ -26,7 +26,7 @@ module wx {
                 if (typeof x === "string")
                     x = module(x);
 
-                state.properties.module = x;
+                state.data.module = x;
             }));
 
             // release closure references to GC 
