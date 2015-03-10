@@ -120,7 +120,7 @@ module wx {
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("selection-binding only operates on elements!");
+                internal.throwError("selectedValue-binding only operates on elements!");
             
             if (utils.isNull(options))
                 internal.throwError("invalid binding-ptions!");
@@ -151,7 +151,7 @@ module wx {
                 }
 
                 if (!impl)
-                    internal.throwError("selection-binding does not support this combination of bound element and model!");
+                    internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
 
                 implCleanup = new Rx.CompositeDisposable();
 
