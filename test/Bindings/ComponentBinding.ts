@@ -124,17 +124,24 @@ describe('Bindings', () => {
         it("Loads a template through an AMD module loader",(done) => {
             loadFixtures('templates/Bindings/Component.html');
 
+            var el = <HTMLElement> document.querySelector("#fixture2");
+
+            var vm = {
+                init: function () {
+                    expect(el.innerHTML).toEqual("<span>foo</span>");
+                    done();
+                }
+            };
+
             wx.module("test").registerComponent("test1", <wx.IComponent> {
-                template: <any> { require: 'text!templates/AMD/template1.html' }
+                template: <any> {
+                     require: 'text!templates/AMD/template1.html'
+                },
+                viewModel: <any> { instance: vm },
+                postBindingInit: "init"
             });
 
-            var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
-
-            setTimeout(() => {
-                expect(el.innerHTML).toEqual("<span>foo</span>");
-                done();
-            }, 1000);
         });
 
         it("When the component isn't supplying a view-model, binding against parent-context works as expected",() => {
@@ -208,16 +215,20 @@ describe('Bindings', () => {
 
             wx.module("test").registerComponent("test1", <wx.IComponent> <any>  {
                 template: template,
-                viewModel: <any> { require: 'templates/AMD/vm1' }
+                viewModel: <any> { require: 'templates/AMD/vm1' },
+                postBindingInit: "init"
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
-            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            setTimeout(() => {
+            window["vm1Hook"] = () => {
+                delete window["vm1Hook"];
+
                 expect(el.childNodes[0].textContent).toEqual('bar');
                 done();
-            }, 1000);
+            }
+
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
         });
 
         it("Params get passed to view-model constructor",() => {
