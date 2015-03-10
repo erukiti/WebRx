@@ -534,6 +534,7 @@ module wx {
     }
 
     export interface IComponentViewModelDescriptor {
+        (Object); any;          // Factory 
         require?: string;       // Async AMD loading
         promise?: Rx.IPromise<string>;  // Async Promise
         resolve?: string;       // DI
@@ -542,7 +543,7 @@ module wx {
 
     export interface IComponent {
         template: string|Node[]|IComponentTemplateDescriptor;
-        viewModel?: (Object)=> any|IComponentViewModelDescriptor;
+        viewModel?: IComponentViewModelDescriptor;
     }
 
     export interface IComponentRegistry {
