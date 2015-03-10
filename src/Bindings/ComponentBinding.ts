@@ -8,7 +8,7 @@ module wx {
         params?: Object;
     }
 
-    class ComponentBinding implements IBinding {
+    class ComponentBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

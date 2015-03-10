@@ -3,7 +3,7 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    class ModuleBinding implements IBinding {
+    class ModuleBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

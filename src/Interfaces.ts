@@ -484,11 +484,11 @@ module wx {
 
     /**
     * Bindings are markers on a DOM element (such as an attribute or comment) that tell 
-    * WebRx's Dom compiler to attach a specified behavior to that DOM element or even transform
-    * the DOM element and its children.
+    * WebRx's DOM compiler to attach a specified behavior to that DOM element or even 
+    * transform the element and its children.
     * @interface 
     **/
-    export interface IBinding {
+    export interface IBindingHandler {
         /**
         * Applies the binding to the specified element
         * @param {Node} node The target node
@@ -519,11 +519,11 @@ module wx {
     }
 
     export interface IBindingRegistry {
-        registerBinding(name: string, handler: IBinding): void;
+        registerBinding(name: string, handler: IBindingHandler): void;
         registerBinding(name: string, handler: string): void;
         unregisterBinding(name: string): void;
         isBindingRegistered(name: string): boolean;
-        getBinding(name: string): IBinding;
+        getBinding(name: string): IBindingHandler;
     }
 
     export interface IComponentTemplateDescriptor {

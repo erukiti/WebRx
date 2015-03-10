@@ -7,7 +7,7 @@ module wx {
         [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>;
     }
 
-    class EventBinding implements IBinding {
+    class EventBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

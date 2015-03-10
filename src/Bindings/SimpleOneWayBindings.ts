@@ -4,7 +4,7 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    class SingleOneWayChangeBindingBase implements IBinding {
+    class SingleOneWayChangeBindingBase implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

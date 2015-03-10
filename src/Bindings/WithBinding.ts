@@ -5,7 +5,7 @@
 /// <reference path="../Core/Resources.ts" />
 
 module wx {
-    class WithBinding implements IBinding {
+    class WithBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

@@ -37,7 +37,7 @@ module wx {
 
             // if the component has been registered as resource, resolve it now and update registry
             if (typeof component === "string") {
-                component = injector.resolve<IBinding>(component);
+                component = injector.resolve<IBindingHandler>(component);
                 this.components[name] = component;
                 return component;
             }
@@ -45,7 +45,7 @@ module wx {
             return this.components[name];
         }
 
-        public registerBinding(name: string, handler: IBinding): void;
+        public registerBinding(name: string, handler: IBindingHandler): void;
         public registerBinding(name: string, handler: string): void;
 
         public registerBinding(): void {
@@ -64,12 +64,12 @@ module wx {
             return this.bindings[name] !== undefined;
         }
 
-        public getBinding(name: string): IBinding {
+        public getBinding(name: string): IBindingHandler {
             var directive = this.bindings[name];
 
             // if the component has been registered as resource, resolve it now and update registry
             if (typeof directive === "string") {
-                directive = injector.resolve<IBinding>(directive);
+                directive = injector.resolve<IBindingHandler>(directive);
                 this.bindings[name] = directive;
                 return directive;
             }

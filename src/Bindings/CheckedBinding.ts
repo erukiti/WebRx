@@ -3,7 +3,7 @@
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
-    class CheckedBinding implements IBinding {
+    class CheckedBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

@@ -9,7 +9,7 @@ module wx {
         condition: string;
     }
 
-    class IfBinding implements IBinding {
+    class IfBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

@@ -51,7 +51,7 @@ module wx {
         afterMove? (nodes: Node[], data: any, index: number): void;
     }
 
-    class ForEachBinding implements IBinding {
+    class ForEachBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

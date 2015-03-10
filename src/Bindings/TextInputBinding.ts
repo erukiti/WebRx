@@ -3,7 +3,7 @@
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
-    class TextInputBinding implements IBinding {
+    class TextInputBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 

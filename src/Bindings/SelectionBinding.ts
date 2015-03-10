@@ -111,7 +111,7 @@ module wx {
     impls.push(new RadioSingleSelectionImpl());
     impls.push(new OptionSingleSelectionImpl());
 
-    class SelectionBinding implements IBinding {
+    class SelectionBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
