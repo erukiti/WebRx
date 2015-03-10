@@ -250,7 +250,7 @@ describe('Bindings', () => {
             var vm: any;
 
             vm = {
-                init: function (el: HTMLElement) {
+                init: function (el: HTMLElement) {  // don't convert this to a lamba or the test will suddenly fail due to Typescript's this-capturing
                     invoked = true;
                     __this = this;
                     elementArg = el instanceof HTMLElement;
@@ -282,7 +282,7 @@ describe('Bindings', () => {
             var vm: any;
             
             vm = {
-                init: function(el: HTMLElement) {
+                init: function(el: HTMLElement) {   // don't convert this to a lamba or the test will suddenly fail due to Typescript's this-capturing
                     invoked = true;
                     __this = this;
                     elementArg = el instanceof HTMLElement;
