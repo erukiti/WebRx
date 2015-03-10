@@ -155,7 +155,7 @@ module wx {
             var syncResult: any;
 
             if (typeof vm === "function") {
-                syncResult = vm(componentParams);
+                syncResult = vm;
                 return Rx.Observable.return(syncResult);
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;

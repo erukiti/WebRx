@@ -240,7 +240,7 @@ describe('Directives', () => {
             expect(fooVal).toEqual(42);
         });
 
-        it("Params get passed to view-model constructor when component is used as tag",() => {
+        it("Params get passed to view-model constructor function when component is used as tag",() => {
             loadFixtures('templates/Directives/Component.html');
 
             var template = '<span>foo</span>';
