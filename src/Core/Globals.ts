@@ -33,6 +33,9 @@ module wx {
     * @return {Rx.Observable<any>} An observable that yields a value as soon as the module has been loaded
     */
     export function observableRequire(module: string): Rx.Observable<any> {
+        if (typeof require === "undefined")
+            internal.throwError("no AMD-module loader loaded!");
+
         return Rx.Observable.create<any>(observer => {
             try {
                 require([module], (m) => {

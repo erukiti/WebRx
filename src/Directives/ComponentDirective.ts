@@ -74,12 +74,19 @@ module wx {
                     this.loadTemplate(component.template),
                     this.loadViewModel(component.viewModel, componentParams),
                         (t, vm) => {
+                            // if viewModel is a function invoke it using params
+                            if (typeof vm === "function") {
+                                vm = vm(componentParams);
+                            }
+
                              return { template: t, viewModel: vm }
                         }).subscribe(x => {
+                            // done
                             this.applyTemplate(el, ctx, state, x.template, x.viewModel);
                         }, (err) => app.defaultExceptionHandler.onNext(err)));
             } else {
                 state.cleanup.add(this.loadTemplate(component.template).subscribe((t) => {
+                    // done
                     this.applyTemplate(el, ctx, state, t);
                 },(err) => app.defaultExceptionHandler.onNext(err)));
             }
