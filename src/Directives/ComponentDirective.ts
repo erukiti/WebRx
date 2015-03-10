@@ -28,7 +28,7 @@ module wx {
             var compiled = this.domService.compileDirectiveOptions(options);
             var exp: ICompiledExpression;
             var componentName: string;
-            var componentParams: Object;
+            var componentParams: Object = undefined;
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
@@ -63,8 +63,11 @@ module wx {
             var component: IComponent = undefined;
             if (state.properties.module)
                 component = state.properties.module.getComponent(componentName);
+
+            // fallback to "app" module if unknown to module
             if (!component)
                 component = app.getComponent(componentName);
+
             if (!component)
                 internal.throwError("component '{0}' has not been registered.", componentName);
 
@@ -74,7 +77,7 @@ module wx {
                     this.loadTemplate(component.template),
                     this.loadViewModel(component.viewModel, componentParams),
                         (t, vm) => {
-                            // if viewModel is a function invoke it using params
+                            // if loadViewModel yields a function, we interpret that as a factory
                             if (typeof vm === "function") {
                                 vm = vm(componentParams);
                             }
@@ -124,8 +127,7 @@ module wx {
                 syncResult = app.templateEngine.parse(<string> template);
                 return Rx.Observable.return(syncResult);
             } else if (Array.isArray(template)) {
-                syncResult = <Node[]> template;
-                return Rx.Observable.return(syncResult);
+                return Rx.Observable.return(<Node[]> template);
             } else if(typeof template === "object") {
                 var options = <IComponentTemplateDescriptor> template;
 
@@ -155,8 +157,7 @@ module wx {
             var syncResult: any;
 
             if (typeof vm === "function") {
-                syncResult = vm;
-                return Rx.Observable.return(syncResult);
+                return Rx.Observable.return(vm);
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;
 
@@ -169,8 +170,7 @@ module wx {
                 } else if (options.require) {
                     return observableRequire(options.require);
                 } else if (options.instance) {
-                    syncResult = options.instance;
-                    return Rx.Observable.return(syncResult);
+                    return Rx.Observable.return(options.instance);
                 }
             }
 
@@ -184,7 +184,7 @@ module wx {
                 el.removeChild(el.firstChild);
             }
 
-            // clone nodes and inject
+            // clone template and inject
             for (var i = 0; i < template.length; i++) {
                 var node = template[i].cloneNode(true);
                 el.appendChild(node);
@@ -193,6 +193,8 @@ module wx {
             if (vm) {
                 state.properties.model = vm;
                 this.domService.setNodeState(el, state);
+
+                // refresh context
                 ctx = this.domService.getDataContext(el);
             }
 
