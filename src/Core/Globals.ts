@@ -30,7 +30,7 @@ module wx {
     /**
     * Turns an AMD-Style require call into an observable
     * @param {string} Module The module to load
-    * @return {Rx.Observable<any>} An observable that yields a value as soon as the module has been loaded
+    * @return {Rx.Observable<any>} An observable that yields a value and completes as soon as the module has been loaded
     */
     export function observableRequire(module: string): Rx.Observable<any> {
         if (typeof require === "undefined")
