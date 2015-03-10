@@ -337,23 +337,15 @@ module wx {
     }
 
     /**
-    * Extensible node state data
-    * @interface 
-    **/
-    export interface INodeStateData {
-        isBound: boolean;   // true of this node has been touched by applyBindings
-        module?: IModule;   // scope module 
-        model?: any;        // scope model 
-        index?: any;        // scope index
-    }
-
-    /**
-    * Stored DOM Node state
+    * Extensible Node state
     * @interface 
     **/
     export interface INodeState {
         cleanup: Rx.CompositeDisposable;
-        data: INodeStateData;
+        isBound: boolean;   // true of this node has been touched by applyBindings
+        module?: IModule;   // scope module 
+        model?: any;        // scope model 
+        index?: any;        // scope index
     }
 
     export interface IObjectLiteralToken {

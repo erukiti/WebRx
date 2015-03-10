@@ -272,13 +272,13 @@ module wx {
                 if (node.nodeType === 1) {
                     // save the index before cleaning
                     var state = this.domService.getNodeState(node);
-                    savedIndex = state ? state.data.index : undefined;
+                    savedIndex = state ? state.index : undefined;
 
                     this.domService.cleanNode(node);
 
                     // restore index before binding
                     state = this.domService.createNodeState(item);
-                    state.data.index = savedIndex;
+                    state.index = savedIndex;
                     this.domService.setNodeState(node, state);
 
                     this.domService.applyBindings(item, node);
@@ -381,7 +381,7 @@ module wx {
 
                     // propagate index to state
                     var state = self.domService.createNodeState(item);
-                    state.data.index = index;
+                    state.index = index;
                     self.domService.setNodeState(node, state);
 
                     if (item) {
