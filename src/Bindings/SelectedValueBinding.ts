@@ -1,9 +1,8 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Services/DomService.ts" />
-/// <reference path="../Core/Environment.ts" />
 
 module wx {
-    interface ISelectionBindingImpl {
+    interface ISelectedValueBindingImpl {
         supports(el: HTMLElement, model: any): boolean;
         observeElement(el: HTMLElement): Rx.Observable<any>;
         observeModel(model: any): Rx.Observable<any>;
@@ -11,9 +10,9 @@ module wx {
         updateModel(el: HTMLElement, model: any, e: any);
     }
 
-    var impls = new Array<ISelectionBindingImpl>();
+    var impls = new Array<ISelectedValueBindingImpl>();
 
-    class RadioSingleSelectionImpl implements ISelectionBindingImpl {
+    class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
         public supports(el: HTMLElement, model: any): boolean {
             return (el.tagName.toLowerCase() === 'input' &&
                 el.getAttribute("type") === 'radio') &&
@@ -58,7 +57,7 @@ module wx {
         }
     }
 
-    class OptionSingleSelectionImpl implements ISelectionBindingImpl {
+    class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
         public supports(el: HTMLElement, model: any): boolean {
             return el.tagName.toLowerCase() === 'select' &&
                 !utils.isList(model);
@@ -111,7 +110,7 @@ module wx {
     impls.push(new RadioSingleSelectionImpl());
     impls.push(new OptionSingleSelectionImpl());
 
-    class SelectionBinding implements IBindingHandler {
+    class SelectedValueBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
@@ -128,7 +127,7 @@ module wx {
 
             var el = <HTMLInputElement> node;
 
-            var impl: ISelectionBindingImpl;
+            var impl: ISelectedValueBindingImpl;
             var implCleanup: Rx.CompositeDisposable;
             
             function cleanupImpl() {
@@ -203,6 +202,6 @@ module wx {
     }
 
     export module internal {
-        export var selectionBindingConstructor = <any> SelectionBinding;
+        export var selectedValueBindingConstructor = <any> SelectedValueBinding;
     }
 }

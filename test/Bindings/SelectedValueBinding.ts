@@ -7,7 +7,7 @@ describe('Bindings', () => {
     describe('Selection', () => {
         describe('Radio (single-selection)',() => {
             it("Should be able to control a radio's checked state",() => {
-                loadFixtures('templates/Bindings/Selection.html');
+                loadFixtures('templates/Bindings/SelectedValue.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 // none of the radios should be checked initially
@@ -36,7 +36,7 @@ describe('Bindings', () => {
             });
 
             it("Clicking a radio should reflect back to model",() => {
-                loadFixtures('templates/Bindings/Selection.html');
+                loadFixtures('templates/Bindings/SelectedValue.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 // none of the radios should be checked initially
@@ -63,7 +63,7 @@ describe('Bindings', () => {
             });
 
             it("If initial model value is undefined none of the radios should be checked",() => {
-                loadFixtures('templates/Bindings/Selection.html');
+                loadFixtures('templates/Bindings/SelectedValue.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 var selected = wx.property(undefined);
@@ -78,7 +78,7 @@ describe('Bindings', () => {
 
         describe('Select (single-selection)',() => {
             it("Should be able to control a Select's selectedIndex",() => {
-                loadFixtures('templates/Bindings/Selection.html');
+                loadFixtures('templates/Bindings/SelectedValue.html');
                 var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
 
                 // first option should be selected by default
@@ -103,7 +103,7 @@ describe('Bindings', () => {
             });
 
             it("Selecting an option should reflect selection back to model",() => {
-                loadFixtures('templates/Bindings/Selection.html');
+                loadFixtures('templates/Bindings/SelectedValue.html');
                 var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
 
                 // first option should be selected by default
@@ -130,7 +130,7 @@ describe('Bindings', () => {
             });
 
             it("If initial model value is undefined, selectedIndex should be undefined as well",() => {
-                loadFixtures('templates/Bindings/Selection.html');
+                loadFixtures('templates/Bindings/SelectedValue.html');
                 var container = <any> document.querySelector("#fixture1");
 
                 var selected = wx.property(undefined);

@@ -10,7 +10,7 @@
 /// <reference path="Bindings/ForEachBinding.ts" />
 /// <reference path="Bindings/EventBinding.ts" />
 /// <reference path="Bindings/TextInputBinding.ts" />
-/// <reference path="Bindings/SelectionBinding.ts" />
+/// <reference path="Bindings/SelectedValueBinding.ts" />
 /// <reference path="Bindings/ComponentBinding.ts" />
 
 module wx {
@@ -36,7 +36,7 @@ module wx {
     injector.register("wx.bindings.event", true, true, [res.domService, internal.eventBindingConstructor]);
     injector.register("wx.bindings.textInput", true, true, [res.domService, internal.textInputBindingConstructor]);
     injector.register("wx.bindings.checked", true, true, [res.domService, internal.checkedBindingConstructor]);
-    injector.register("wx.bindings.selection", true, true, [res.domService, internal.selectionBindingConstructor]);
+    injector.register("wx.bindings.selectedValue", true, true, [res.domService, internal.selectedValueBindingConstructor]);
     injector.register("wx.bindings.component", true, true, [res.domService, internal.componentBindingConstructor]);
 
     app.registerBinding("module", "wx.bindings.module");
@@ -57,6 +57,6 @@ module wx {
     app.registerBinding("event", "wx.bindings.event");
     app.registerBinding("textInput", "wx.bindings.textInput");
     app.registerBinding("checked", "wx.bindings.checked");
-    app.registerBinding("selection", "wx.bindings.selection");
+    app.registerBinding("selectedValue", "wx.bindings.selectedValue");
     app.registerBinding("component", "wx.bindings.component");
 }
