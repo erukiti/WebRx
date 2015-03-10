@@ -33,16 +33,18 @@ module wx {
                 // Ignore which event was raised and determine focus state using activeElement,
                 // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
                 var ownerDoc = el.ownerDocument;
-                var active;
 
-                try {
-                    active = ownerDoc.activeElement;
-                } catch (e) {
-                    // IE9 throws if you access activeElement during page load (see issue #703)
-                    active = ownerDoc.body;
+                if ("activeElement" in ownerDoc) {
+                    var active;
+                    try {
+                        active = ownerDoc.activeElement;
+                    } catch (e) {
+                        // IE9 throws if you access activeElement during page load (see issue #703)
+                        active = ownerDoc.body;
+                    }
+                    isFocused = (active === el);
                 }
 
-                isFocused = (active === el);
                 prop(isFocused);
             }
 
