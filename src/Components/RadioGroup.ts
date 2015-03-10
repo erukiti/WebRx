@@ -24,14 +24,14 @@ module wx {
         }
 
         public viewModel = (params: any): any => {
-            return params.items;
+            return { items: params.items, selectedValue: params.selectedValue };
         }
 
         ////////////////////
         // Implementation
 
         protected buildTemplate(options: IRadioGroupComponentParams): string {
-            var template = '<div data-bind="foreach: $data"><input type="radio" data-bind="{0}">{1}</div>';
+            var template = '<div data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
             var groupName = options.groupName || utils.formatString("wx-radiogroup-{0}", groupId++);
             var perItemExtraMarkup = "";
 
@@ -42,7 +42,7 @@ module wx {
             bindings.push({ key: "attr", value: "{ name: '" + groupName + "' }" });
 
             if (options.selectedValue) {
-                bindings.push({ key: "selectedValue", value: options.selectedValue });
+                bindings.push({ key: "selectedValue", value: "$parent.selectedValue" });
             }
 
             if (options.itemText) {
@@ -56,7 +56,7 @@ module wx {
                 bindings.push({ key: "attr", value: "{ class: '" + options.itemClass + "'}" });
             }
 
-            var bindingString = bindings.map(x => utils.formatString("{0}: {1}", x.key, x.value)).join(", ");
+            var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
 
             // create final template
             template = utils.formatString(template, bindingString, perItemExtraMarkup);
