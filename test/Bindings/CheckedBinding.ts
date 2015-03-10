@@ -42,7 +42,21 @@ describe('Bindings', () => {
             expect(testNode.childNodes[0].checked).toEqual(false);
         });
 
-        it('Should update observable properties on the underlying model when the checkbox click event fires', ()=> {
+        it('Should be able to control a radio\'s checked state',() => {
+            loadFixtures('templates/Generic.html');
+            var testNode = <any> document.querySelector("#fixture");
+
+            var myobservable = wx.property(true);
+            testNode.innerHTML = "<input type='radio' data-bind='checked:someProp' />";
+
+            wx.applyBindings({ someProp: myobservable }, testNode);
+            expect(testNode.childNodes[0].checked).toEqual(true);
+
+            myobservable(false);
+            expect(testNode.childNodes[0].checked).toEqual(false);
+        });
+
+        it('Should update observable properties on the model when the checkbox click event fires', ()=> {
             loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
@@ -54,7 +68,19 @@ describe('Bindings', () => {
             expect(myobservable()).toEqual(true);
         });
 
-        it('Should only notify observable properties on the underlying model once even if the checkbox change events fire multiple times', ()=> {
+        it("Should update observable properties on the model when the radio's click event fires",() => {
+            loadFixtures('templates/Generic.html');
+            var testNode = <any> document.querySelector("#fixture");
+
+            var myobservable = wx.property(false);
+            testNode.innerHTML = "<input type='radio' data-bind='checked:someProp' />";
+            wx.applyBindings({ someProp: myobservable }, testNode);
+
+            testNode.childNodes[0].click();
+            expect(myobservable()).toEqual(true);
+        });
+
+        it('Should only notify observable properties on the model once even if the checkbox change events fire multiple times', ()=> {
             loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
@@ -74,6 +100,29 @@ describe('Bindings', () => {
             testNode.childNodes[0].click();
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(timesNotified).toEqual(2);
+        });
+
+        it('Should only notify observable properties on the model once even if the radio change events fire multiple times',() => {
+            loadFixtures('templates/Generic.html');
+            var testNode = <any> document.querySelector("#fixture");
+
+            var myobservable = wx.property();
+            var timesNotified = 0;
+            myobservable.changed.subscribe(() => { timesNotified++ });
+            testNode.innerHTML = "<input type='radio' data-bind='checked:someProp' />";
+            wx.applyBindings({ someProp: myobservable }, testNode);
+
+            // Multiple events only cause one notification...
+            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "change");
+            testutils.triggerEvent(testNode.childNodes[0], "change");
+            expect(timesNotified).toEqual(1);
+
+            // ... until the checkbox value actually changes
+            myobservable(false);
+            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "change");
+            expect(timesNotified).toEqual(3);
         });
     });
 });

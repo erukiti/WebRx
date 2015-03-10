@@ -20,29 +20,24 @@ module wx {
 
             var el = <HTMLInputElement> node;
             var tag = el.tagName.toLowerCase();
+            var isCheckBox = el.type === 'checkbox';
             var isRadioButton = el.type === 'radio';
 
-            if (tag !== 'input' || el.type !== 'checkbox')
+            if (tag !== 'input' || (!isCheckBox && !isRadioButton))
                 internal.throwError("checked-binding only operates on checkboxes and radio-buttons");
 
             var prop: IObservableProperty<any>;
-            var propertySubscription: Rx.Disposable;
-            var eventSubscription: Rx.Disposable;
+            var locals: Rx.CompositeDisposable;
+
+            function cleanup() {
+                if (locals) {
+                    locals.dispose();
+                    locals = null;
+                }
+            }
 
             function updateElement(value: any) {
                 el.checked = value;
-            }
-
-            function cleanup() {
-                if (propertySubscription) {
-                    propertySubscription.dispose();
-                    propertySubscription = null;
-                }
-
-                if (eventSubscription) {
-                    eventSubscription.dispose();
-                    eventSubscription = null;
-                }
             }
 
             // options is supposed to be a field-access path
@@ -52,13 +47,14 @@ module wx {
                     updateElement(model);
                 } else {
                     cleanup();
+                    locals = new Rx.CompositeDisposable();
 
                     // update on property change
                     prop = model;
 
-                    propertySubscription = prop.changed.subscribe(x => {
+                    locals.add(prop.changed.subscribe(x => {
                         updateElement(x);
-                    });
+                    }));
 
                     // initial update
                     updateElement(prop());
@@ -67,13 +63,9 @@ module wx {
                     if (!prop.source) {
                         // wire change-events depending on browser and version
                         var events = this.getCheckedEventObservables(el);
-                        eventSubscription = Rx.Observable.merge(events).subscribe(e => {
-                            if (isRadioButton) {
-                                prop(el.value);
-                            } else {
-                                prop(el.checked);
-                            }
-                        });
+                        locals.add(Rx.Observable.merge(events).subscribe(e => {
+                            prop(el.checked);
+                        }));
                     }
                 }
             }));
