@@ -517,7 +517,8 @@ module wx {
     export interface IBindingRegistry {
         registerBinding(name: string, handler: IBindingHandler): void;
         registerBinding(name: string, handler: string): void;
-        unregisterBinding(name: string): void;
+        registerBinding(names: string[], handler: IBindingHandler): void;
+        registerBinding(names: string[], handler: string): void;
         isBindingRegistered(name: string): boolean;
         getBinding(name: string): IBindingHandler;
     }
@@ -548,7 +549,6 @@ module wx {
     export interface IComponentRegistry {
         registerComponent(name: string, handler: IComponent): void;
         registerComponent(name: string, handler: string): void;
-        unregisterComponent(name: string): void;
         isComponentRegistered(name: string): boolean;
         getComponent(name: string): IComponent;
     }

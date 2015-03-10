@@ -24,10 +24,6 @@ module wx {
             this.components[name] = handler;
         }
 
-        public unregisterComponent(name: string): void {
-            delete this.components[name];
-        }
-
         public isComponentRegistered(name: string): boolean {
             return this.components[name] !== undefined;
         }
@@ -47,17 +43,19 @@ module wx {
 
         public registerBinding(name: string, handler: IBindingHandler): void;
         public registerBinding(name: string, handler: string): void;
+        public registerBinding(names: string[], handler: IBindingHandler): void;
+        public registerBinding(names: string[], handler: string): void;
 
         public registerBinding(): void {
             var args = utils.args2Array(arguments);
             var name = args.shift();
             var handler = args.shift();
 
-            this.bindings[name] = handler;
-        }
-
-        public unregisterBinding(name: string): void {
-            delete this.bindings[name];
+            if (Array.isArray(name)) {
+                name.forEach(x => this.bindings[x] = handler);
+            } else {
+                this.bindings[name] = handler;
+            }
         }
 
         public isBindingRegistered(name: string): boolean {
