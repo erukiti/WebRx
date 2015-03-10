@@ -17,7 +17,6 @@ module wx {
         // IBinding
 
         public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
-            debugger;
             if (node.nodeType !== 1)
                 internal.throwError("component-binding only operates on elements!");
 
@@ -74,7 +73,7 @@ module wx {
             // resolve template & view-model
             if (component.viewModel) {
                 state.cleanup.add(Rx.Observable.combineLatest(
-                    this.loadTemplate(component.template),
+                    this.loadTemplate(component.template, componentParams),
                     this.loadViewModel(component.viewModel, componentParams),
                         (t, vm) => {
                             // if loadViewModel yields a function, we interpret that as a factory
@@ -88,7 +87,7 @@ module wx {
                             this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
                         }, (err) => app.defaultExceptionHandler.onNext(err)));
             } else {
-                state.cleanup.add(this.loadTemplate(component.template).subscribe((t) => {
+                state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
                     // done
                     this.applyTemplate(component, el, ctx, state, t);
                 },(err) => app.defaultExceptionHandler.onNext(err)));
@@ -120,10 +119,13 @@ module wx {
 
         protected domService: IDomService;
 
-        protected loadTemplate(template: any): Rx.Observable<Node[]> {
+        protected loadTemplate(template: any, params: Object): Rx.Observable<Node[]> {
             var syncResult: Node[];
 
-            if (typeof template === "string") {
+            if (typeof template === "function") {
+                syncResult = app.templateEngine.parse(<string> template(params));
+                return Rx.Observable.return(syncResult);
+            } else if (typeof template === "string") {
                 syncResult = app.templateEngine.parse(<string> template);
                 return Rx.Observable.return(syncResult);
             } else if (Array.isArray(template)) {

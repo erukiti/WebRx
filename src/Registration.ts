@@ -1,17 +1,16 @@
 ﻿/// <reference path="Core/Injector.ts" />
 /// <reference path="Services/ExpressionCompiler.ts" />
 /// <reference path="Services/DomService.ts" />
-/// <reference path="Core/Module.ts" />
 /// <reference path="Services/HtmlTemplateEngine.ts" />
-/// <reference path="Bindings/CommandBinding.ts" />
-/// <reference path="Bindings/IfBinding.ts" />
-/// <reference path="Bindings/MultiOneWayBindings.ts" />
-/// <reference path="Bindings/SimpleOneWayBindings.ts" />
-/// <reference path="Bindings/ForEachBinding.ts" />
-/// <reference path="Bindings/EventBinding.ts" />
-/// <reference path="Bindings/TextInputBinding.ts" />
-/// <reference path="Bindings/SelectedValueBinding.ts" />
-/// <reference path="Bindings/ComponentBinding.ts" />
+/// <reference path="Bindings/Command.ts" />
+/// <reference path="Bindings/If.ts" />
+/// <reference path="Bindings/MultiOneWay.ts" />
+/// <reference path="Bindings/SimpleOneWay.ts" />
+/// <reference path="Bindings/ForEach.ts" />
+/// <reference path="Bindings/Event.ts" />
+/// <reference path="Bindings/TextInput.ts" />
+/// <reference path="Bindings/SelectedValue.ts" />
+/// <reference path="Bindings/Component.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
@@ -41,6 +40,8 @@ module wx {
     injector.register("wx.bindings.value", true, true, [res.domService, internal.valueBindingConstructor]);
     injector.register("wx.bindings.hasFocus", true, true, [res.domService, internal.hasFocusBindingConstructor]);
 
+    injector.register("wx.components.radiogroup", false, true, [res.domService, internal.radioGroupComponentConstructor]);
+
     app.registerBinding("module", "wx.bindings.module");
     app.registerBinding("css", "wx.bindings.css");
     app.registerBinding("attr", "wx.bindings.attr");
@@ -63,4 +64,6 @@ module wx {
     app.registerBinding("component", "wx.bindings.component");
     app.registerBinding("value", "wx.bindings.value");
     app.registerBinding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus");
+
+    app.registerComponent("wx-radiogroup", "wx.components.radiogroup");
 }

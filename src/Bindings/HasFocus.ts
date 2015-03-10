@@ -33,7 +33,7 @@ module wx {
                 // If possible, ignore which event was raised and determine focus state using activeElement,
                 // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
                 var ownerDoc = el.ownerDocument;
-debugger ;
+
                 if ("activeElement" in ownerDoc) {
                     var active;
                     try {
@@ -49,7 +49,6 @@ debugger ;
             }
 
             function updateElement(value: any) {
-debugger;
                 if (value) {
                     el.focus();
                 } else {

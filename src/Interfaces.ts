@@ -524,6 +524,7 @@ module wx {
     }
 
     export interface IComponentTemplateDescriptor {
+        (params: any): string;  // Factory 
         require?: string;       // Async AMD
         promise?: Rx.IPromise<Node[]>;  // Async Promise
         resolve?: string;       // DI
@@ -531,7 +532,7 @@ module wx {
     }
 
     export interface IComponentViewModelDescriptor {
-        (Object); any;          // Factory 
+        (params: any): any;     // Factory 
         require?: string;       // Async AMD loading
         promise?: Rx.IPromise<string>;  // Async Promise
         resolve?: string;       // DI
