@@ -110,11 +110,11 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
-<ItemGroup>
+  <ItemGroup>
     <Compile Include="..\src\**\*.*">
-        <Link>%(RecursiveDir)%(FileName)</Link>
+      <Link>%(RecursiveDir)%(FileName)</Link>
     </Compile>
-     </ItemGroup>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

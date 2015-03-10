@@ -4,6 +4,8 @@
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Core/Globals.ts" />
 /// <reference path="../Collections/Set.ts" />
+/// <reference path="../Core/Environment.ts" />
+/// <reference path="../Core/Module.ts" />
 
 module wx {
     class DomService implements IDomService {
