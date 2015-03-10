@@ -52,7 +52,7 @@ module wx {
     }
 
     /**
-    * Returns an observable that signals any changes of observable properties on the target object
+    * Returns an observable that notifes of any observable property changes on the target
     * @param {any} target The object to observe
     * @return {Rx.Observable<T>} An observable
     */
