@@ -34,7 +34,7 @@ module wx {
     */
     export function observableRequire(module: string): Rx.Observable<any> {
         if (typeof require === "undefined")
-            internal.throwError("no AMD-module loader loaded!");
+            internal.throwError("there's no AMD-module loader available (Hint: did you forget to include RequireJS in your project?)");
 
         return Rx.Observable.create<any>(observer => {
             try {
