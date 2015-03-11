@@ -45,7 +45,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#if-observable-boolean");
             var backup = el.innerHTML;
             var obs = new Rx.Subject<boolean>();
-            expect(() => wx.applyBindings(obs.asObservable(), el)).not.toThrowError();
+            expect(() => wx.applyBindings(obs, el)).not.toThrowError();
             expect(el.innerHTML).toEqual(backup);
             obs.onNext(false);
             expect(el.innerHTML).toEqual('');
