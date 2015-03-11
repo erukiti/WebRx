@@ -103,8 +103,8 @@ module testutils {
         return Array.prototype.slice.call(nodes);
     }
 
-    export function nodeChildrenToArray(node: Node): Node[] {
-        return nodeListToArray(node.childNodes);
+    export function nodeChildrenToArray<T>(node: Node): T[] {
+        return <T[]> <any> nodeListToArray(node.childNodes);
     }
 
     export function allAttributes2String(nodes: any[], attr: string, except?: any[]) {

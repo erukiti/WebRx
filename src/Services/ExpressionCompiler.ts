@@ -353,7 +353,7 @@ module wx {
             private isIdent(ch): boolean {
                 return ("a" <= ch && ch <= "z" ||
                     "A" <= ch && ch <= "Z" ||
-                    "_" === ch || ch === "$");
+                    "_" === ch || ch === "$" || ch === "@");
             }
 
             private isExpOperator(ch): boolean {

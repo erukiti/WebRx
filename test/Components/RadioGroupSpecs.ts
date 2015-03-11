@@ -15,7 +15,8 @@ describe('Components', () => {
             el = <HTMLElement> el.childNodes[0];
 
             expect(el.childNodes.length).toEqual(items.length);
-            expect($(el).children("input").map((x, y) => y.getAttribute("value"))).toEqual(items.map(x=> x.toString()));
+            expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
+                .map(x => x.getAttribute("value"))).toEqual(items.map(x=> x.toString()));
         });
 
         it('items with label',() => {
@@ -27,9 +28,10 @@ describe('Components', () => {
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
             el = <HTMLElement> el.childNodes[0];
-
+            
             expect(el.childNodes.length / 2).toEqual(items.length);
-            expect($(el).children("label").map((x, y) => y.textContent)).toEqual(items.map(x=> x.key));
+            expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLLabelElement)
+                .map(x => x.textContent)).toEqual(items.map(x=> x.key));
         });
 
         it('items with label and css-class',() => {
@@ -63,7 +65,7 @@ describe('Components', () => {
 
             // selection should propagate to model
             (<HTMLInputElement> $(el).children("input")[2]).click();
-//            expect(model.selection()).toEqual("3");
+            expect(model.selection()).toEqual("3");
         });
     });
 });
