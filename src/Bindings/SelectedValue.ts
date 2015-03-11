@@ -7,7 +7,7 @@ module wx {
         observeElement(el: HTMLElement): Rx.Observable<any>;
         observeModel(model: any): Rx.Observable<any>;
         updateElement(el: HTMLElement, model: any);
-        updateModel(el: HTMLElement, model: any, e: any);
+        updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any);
     }
 
     var impls = new Array<ISelectedValueBindingImpl>();
@@ -45,14 +45,11 @@ module wx {
             }
         }
 
-        public updateModel(el: HTMLElement, model: any, e: any) {
+        public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
             var input = <HTMLInputElement> el;
-//here
-            if (utils.isProperty(model)) {
-                if (input.checked) {
-                    var prop = <IObservableProperty<any>> model;
-                    prop(input.value);
-                }
+
+            if (input.checked) {
+                model(input.value);
             }
         }
     }
@@ -97,13 +94,9 @@ module wx {
             }
         }
 
-        public updateModel(el: HTMLElement, model: any, e: any) {
+        public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
             var option = <HTMLSelectElement> el;
-
-            if (utils.isProperty(model)) {
-                var prop = <IObservableProperty<any>> model;
-                prop(option.value);
-            }
+            model(option.value);
         }
     }
 
@@ -164,9 +157,11 @@ module wx {
                 }));
 
                 // wire change-events
-                implCleanup.add(impl.observeElement(el).subscribe(e => {
-                    impl.updateModel(el, model, e);
-                }));
+                if (utils.isProperty(model)) {
+                    implCleanup.add(impl.observeElement(el).subscribe(e => {
+                        impl.updateModel(el, model, e);
+                    }));
+                }
             }));
 
             // release subscriptions and handlers
