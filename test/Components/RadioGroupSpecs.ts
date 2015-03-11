@@ -46,18 +46,18 @@ describe('Components', () => {
             expect($(el).children("input").map((x, y) => y.getAttribute("class"))).toEqual(['radio-item', 'radio-item', 'radio-item']);
         });
 
-        //it('items with label, css-class and selection',() => {
-        //    loadFixtures('templates/Components/RadioGroup.html');
+        it('items with label, css-class and selection',() => {
+            loadFixtures('templates/Components/RadioGroup.html');
 
-        //    var el = document.querySelector("#fixture4");
-        //    var items = [{ key: "foo", value: 1 }, { key: "bar", value: 2 }, { key: "baz", value: 3 }];
-        //    var model = { items: items, selection: wx.property(2) };
+            var el = document.querySelector("#fixture4");
+            var items = [{ key: "foo", value: 1 }, { key: "bar", value: 2 }, { key: "baz", value: 3 }];
+            var model = { items: items, selection: wx.property(2) };
 
-        //    expect(() => wx.applyBindings(model, el)).not.toThrowError();
-        //    el = <HTMLElement> el.childNodes[0];
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            el = <HTMLElement> el.childNodes[0];
 
-        //    expect(el.childNodes.length / 2).toEqual(items.length);
-        //    expect((<HTMLInputElement> $(el).children("input")[1]).checked).toBeTruthy();
-        //});
+            expect(el.childNodes.length / 2).toEqual(items.length);
+            expect((<HTMLInputElement> $(el).children("input")[1]).checked).toBeTruthy();
+        });
     });
 });

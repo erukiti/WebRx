@@ -347,7 +347,7 @@ module wx {
         protected applyValue(el: HTMLElement, value: any, hooks: IForEachBindingHooks, template: Array<Node>,
             ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable, setProxyFunc: (VirtualChildNodes) => void): void {
             var i, length;
-
+    
             if (initialApply) {
                 // clone to template
                 length = el.childNodes.length;

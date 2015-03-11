@@ -29,16 +29,16 @@ module wx.internal {
             else
                 this.childNodes.push(nodes[0]);
 
-            // callback
-            if (this.insertCB) {
-                for (var i = 0; i < length; i++) {
-                    this.insertCB(nodes[i], callbackData);
-                }
+            // append to DOM
+            for (var i = 0; i < length; i++) {
+                this.targetNode.appendChild(nodes[i]);
             }
 
-            // append to DOM
-            for (i = 0; i < length; i++) {
-                this.targetNode.appendChild(nodes[i]);
+            // callback
+            if (this.insertCB) {
+                for (i = 0; i < length; i++) {
+                    this.insertCB(nodes[i], callbackData);
+                }
             }
         }
 
@@ -52,16 +52,16 @@ module wx.internal {
                 // insert into proxy array
                 Array.prototype.splice.apply(this.childNodes, [index, 0].concat(<any> nodes));
 
-                // callback
-                if (this.insertCB) {
-                    for (var i = 0; i < length; i++) {
-                        this.insertCB(nodes[i], callbackData);
-                    }
+                // insert into DOM
+                for (var i = 0; i < length; i++) {
+                    this.targetNode.insertBefore(nodes[i], refNode);
                 }
 
-                // insert into DOM
-                for (i = 0; i < length; i++) {
-                    this.targetNode.insertBefore(nodes[i], refNode);
+                // callback
+                if (this.insertCB) {
+                    for (i = 0; i < length; i++) {
+                        this.insertCB(nodes[i], callbackData);
+                    }
                 }
             }
         }

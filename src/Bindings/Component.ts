@@ -194,7 +194,6 @@ module wx {
 
             if (vm) {
                 state.model = vm;
-                this.domService.setNodeState(el, state);
 
                 // refresh context
                 ctx = this.domService.getDataContext(el);

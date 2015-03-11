@@ -21,9 +21,14 @@ module wx {
             if (this.isNodeBound(rootNode))
                 internal.throwError("an element must not be bound multiple times!");
 
-            // create node state for root node
-            var state: INodeState = this.getNodeState(rootNode) || this.createNodeState(model);
-            this.setNodeState(rootNode, state);
+            // create or update node state for root node
+            var state = this.getNodeState(rootNode);
+            if (state) {
+                state.model = model;
+            } else {
+                state = this.createNodeState(model);
+                this.setNodeState(rootNode, state);
+            }
 
             // calculate resulting data-context and apply bindings
             var ctx = this.getDataContext(rootNode);
@@ -126,15 +131,14 @@ module wx {
 
             // collect model hierarchy
             while (node) {
-                state = state || this.getNodeState(node);
-
+                state = utils.isNotNull(state) ? state : this.getNodeState(node);
                 if (utils.isNotNull(state)) {
                     if (utils.isNotNull(state.model)) {
                         models.push(state.model);
                     }
                 }
 
-                state = undefined;
+                state = null;
                 node = node.parentNode;
             }
 
