@@ -37,9 +37,10 @@ module wx {
 
             // construct item bindings
             var bindings: Array<{ key: string; value: string }> = [];
+            var attrs: Array<{ key: string; value: string }> = [];
 
             bindings.push({ key: "value", value: params.itemValue || "$data" });
-            bindings.push({ key: "attr", value: "{ name: '" + groupName + "' }" });
+            attrs.push({ key: 'name', value: "'" + groupName + "'" });
 
             if (params.selectedValue) {
                 bindings.push({ key: "selectedValue", value: "@$parent.selectedValue" });
@@ -49,12 +50,15 @@ module wx {
                 perItemExtraMarkup += utils.formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
                     params.itemText, "'" + groupName + "' + '-' + $index");
 
-                bindings.push({ key: "attr", value: "{ id: '" + groupName + "' + '-' + $index }" });
+                attrs.push({ key: 'id', value: "'" + groupName + "' + '-' + $index" });
             }
 
             if (params.itemClass) {
-                bindings.push({ key: "attr", value: "{ class: '" + params.itemClass + "'}" });
+                attrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
             }
+
+            if (attrs.length)
+                bindings.push({ key: "attr", value: "{ " + attrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
 
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
 
