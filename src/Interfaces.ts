@@ -379,15 +379,6 @@ module wx {
         getRuntimeHooks(locals: any): ICompiledExpressionRuntimeHooks;
         setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void;
         parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
-
-        /**
-        * Evaluates a field access expression against a data context.
-        * Captures any observable properties touched along the way. 
-        * @param {IExpressionFunc} exp The source expression 
-        * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-        * @return {IDataContext} The data context to evaluate the expression against
-        */
-        evaluateFieldAccess(path: string, ctx: IDataContext, captured: ISet<Rx.Observable<any>>, preserveFinalProperty: boolean): any;
     }
 
     /**

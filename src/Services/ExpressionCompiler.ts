@@ -1236,54 +1236,6 @@ module wx {
 
             return cached;
         }
-
-        /**
-        * Evaluates a field access expression against a data context.
-        * Captures any observable properties touched along the way. 
-        * @param {IExpressionFunc} exp The source expression 
-        * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-        * @return {IDataContext} The data context to evaluate the expression against
-        */
-        export function evaluateFieldAccess(path: string, ctx: IDataContext, captured: ISet<Rx.Observable<any>>, preserveFinalProperty: boolean): any {
-            var parts = path.split(".");
-            var length = parts.length;
-            var value: any = undefined;
-            var field;
-            var prop: IObservableProperty<any>;
-
-            if (length > 0) {
-                // change context to ctx.$data if first access is not IDataContext related
-                if (ctx.hasOwnProperty(parts[0])) {
-                    value = ctx;
-                } else {
-                    value = ctx.$data;
-                }
-
-                for (var i = 0; i < length; i++) {
-                    field = parts[i];
-
-                    if (/\(|\)/.test(field))
-                        internal.throwError("field-access expression '{0}' attempts to invoke a function, which is not supported", path);
-
-                    if (!value.hasOwnProperty(field)) {
-                        return undefined;
-                    }
-
-                    value = value[field];
-
-                    // intercept access to observable properties but not if final part of path
-                    if (utils.isProperty(value)) {
-                        if (i !== (length - 1) || !preserveFinalProperty) {
-                            prop = value;
-                            captured.add(prop.changed);
-                            value = prop();
-                        }
-                    }
-                }
-            }
-
-            return value;
-        }
     }
 
     export module internal {
