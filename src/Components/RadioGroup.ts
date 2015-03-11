@@ -30,30 +30,30 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected buildTemplate(options: IRadioGroupComponentParams): string {
+        protected buildTemplate(params: IRadioGroupComponentParams): string {
             var template = '<div data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
-            var groupName = options.groupName || utils.formatString("wx-radiogroup-{0}", groupId++);
+            var groupName = params.groupName || utils.formatString("wx-radiogroup-{0}", groupId++);
             var perItemExtraMarkup = "";
 
             // construct item bindings
             var bindings: Array<{ key: string; value: string }> = [];
 
-            bindings.push({ key: "value", value: options.itemValue || "$data" });
+            bindings.push({ key: "value", value: params.itemValue || "$data" });
             bindings.push({ key: "attr", value: "{ name: '" + groupName + "' }" });
 
-            if (options.selectedValue) {
+            if (params.selectedValue) {
                 bindings.push({ key: "selectedValue", value: "@$parent.selectedValue" });
             }
 
-            if (options.itemText) {
+            if (params.itemText) {
                 perItemExtraMarkup += utils.formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
-                    options.itemText, "'" + groupName + "' + '-' + $index");
+                    params.itemText, "'" + groupName + "' + '-' + $index");
 
                 bindings.push({ key: "attr", value: "{ id: '" + groupName + "' + '-' + $index }" });
             }
 
-            if (options.itemClass) {
-                bindings.push({ key: "attr", value: "{ class: '" + options.itemClass + "'}" });
+            if (params.itemClass) {
+                bindings.push({ key: "attr", value: "{ class: '" + params.itemClass + "'}" });
             }
 
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
