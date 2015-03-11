@@ -22,7 +22,7 @@ describe('Components', () => {
             loadFixtures('templates/Components/RadioGroup.html');
 
             var el = document.querySelector("#fixture2");
-            var items = [{ key: "foo", value: 1 }, { key: "bar", value: 2 }, { key: "baz", value: 3 }];
+            var items = [{ key: "foo", value: "1" }, { key: "bar", value: "2" }, { key: "baz", value: "3" }];
             var model = { items: items };
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
@@ -36,7 +36,7 @@ describe('Components', () => {
             loadFixtures('templates/Components/RadioGroup.html');
 
             var el = document.querySelector("#fixture3");
-            var items = [{ key: "foo", value: 1 }, { key: "bar", value: 2 }, { key: "baz", value: 3 }];
+            var items = [{ key: "foo", value: "1" }, { key: "bar", value: "2" }, { key: "baz", value: "3" }];
             var model = { items: items };
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
@@ -50,14 +50,20 @@ describe('Components', () => {
             loadFixtures('templates/Components/RadioGroup.html');
 
             var el = document.querySelector("#fixture4");
-            var items = [{ key: "foo", value: 1 }, { key: "bar", value: 2 }, { key: "baz", value: 3 }];
-            var model = { items: items, selection: wx.property(2) };
+            var items = [{ key: "foo", value: "1" }, { key: "bar", value: "2" }, { key: "baz", value: "3" }];
+            var model = { items: items, selection: wx.property("2") };
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
             el = <HTMLElement> el.childNodes[0];
 
             expect(el.childNodes.length / 2).toEqual(items.length);
+
+            // selection should propagate from model
             expect((<HTMLInputElement> $(el).children("input")[1]).checked).toBeTruthy();
+
+            // selection should propagate to model
+            (<HTMLInputElement> $(el).children("input")[2]).click();
+//            expect(model.selection()).toEqual("3");
         });
     });
 });

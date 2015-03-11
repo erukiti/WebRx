@@ -47,7 +47,7 @@ module wx {
 
         public updateModel(el: HTMLElement, model: any, e: any) {
             var input = <HTMLInputElement> el;
-
+//here
             if (utils.isProperty(model)) {
                 if (input.checked) {
                     var prop = <IObservableProperty<any>> model;
