@@ -33,7 +33,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(true);
-            testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
+            testNode.innerHTML = "<input type='checkbox' data-bind='checked:@someProp' />";
 
             wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].checked).toEqual(true);
@@ -47,7 +47,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(true);
-            testNode.innerHTML = "<input type='radio' data-bind='checked:someProp' />";
+            testNode.innerHTML = "<input type='radio' data-bind='checked:@someProp' />";
 
             wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].checked).toEqual(true);
@@ -61,7 +61,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(false);
-            testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
+            testNode.innerHTML = "<input type='checkbox' data-bind='checked:@someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             testNode.childNodes[0].click();
@@ -73,7 +73,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(false);
-            testNode.innerHTML = "<input type='radio' data-bind='checked:someProp' />";
+            testNode.innerHTML = "<input type='radio' data-bind='checked:@someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             testNode.childNodes[0].click();
@@ -87,7 +87,7 @@ describe('Bindings', () => {
             var myobservable = wx.property();
             var timesNotified = 0;
             myobservable.changed.subscribe(()=> { timesNotified++ });
-            testNode.innerHTML = "<input type='checkbox' data-bind='checked:someProp' />";
+            testNode.innerHTML = "<input type='checkbox' data-bind='checked:@someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Multiple events only cause one notification...
@@ -109,7 +109,7 @@ describe('Bindings', () => {
             var myobservable = wx.property();
             var timesNotified = 0;
             myobservable.changed.subscribe(() => { timesNotified++ });
-            testNode.innerHTML = "<input type='radio' data-bind='checked:someProp' />";
+            testNode.innerHTML = "<input type='radio' data-bind='checked:@someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Multiple events only cause one notification...

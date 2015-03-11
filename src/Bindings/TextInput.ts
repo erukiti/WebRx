@@ -25,6 +25,7 @@ module wx {
             if (tag !== 'input' && tag !== 'textarea')
                 internal.throwError("textInput-binding can only be applied to input or textarea elements");
 
+            var exp = this.domService.compileBindingOptions(options);
             var prop: IObservableProperty<any>;
             var propertySubscription: Rx.Disposable;
             var eventSubscription: Rx.Disposable;
@@ -55,8 +56,7 @@ module wx {
                 }
             }
 
-            // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(src => {
+            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(src => {
                 if (!utils.isProperty(src)) {
                     // initial and final update
                     updateElement(src);

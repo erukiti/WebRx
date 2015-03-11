@@ -102,13 +102,16 @@ describe('Bindings', () => {
             var clickCallCount = 0;
             var inputCallCount = 0;
 
+            var clickSubject = new Rx.Subject<Event>();
+            var inputSubject = new Rx.Subject<Event>();
+            
             var model = {
-                clickObserver: new Rx.Subject<Event>(),
-                inputObserver: new Rx.Subject<Event>()
+                clickObserver: Rx.Observer.create<Event>((x) => { clickSubject.onNext(x) }),
+                inputObserver: Rx.Observer.create<Event>((x) => { inputSubject.onNext(x) })
             };
 
-            model.clickObserver.subscribe(x => clickCallCount++);
-            model.inputObserver.subscribe(x => inputCallCount++);
+            clickSubject.subscribe(x => clickCallCount++);
+            inputSubject.subscribe(x => inputCallCount++);
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
 

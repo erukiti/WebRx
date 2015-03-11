@@ -282,61 +282,6 @@ module wx {
                 .refCount();
         }
 
-        public fieldAccessToObservable(path: string, ctx: IDataContext,
-            preserveFinalObservableProperty: boolean, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
-            var captured = createSet<any>();
-            var result: any;
-
-            // initial evaluation
-            try {
-                result = this.compiler.evaluateFieldAccess(path, ctx, captured, preserveFinalObservableProperty);
-
-                // diagnostics
-                if (evalObs)
-                    evalObs.onNext(true);
-            } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
-
-                return Rx.Observable.return(undefined);
-            } 
-
-            // Optimization: If we didn't capture any observables during 
-            // initial evaluation, it is treated as a constant expression
-            if (captured.size === 0) {
-                return Rx.Observable.return(result);
-            }
-
-            var obs = Rx.Observable.create<any>(observer => {
-                var innerDisp = Rx.Observable.defer(() => {
-                        // construct observable that represents the first change of any of the expression's dependencies
-                        return Rx.Observable.merge(utils.getSetValues(captured)).take(1);
-                    })
-                    .repeat()
-                    .subscribe(trigger => {
-                        try {
-                            // reset execution state before evaluation
-                            captured.clear();
-
-                            // evaluate and produce next value
-                            result = this.compiler.evaluateFieldAccess(path, ctx, captured, preserveFinalObservableProperty);
-                            observer.onNext(result);
-
-                            // diagnostics
-                            if (evalObs)
-                                evalObs.onNext(true);
-                        } catch (e) {
-                            app.defaultExceptionHandler.onNext(e);
-                        }
-                    });
-
-                return innerDisp;
-            });
-
-            return obs.startWith(result)
-                .publish()
-                .refCount();
-        }
-
         //////////////////////////////////
         // Implementation
 

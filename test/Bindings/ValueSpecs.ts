@@ -9,7 +9,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
-            testNode.innerHTML = "<input data-bind='value:myProp' />";
+            testNode.innerHTML = "<input data-bind='value: @myProp' />";
             wx.applyBindings({ myProp: wx.property(0) }, testNode);
             expect(testNode.childNodes[0].value).toEqual("0");
         });
@@ -28,7 +28,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
-            testNode.innerHTML = "<input data-bind='value:someProp' />";
+            testNode.innerHTML = "<input data-bind='value: @someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].value).toEqual("123");
             myobservable(456);
@@ -40,7 +40,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property<any>("+123");
-            testNode.innerHTML = "<input data-bind='value:someProp' />";
+            testNode.innerHTML = "<input data-bind='value: @someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
             expect(testNode.childNodes[0].value).toEqual("+123");
             myobservable(123);
@@ -52,7 +52,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
-            testNode.innerHTML = "<input data-bind='value:someProp' />";
+            testNode.innerHTML = "<input data-bind='value: @someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
             testNode.childNodes[0].value = "some user-entered value";
             testutils.triggerEvent(testNode.childNodes[0], "change");
@@ -66,7 +66,7 @@ describe('Bindings', () => {
             var computedValue = Rx.Observable.return('zzz').toProperty();
             var vm = { prop: computedValue };
 
-            testNode.innerHTML = "<input data-bind='value: prop' />";
+            testNode.innerHTML = "<input data-bind='value: @prop' />";
             wx.applyBindings(vm, testNode);
             expect(testNode.childNodes[0].value).toEqual("zzz");
 
@@ -87,7 +87,7 @@ describe('Bindings', () => {
             var model = { myprop: wx.property<any>({ subproperty: originalSubproperty }) };
 
             // Set up a text box whose value is linked to the subproperty of the observable's current value
-            testNode.innerHTML = "<input data-bind='value: myprop.subproperty' />";
+            testNode.innerHTML = "<input data-bind='value: @myprop.subproperty' />";
             wx.applyBindings(model, testNode);
             expect(testNode.childNodes[0].value).toEqual("original value");
 
@@ -109,7 +109,7 @@ describe('Bindings', () => {
             myobservable.changed.subscribe(value => { notifiedValues.push(value); });
             expect(notifiedValues.length).toEqual(0);
 
-            testNode.innerHTML = "<input data-bind='value:someProp' />";
+            testNode.innerHTML = "<input data-bind='value: @someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Implicitly observe the number of handlers by seeing how many times "myobservable"

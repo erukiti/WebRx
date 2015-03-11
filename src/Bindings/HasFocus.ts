@@ -18,9 +18,9 @@ module wx {
                 internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLInputElement> node;
-
             var prop: IObservableProperty<any>;
             var locals: Rx.CompositeDisposable;
+            var exp = this.domService.compileBindingOptions(options);
 
             function cleanup() {
                 if (locals) {
@@ -57,7 +57,7 @@ module wx {
             }
 
             // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(model => {
+            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(model => {
                 if (!utils.isProperty(model)) {
                     // initial and final update
                     updateElement(model);

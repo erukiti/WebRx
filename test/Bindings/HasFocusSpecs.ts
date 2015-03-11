@@ -14,7 +14,7 @@ describe('Bindings', () => {
 
             var currentState = false;
             var model = { myVal: wx.property() }
-            testNode.innerHTML = "<input data-bind='hasfocus: myVal' /><input />";
+            testNode.innerHTML = "<input data-bind='hasfocus: @myVal' /><input />";
             wx.applyBindings(model, testNode);
             testNode.childNodes[0].addEventListener(focusInEvent, () => { currentState = true });
             testNode.childNodes[0].addEventListener(focusOutEvent, () => { currentState = false });
@@ -33,7 +33,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var model = { myVal: wx.property() }
-            testNode.innerHTML = "<input data-bind='hasfocus: myVal' /><input />";
+            testNode.innerHTML = "<input data-bind='hasfocus: @myVal' /><input />";
             wx.applyBindings(model, testNode);
 
             // Need to raise focusInEvent and focusOutEvent manually, because simply calling ".focus()" and ".blur()"
@@ -62,7 +62,7 @@ describe('Bindings', () => {
 
             // This is the closest we can get to representing issue #698 as a spec
             var model = { isFocused: wx.property({}) };
-            testNode.innerHTML = "<input data-bind='hasfocus: isFocused' />";
+            testNode.innerHTML = "<input data-bind='hasfocus: @isFocused' />";
             wx.applyBindings(model, testNode);
 
             // The elem is already focused, so changing the model value to a different truthy value

@@ -27,8 +27,10 @@ module wx {
             // create an observable for each event handler value
             var tokens = this.domService.getObjectLiteralTokens(options);
             var eventDisposables: { [eventName: string]: Rx.Disposable } = {};
-            var eventHandlers = tokens.map(token =>
-                <Rx.Observable<any>> <any> this.domService.fieldAccessToObservable(token.value, ctx, false));
+            var eventHandlers = tokens.map(token => {
+                var exp = this.domService.compileBindingOptions(token.value);
+                return this.domService.expressionToObservable(exp, ctx);
+            });
 
             // subscribe to all events
             for (var i = 0; i < tokens.length; i++) {

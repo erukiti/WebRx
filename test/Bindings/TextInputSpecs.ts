@@ -12,7 +12,7 @@ describe('Bindings', () => {
                 text: wx.property("foo")
             };
 
-            var el = <HTMLInputElement> document.querySelector("#fixture3");
+            var el = <HTMLInputElement> document.querySelector("#fixture1");
 
             expect(() => wx.applyBindings(model, el)).toThrowError(/textInput-binding can only be applied/);
         });
@@ -73,7 +73,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
-            testNode.innerHTML = "<input data-bind='textInput:someProp' />";
+            testNode.innerHTML = "<input data-bind='textInput:@someProp' />";
             expect(() => wx.applyBindings({ someProp: myobservable }, testNode)).not.toThrowError();
             testNode.childNodes[0].value = "some user-entered value";
             testutils.triggerEvent(testNode.childNodes[0], "change");
@@ -87,7 +87,7 @@ describe('Bindings', () => {
             var computedValue = Rx.Observable.return('zzz').toProperty();
             var vm = { prop: computedValue };
 
-            testNode.innerHTML = "<input data-bind='textInput: prop' />";
+            testNode.innerHTML = "<input data-bind='textInput: @prop' />";
             expect(() => wx.applyBindings(vm, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("zzz");
 
@@ -103,7 +103,7 @@ describe('Bindings', () => {
             var testNode = <any> document.querySelector("#fixture");
 
             var myobservable = wx.property(123);
-            testNode.innerHTML = "<input data-bind='textInput: someProp' />";
+            testNode.innerHTML = "<input data-bind='textInput: @someProp' />";
             expect(() => wx.applyBindings({ someProp: myobservable }, testNode)).not.toThrowError();
             expect(testNode.childNodes[0].value).toEqual("123");
 
@@ -120,7 +120,7 @@ describe('Bindings', () => {
 
             var model = { writtenValue: wx.property('') };
 
-            testNode.innerHTML = "<input data-bind='textInput: writtenValue' />";
+            testNode.innerHTML = "<input data-bind='textInput: @writtenValue' />";
             expect(() => wx.applyBindings(model, testNode)).not.toThrowError();
 
             testNode.childNodes[0].value = "1234";

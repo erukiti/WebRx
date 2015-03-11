@@ -119,9 +119,9 @@ module wx {
                 internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLInputElement> node;
-
             var impl: ISelectedValueBindingImpl;
             var implCleanup: Rx.CompositeDisposable;
+            var exp = this.domService.compileBindingOptions(options);
             
             function cleanupImpl() {
                 if (implCleanup) {
@@ -131,7 +131,7 @@ module wx {
             }
 
             // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(model => {
+            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(model => {
                 cleanupImpl();
 
                 // lookup implementation

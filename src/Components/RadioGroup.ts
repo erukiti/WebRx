@@ -42,7 +42,7 @@ module wx {
             bindings.push({ key: "attr", value: "{ name: '" + groupName + "' }" });
 
             if (options.selectedValue) {
-                bindings.push({ key: "selectedValue", value: "$parent.selectedValue" });
+                bindings.push({ key: "selectedValue", value: "@$parent.selectedValue" });
             }
 
             if (options.itemText) {

@@ -25,6 +25,7 @@ module wx {
             if (tag !== 'input' || (!isCheckBox && !isRadioButton))
                 internal.throwError("checked-binding only operates on checkboxes and radio-buttons");
 
+            var exp = this.domService.compileBindingOptions(options);
             var prop: IObservableProperty<any>;
             var locals: Rx.CompositeDisposable;
 
@@ -39,8 +40,7 @@ module wx {
                 el.checked = value;
             }
 
-            // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(model => {
+            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(model => {
                 if (!utils.isProperty(model)) {
                     // initial and final update
                     updateElement(model);
