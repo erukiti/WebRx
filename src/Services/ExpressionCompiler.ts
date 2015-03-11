@@ -1038,7 +1038,7 @@ module wx {
      * - http://jsperf.com/angularjs-parse-getter/4
      * - http://jsperf.com/path-evaluation-simplified/7
      */
-        function cspSafeGetterFn(key0, key1, key2, key3, key4, fullExp, options?): ICompiledExpression {
+        function cspSafeGetterFn(key0, key1, key2, key3, key4, fullExp, keepObservable:boolean, options?): ICompiledExpression {
             ensureSafeMemberName(key0, fullExp);
             ensureSafeMemberName(key1, fullExp);
             ensureSafeMemberName(key2, fullExp);
@@ -1051,23 +1051,23 @@ module wx {
                 var hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook) {
                     if (pathVal == null) return pathVal;
-                    pathVal = hooks.readFieldHook(pathVal, key0);
+                    pathVal = hooks.readFieldHook(pathVal, key0, keepObservable && key1 === null);
 
                     if (!key1) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key1);
+                    pathVal = hooks.readFieldHook(pathVal, key1, keepObservable && key1 === null);
 
                     if (!key2) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key2);
+                    pathVal = hooks.readFieldHook(pathVal, key2, keepObservable && key1 === null);
 
                     if (!key3) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key3);
+                    pathVal = hooks.readFieldHook(pathVal, key3, keepObservable && key1 === null);
 
                     if (!key4) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key4);
+                    pathVal = hooks.readFieldHook(pathVal, key4, keepObservable);
 
                     return pathVal;
                 }
@@ -1095,7 +1095,7 @@ module wx {
             };
         }
 
-        function simpleGetterFn1(key0, fullExp): ICompiledExpression {
+        function simpleGetterFn1(key0, fullExp, keepObservable: boolean): ICompiledExpression {
             ensureSafeMemberName(key0, fullExp);
 
             return (scope: any, locals: any) => {
@@ -1105,13 +1105,13 @@ module wx {
 
                 var hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook)
-                    return hooks.readFieldHook(scope, key0);
+                    return hooks.readFieldHook(scope, key0, keepObservable);
 
                 return scope[key0];
             };
         }
 
-        function simpleGetterFn2(key0, key1, fullExp): ICompiledExpression {
+        function simpleGetterFn2(key0, key1, fullExp, keepObservable: boolean): ICompiledExpression {
             ensureSafeMemberName(key0, fullExp);
             ensureSafeMemberName(key1, fullExp);
 
@@ -1122,7 +1122,7 @@ module wx {
                 if (hooks && hooks.readFieldHook) {
                     scope = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
                     scope = hooks.readFieldHook(scope, key0);
-                    return scope == null ? undefined : hooks.readFieldHook(scope, key1);
+                    return scope == null ? undefined : hooks.readFieldHook(scope, key1, keepObservable);
                 }
 
                 scope = ((locals && locals.hasOwnProperty(key0)) ? locals : scope)[key0];
@@ -1138,6 +1138,14 @@ module wx {
                 return getterFnCache[path];
             }
 
+            // handle "no-unbox" access-modifier
+            var keepObservable = false;
+
+            if (path[0] === '@') {
+                keepObservable = true;
+                path = path.substring(1);
+            }
+
             var pathKeys = path.split("."),
                 pathKeysLength = pathKeys.length,
                 fn: (scope: any, locals?: any, self?: any) => any;
@@ -1145,18 +1153,18 @@ module wx {
             // When we have only 1 or 2 tokens, use optimized special case closures.
             // http://jsperf.com/angularjs-parse-getter/6
             if (pathKeysLength === 1) {
-                fn = simpleGetterFn1(pathKeys[0], fullExp);
+                fn = simpleGetterFn1(pathKeys[0], fullExp, keepObservable);
             } else if (pathKeysLength === 2) {
-                fn = simpleGetterFn2(pathKeys[0], pathKeys[1], fullExp);
+                fn = simpleGetterFn2(pathKeys[0], pathKeys[1], fullExp, keepObservable);
             } else { // if (options.csp) {
                 if (pathKeysLength < 6) {
-                    fn = cspSafeGetterFn(pathKeys[0], pathKeys[1], pathKeys[2], pathKeys[3], pathKeys[4], fullExp, options);
+                    fn = cspSafeGetterFn(pathKeys[0], pathKeys[1], pathKeys[2], pathKeys[3], pathKeys[4], keepObservable, fullExp, options);
                 } else {
                     fn = (scope: any, locals: any) => {
                         var i = 0, val;
                         do {
                             val = cspSafeGetterFn(pathKeys[i++], pathKeys[i++], pathKeys[i++], pathKeys[i++],
-                                pathKeys[i++], fullExp, options)(scope, locals);
+                                pathKeys[i++], fullExp, keepObservable && (i >= pathKeysLength - 5), options)(scope, locals);
 
                             locals = undefined; // clear after first iteration
                             scope = val;

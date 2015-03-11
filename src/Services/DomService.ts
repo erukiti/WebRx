@@ -496,19 +496,11 @@ module wx {
             var result, target;
 
             var hooks: ICompiledExpressionRuntimeHooks = {
-                readFieldHook: (o: any, field: any): any => {
-                    // handle "no-unbox" access-modifier
-                    var preventUnboxing = false;
-
-                    if (field[0] === '@') {
-                        preventUnboxing = true;
-                        field = field.substring(1);
-                    }
-
+                readFieldHook: (o: any, field: any, keepObservable?: boolean): any => {
                     result = o[field];
                     
                     // intercept access to observable properties
-                    if (!preventUnboxing && utils.isProperty(result)) {
+                    if (!keepObservable && utils.isProperty(result)) {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable
