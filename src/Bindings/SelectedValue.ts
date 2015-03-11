@@ -139,8 +139,6 @@ module wx {
 
             // options is supposed to be a field-access path
             state.cleanup.add(this.domService.fieldAccessToObservable(options, ctx, true).subscribe(model => {
-                console.log(model);
-
                 cleanupImpl();
 
                 // lookup implementation
