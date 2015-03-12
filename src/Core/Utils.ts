@@ -27,26 +27,11 @@ module wx.utils {
     }
 
     /**
-    * Returns true if target is neither null nor undefined
+    * Determines if target is an instance of a IObservableProperty
+    * @param {any} target
     */
-    export function isNotNull(target: any): boolean {
-        return target !== undefined && target !== null;
-    }
-
-    /**
-    * Returns true if target is either null nor undefined
-    */
-    export function isNull(target: any): boolean {
-        return target === undefined || target === null;
-    }
-
-
-    /**
-        * Determines if target is an instance of a IObservableProperty
-        * @param {any} target
-        */
     export function isProperty(target: any): boolean {
-        if (!isNotNull(target))
+        if (target == null)
             return false;
 
         return queryInterface(target, IID.IObservableProperty);
@@ -57,7 +42,7 @@ module wx.utils {
     * @param {any} target
     */
     export function isCommand(target: any): boolean {
-        if (!isNotNull(target))
+        if (target == null)
             return false;
 
         return target instanceof internal.commandConstructor ||
@@ -69,7 +54,7 @@ module wx.utils {
     * @param {any} target
     */
     export function isList(target: any): boolean {
-        if (!isNotNull(target))
+        if (target == null)
             return false;
 
         return target instanceof internal.listConstructor ||
@@ -81,7 +66,7 @@ module wx.utils {
     * @param {any} target
     */
     export function isRxScheduler(target: any): boolean {
-        if (!isNotNull(target))
+        if (target == null)
             return false;
 
         return Rx.helpers.isScheduler(target);
@@ -92,7 +77,7 @@ module wx.utils {
     * @param {any} target
     */
     export function isRxObservable(target: any): boolean {
-        if (!isNotNull(target))
+        if (target == null)
             return false;
 
         return target instanceof RxObsConstructor;

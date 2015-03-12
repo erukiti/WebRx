@@ -109,8 +109,8 @@ module wx {
             while (node) {
                 state = this.getNodeState(node);
 
-                if (utils.isNotNull(state)) {
-                    if (utils.isNotNull(state.module)) {
+                if (state != null) {
+                    if (state.module != null) {
                         return state.module;
                     }
                 }
@@ -131,9 +131,9 @@ module wx {
 
             // collect model hierarchy
             while (node) {
-                state = utils.isNotNull(state) ? state : this.getNodeState(node);
-                if (utils.isNotNull(state)) {
-                    if (utils.isNotNull(state.model)) {
+                state = state != null ? state : this.getNodeState(node);
+                if (state != null) {
+                    if (state.model != null) {
                         models.push(state.model);
                     }
                 }
@@ -336,7 +336,7 @@ module wx {
                 _bindings = this.extractBindingsFromDataAttribute(el);
             }
 
-            if (utils.isNotNull(_bindings) && _bindings.length > 0) {
+            if (_bindings != null && _bindings.length > 0) {
                 // lookup handlers
                 var bindings = _bindings.map(x=> {
                     // if handler is not registered with current module, fall-back to 'app' module 

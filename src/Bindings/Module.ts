@@ -15,7 +15,7 @@ module wx {
             if (node.nodeType !== 1)
                 internal.throwError("module-binding only operates on elements!");
 
-            if (utils.isNull(options))
+            if (options == null)
                 internal.throwError("invalid binding-ptions!");
 
             var exp = this.domService.compileBindingOptions(options);

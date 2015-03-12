@@ -18,7 +18,7 @@ module wx {
 
             var compiled = this.domService.compileBindingOptions(options);
 
-            if (utils.isNull(compiled) || typeof compiled !== "object")
+            if (compiled == null || typeof compiled !== "object")
                 internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLElement> node;

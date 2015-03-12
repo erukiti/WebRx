@@ -115,7 +115,7 @@ module wx {
             if (node.nodeType !== 1)
                 internal.throwError("selectedValue-binding only operates on elements!");
             
-            if (utils.isNull(options))
+            if (options == null)
                 internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLInputElement> node;

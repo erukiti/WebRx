@@ -20,7 +20,7 @@ module wx {
             if (node.nodeType !== 1)
                 internal.throwError("component-binding only operates on elements!");
 
-            if (utils.isNull(options))
+            if (options == null)
                 internal.throwError("invalid binding-ptions!");
 
             var el = <HTMLElement> node;
@@ -60,7 +60,7 @@ module wx {
             if (state.module)
                 component = state.module.getComponent(componentName);
 
-            // fallback to "app" module if unknown to module
+            // fallback to "app" module if not registered with
             if (!component)
                 component = app.getComponent(componentName);
 
