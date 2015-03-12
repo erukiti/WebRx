@@ -446,6 +446,15 @@ module wx {
         extractBindingsFromDataAttribute(node: Node): Array<{ key: string; value: string }>;
 
         /**
+        * Evaluates an expression against a data-context and returns the result
+        * @param {IExpressionFunc} exp The source expression 
+        * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
+        * @param {IDataContext} The data context to evaluate the expression against
+        * @return {any} A value representing the result of the expression-evaluation
+        */
+        evaluateExpression(exp: ICompiledExpression, ctx: IDataContext): any;
+
+        /**
         * Creates an observable that produces values representing the result of the expression.
         * If any observable input of the expression changes, the expression gets re-evaluated
         * and the observable produces a new value.

@@ -209,6 +209,12 @@ module wx {
             env.cleanExternalData(node);
         }
 
+        public evaluateExpression(exp: ICompiledExpression, ctx: IDataContext): any {
+            var locals = this.createLocals(undefined, ctx);
+            var result = exp(ctx.$data, locals);
+            return result;
+        }
+
         public expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
             var captured = createSet<Rx.Observable<any>>();
             var locals;
@@ -449,7 +455,8 @@ module wx {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable
-                        captured.add(prop.changed);
+                        if (captured)
+                            captured.add(prop.changed);
 
                         // get the property's real value
                         result = prop();
@@ -466,7 +473,8 @@ module wx {
                         var prop = <IObservableProperty<any>> target;
 
                         // register observable
-                        captured.add(prop.changed);
+                        if (captured)
+                            captured.add(prop.changed);
 
                         // replace field assignment with property invocation
                         prop(newValue);
@@ -485,7 +493,8 @@ module wx {
                         result = list.get(index);
 
                         // add collectionChanged to monitored observables
-                        captured.add(list.listChanged);
+                        if (captured)
+                            captured.add(list.listChanged);
                     } else {
                         result = o[index];
                     }
@@ -495,7 +504,8 @@ module wx {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable
-                        captured.add(prop.changed);
+                        if (captured)
+                            captured.add(prop.changed);
 
                         // get the property's real value
                         result = prop();
@@ -512,14 +522,16 @@ module wx {
                         target = list.get(index);
 
                         // add collectionChanged to monitored observables
-                        captured.add(list.listChanged);
+                        if (captured)
+                            captured.add(list.listChanged);
 
                         // intercept access to observable properties
                         if (utils.queryInterface(target, IID.IObservableProperty)) {
                             prop = <IObservableProperty<any>> target;
 
                             // register observable
-                            captured.add(prop.changed);
+                            if (captured)
+                                captured.add(prop.changed);
 
                             // replace field assignment with property invocation
                             prop(newValue);
@@ -533,7 +545,8 @@ module wx {
                             prop = <IObservableProperty<any>> target[index];
 
                             // register observable
-                            captured.add(prop.changed);
+                            if (captured)
+                                captured.add(prop.changed);
 
                             // replace field assignment with property invocation
                             prop(newValue);

@@ -38,18 +38,15 @@ module wx {
             } else {
                 var opt = <IComponentBindingOptions> compiled;
 
-                exp = <ICompiledExpression> <any> opt.name;
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    componentName = prop();
-                });
+                // get name
+                componentName = this.domService.evaluateExpression(<ICompiledExpression> <any> opt.name, ctx);
 
+                // build params
                 if (opt.params) {
                     componentParams = {};
 
                     Object.keys(opt.params).forEach(x => {
-                        using(this.domService.expressionToObservable(opt.params[x], ctx).toProperty(),(prop) => {
-                            componentParams[x] = prop();
-                        });
+                        componentParams[x] = this.domService.evaluateExpression(opt.params[x], ctx);
                     });
                 }
             }
