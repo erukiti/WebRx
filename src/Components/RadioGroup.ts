@@ -11,9 +11,18 @@ module wx {
         itemValue?: string;
         itemClass?: string;
         selectedValue?: any;
+        noCache?: boolean;
     }
 
     var groupId = 0;
+    var templateCache: { [key: string]: any } = {};
+
+    function toKey(value: any) {
+        if (value == null)
+            return "";
+
+        return value;
+    }
 
     class RadioGroupComponent implements IComponent {
         ////////////////////
@@ -41,7 +50,24 @@ module wx {
         // Implementation
 
         protected buildTemplate(params: IRadioGroupComponentParams): string {
-            var template = '<div class="wx-radiogroup" data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
+            var result: string;
+            var key: string = undefined;
+
+            // check cache
+            if (!params.noCache) {
+                key = toKey(params.itemText) + "-" + toKey(params.itemValue) + "-"
+                    + toKey(params.itemClass) + "-" + (params.selectedValue != null ? "true" : "false");
+
+                result = templateCache[key];
+ 
+                if (result != null) {
+                    //console.log("cache hit", key, result);
+                    return result;
+                }
+            }
+
+            // base-template
+            result = '<div class="wx-radiogroup" data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
             var perItemExtraMarkup = "";
 
             // construct item bindings
@@ -62,9 +88,9 @@ module wx {
             // label
             if (params.itemText) {
                 perItemExtraMarkup += utils.formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
-                    params.itemText, "groupName + '-' + $index");
+                    params.itemText, "$parent.groupName + '-' + $index");
 
-                attrs.push({ key: 'id', value: "groupName + '-' + $index" });
+                attrs.push({ key: 'id', value: "$parent.groupName + '-' + $index" });
             }
 
             // per-item css class
@@ -80,8 +106,14 @@ module wx {
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
 
             // assemble template
-            template = utils.formatString(template, bindingString, perItemExtraMarkup);
-            return template;
+            result = utils.formatString(result, bindingString, perItemExtraMarkup);
+
+            // store
+            if (!params.noCache) {
+                templateCache[key] = result;
+            }
+
+            return result;
         }
     }
 

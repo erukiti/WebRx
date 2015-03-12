@@ -82,16 +82,12 @@ module wx {
 
                 if (opt.hooks) {
                     // extract hooks
-                    using(this.domService.expressionToObservable(<ICompiledExpression> opt.hooks, ctx).toProperty(), (prop) => {
-                        hooks = prop();
-                    });
+                    hooks = this.domService.evaluateExpression(<ICompiledExpression> opt.hooks, ctx);
                 }
 
                 if (opt['debug']) {
                     if (opt['debug']['setProxyFunc']) {
-                        using(this.domService.expressionToObservable(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx).toProperty(),(prop) => {
-                            setProxyFunc = prop();
-                        });
+                        setProxyFunc = this.domService.evaluateExpression(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx);
                     }
                 }
 
@@ -109,6 +105,11 @@ module wx {
                 if (cleanup) {
                     cleanup.dispose();
                     cleanup = null;
+                }
+
+                // clean generated nodes
+                for (var i = 0; i < el.childNodes.length; i++) {
+                    cleanNode(el.childNodes[i]);
                 }
             }));
 
