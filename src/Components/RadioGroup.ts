@@ -31,7 +31,7 @@ module wx {
         // Implementation
 
         protected buildTemplate(params: IRadioGroupComponentParams): string {
-            var template = '<div data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
+            var template = '<div class="wx-radiogroup" data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
             var groupName = params.groupName || utils.formatString("wx-radiogroup-{0}", groupId++);
             var perItemExtraMarkup = "";
 
