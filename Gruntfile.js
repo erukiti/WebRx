@@ -67,11 +67,21 @@ module.exports = function (grunt) {
             }
         },
 
+        watch: {
+            src: {
+                files: [ "src/**/*.ts"],
+                tasks: ['ts:src']
+            },
+            specs: {
+                files: [ "test/**/*.ts", "!test/typings/*.ts"],
+                tasks: ['ts:specs']
+            }
+        },
+
         connect: {
             server: {
                 options: {
                     port: 8000,
-                    keepalive: true
                 }
             }
         },
@@ -106,9 +116,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask("default", ["clean:build", "ts:default"]);
     grunt.registerTask("tests", ["ts:src", "ts:specs", "jasmine"]);
-    grunt.registerTask("debug", ["ts:src", "ts:specs", "jasmine:default:build", "connect"]);
+    grunt.registerTask("debug", ["ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
     grunt.registerTask("dist", ["clean:build", "ts:src", "ts:specs", "jasmine", "clean:dist", "ts:dist", "uglify:dist", "compress:dist"]);
 };

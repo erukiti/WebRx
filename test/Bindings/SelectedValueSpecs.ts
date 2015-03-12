@@ -50,12 +50,12 @@ describe('Bindings', () => {
                 var notificationCount = 0;
                 model.selected.changed.subscribe(x => notificationCount++);
 
-                container.children[1].click();
+                testutils.triggerEvent(container.children[1], "click");
                 expect(model.selected()).toEqual('1');
 
-                container.children[0].click();
-                container.children[0].click();
-                container.children[0].click();
+                testutils.triggerEvent(container.children[0], "click");
+                testutils.triggerEvent(container.children[0], "click");
+                testutils.triggerEvent(container.children[0], "click");
                 testutils.triggerEvent(container.children[0], "change");
                 expect(model.selected()).toEqual('0');
 

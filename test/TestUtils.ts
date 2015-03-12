@@ -1,6 +1,20 @@
 ﻿///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
 module testutils {
+    var knownEvents = {}, knownEventTypesByEventName = {};
+    var keyEventTypeName = (navigator && /Firefox\/2/i.test(navigator.userAgent)) ? 'KeyboardEvent' : 'UIEvents';
+    knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress'];
+    knownEvents['MouseEvents'] = ['click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave'];
+    Object.keys(knownEvents).forEach(x=> {
+        var eventType = x;
+        var knownEventsForType = knownEvents[x];
+
+        if (knownEventsForType.length) {
+            for (var i = 0, j = knownEventsForType.length; i < j; i++)
+                knownEventTypesByEventName[knownEventsForType[i]] = eventType;
+        }
+    });
+
     export function distinctUntilChanged<T>(arr: Array<T>): Array<T> {
         var isFirst = true;
         var lastValue;
@@ -114,17 +128,22 @@ module testutils {
         return nodes.map(x => x.getAttribute(attr)).join(", ");
     }
 
-    export function triggerEvent(element: HTMLElement, event: string) {
-        if (document.createEventObject) {
-            // dispatch for IE
-            var e1 = document.createEventObject();
-            return element.fireEvent('on' + event, e1);
-        }
-        else {
-            // dispatch for firefox + others
-            var e2 = document.createEvent("HTMLEvents");
-            e2.initEvent(event, true, true); // event type,bubbling,cancelable
-            return !element.dispatchEvent(e2);
+    export function triggerEvent(element: HTMLElement, eventType: string) {
+        if (typeof document.createEvent == "function") {
+            if (typeof element.dispatchEvent == "function") {
+                var eventCategory = knownEventTypesByEventName[eventType] || "HTMLEvents";
+                var event = document.createEvent(eventCategory);
+                (<any> event.initEvent)(eventType, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, element);
+                element.dispatchEvent(event);
+            }
+            else
+                throw new Error("The supplied element doesn't support dispatchEvent");
+        } else if (element.click) {
+            element.click();
+        } else if (typeof element.fireEvent != "undefined") {
+            element.fireEvent("on" + eventType);
+        } else {
+            throw new Error("Browser doesn't support triggering events");
         }
     }
 }

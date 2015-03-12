@@ -18,12 +18,12 @@ describe('Bindings', () => {
             });
             expect(testNode.childNodes[0].checked).toEqual(false);
             expectedCheckedStateInHandler = true;
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             expect(testNode.childNodes[0].checked).toEqual(true);
             expect(clickHandlerFireCount).toEqual(1);
 
             expectedCheckedStateInHandler = false;
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             expect(testNode.childNodes[0].checked).toEqual(false);
             expect(clickHandlerFireCount).toEqual(2);
         });
@@ -64,7 +64,7 @@ describe('Bindings', () => {
             testNode.innerHTML = "<input type='checkbox' data-bind='checked:@someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             expect(myobservable()).toEqual(true);
         });
 
@@ -76,7 +76,7 @@ describe('Bindings', () => {
             testNode.innerHTML = "<input type='radio' data-bind='checked:@someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
 
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             expect(myobservable()).toEqual(true);
         });
 
@@ -91,13 +91,13 @@ describe('Bindings', () => {
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Multiple events only cause one notification...
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             testutils.triggerEvent(testNode.childNodes[0], "change");
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(timesNotified).toEqual(1);
 
             // ... until the checkbox value actually changes
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(timesNotified).toEqual(2);
         });
@@ -113,14 +113,14 @@ describe('Bindings', () => {
             wx.applyBindings({ someProp: myobservable }, testNode);
 
             // Multiple events only cause one notification...
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             testutils.triggerEvent(testNode.childNodes[0], "change");
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(timesNotified).toEqual(1);
 
             // ... until the checkbox value actually changes
             myobservable(false);
-            testNode.childNodes[0].click();
+            testutils.triggerEvent(testNode.childNodes[0], "click");
             testutils.triggerEvent(testNode.childNodes[0], "change");
             expect(timesNotified).toEqual(3);
         });

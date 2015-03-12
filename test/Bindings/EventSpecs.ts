@@ -7,7 +7,7 @@ describe('Bindings', () => {
         it('binds a single event to a handler function',() => {
             loadFixtures('templates/Bindings/Event.html');
 
-            var el = document.querySelector("#event-single");
+            var el = <HTMLElement> document.querySelector("#event-single");
 
             var called = false;
             var eventName = undefined;
@@ -36,7 +36,7 @@ describe('Bindings', () => {
             expect(calledWithValidContext).not.toBeTruthy();
             expect(calledWithValidEvent).not.toBeTruthy();
 
-            $(el).click();
+            testutils.triggerEvent(el, "click");
 
             expect(called).toBeTruthy();
             expect(eventName).toEqual("click");
@@ -47,7 +47,7 @@ describe('Bindings', () => {
             called = false;
 
             // should no longer fire
-            $(el).click();
+            testutils.triggerEvent(el, "click");
 
             expect(called).toBeFalsy();
         });
@@ -74,7 +74,7 @@ describe('Bindings', () => {
             expect(clickCallCount).toEqual(0);
             expect(inputCallCount).toEqual(0);
 
-            $(el).click();
+            testutils.triggerEvent(el, "click");
             expect(clickCallCount).toEqual(1);
 
             $(el).val("new");
@@ -86,7 +86,7 @@ describe('Bindings', () => {
             inputCallCount = 0;
 
             // should no longer fire
-            $(el).click();
+            testutils.triggerEvent(el, "click");
             expect(clickCallCount).toEqual(0);
 
             $(el).val("old");
@@ -118,7 +118,7 @@ describe('Bindings', () => {
             expect(clickCallCount).toEqual(0);
             expect(inputCallCount).toEqual(0);
 
-            $(el).click();
+            testutils.triggerEvent(el, "click");
             expect(clickCallCount).toEqual(1);
 
             el.value = "new";
@@ -130,7 +130,7 @@ describe('Bindings', () => {
             inputCallCount = 0;
 
             // should no longer fire
-            $(el).click();
+            testutils.triggerEvent(el, "click");
             expect(clickCallCount).toEqual(0);
 
             el.value = "old";

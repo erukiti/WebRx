@@ -91,14 +91,14 @@ describe('Components', () => {
             expect((<HTMLInputElement> $(el).children("input")[1]).checked).toBeTruthy();
 
             // selection should propagate to model
-            (<HTMLInputElement> $(el).children("input")[2]).click();
+            testutils.triggerEvent($(el).children("input")[2], "click");
             expect(model.selection()).toEqual("3");
 
             //console.log((<any> document.querySelector("#fixture4")).innerHTML);
             wx.cleanNode(document.querySelector("#fixture4"));
 
             // selection should no longer propagate to model
-            (<HTMLInputElement> $(el).children("input")[0]).click();
+            testutils.triggerEvent($(el).children("input")[0], "click");
             expect(model.selection()).toEqual("3");
         });
     });

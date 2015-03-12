@@ -128,6 +128,11 @@ module wx {
                         env.ie.getSelectionChangeObservable(el).where(doc=> doc.activeElement === el)); 
 
                     result.push(Rx.Observable.fromEvent(el, 'dragend'));
+
+                    // IE 9 does support 'input', but since it doesn't fire it when
+                    // using autocomplete, we'll use 'propertychange' for it also.
+                    result.push(Rx.Observable.fromEvent(el, 'input'));
+                    result.push(Rx.Observable.fromEvent(el, 'propertychange').where(e=> (<any> e).propertyName === 'value'));
                 }
             } else {
                 // All other supported browsers support the 'input' event, which fires whenever the content of the element is changed

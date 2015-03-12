@@ -34,7 +34,7 @@ describe('Bindings', () => {
             expect(el.disabled).toBeFalsy();
 
             // execute test
-            el.click();
+            testutils.triggerEvent(el, "click");
             expect(executed).toBeTruthy();
 
             // disposed tests
@@ -42,7 +42,7 @@ describe('Bindings', () => {
             executed = false;
             model.canExecute(false);
             expect(el.disabled).toBeFalsy();
-            el.click();
+            testutils.triggerEvent(el, "click");
             expect(executed).toBeFalsy();
         }
 

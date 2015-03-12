@@ -85,12 +85,12 @@ describe('Bindings', () => {
             var count = 0;
             var disp = model.cmd.results.subscribe(x => count++);
             expect(count).toEqual(0);
-            $(el).children("button")[0].click();
+            testutils.triggerEvent($(el).children("button")[0], "click");
             expect(count).toEqual(1);
 
             // try it again
             wx.cleanNode(el);
-            $(el).children("button")[0].click(); // command shouldnt fire now
+            testutils.triggerEvent($(el).children("button")[0], "click");
             expect(count).toEqual(1);
             disp.dispose();
         });
