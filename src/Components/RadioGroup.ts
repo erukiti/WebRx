@@ -24,7 +24,17 @@ module wx {
         }
 
         public viewModel = (params: any): any => {
-            return { items: params.items, selectedValue: params.selectedValue };
+            var opt = <IRadioGroupComponentParams> params;
+
+            var groupName = opt.groupName != null ?
+                opt.groupName :
+                utils.formatString("wx-radiogroup-{0}", groupId++);
+
+            return {
+                items: params.items,
+                selectedValue: params.selectedValue,
+                groupName: groupName
+            };
         }
 
         ////////////////////
@@ -32,7 +42,6 @@ module wx {
 
         protected buildTemplate(params: IRadioGroupComponentParams): string {
             var template = '<div class="wx-radiogroup" data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
-            var groupName = params.groupName || utils.formatString("wx-radiogroup-{0}", groupId++);
             var perItemExtraMarkup = "";
 
             // construct item bindings
@@ -43,7 +52,7 @@ module wx {
             bindings.push({ key: "value", value: params.itemValue || "$data" });
 
             // name
-            attrs.push({ key: 'name', value: "'" + groupName + "'" });
+            attrs.push({ key: 'name', value: "$parent.groupName" });
 
             // selection (two-way)
             if (params.selectedValue) {
@@ -53,9 +62,9 @@ module wx {
             // label
             if (params.itemText) {
                 perItemExtraMarkup += utils.formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
-                    params.itemText, "'" + groupName + "' + '-' + $index");
+                    params.itemText, "groupName + '-' + $index");
 
-                attrs.push({ key: 'id', value: "'" + groupName + "' + '-' + $index" });
+                attrs.push({ key: 'id', value: "groupName + '-' + $index" });
             }
 
             // per-item css class
