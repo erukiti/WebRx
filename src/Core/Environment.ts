@@ -10,11 +10,11 @@ module wx.env {
         version: number;
     }
 
-    export interface IIEIBrowserProperties extends IBrowserProperties {
+    export interface IIEBrowserProperties extends IBrowserProperties {
         getSelectionChangeObservable(el: HTMLElement): Rx.Observable<Document>;
     }
 
-    export var ie: IIEIBrowserProperties;
+    export var ie: IIEBrowserProperties;
     export var opera: IBrowserProperties;
     export var safari: IBrowserProperties;
     export var firefox: IBrowserProperties;
@@ -44,7 +44,7 @@ module wx.env {
     })());
 
     if (version) {
-        ie = <IIEIBrowserProperties> { version: version };
+        ie = <IIEBrowserProperties> { version: version };
 
         if (version < 10) {
             // for IE9 and lower, provide an accessor for document scoped

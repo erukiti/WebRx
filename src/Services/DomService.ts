@@ -358,7 +358,7 @@ module wx {
                     var binding = bindings[i];
                     var handler = binding.handler;
 
-                    handler.apply(el, binding.value, ctx, state);
+                    handler.applyBinding(el, binding.value, ctx, state);
                 }
             }
 

@@ -471,7 +471,7 @@ module wx {
         * @param {IDataContext} ctx The curent data context
         * @param {IDomElementState} state State of the target element
         */
-        apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void;
+        applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void;
 
         /**
         * Configures the handler using a handler-specific options object

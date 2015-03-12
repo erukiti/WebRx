@@ -111,7 +111,7 @@ module wx {
         ////////////////////
         // IBinding
 
-        public apply(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
+        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
                 internal.throwError("selectedValue-binding only operates on elements!");
             
