@@ -11,23 +11,14 @@ module wx {
         itemValue?: string;
         itemClass?: string;
         selectedValue?: any;
+        afterRender?(nodes: Node[], data: any): void;
         noCache?: boolean;
     }
 
     var groupId = 0;
     var templateCache: { [key: string]: any } = {};
 
-    function toKey(value: any) {
-        if (value == null)
-            return "";
-
-        return value;
-    }
-
     class RadioGroupComponent implements IComponent {
-        ////////////////////
-        // IComponent
-
         public template = (params: any): string => {
             return this.buildTemplate(params);
         }
@@ -42,7 +33,8 @@ module wx {
             return {
                 items: params.items,
                 selectedValue: params.selectedValue,
-                groupName: groupName
+                groupName: groupName,
+                hooks: { afterRender: params.afterRender }
             };
         }
 
@@ -55,8 +47,10 @@ module wx {
 
             // check cache
             if (!params.noCache) {
-                key = toKey(params.itemText) + "-" + toKey(params.itemValue) + "-"
-                    + toKey(params.itemClass) + "-" + (params.selectedValue != null ? "true" : "false");
+                key = (params.itemText != null ? params.itemText : "") + "-" +
+                    (params.itemValue != null ? params.itemValue : "") + "-" +
+                    (params.itemClass != null ? params.itemClass : "") + "-" +
+                    (params.selectedValue != null ? "true" : "false");
 
                 result = templateCache[key];
  
@@ -67,7 +61,7 @@ module wx {
             }
 
             // base-template
-            result = '<div class="wx-radiogroup" data-bind="foreach: items"><input type="radio" data-bind="{0}">{1}</div>';
+            result = '<div class="wx-radiogroup" data-bind="foreach: { data: items, hooks: hooks }"><input type="radio" data-bind="{0}">{1}</div>';
             var perItemExtraMarkup = "";
 
             // construct item bindings
