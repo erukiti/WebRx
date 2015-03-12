@@ -103,8 +103,6 @@ module wx.env {
             jQueryInstance['cleanData']([node]);
         };
     } else {
-        env.cleanExternalData = (node: Node) => {
-            // deliberately left blank
-        };
+        env.cleanExternalData = (node: Node) => { };
     }
 }

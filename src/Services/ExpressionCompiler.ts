@@ -1046,7 +1046,6 @@ module wx {
             ensureSafeMemberName(key4, fullExp);
 
             return (scope: any, locals: any) => {
-                debugger;
                 var pathVal = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
                 var hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook) {

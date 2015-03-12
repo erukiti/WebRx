@@ -164,11 +164,6 @@ module wx {
                 }
             }));
 
-            // release subscriptions and handlers
-            state.cleanup.add(Rx.Disposable.create(() => {
-                cleanupImpl();
-            }));
-
             // release closure references to GC 
             state.cleanup.add(Rx.Disposable.create(() => {
                 // nullify args
@@ -181,6 +176,7 @@ module wx {
                 el = null;
 
                 // nullify locals
+                cleanupImpl();
             }));
         }
 

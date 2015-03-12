@@ -106,11 +106,6 @@ module wx {
                     cleanup.dispose();
                     cleanup = null;
                 }
-
-                // clean generated nodes
-                for (var i = 0; i < el.childNodes.length; i++) {
-                    cleanNode(el.childNodes[i]);
-                }
             }));
 
             // backup inner HTML

@@ -94,13 +94,12 @@ describe('Components', () => {
             (<HTMLInputElement> $(el).children("input")[2]).click();
             expect(model.selection()).toEqual("3");
 
-            // selection should no longer propagate to model
+            //console.log((<any> document.querySelector("#fixture4")).innerHTML);
             wx.cleanNode(document.querySelector("#fixture4"));
+
+            // selection should no longer propagate to model
             (<HTMLInputElement> $(el).children("input")[0]).click();
             expect(model.selection()).toEqual("3");
-
-            //el = document.querySelector("#fixture4");
-            //expect(() => wx.applyBindings(model, el)).not.toThrowError();
         });
     });
 });

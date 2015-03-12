@@ -191,21 +191,23 @@ module wx {
             var state = this.elementState.get(node);
 
             if (state) {
-                if (state.cleanup) {
+                if (state.cleanup != null) {
                     state.cleanup.dispose();
+                    state.cleanup = undefined;
                 }
 
-                if (state.model) {
-                    state.model = null;
+                if (state.model != null) {
+                    state.model = undefined;
                 }
 
-                if (state.module) {
-                    state.module = null;
+                if (state.module != null) {
+                    state.module = undefined;
                 }
             }
 
             this.elementState.delete(node);
 
+            // support external per-node cleanup
             env.cleanExternalData(node);
         }
 
@@ -425,14 +427,16 @@ module wx {
 
         private cleanNodeRecursive(node: Node): void {
             if (node.hasChildNodes()) {
-                for (var i = 0; i < node.childNodes.length; i++) {
+                var length = node.childNodes.length;
+
+                for (var i = 0; i < length; i++) {
                     var child = node.childNodes[i];
 
                     // only elements
                     if (node.nodeType !== 1)
                         continue;
 
-                    this.clearElementState(child);
+                    this.cleanNodeRecursive(child);
                 }
             }
 
