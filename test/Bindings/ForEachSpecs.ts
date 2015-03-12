@@ -235,29 +235,5 @@ describe('Bindings',() => {
             // verify indexes
             expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
         });
-
-        it('generated nodes get properly cleaned',() => {
-            loadFixtures('templates/Bindings/ForEach.html');
-
-            var el = <HTMLElement> document.querySelector("#foreach-with-event");
-            var clickCount = 0;
-
-            expect(() => wx.applyBindings({
-                src: [3, 2, 1],
-                clickHandler: (_) => clickCount++
-            }, el)).not.toThrowError();
-
-            expect(clickCount).toEqual(0);
-            $(el).children(".part1")[0].click();
-            expect(clickCount).toEqual(1);
-
-            $(el).children(".part1")[0].click();
-            expect(clickCount).toEqual(2);
-
-            wx.cleanNode(el);
-
-            $(el).children(".part1")[0].click();
-            expect(clickCount).toEqual(2);
-        });
     });
 });

@@ -140,33 +140,6 @@ describe('Bindings', () => {
                 // none of the radios should be checked initially
                 expect(container.selectedIndex).not.toBeDefined();
             });
-
-            it("should properly cleanup",() => {
-                loadFixtures('templates/Bindings/SelectedValue.html');
-                var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
-
-                var selected = wx.property();
-                var model = { selected: selected };
-                wx.applyBindings(model, container);
-
-                var notificationCount = 0;
-                model.selected.changed.subscribe(x => notificationCount++);
-
-                container.selectedIndex = 1;
-                testutils.triggerEvent(container, "change");
-                testutils.triggerEvent(container, "change");
-                testutils.triggerEvent(container, "change");
-                expect(notificationCount).toEqual(1);
-
-                wx.cleanNode(container);
-
-                // should no longer fire
-                container.selectedIndex = 0;
-                testutils.triggerEvent(container, "change");
-                testutils.triggerEvent(container, "change");
-                testutils.triggerEvent(container, "change");
-                expect(notificationCount).toEqual(1);
-            });
         });
     });
 });
