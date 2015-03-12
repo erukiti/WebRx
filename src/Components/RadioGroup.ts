@@ -39,13 +39,18 @@ module wx {
             var bindings: Array<{ key: string; value: string }> = [];
             var attrs: Array<{ key: string; value: string }> = [];
 
+            // value
             bindings.push({ key: "value", value: params.itemValue || "$data" });
+
+            // name
             attrs.push({ key: 'name', value: "'" + groupName + "'" });
 
+            // selection (two-way)
             if (params.selectedValue) {
                 bindings.push({ key: "selectedValue", value: "@$parent.selectedValue" });
             }
 
+            // label
             if (params.itemText) {
                 perItemExtraMarkup += utils.formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
                     params.itemText, "'" + groupName + "' + '-' + $index");
@@ -53,19 +58,20 @@ module wx {
                 attrs.push({ key: 'id', value: "'" + groupName + "' + '-' + $index" });
             }
 
+            // per-item css class
             if (params.itemClass) {
                 attrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
             }
 
+            // assemble attr-binding
             if (attrs.length)
                 bindings.push({ key: "attr", value: "{ " + attrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
 
+            // assemble all bindings
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
 
-            // create final template
+            // assemble template
             template = utils.formatString(template, bindingString, perItemExtraMarkup);
-            //console.log(template);
-
             return template;
         }
     }
