@@ -1046,24 +1046,24 @@ module wx {
             ensureSafeMemberName(key4, fullExp);
 
             return (scope: any, locals: any) => {
+                debugger;
                 var pathVal = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
-
                 var hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook) {
                     if (pathVal == null) return pathVal;
-                    pathVal = hooks.readFieldHook(pathVal, key0, keepObservable && key1 === null);
+                    pathVal = hooks.readFieldHook(pathVal, key0, keepObservable && key1 == null);
 
                     if (!key1) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key1, keepObservable && key1 === null);
+                    pathVal = hooks.readFieldHook(pathVal, key1, keepObservable && key2 == null);
 
                     if (!key2) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key2, keepObservable && key1 === null);
+                    pathVal = hooks.readFieldHook(pathVal, key2, keepObservable && key3 == null);
 
                     if (!key3) return pathVal;
                     if (pathVal == null) return undefined;
-                    pathVal = hooks.readFieldHook(pathVal, key3, keepObservable && key1 === null);
+                    pathVal = hooks.readFieldHook(pathVal, key3, keepObservable && key4 == null);
 
                     if (!key4) return pathVal;
                     if (pathVal == null) return undefined;
@@ -1158,16 +1158,23 @@ module wx {
                 fn = simpleGetterFn2(pathKeys[0], pathKeys[1], fullExp, keepObservable);
             } else { // if (options.csp) {
                 if (pathKeysLength < 6) {
-                    fn = cspSafeGetterFn(pathKeys[0], pathKeys[1], pathKeys[2], pathKeys[3], pathKeys[4], keepObservable, fullExp, options);
+                    fn = cspSafeGetterFn(pathKeys[0], pathKeys[1], pathKeys[2], pathKeys[3], pathKeys[4], fullExp, keepObservable, options);
                 } else {
                     fn = (scope: any, locals: any) => {
+                        // backup locals
+                        var _locals = {};
+                        Object.keys(locals).forEach(x => _locals[x] = locals[x]);
+
                         var i = 0, val;
                         do {
                             val = cspSafeGetterFn(pathKeys[i++], pathKeys[i++], pathKeys[i++], pathKeys[i++],
-                                pathKeys[i++], fullExp, keepObservable && (i >= pathKeysLength - 5), options)(scope, locals);
+                                pathKeys[i++], fullExp, keepObservable && ((i - 5) >= pathKeysLength - 5), options)(scope, locals);
 
-                            locals = undefined; // clear after first iteration
                             scope = val;
+
+                            // reset locals
+                            locals = {};
+                            Object.keys(_locals).forEach(x => locals[x] = _locals[x]);
                         } while (i < pathKeysLength);
                         return val;
                     };

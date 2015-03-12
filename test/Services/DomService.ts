@@ -364,5 +364,78 @@ describe('DomService',() => {
 
             expect(evalCount).toEqual(1 + 1);   // + 1 for initial evaluation
         });
+
+        it('an expression evaluating to an observable property result, using the @-modifier should return the property itself instead of its value ',() => {
+            var compiled: any;
+
+            var model: any = {
+                foo: wx.property<any>("baz")
+            };
+
+            var ctx = testutils.createModelContext(model);
+
+            var def = "{ text: @foo }";
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            var result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(result()).toBe(model.foo);
+
+            // increase complexity
+            var childModel: any = {
+                bar: wx.property<any>("foo")
+            };
+            model.foo(childModel);
+
+            def = "{ text: @foo.bar }";
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(result()).toBe(childModel.bar);
+
+            // increase complexity even more (trigger use of cspSafeGetterFn)
+            var grandChildModel: any = {
+                baz: wx.property<any>("bar")
+            };
+            childModel.bar(grandChildModel);
+
+            def = "{ text: @foo.bar.baz }";
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(result()).toBe(grandChildModel.baz);
+
+            // go nuts (trigger use of cspSafeGetterFn in a loop)
+            var model1: any = {
+                prop1: wx.property<any>("1")
+            };
+            grandChildModel.baz(model1);
+
+            var model2: any = {
+                prop2: wx.property<any>("2")
+            };
+            model1.prop1(model2);
+
+            var model3: any = {
+                prop3: wx.property<any>("3")
+            };
+            model2.prop2(model3);
+
+            var model4: any = {
+                prop4: wx.property<any>("4")
+            };
+            model3.prop3(model4);
+
+            var model5: any = {
+                prop5: wx.property<any>("5")
+            };
+            model4.prop4(model5);
+
+            def = "{ text: @foo.bar.baz.prop1.prop2.prop3.prop4 }";
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(result()).toBe(model4.prop4);
+
+            def = "{ text: foo.bar.baz.prop1.prop2.prop3.prop4.prop5 }";
+            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(result()).toEqual("5");
+        });
     });
 });
