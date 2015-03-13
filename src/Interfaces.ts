@@ -333,7 +333,6 @@ module wx {
         $root: any;
         $parent: any;
         $parents: any[];
-        $index: number;
     }
 
     /**
@@ -343,9 +342,7 @@ module wx {
     export interface INodeState {
         cleanup: Rx.CompositeDisposable;
         isBound: boolean;   // true of this node has been touched by applyBindings
-        module?: IModule;   // scope module 
         model?: any;        // scope model 
-        index?: any;        // scope index
     }
 
     export interface IObjectLiteralToken {
@@ -444,6 +441,8 @@ module wx {
         compileBindingOptions(value: string): any;
         getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
         extractBindingsFromDataAttribute(node: Node): Array<{ key: string; value: string }>;
+
+        registerDataContextExtension(extension:(node: Node, ctx:IDataContext)=> void);
 
         /**
         * Evaluates an expression against a data-context and returns the result
@@ -550,6 +549,10 @@ module wx {
         defaultExceptionHandler: Rx.Observer<Error>;
         mainThreadScheduler: Rx.IScheduler;
         templateEngine: ITemplateEngine;
+    }
+
+    export interface IRouter {
+        
     }
 }
 

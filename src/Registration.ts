@@ -16,6 +16,7 @@ module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
     injector.register(res.htmlTemplateEngine, true, true, [internal.htmlTemplateEngineConstructor]);
     injector.register(res.domService, true, true, [res.expressionCompiler, internal.domServiceConstructor]);
+    injector.register(res.router, true, true, [res.domService, internal.routerConstructor]);
 
     injector.register("wx.bindings.module", true, true, [res.domService, internal.moduleBindingConstructor]);
     injector.register("wx.bindings.command", true, true, [res.domService, internal.commandBindingConstructor]);
@@ -39,6 +40,8 @@ module wx {
     injector.register("wx.bindings.component", true, true, [res.domService, internal.componentBindingConstructor]);
     injector.register("wx.bindings.value", true, true, [res.domService, internal.valueBindingConstructor]);
     injector.register("wx.bindings.hasFocus", true, true, [res.domService, internal.hasFocusBindingConstructor]);
+    injector.register("wx.bindings.view", true, true, [res.domService, internal.viewBindingConstructor]);
+    injector.register("wx.bindings.sref", true, true, [res.domService, internal.stateRefBindingConstructor]);
 
     injector.register("wx.components.radiogroup", false, true, [res.domService, internal.radioGroupComponentConstructor]);
     injector.register("wx.components.select", false, true, [res.domService, internal.selectComponentConstructor]);
@@ -65,6 +68,8 @@ module wx {
     app.registerBinding("component", "wx.bindings.component");
     app.registerBinding("value", "wx.bindings.value");
     app.registerBinding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus");
+    app.registerBinding("view", "wx.bindings.view");
+    app.registerBinding("sref", "wx.bindings.sref");
 
     app.registerComponent("wx-radiogroup", "wx.components.radiogroup");
     app.registerComponent("wx-select", "wx.components.select");

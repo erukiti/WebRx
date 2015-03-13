@@ -4,6 +4,16 @@
 /// <reference path="../Core/VirtualChildNodes.ts" />
 
 module wx {
+    // Binding additions to node-state
+    export interface INodeState {
+        index?: any;        // scope index
+    }
+
+    // Binding additions to data-context
+    export interface IDataContext {
+        $index: number;
+    }
+
     export interface IForEachBindingOptions {
         data: any;
         hooks?: IForEachBindingHooks|string;
@@ -54,6 +64,13 @@ module wx {
     class ForEachBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
+
+            domService.registerDataContextExtension((node: Node, ctx: IDataContext) => {
+                var state = domService.getNodeState(node);
+
+                if (state != null)
+                    ctx.$index = state.index;
+            });
         } 
  
         ////////////////////
@@ -268,7 +285,7 @@ module wx {
                 if (node.nodeType === 1) {
                     // save the index before cleaning
                     var state = this.domService.getNodeState(node);
-                    savedIndex = state ? state.index : undefined;
+                    savedIndex = state != null ? state.index : undefined;
 
                     this.domService.cleanNode(node);
 

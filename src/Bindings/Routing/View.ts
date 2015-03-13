@@ -1,14 +1,9 @@
-﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Services/DomService.ts" />
-/// <reference path="../Interfaces.ts" />
+﻿///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../Services/DomService.ts" />
+/// <reference path="../../Interfaces.ts" />
 
 module wx {
-    // Binding additions to node-state
-    export interface INodeState {
-        module?: IModule;   // scope module 
-    }
-
-    class ModuleBinding implements IBindingHandler {
+    class ViewBinding implements IBindingHandler {
         constructor(domService: IDomService) {
             this.domService = domService;
         } 
@@ -18,7 +13,7 @@ module wx {
 
         public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
             if (node.nodeType !== 1)
-                internal.throwError("module-binding only operates on elements!");
+                internal.throwError("view-binding only operates on elements!");
 
             if (options == null)
                 internal.throwError("invalid binding-ptions!");
@@ -61,6 +56,6 @@ module wx {
     }
 
     export module internal {
-        export var moduleBindingConstructor = <any> ModuleBinding;
+        export var viewBindingConstructor = <any> ViewBinding;
     }
 }

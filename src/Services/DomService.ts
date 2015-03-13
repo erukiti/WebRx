@@ -122,12 +122,16 @@ module wx {
             return app;
         }
 
+        public registerDataContextExtension(extension: (node: Node, ctx: IDataContext) => void) {
+            this.dataContextExtensions.add(extension);
+        }
+
         public getDataContext(node: Node): IDataContext {
             var models = [];
             var state: INodeState = this.getNodeState(node);
 
             // remember index present
-            var index = state ? state.index : undefined;
+            var index = state != null ? state.index : undefined;
 
             // collect model hierarchy
             while (node) {
@@ -161,6 +165,9 @@ module wx {
                     $index: null
                 };
             }
+
+            // extensions
+            this.dataContextExtensions.forEach(ext=> ext(node, ctx));
 
             return ctx;
         }
@@ -298,6 +305,7 @@ module wx {
         private elementState: IWeakMap<Node, INodeState>;
         private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
         private compiler: IExpressionCompiler;
+        private dataContextExtensions = createSet<(node: Node, ctx: IDataContext) => void>();
 
         private parserOptions: IExpressionCompilerOptions = {
             disallowFunctionCalls: true
@@ -566,12 +574,13 @@ module wx {
             // install property interceptor hooks
             this.compiler.setRuntimeHooks(locals, hooks);
 
-            // injected context members into lcoals
-            locals["$data"] = ctx.$data;
-            locals["$root"] = ctx.$root;
-            locals["$parent"] = ctx.$parent;
-            locals["$parents"] = ctx.$parents;
-            locals["$index"] = ctx.$index;
+            // injected context members into locals
+            var keys = Object.keys(ctx);
+            var length = keys.length;
+            for (var i = 0; i < length; i++) {
+                var key = keys[i];
+                locals[key] = ctx[key];
+            }
 
             return locals;
         }
