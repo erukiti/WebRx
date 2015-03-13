@@ -3,7 +3,7 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    // Binding contribution to node-state
+    // Binding contributions to node-state
     export interface INodeState {
         module?: IModule;
     }

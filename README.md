@@ -6,15 +6,17 @@
 
 **Note**: This project is currently in proof-of-concept state. If you need something usable check back later.
 
-WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/), and [ReactiveUI for .Net](http://reactiveui.net/) with the [Reactive Extensions for Javascript (RxJs)](https://github.com/Reactive-Extensions/RxJS) into a MVC framework that aims to enable to developers to create structured and testable Web-Applications that run in any *modern* browser.
+WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/), [AngularJS](https://angularjs.org/) and [ReactiveUI for .Net](http://reactiveui.net/) with the [Reactive Extensions for Javascript (RxJs)](https://github.com/Reactive-Extensions/RxJS) into a MVC framework that aims to enable to developers to create structured and testable Web-Applications that run in any *modern* browser.
 
 ##### Features
 
 - Extensible data-binding
 - Supports partitioning larger projects into 'modules' which are very similar to AngularJS's module concept. Using modules is completely optional.
-- Built-in light-weight dependency injection 
+- Light-weight dependency injection 
+- Includes state-based routing engine based on angular [ui-router](https://github.com/angular-ui/ui-router)
+- Developed in Typescript but can just as easily consumed in plain Javascript
 
-##### Key differences between WebRx and KnockoutJS
+##### WebRx vs KnockoutJS
 
 Even though WebRx shares many similarities with KnockoutJS, the project is not meant to be a drop-in replacement.
 
