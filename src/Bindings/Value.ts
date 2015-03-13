@@ -20,7 +20,7 @@ module wx {
             var el = <HTMLInputElement> node;
             var tag = el.tagName.toLowerCase();
 
-            if (tag !== 'input' && tag !== 'option')
+            if (tag !== 'input' && tag !== 'option' && tag !== 'select' && tag !== 'textarea')
                 internal.throwError("value-binding only operates on checkboxes and radio-buttons");
 
             var prop: IObservableProperty<any>;
