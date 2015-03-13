@@ -4,13 +4,13 @@
 /// <reference path="../Core/VirtualChildNodes.ts" />
 
 module wx {
-    // Binding additions to node-state
-    export interface INodeState {
-        index?: any;        // scope index
+    // Binding contributions to node-state
+    interface IForEachNodeState extends INodeState {
+        index?: any;
     }
 
-    // Binding additions to data-context
-    export interface IDataContext {
+    // Binding contributions to data-context
+    interface IForEachDataContext extends IDataContext {
         $index: number;
     }
 
@@ -65,8 +65,8 @@ module wx {
         constructor(domService: IDomService) {
             this.domService = domService;
 
-            domService.registerDataContextExtension((node: Node, ctx: IDataContext) => {
-                var state = domService.getNodeState(node);
+            domService.registerDataContextExtension((node: Node, ctx: IForEachDataContext) => {
+                var state = <IForEachNodeState>domService.getNodeState(node);
 
                 if (state != null)
                     ctx.$index = state.index;
@@ -284,7 +284,7 @@ module wx {
 
                 if (node.nodeType === 1) {
                     // save the index before cleaning
-                    var state = this.domService.getNodeState(node);
+                    var state = <IForEachNodeState> this.domService.getNodeState(node);
                     savedIndex = state != null ? state.index : undefined;
 
                     this.domService.cleanNode(node);
@@ -393,7 +393,7 @@ module wx {
                     }
 
                     // propagate index to state
-                    var state = self.domService.createNodeState(item);
+                    var state = <IForEachNodeState> self.domService.createNodeState(item);
                     state.index = index;
                     self.domService.setNodeState(node, state);
 

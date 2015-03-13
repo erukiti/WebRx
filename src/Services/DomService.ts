@@ -128,14 +128,12 @@ module wx {
 
         public getDataContext(node: Node): IDataContext {
             var models = [];
-            var state: INodeState = this.getNodeState(node);
-
-            // remember index present
-            var index = state != null ? state.index : undefined;
+            var state = this.getNodeState(node);
 
             // collect model hierarchy
-            while (node) {
-                state = state != null ? state : this.getNodeState(node);
+            var _node = node;
+            while (_node) {
+                state = state != null ? state : this.getNodeState(_node);
                 if (state != null) {
                     if (state.model != null) {
                         models.push(state.model);
@@ -143,7 +141,7 @@ module wx {
                 }
 
                 state = null;
-                node = node.parentNode;
+                _node = _node.parentNode;
             }
 
             var ctx: IDataContext;
@@ -153,16 +151,14 @@ module wx {
                     $data: models[0],
                     $root: models[models.length - 1],
                     $parent: models.length > 1 ? models[1] : null,
-                    $parents: models.slice(1),
-                    $index: index
+                    $parents: models.slice(1)
                 };
             } else {
                 ctx = {
                     $data: null,
                     $root: null,
                     $parent: null,
-                    $parents: [],
-                    $index: null
+                    $parents: []
                 };
             }
 

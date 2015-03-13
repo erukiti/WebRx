@@ -132,7 +132,6 @@ describe('DomService',() => {
             expect(domService.expressionToObservable(compiled.ctx.root, ctx).toProperty()()).toBe(ctx.$root);
             expect(domService.expressionToObservable(compiled.ctx.parent, ctx).toProperty()()).toBe(ctx.$parent);
             expect(domService.expressionToObservable(compiled.ctx.parents, ctx).toProperty()()).toBe(ctx.$parents);
-            expect(domService.expressionToObservable(compiled.ctx.index, ctx).toProperty()()).toBe(ctx.$index);
         });
 
         it('returns the current value of the expression upon subscription',() => {

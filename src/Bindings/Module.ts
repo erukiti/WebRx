@@ -3,9 +3,9 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
-    // Binding additions to node-state
+    // Binding contribution to node-state
     export interface INodeState {
-        module?: IModule;   // scope module 
+        module?: IModule;
     }
 
     class ModuleBinding implements IBindingHandler {
