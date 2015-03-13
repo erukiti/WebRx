@@ -1,11 +1,13 @@
 ﻿///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../../Services/DomService.ts" />
 /// <reference path="../../Interfaces.ts" />
+/// <reference path="../../Core/Log.ts" />
 
 module wx {
     class ViewBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
+        constructor(domService: IDomService, router: IRouter) {
             this.domService = domService;
+            this.router = router;
         } 
 
         ////////////////////
@@ -18,15 +20,17 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-ptions!");
 
-            var exp = this.domService.compileBindingOptions(options);
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var compiled = this.domService.compileBindingOptions(options);
+            var viewName = this.domService.evaluateExpression(compiled, ctx);
 
-            // subscribe
-            state.cleanup.add(obs.subscribe(x => {
-                if (typeof x === "string")
-                    x = module(x);
+            if (!viewName)
+                internal.throwError("views needs to have a name!");
 
-                state.module = x;
+            // subscribe to router-state changes
+            state.cleanup.add(this.router.currentState.subscribe(newState => {
+                var componentName = newState.views != null ? newState.views[viewName] : undefined;
+
+                log.info("component for view {0} is now {1}", viewName, componentName);
             }));
 
             // release closure references to GC 
@@ -38,7 +42,6 @@ module wx {
                 state = null;
 
                 // nullify common locals
-                obs = null;
                 self = null;
             }));
         }
@@ -53,6 +56,7 @@ module wx {
         // Implementation
 
         protected domService: IDomService;
+        protected  router: IRouter;
     }
 
     export module internal {

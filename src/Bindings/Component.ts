@@ -32,9 +32,7 @@ module wx {
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    componentName = prop();
-                });
+                componentName = this.domService.evaluateExpression(exp, ctx);
             } else {
                 var opt = <IComponentBindingOptions> compiled;
 

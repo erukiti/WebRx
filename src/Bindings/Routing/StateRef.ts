@@ -4,8 +4,9 @@
 
 module wx {
     class StateRefBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
+        constructor(domService: IDomService, router: IRouter) {
             this.domService = domService;
+            this.router = router;
         } 
 
         ////////////////////
@@ -53,6 +54,7 @@ module wx {
         // Implementation
 
         protected domService: IDomService;
+        protected  router: IRouter;
     }
 
     export module internal {
