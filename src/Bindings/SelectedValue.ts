@@ -61,8 +61,7 @@ module wx {
         }
 
         public observeElement(el: HTMLElement): Rx.Observable<any> {
-            return <Rx.Observable<any>> <any> Rx.Observable.merge(
-                Rx.Observable.fromEvent(el, 'change'));
+            return <Rx.Observable<any>> <any> Rx.Observable.fromEvent(el, 'change');
         }
 
         public observeModel(model: any): Rx.Observable<any> {

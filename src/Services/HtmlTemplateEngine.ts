@@ -132,7 +132,7 @@ module wx {
         i = 0;
         while ((elem = nodes[i++])) {
             // filter out scripts
-            if (!elem.type && !rscriptType.test(elem.type)) {
+            if (elem.nodeType !== 1 || elem.tagName.toLowerCase() !== "script" || !rscriptType.test(elem.type || "")) {
                 fragment.appendChild(elem);
             }
         }
@@ -144,7 +144,6 @@ module wx {
         public parse(data: string): Node[] {
             // document.implementation stops scripts or inline event handlers from being executed immediately
             var context = supportsCreateHTMLDocument ? document.implementation.createHTMLDocument("") : document;
-
             var parsed: any = rsingleTag.exec(data);
 
             // Single tag

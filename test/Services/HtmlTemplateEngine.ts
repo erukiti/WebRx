@@ -23,7 +23,8 @@ describe('HtmlTemplateEngine',() => {
             jQuery["parseHTML"]($("#fixture1")[0].innerHTML).map(x=> x.toString()).join());
 
         html = "<script>undefined()</script>";  // "Ignore scripts by default" 
-        expect(engine.parse(html).length).toEqual(0);
+        var parsed = engine.parse(html);
+        expect(parsed.length).toEqual(0);
 
         html += "<div></div>";
         expect(engine.parse(html)[0].nodeName.toLowerCase()).toEqual("div"); // "Preserve non-script nodes"

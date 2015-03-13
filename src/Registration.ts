@@ -41,6 +41,7 @@ module wx {
     injector.register("wx.bindings.hasFocus", true, true, [res.domService, internal.hasFocusBindingConstructor]);
 
     injector.register("wx.components.radiogroup", false, true, [res.domService, internal.radioGroupComponentConstructor]);
+    injector.register("wx.components.select", false, true, [res.domService, internal.selectComponentConstructor]);
 
     app.registerBinding("module", "wx.bindings.module");
     app.registerBinding("css", "wx.bindings.css");
@@ -66,4 +67,5 @@ module wx {
     app.registerBinding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus");
 
     app.registerComponent("wx-radiogroup", "wx.components.radiogroup");
+    app.registerComponent("wx-select", "wx.components.select");
 }
