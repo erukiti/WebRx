@@ -68,9 +68,7 @@ module wx {
             // hook into getDataContext() to map state['index'] to ctx['$index']
             domService.registerDataContextExtension((node: Node, ctx: IForEachDataContext) => {
                 var state = <IForEachNodeState> domService.getNodeState(node);
-
-                if (state != null)
-                    ctx.$index = state.index;
+                ctx.$index = state.index;
             });
         } 
  

@@ -4,10 +4,16 @@
 /// <reference path="../../Core/Log.ts" />
 
 module wx {
+    // Binding contributions to data-context
+    interface IViewDataContext extends IDataContext {
+        $componentParams?: Object;
+    }
+
     class ViewBinding implements IBindingHandler {
-        constructor(domService: IDomService, router: IRouter) {
+        constructor(domService: IDomService, router: IRouter, htmlTemplateEngine: ITemplateEngine) {
             this.domService = domService;
             this.router = router;
+            this.htmlTemplateEngine = htmlTemplateEngine;
         } 
 
         ////////////////////
@@ -18,8 +24,9 @@ module wx {
                 internal.throwError("view-binding only operates on elements!");
 
             if (options == null)
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
+            var el = <HTMLElement> node;
             var compiled = this.domService.compileBindingOptions(options);
             var viewName = this.domService.evaluateExpression(compiled, ctx);
             var componentName: string = null;
@@ -35,15 +42,17 @@ module wx {
 
                     if (viewState != null) {
                         if (typeof viewState === "object") {
-                            componentName = viewState[viewName].name;
-                            componentParams = viewState[viewName].params;
+                            componentName = viewState.component;
+                            componentParams = viewState.params;
                         } else {
-                            componentName = viewState[viewName];
+                            componentName = <string> viewState;
                             componentParams = {};
                         }
 
                         log.info("component for view {0} is now {1}, params: {2}", viewName, componentName,
                             (componentParams != null ? JSON.stringify(componentParams) : ""));
+
+                        this.applyTemplate(componentName, componentParams, el, ctx);
                     }
                 }
             }));
@@ -65,13 +74,15 @@ module wx {
             // intentionally left blank
         }
 
-        public priority = 100;
+        public priority = 1000;
+        public controlsDescendants = true;
 
         ////////////////////
         // Implementation
 
         protected domService: IDomService;
-        protected  router: IRouter;
+        protected router: IRouter;
+        protected htmlTemplateEngine: ITemplateEngine;
 
         protected applyTemplate(componentName: string, componentParams: Object, el: HTMLElement, ctx: IDataContext) {
             // clear
@@ -80,11 +91,14 @@ module wx {
                 el.removeChild(el.firstChild);
             }
 
-            // clone template and inject
-            //for (var i = 0; i < template.length; i++) {
-            //    var node = template[i].cloneNode(true);
-            //    el.appendChild(node);
-            //}
+            // to avoid early evaluation of componentParams we enrich the data-context with the actual
+            (<IViewDataContext> ctx).$componentParams = componentParams;
+
+            // create component container
+            var container = <HTMLElement> document.createElement("div");
+            var binding = utils.formatString("component: { name: '{0}', params: $componentParams }", componentName);
+            container.setAttribute("data-bind", binding);
+            el.appendChild(container);
 
             // done
             this.domService.applyBindingsToDescendants(ctx, el);

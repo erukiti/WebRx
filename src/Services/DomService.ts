@@ -50,8 +50,8 @@ module wx {
         }
 
         public cleanNode(rootNode: Node): void {
-            if (rootNode.nodeType !== 1)  // && (node.nodeType !== 8))
-                internal.throwError("first parameter should be a DOM node!");
+            if (rootNode.nodeType !== 1) // && (node.nodeType !== 8))
+                return;
 
             this.cleanNodeRecursive(rootNode);
         }

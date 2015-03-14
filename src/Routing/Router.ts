@@ -44,7 +44,12 @@ module wx {
         }
 
         public go(to: string, params?: {}, options?: IStateOptions): Rx.Observable<any> {
-            throw new Error("Not implemented");
+            var state = this.states[to];
+            if (state == null)
+                internal.throwError("state '{0}' was not registered");
+
+            this.state(state);
+            return Rx.Observable.return<any>(false);
         }
 
         public getState(state: string): IState {

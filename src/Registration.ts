@@ -43,7 +43,7 @@ module wx {
     injector.register("wx.bindings.component", true, true, [res.domService, internal.componentBindingConstructor]);
     injector.register("wx.bindings.value", true, true, [res.domService, internal.valueBindingConstructor]);
     injector.register("wx.bindings.hasFocus", true, true, [res.domService, internal.hasFocusBindingConstructor]);
-    injector.register("wx.bindings.view", true, true, [res.domService, res.router, internal.viewBindingConstructor]);
+    injector.register("wx.bindings.view", true, true, [res.domService, res.router, res.htmlTemplateEngine, internal.viewBindingConstructor]);
     injector.register("wx.bindings.sref", true, true, [res.domService, res.router, internal.stateRefBindingConstructor]);
 
     injector.register("wx.components.radiogroup", false, true, [res.htmlTemplateEngine, internal.radioGroupComponentConstructor]);

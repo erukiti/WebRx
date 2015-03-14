@@ -42,10 +42,17 @@ module wx {
                 // build params
                 if (opt.params) {
                     componentParams = {};
-
-                    Object.keys(opt.params).forEach(x => {
-                        componentParams[x] = this.domService.evaluateExpression(opt.params[x], ctx);
-                    });
+                    
+                    // opt params may have been an object passed by value (probably $componentParams from view-binding)
+                    if (typeof opt.params === "function") {
+                        componentParams = this.domService.evaluateExpression(<ICompiledExpression> opt.params, ctx);
+                    } else if (typeof opt.params === "object") {
+                        Object.keys(opt.params).forEach(x => {
+                            componentParams[x] = this.domService.evaluateExpression(opt.params[x], ctx);
+                        });
+                    } else {
+                        internal.throwError("invalid component-params");
+                    }
                 }
             }
 

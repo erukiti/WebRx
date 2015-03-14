@@ -558,7 +558,7 @@ module wx {
 
     export interface IState {
         name?: string;
-        views?: { [view:string]: string|Object };
+        views?: { [view:string]: string|{ component: string; params: any } };
         url?: string;
         params?: any;
         //abstract?: boolean;
