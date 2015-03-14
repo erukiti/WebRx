@@ -91,7 +91,7 @@ module wx {
                 el.removeChild(el.firstChild);
             }
 
-            // to avoid early evaluation of componentParams we enrich the data-context with the actual
+            // to avoid stringifying componentParams we inject them into the data-context
             (<IViewDataContext> ctx).$componentParams = componentParams;
 
             // create component container
