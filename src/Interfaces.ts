@@ -511,7 +511,7 @@ module wx {
     }
 
     export interface IComponentTemplateDescriptor {
-        (params: any): string;  // Factory 
+        (params: any): string|Node[];  // Factory 
         require?: string;       // Async AMD
         promise?: Rx.IPromise<Node[]>;  // Async Promise
         resolve?: string;       // DI

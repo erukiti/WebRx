@@ -46,8 +46,8 @@ module wx {
     injector.register("wx.bindings.view", true, true, [res.domService, res.router, internal.viewBindingConstructor]);
     injector.register("wx.bindings.sref", true, true, [res.domService, res.router, internal.stateRefBindingConstructor]);
 
-    injector.register("wx.components.radiogroup", false, true, [res.domService, internal.radioGroupComponentConstructor]);
-    injector.register("wx.components.select", false, true, [res.domService, internal.selectComponentConstructor]);
+    injector.register("wx.components.radiogroup", false, true, [res.htmlTemplateEngine, internal.radioGroupComponentConstructor]);
+    injector.register("wx.components.select", false, true, [res.htmlTemplateEngine, internal.selectComponentConstructor]);
 
     app.registerBinding("module", "wx.bindings.module");
     app.registerBinding("css", "wx.bindings.css");

@@ -72,6 +72,23 @@ module wx {
 
         protected domService: IDomService;
         protected  router: IRouter;
+
+        protected applyTemplate(componentName: string, componentParams: Object, el: HTMLElement, ctx: IDataContext) {
+            // clear
+            while (el.firstChild) {
+                this.domService.cleanNode(el.firstChild);
+                el.removeChild(el.firstChild);
+            }
+
+            // clone template and inject
+            //for (var i = 0; i < template.length; i++) {
+            //    var node = template[i].cloneNode(true);
+            //    el.appendChild(node);
+            //}
+
+            // done
+            this.domService.applyBindingsToDescendants(ctx, el);
+        }
     }
 
     export module internal {

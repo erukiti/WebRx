@@ -59,7 +59,6 @@ describe('Components', () => {
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
             el = <HTMLSelectElement> el.childNodes[0];
             var select = <HTMLSelectElement> el;
-            console.log(select.outerHTML);
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(model.selection()).toEqual("2");

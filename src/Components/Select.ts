@@ -14,11 +14,14 @@ module wx {
         noCache?: boolean;
     }
 
-    var groupId = 0;
     var templateCache: { [key: string]: any } = {};
 
     class SelectComponent implements IComponent {
-        public template = (params: any): string => {
+        constructor(htmlTemplateEngine: ITemplateEngine) {
+            this.htmlTemplateEngine = htmlTemplateEngine;
+        }
+
+        public template = (params: any): Node[]=> {
             return this.buildTemplate(params);
         }
 
@@ -35,9 +38,12 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected buildTemplate(params: ISelectComponentParams): string {
+        htmlTemplateEngine: ITemplateEngine;
+
+        protected buildTemplate(params: ISelectComponentParams): Node[] {
             var result: string;
             var key: string = undefined;
+            var nodes: Node[];
 
             // check cache
             if (!params.noCache) {
@@ -46,11 +52,11 @@ module wx {
                     (params.itemClass != null ? params.itemClass : "") + "-" +
                     (params.selectedValue != null ? "true" : "false");
 
-                result = templateCache[key];
+                nodes = templateCache[key];
  
-                if (result != null) {
+                if (nodes != null) {
                     //console.log("cache hit", key, result);
-                    return result;
+                    return nodes;
                 }
             }
 
@@ -84,14 +90,17 @@ module wx {
 
             // assemble template
             result = utils.formatString(result, bindingString);
-            console.log(result);
+            //console.log(result);
 
             // store
             if (!params.noCache) {
                 templateCache[key] = result;
             }
 
-            return result;
+            // app.templateEngine can be altered by developer therefore we make sure to parse using HtmlTemplateEngine
+            nodes = this.htmlTemplateEngine.parse(result);
+
+            return nodes;
         }
     }
 

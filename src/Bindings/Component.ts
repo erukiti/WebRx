@@ -76,7 +76,7 @@ module wx {
                                 vm = vm(componentParams);
                             }
 
-                             return { template: t, viewModel: vm }
+                            return { template: t, viewModel: vm }
                         }).subscribe(x => {
                             // done
                             this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
@@ -118,7 +118,12 @@ module wx {
             var syncResult: Node[];
 
             if (typeof template === "function") {
-                syncResult = app.templateEngine.parse(<string> template(params));
+                syncResult = template(params);
+
+                if (typeof syncResult === "string") {
+                    syncResult = app.templateEngine.parse(<string> template(params));
+                }
+
                 return Rx.Observable.return(syncResult);
             } else if (typeof template === "string") {
                 syncResult = app.templateEngine.parse(<string> template);
