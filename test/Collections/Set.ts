@@ -17,33 +17,33 @@ describe("ISet",() => {
         hs.add(o1);
         expect(hs.size).toEqual(1);
         expect(hs.has(o1)).toBeTruthy();
-        expect(wx.utils.getSetValues(hs)[0]).toEqual(o1);
-        expect(wx.utils.getSetValues(hs).indexOf(o1) !== -1).toBeTruthy();
+        expect(wx.setToArray(hs)[0]).toEqual(o1);
+        expect(wx.setToArray(hs).indexOf(o1) !== -1).toBeTruthy();
 
         // add o2
         hs.add(o2);
         expect(hs.size).toEqual(2);
         expect(hs.has(o1)).toBeTruthy();
         expect(hs.has(o2)).toBeTruthy();
-        expect(wx.utils.getSetValues(hs).length).toEqual(2);
-        expect(wx.utils.getSetValues(hs).indexOf(o1) !== -1).toBeTruthy();
-        expect(wx.utils.getSetValues(hs).indexOf(o2) !== -1).toBeTruthy();
+        expect(wx.setToArray(hs).length).toEqual(2);
+        expect(wx.setToArray(hs).indexOf(o1) !== -1).toBeTruthy();
+        expect(wx.setToArray(hs).indexOf(o2) !== -1).toBeTruthy();
 
         // remove o1
         hs.delete(o1);
         expect(hs.size).toEqual(1);
         expect(hs.has(o1)).toBeFalsy();
         expect(hs.has(o2)).toBeTruthy();
-        expect(wx.utils.getSetValues(hs).length).toEqual(1);
-        expect(wx.utils.getSetValues(hs).indexOf(o1) !== -1).toBeFalsy();
-        expect(wx.utils.getSetValues(hs).indexOf(o2) !== -1).toBeTruthy();
+        expect(wx.setToArray(hs).length).toEqual(1);
+        expect(wx.setToArray(hs).indexOf(o1) !== -1).toBeFalsy();
+        expect(wx.setToArray(hs).indexOf(o2) !== -1).toBeTruthy();
 
         // remove o2
         hs.delete(o2);
         expect(hs.size).toEqual(0);
         expect(hs.has(o2)).toBeFalsy();
-        expect(wx.utils.getSetValues(hs).length).toEqual(0);
-        expect(wx.utils.getSetValues(hs).indexOf(o2) !== -1).toBeFalsy();
+        expect(wx.setToArray(hs).length).toEqual(0);
+        expect(wx.setToArray(hs).indexOf(o2) !== -1).toBeFalsy();
     }
 
     it("emulated: creation",() => {

@@ -551,9 +551,14 @@ module wx {
         templateEngine: ITemplateEngine;
     }
 
+    export interface IRoute {
+        parse: (url) => Object;
+        stringify: (params?: Object) => string;
+    }
+
     export interface IState {
         name?: string;
-        views?: { [view:string]: string };
+        views?: { [view:string]: string|Object };
         url?: string;
         params?: any;
         //abstract?: boolean;

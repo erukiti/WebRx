@@ -5,5 +5,7 @@
 /// <reference path="../typings/l2o.d.ts" />
 /// <reference path="../typings/ix.d.ts" />
 
-describe('Router',() => {
+describe('Routing',() => {
+    describe('Router',() => {
+    });
 });

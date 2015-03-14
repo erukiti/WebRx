@@ -14,9 +14,9 @@ module wx {
 
             // Implicit root state that is always active
             this.root = this.registerStateInternal({
-                name: '',
-                url: '^',
-                'abstract': true
+                name: "",
+                url: "^",
+                "abstract": true
             });
 
             //this.root.navigable = null;

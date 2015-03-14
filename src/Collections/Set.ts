@@ -77,4 +77,13 @@
 
         return <ISet<T>> <any> new Set();
     }
+
+    /**
+    * Extracts the values of a Set by invoking its forEach method and capturing the output
+    */
+    export function setToArray<T>(src: ISet<T>): Array<T> {
+        var result = new Array<T>();
+        src.forEach(x => result.push(x));
+        return result;
+    }
 }

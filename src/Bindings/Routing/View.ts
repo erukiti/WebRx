@@ -22,15 +22,30 @@ module wx {
 
             var compiled = this.domService.compileBindingOptions(options);
             var viewName = this.domService.evaluateExpression(compiled, ctx);
+            var componentName: string = null;
+            var componentParams: any;
 
             if (!viewName)
                 internal.throwError("views needs to have a name!");
 
             // subscribe to router-state changes
             state.cleanup.add(this.router.currentState.subscribe(newState => {
-                var componentName = newState.views != null ? newState.views[viewName] : undefined;
+                if (newState.views != null) {
+                    var viewState = newState.views[viewName];
 
-                log.info("component for view {0} is now {1}", viewName, componentName);
+                    if (viewState != null) {
+                        if (typeof viewState === "object") {
+                            componentName = viewState[viewName].name;
+                            componentParams = viewState[viewName].params;
+                        } else {
+                            componentName = viewState[viewName];
+                            componentParams = {};
+                        }
+
+                        log.info("component for view {0} is now {1}, params: {2}", viewName, componentName,
+                            (componentParams != null ? JSON.stringify(componentParams) : ""));
+                    }
+                }
             }));
 
             // release closure references to GC 

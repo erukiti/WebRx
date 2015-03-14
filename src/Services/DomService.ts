@@ -252,7 +252,7 @@ module wx {
             var obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
                 var innerDisp = Rx.Observable.defer(() => {
                     // construct observable that represents the first change of any of the expression's dependencies
-                    return Rx.Observable.merge(utils.getSetValues(captured)).take(1);
+                    return Rx.Observable.merge(setToArray(captured)).take(1);
                 })
                 .repeat()
                 .subscribe(trigger => {
@@ -408,6 +408,7 @@ module wx {
         }
 
         private applyBindingsRecursive(ctx: IDataContext, el: HTMLElement, module?: IModule): void {
+            // "module" binding receiving first-class treatment here because it is considered part of the core
             module = module || this.getModuleContext(el);
 
             if (!this.applyBindingsInternal(ctx, el, module) && el.hasChildNodes()) {
