@@ -91,7 +91,7 @@ module wx {
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {
-            utils.toggleCssClass(el, !!value, key);
+            toggleCssClass(el, !!value, key);
         }
     }
 

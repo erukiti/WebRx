@@ -24,7 +24,7 @@ module wx {
                 })
                 .publish();
 
-            if (utils.isInUnitTest()) {
+            if (isInUnitTest()) {
                 this.canExecuteObs.connect();
             }
 
@@ -260,13 +260,13 @@ module wx {
 
     // factory method implementation
     export function combinedCommand<T>(): ICommand<any> {
-        var args = utils.args2Array(arguments);
+        var args = args2Array(arguments);
 
         var commands: ICommand<any>[] = args
-            .filter(x=> utils.isCommand(x));
+            .filter(x=> isCommand(x));
 
         var canExecute: Rx.Observable<boolean> = args
-            .filter(x => utils.isRxObservable(x))
+            .filter(x => isRxObservable(x))
             .pop();
 
         if (!canExecute)

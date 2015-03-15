@@ -53,7 +53,7 @@ module wx {
                 }
             }
 
-            if (!utils.isCommand(cmd)) {
+            if (!isCommand(cmd)) {
                 // value is not a ICommand
                 internal.throwError("Command-Binding only works when bound to a Reactive Command!");
             } else {

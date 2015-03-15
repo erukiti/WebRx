@@ -10,10 +10,9 @@ module wx {
     }
 
     class ViewBinding implements IBindingHandler {
-        constructor(domService: IDomService, router: IRouter, htmlTemplateEngine: ITemplateEngine) {
+        constructor(domService: IDomService, router: IRouter) {
             this.domService = domService;
             this.router = router;
-            this.htmlTemplateEngine = htmlTemplateEngine;
         } 
 
         ////////////////////
@@ -31,28 +30,42 @@ module wx {
             var viewName = this.domService.evaluateExpression(compiled, ctx);
             var componentName: string = null;
             var componentParams: any;
+            var currentComponentName: string = null;
+            var currentComponentParams: any;
 
             if (!viewName)
                 internal.throwError("views needs to have a name!");
 
             // subscribe to router-state changes
-            state.cleanup.add(this.router.currentState.subscribe(newState => {
+            state.cleanup.add(this.router.currentState.changed.startWith(this.router.currentState()).subscribe(newState => {
                 if (newState.views != null) {
-                    var viewState = newState.views[viewName];
+                    var component = newState.views[viewName];
 
-                    if (viewState != null) {
-                        if (typeof viewState === "object") {
-                            componentName = viewState.component;
-                            componentParams = viewState.params;
+                    if (component != null) {
+                        if (typeof component === "object") {
+                            componentName = component.component;
+                            componentParams = component.params;
                         } else {
-                            componentName = <string> viewState;
+                            componentName = <string> component;
                             componentParams = {};
                         }
 
-                        log.info("component for view {0} is now {1}, params: {2}", viewName, componentName,
-                            (componentParams != null ? JSON.stringify(componentParams) : ""));
+                        // merge state params into component params
+                        if (newState.params != null)
+                            componentParams = extend(newState.params, extend(componentParams, {}));
 
-                        this.applyTemplate(componentName, componentParams, el, ctx);
+                        // only update if changed
+                        if (componentName !== currentComponentName ||
+                            !isEqual(componentParams, currentComponentParams)) {
+
+                            log.info("component for view '{0}' is now '{1}', params: {2}", viewName, componentName,
+                                (componentParams != null ? JSON.stringify(componentParams) : ""));
+
+                            this.applyTemplate(componentName, componentParams, el, ctx);
+
+                            currentComponentName = componentName;
+                            currentComponentParams = componentParams;
+                        }
                     }
                 }
             }));
@@ -82,7 +95,6 @@ module wx {
 
         protected domService: IDomService;
         protected router: IRouter;
-        protected htmlTemplateEngine: ITemplateEngine;
 
         protected applyTemplate(componentName: string, componentParams: Object, el: HTMLElement, ctx: IDataContext) {
             // clear
@@ -96,7 +108,7 @@ module wx {
 
             // create component container
             var container = <HTMLElement> document.createElement("div");
-            var binding = utils.formatString("component: { name: '{0}', params: $componentParams }", componentName);
+            var binding = formatString("component: { name: '{0}', params: $componentParams }", componentName);
             container.setAttribute("data-bind", binding);
             el.appendChild(container);
 

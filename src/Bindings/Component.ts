@@ -1,6 +1,7 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Services/DomService.ts" />
 /// <reference path="../Core/Module.ts" />
+/// <reference path="../Bindings/Module.ts" />
 
 module wx {
     export interface IComponentBindingOptions {
@@ -69,7 +70,7 @@ module wx {
             if (!component)
                 component = app.getComponent(componentName);
 
-            if (!component)
+            if (component == null)
                 internal.throwError("component '{0}' has not been registered.", componentName);
 
             // resolve template & view-model

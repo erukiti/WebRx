@@ -1,5 +1,4 @@
 ﻿/// <reference path="../Interfaces.ts" />
-/// <reference path="../Core/Globals.ts" />
 /// <reference path="../Core/Utils.ts" />
 /// <reference path="../../test/typings/jquery.d.ts" />
 

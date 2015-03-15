@@ -552,20 +552,25 @@ module wx {
     }
 
     export interface IRoute {
-        parse: (url) => Object;
-        stringify: (params?: Object) => string;
+        parse(url): Object;
+        stringify(params?: Object): string;
+        concat(route: IRoute): IRoute;
+        isAbsolute: boolean;
     }
 
-    export interface IState {
-        name?: string;
-        views?: { [view:string]: string|{ component: string; params: any } };
-        url?: string;
+    export interface IRouterStateConfig {
+        name: string;
+        url?: string|IRoute;
+        views?: { [view: string]: string|{ component: string; params?: any } };
         params?: any;
-        //abstract?: boolean;
-        //onEnter?: any;
-        //onExit?: any;
-        //data?: any;
         //reloadOnSearch?: boolean;
+    }
+
+    export interface IRouterState {
+        name: string;
+        views: { [view: string]: string|{ component: string; params?: any } };
+        url: string;
+        params: any;
     }
 
     export interface IStateOptions {
@@ -599,7 +604,7 @@ module wx {
         /**
         * Registers a state configuration under a given state name.
         **/
-        registerState(name: string, config: IState): IRouter;
+        registerState(config: IRouterStateConfig): IRouter;
 
         /**
         * Convenience method for transitioning to a new state. IRouter.go calls IRouter.transitionTo internally 
@@ -646,12 +651,14 @@ module wx {
         /**
         * Returns the state configuration object for any specific state or all states.
         **/
-        getState(state: string): IState;
+        getState(state: string): IRouterStateConfig;
+
+        resetStates(): void;
 
         /**
         * A reference to the current state's config object. However you passed it in. Useful for accessing custom data.
         **/
-        currentState: Rx.Observable<IState>;
+        currentState: IObservableProperty<IRouterState>;
     }
 }
 

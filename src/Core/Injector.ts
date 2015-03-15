@@ -1,6 +1,6 @@
 ﻿/// <reference path="Utils.ts" />
 /// <reference path="Resources.ts" />
-/// <reference path="Globals.ts" />
+/// <reference path="Utils.ts" />
 
 module wx {
     /**
@@ -15,7 +15,7 @@ module wx {
         public register(key: string, instance: any): void;
 
         public register() {
-            var args = utils.args2Array(arguments);
+            var args = args2Array(arguments);
             var key = args.shift();
             var factory: (deps: any, args: any) => any;
             var isConstructor = false;
@@ -112,7 +112,7 @@ module wx {
             // append current key
             var newDeps = {};
             newDeps[key] = true;
-            utils.extend(deps, newDeps);
+            extend(deps, newDeps);
 
             // create it
             var result = registration.factory(args, newDeps);

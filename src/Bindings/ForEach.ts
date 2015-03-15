@@ -202,7 +202,7 @@ module wx {
             hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
-            var nodes = utils.cloneNodeArray(template);
+            var nodes = cloneNodeArray(template);
             var _index = indexTrigger ? <any> this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length) : index;
             proxy.appendChilds(nodes, { index: _index, item: item });
 
@@ -220,7 +220,7 @@ module wx {
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
 
-            var nodes = utils.cloneNodeArray(template);
+            var nodes = cloneNodeArray(template);
             var _index = this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length);
             proxy.insertChilds(index * templateLength, nodes, { index: _index, item: item });
 
@@ -264,7 +264,7 @@ module wx {
             }
 
             // create new row
-            nodes = utils.cloneNodeArray(template);
+            nodes = cloneNodeArray(template);
             var _index = this.createIndexObservableForNode(proxy, nodes[0], from, indexTrigger, indexes, template.length);
             proxy.insertChilds(templateLength * to, nodes, { index: _index, item: item });
             
@@ -428,7 +428,7 @@ module wx {
                 for (i = 0; i < length; i++) {
                     this.appendRow(proxy, i, arr[i], ctx, template, hooks, undefined, undefined, true);
                 }
-            } else if(utils.isList(value)) {
+            } else if(isList(value)) {
                 var list = <IObservableList<any>> value;
                 indexes = createWeakMap<Node, Rx.Observable<any>>();
                 recalcIndextrigger = new Rx.Subject<any>();

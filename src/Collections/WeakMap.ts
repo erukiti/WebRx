@@ -11,22 +11,22 @@ module wx {
         /// IWeakMap
 
         public set(key: TKey, value: T) {
-            var oid = utils.getOid(key);
+            var oid = getOid(key);
             this.inner[oid] = value;
         }
 
         public get(key: TKey): T {
-            var oid = utils.getOid(key);
+            var oid = getOid(key);
             return this.inner[oid];
         }
 
         public has(key: TKey): boolean {
-            var oid = utils.getOid(key);
+            var oid = getOid(key);
             return this.inner.hasOwnProperty(oid);
         }
 
         public delete(key: TKey): boolean {
-            var oid = utils.getOid(key);
+            var oid = getOid(key);
             return delete this.inner[oid];
         }
 

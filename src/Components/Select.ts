@@ -89,7 +89,7 @@ module wx {
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
 
             // assemble template
-            result = utils.formatString(result, bindingString);
+            result = formatString(result, bindingString);
             //console.log(result);
 
             // store

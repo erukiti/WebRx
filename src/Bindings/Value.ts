@@ -48,7 +48,7 @@ module wx {
 
             // options is supposed to be a field-access path
             state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(model => {
-                if (!utils.isProperty(model)) {
+                if (!isProperty(model)) {
                     // initial and final update
                     updateElement(model);
                 } else {

@@ -505,7 +505,7 @@ describe("ExpressionCompiler", function () {
 
     it("parse literal containing complex angular expressions",() => {
         var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
-        var input = wx.utils.formatString("foo: {0}, bar: true", exp1);
+        var input = wx.formatString("foo: {0}, bar: true", exp1);
         var result = compiler.parseObjectLiteral(input);
 
         expect(result.length).toEqual(2);
@@ -523,7 +523,7 @@ describe("ExpressionCompiler", function () {
     it("parse literal containing multiple complex angular expressions",() => {
         var exp1 = "a=1;b=2;{ 'c': a + b }['c']";
         var exp2 = "a=1;b=2;[a, ['three',b]]";
-        var input = wx.utils.formatString("foo: {0}, bar: true, baz: {1}", exp1, exp2);
+        var input = wx.formatString("foo: {0}, bar: true, baz: {1}", exp1, exp2);
         var result = compiler.parseObjectLiteral(input);
 
         expect(result.length).toEqual(3);

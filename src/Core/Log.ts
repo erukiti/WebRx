@@ -15,7 +15,7 @@ module wx.log {
 
     export function critical(fmt: string, ...args: any[]) {
         if (args.length) {
-            fmt = utils.formatString(fmt, args);
+            fmt = formatString.apply(null, [fmt].concat(args));
         }
 
         log("**** WebRx Critical: " + fmt);
@@ -23,7 +23,7 @@ module wx.log {
 
     export function error(fmt: string, ...args: any[]) {
         if (args.length) {
-            fmt = utils.formatString(fmt, args);
+            fmt = formatString.apply(null, [fmt].concat(args));
         }
 
         log("*** WebRx Error: " + fmt);
@@ -31,7 +31,7 @@ module wx.log {
 
     export function info(fmt: string, ...args: any[]) {
         if (args.length) {
-            fmt = utils.formatString(fmt, args);
+            fmt = formatString.apply(null, [fmt].concat(args));
         }
 
         log("* WebRx Info: " + fmt);

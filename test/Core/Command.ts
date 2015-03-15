@@ -6,12 +6,12 @@
 describe("Command", () => {
     it("implements IUnknown", () => {
         var cmd = wx.command();
-        expect(wx.utils.supportsQueryInterface(cmd)).toBeTruthy();
+        expect(wx.supportsQueryInterface(cmd)).toBeTruthy();
     });
 
     it("implements ICommand", () => {
         var cmd = wx.command();
-        expect(wx.utils.queryInterface(cmd, wx.IID.ICommand)).toBeTruthy();
+        expect(wx.queryInterface(cmd, wx.IID.ICommand)).toBeTruthy();
     });
 
     it("completely default reactive command should fire", () => {

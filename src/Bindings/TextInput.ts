@@ -57,7 +57,7 @@ module wx {
             }
 
             state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(src => {
-                if (!utils.isProperty(src)) {
+                if (!isProperty(src)) {
                     // initial and final update
                     updateElement(src);
                 } else {

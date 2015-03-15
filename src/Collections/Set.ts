@@ -8,7 +8,7 @@
         /// ISet
 
         public add(value: T): ISet<T> {
-            var key = utils.getOid(value);
+            var key = getOid(value);
 
             if (!this.keys[key]) {
                 this.values.push(value);
@@ -19,7 +19,7 @@
         }
 
         public delete(value: T): boolean {
-            var key = utils.getOid(value);
+            var key = getOid(value);
 
             if (this.keys[key]) {
                 var index = this.values.indexOf(value);
@@ -33,7 +33,7 @@
         }
 
         public has(value: T): boolean {
-            var key = utils.getOid(value);
+            var key = getOid(value);
             return this.keys.hasOwnProperty(key);
         }
 

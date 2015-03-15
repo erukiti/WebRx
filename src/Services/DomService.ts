@@ -2,7 +2,6 @@
 /// <reference path="../Collections/WeakMap.ts" />
 /// <reference path="../Core/Resources.ts" />
 /// <reference path="../Core/Injector.ts" />
-/// <reference path="../Core/Globals.ts" />
 /// <reference path="../Collections/Set.ts" />
 /// <reference path="../Core/Environment.ts" />
 /// <reference path="../Core/Module.ts" />
@@ -71,7 +70,7 @@ module wx {
         }
 
         public getObjectLiteralTokens(value: string): Array<IObjectLiteralToken> {
-            value = utils.trimString(value);
+            value = trimString(value);
 
             if (value !== '' && this.isObjectLiteralString(value)) {
                 return this.compiler.parseObjectLiteral(value);
@@ -81,7 +80,7 @@ module wx {
         }
 
         public compileBindingOptions(value: string): any {
-            value = utils.trimString(value);
+            value = trimString(value);
             if (value === '') {
                 return null;
             }
@@ -242,7 +241,7 @@ module wx {
             // Optimization: If we didn't capture any observables during 
             // initial evaluation, it is treated as a constant expression
             if (captured.size === 0) {
-                if (utils.isRxObservable(result))
+                if (isRxObservable(result))
                     return result;
 
                 // wrap it
@@ -264,7 +263,7 @@ module wx {
                         // evaluate and produce next value
                         result = exp(ctx.$data, locals);
 
-                        if (!utils.isRxObservable(result)) {
+                        if (!isRxObservable(result)) {
                             // wrap non-observable
                             observer.onNext(Rx.Observable.return(result));
                         } else {
@@ -283,7 +282,7 @@ module wx {
             });
 
             // prefix with initial result
-            var startValue = utils.isRxObservable(result) ?
+            var startValue = isRxObservable(result) ?
                 result :
                 Rx.Observable.return(result);
 
@@ -398,7 +397,7 @@ module wx {
             // transform textual binding-definition into a key-value store where 
             // the key is the binding name and the value is its options
             if (bindingText) {
-                bindingText = utils.trimString(bindingText);
+                bindingText = trimString(bindingText);
             }
 
             if (bindingText)
@@ -460,7 +459,7 @@ module wx {
                     result = o[field];
                     
                     // intercept access to observable properties
-                    if (!keepObservable && utils.isProperty(result)) {
+                    if (!keepObservable && isProperty(result)) {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable
@@ -478,7 +477,7 @@ module wx {
                     target = o[field];
 
                     // intercept access to observable properties
-                    if (utils.isProperty(target)) {
+                    if (isProperty(target)) {
                         var prop = <IObservableProperty<any>> target;
 
                         // register observable
@@ -496,7 +495,7 @@ module wx {
 
                 readIndexHook: (o: any, index: any): any => {
                     // recognize observable lists
-                    if (utils.queryInterface(o, IID.IObservableList)) {
+                    if (queryInterface(o, IID.IObservableList)) {
                         // translate indexer to list.get()
                         list = <IObservableList<any>> o;
                         result = list.get(index);
@@ -509,7 +508,7 @@ module wx {
                     }
                     
                     // intercept access to observable properties
-                    if (utils.queryInterface(result, IID.IObservableProperty)) {
+                    if (queryInterface(result, IID.IObservableProperty)) {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable
@@ -525,7 +524,7 @@ module wx {
 
                 writeIndexHook: (o: any, index: any, newValue: any): any => {
                     // recognize observable lists
-                    if (utils.queryInterface(o, IID.IObservableList)) {
+                    if (queryInterface(o, IID.IObservableList)) {
                         // translate indexer to list.get()
                         list = <IObservableList<any>> o;
                         target = list.get(index);
@@ -535,7 +534,7 @@ module wx {
                             captured.add(list.listChanged);
 
                         // intercept access to observable properties
-                        if (utils.queryInterface(target, IID.IObservableProperty)) {
+                        if (queryInterface(target, IID.IObservableProperty)) {
                             prop = <IObservableProperty<any>> target;
 
                             // register observable
@@ -550,7 +549,7 @@ module wx {
 
                     } else {
                         // intercept access to observable properties
-                        if (utils.queryInterface(o[index], IID.IObservableProperty)) {
+                        if (queryInterface(o[index], IID.IObservableProperty)) {
                             prop = <IObservableProperty<any>> target[index];
 
                             // register observable

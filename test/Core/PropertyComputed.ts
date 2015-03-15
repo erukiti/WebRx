@@ -9,12 +9,12 @@ describe("ObservablePropertyComputed", () => {
 
     it("implements IUnknown",() => {
         var prop = Rx.Observable.never().toProperty();
-        expect(wx.utils.supportsQueryInterface(prop)).toBeTruthy();
+        expect(wx.supportsQueryInterface(prop)).toBeTruthy();
     });
 
     it("implements IObservableProperty",() => {
         var prop = Rx.Observable.never().toProperty();
-        expect(wx.utils.queryInterface(prop, wx.IID.IObservableProperty)).toBeTruthy();
+        expect(wx.queryInterface(prop, wx.IID.IObservableProperty)).toBeTruthy();
     });
 
     it("observables are set up during creation",() => {

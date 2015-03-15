@@ -108,7 +108,7 @@ module wx {
                     el.style.display = "";
                 }
             } else {
-                utils.toggleCssClass(el, !value, VisibleBinding.hiddenClass);
+                toggleCssClass(el, !value, VisibleBinding.hiddenClass);
             }
         }
 

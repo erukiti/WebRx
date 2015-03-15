@@ -2,7 +2,6 @@
 /// <reference path="../Collections/WeakMap.ts" />
 /// <reference path="../Core/Resources.ts" />
 /// <reference path="../Core/Injector.ts" />
-/// <reference path="../Core/Globals.ts" />
 /// <reference path="../Collections/Set.ts" />
 /// <reference path="../Core/Environment.ts" />
 /// <reference path="../Core/Module.ts" />
@@ -27,6 +26,10 @@ module wx {
         // Pass in a route string (or RegExp) plus an optional map of rules, and get
         // back an object with .parse and .stringify methods.
         constructor(route, rules?) {
+            // store
+            this.route = route;
+            this.rules = rules;
+
             // Object to be returned. The public API.
             // Matched param or splat names, in order
             var names = [];
@@ -100,8 +103,51 @@ module wx {
             }
         }
 
-        public parse: (url) => Object;
+        private stripTrailingSlash(route: string) {
+            if (route.length === 0 || route === "/" || route.lastIndexOf("/") !== route.length - 1)
+                return route;
+
+            return route.substr(0, route.length - 1);
+        }
+
+        public parse:(url) => Object;
         public stringify: (params?: Object) => string;
+
+        public get isAbsolute() {
+            return this.route.lastIndexOf("/") === 0;
+        }
+
+        public concat(route: IRoute): IRoute {
+            var other = <RouteMatcher> route;
+            var a = this.stripTrailingSlash(this.route);
+            var b = this.stripTrailingSlash(other.route);
+            var rules = null;
+
+            // check for conflicting rules
+            if (other.rules) {
+                if (this.rules) {
+                    Object.keys(this.rules).forEach(rule => {
+                        if (other.rules.hasOwnProperty(rule)) {
+                            internal.throwError("route '{0}' and '{1}' have conflicting rule '{2}", a, b, rule);
+                        }
+                    });
+
+                    rules = extend(this.rules, extend(other.rules, {}));
+                } else {
+                    rules = extend(other.rules, {});
+                }
+            } else if (this.rules) {
+                rules = extend(this.rules, {});
+            }
+
+            if (a === "/")
+                a = "";
+
+            return wx.route(a + "/" + b, rules);
+        }
+
+        private route: string;
+        private rules: Object;
                 
         // Test to see if a value matches the corresponding rule.
         private validateRule(rule, value) {

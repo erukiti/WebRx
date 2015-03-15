@@ -32,7 +32,7 @@ module wx {
 
             var groupName = opt.groupName != null ?
                 opt.groupName :
-                utils.formatString("wx-radiogroup-{0}", groupId++);
+                formatString("wx-radiogroup-{0}", groupId++);
 
             return {
                 items: params.items,
@@ -88,7 +88,7 @@ module wx {
 
             // label
             if (params.itemText) {
-                perItemExtraMarkup += utils.formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
+                perItemExtraMarkup += formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
                     params.itemText, "$parent.groupName + '-' + $index");
 
                 attrs.push({ key: 'id', value: "$parent.groupName + '-' + $index" });
@@ -107,7 +107,7 @@ module wx {
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
 
             // assemble template
-            result = utils.formatString(result, bindingString, perItemExtraMarkup);
+            result = formatString(result, bindingString, perItemExtraMarkup);
 
             // store
             if (!params.noCache) {

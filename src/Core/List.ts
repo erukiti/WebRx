@@ -1,6 +1,5 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="Utils.ts" />
-/// <reference path="Globals.ts" />
 
 module wx {
     /**
@@ -366,7 +365,7 @@ module wx {
         public suppressChangeNotifications(): Rx.IDisposable {
             this.changeNotificationsSuppressed++;
 
-            if (!this.hasWhinedAboutNoResetSub && this.resetSubCount === 0 && !utils.isInUnitTest()) {
+            if (!this.hasWhinedAboutNoResetSub && this.resetSubCount === 0 && !isInUnitTest()) {
                 log.info("suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
                 this.hasWhinedAboutNoResetSub = true;
             }
@@ -623,7 +622,7 @@ module wx {
         }
 
         private addItemToPropertyTracking(toTrack: T): void {
-            var rcd = this.propertyChangeWatchers[utils.getOid(toTrack)];
+            var rcd = this.propertyChangeWatchers[getOid(toTrack)];
             var self = this;
 
             if (rcd) {
@@ -641,15 +640,15 @@ module wx {
                 changing.where(_ => self.areChangeNotificationsEnabled()).subscribe(x=> self.itemChangingSubject.value.onNext(x)),
                 changed.where(_ => self.areChangeNotificationsEnabled()).subscribe(x=> self.itemChangedSubject.value.onNext(x)));
 
-            this.propertyChangeWatchers[utils.getOid(toTrack)] = new RefCountDisposeWrapper(
+            this.propertyChangeWatchers[getOid(toTrack)] = new RefCountDisposeWrapper(
                 Rx.Disposable.create(() => {
                     disp.dispose();
-                    delete self.propertyChangeWatchers[utils.getOid(toTrack)];
+                    delete self.propertyChangeWatchers[getOid(toTrack)];
                 }));
         }
 
         private removeItemFromPropertyTracking(toUntrack: T): void {
-            var rcd = this.propertyChangeWatchers[utils.getOid(toUntrack)];
+            var rcd = this.propertyChangeWatchers[getOid(toUntrack)];
 
             if (rcd) {
                 rcd.release();

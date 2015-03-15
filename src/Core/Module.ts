@@ -2,7 +2,6 @@
 /// <reference path="Utils.ts" />
 /// <reference path="Injector.ts" />
 /// <reference path="Resources.ts" />
-/// <reference path="Globals.ts" />
 
 module wx {
     class Module implements IModule {
@@ -17,7 +16,7 @@ module wx {
         public registerComponent(name: string, handler: string): void;
 
         public registerComponent(): void {
-            var args = utils.args2Array(arguments);
+            var args = args2Array(arguments);
             var name = args.shift();
             var handler = args.shift();
 
@@ -47,7 +46,7 @@ module wx {
         public registerBinding(names: string[], handler: string): void;
 
         public registerBinding(): void {
-            var args = utils.args2Array(arguments);
+            var args = args2Array(arguments);
             var name = args.shift();
             var handler = args.shift();
 
@@ -96,7 +95,7 @@ module wx {
         /// the application with an error message.
         /// </summary>
         public defaultExceptionHandler: Rx.Observer<Error> = Rx.Observer.create<Error>(ex => {
-            if (!utils.isInUnitTest()) {
+            if (!isInUnitTest()) {
                 log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
             }
         });
@@ -113,7 +112,7 @@ module wx {
         }
 
         public set mainThreadScheduler(value: Rx.IScheduler) {
-            if (utils.isInUnitTest()) {
+            if (isInUnitTest()) {
                 this._unitTestMainThreadScheduler = value;
                 this._mainThreadScheduler = this._mainThreadScheduler || value;
             } else {

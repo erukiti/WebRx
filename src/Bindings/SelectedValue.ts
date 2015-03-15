@@ -16,7 +16,7 @@ module wx {
         public supports(el: HTMLElement, model: any): boolean {
             return (el.tagName.toLowerCase() === 'input' &&
                 el.getAttribute("type") === 'radio') &&
-                !utils.isList(model);
+                !isList(model);
         }
 
         public observeElement(el: HTMLElement): Rx.Observable<any> {
@@ -26,7 +26,7 @@ module wx {
         }
 
         public observeModel(model: any): Rx.Observable<any> {
-            if (utils.isProperty(model)) {
+            if (isProperty(model)) {
                 var prop = <IObservableProperty<any>> model;
                 return prop.changed;
             }
@@ -37,7 +37,7 @@ module wx {
         public updateElement(el: HTMLElement, model: any) {
             var input = <HTMLInputElement> el;
 
-            if (utils.isProperty(model)) {
+            if (isProperty(model)) {
                 var prop = <IObservableProperty<any>> model;
                 input.checked = input.value == prop();
             } else {
@@ -57,7 +57,7 @@ module wx {
     class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
         public supports(el: HTMLElement, model: any): boolean {
             return el.tagName.toLowerCase() === 'select' &&
-                !utils.isList(model);
+                !isList(model);
         }
 
         public observeElement(el: HTMLElement): Rx.Observable<any> {
@@ -65,7 +65,7 @@ module wx {
         }
 
         public observeModel(model: any): Rx.Observable<any> {
-            if (utils.isProperty(model)) {
+            if (isProperty(model)) {
                 var prop = <IObservableProperty<any>> model;
                 return prop.changed;
             }
@@ -76,7 +76,7 @@ module wx {
         public updateElement(el: HTMLElement, model: any) {
             var option = <HTMLSelectElement> el;
 
-            if (utils.isProperty(model)) {
+            if (isProperty(model)) {
                 var prop = <IObservableProperty<any>> model;
 
                 if (prop() === undefined) {
@@ -156,7 +156,7 @@ module wx {
                 }));
 
                 // wire change-events
-                if (utils.isProperty(model)) {
+                if (isProperty(model)) {
                     implCleanup.add(impl.observeElement(el).subscribe(e => {
                         impl.updateModel(el, model, e);
                     }));
