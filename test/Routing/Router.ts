@@ -6,6 +6,59 @@
 /// <reference path="../typings/ix.d.ts" />
 
 describe('Routing',() => {
+    var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
+
+    beforeEach(() => {
+        router.resetStates();
+    });
+
+    afterEach(() => {
+        wx.cleanNode(document.body);
+    });
+
     describe('Router',() => {
+        it('child state should override views of parent',() => {
+            router.registerState({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.registerState({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo");
+            expect(router.currentState().views['main']).toEqual("foo");
+
+            router.go("foo.bar");
+            expect(router.currentState().views['main']).toEqual("bar");
+        });
+
+        it('currentState url should reflect state url hierarchy',() => {
+            router.registerState({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.registerState({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo");
+            expect(router.currentState().url).toEqual("/foo");
+
+            router.go("foo.bar");
+            expect(router.currentState().url).toEqual("/foo/bar");
+        });
     });
 });

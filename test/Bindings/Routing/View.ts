@@ -5,6 +5,14 @@
 describe('Routing', () => {
     var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
 
+    beforeEach(() => {
+        router.resetStates();
+    });
+
+    afterEach(() => {
+        wx.cleanNode(document.body);
+    });
+
     describe('Bindings',() => {
         describe('View', () => {
             it('binds using view name',() => {
@@ -20,7 +28,8 @@ describe('Routing', () => {
 
                 var items = [3, 2, 1];
 
-                router.registerState("foo", {
+                router.registerState({
+                    name: "foo",
                     views: {
                         'main': {
                             component: "wx-select",

@@ -61,8 +61,8 @@ describe('Routing', () => {
             });
 
             it('string route, variables and splats', () => {
-                var r = wx.route("users/:id/*stuff/:other/*more");
-                expect(r.parse("users/123/aaa/456/bbb")).toEqual({ id: "123", other: "456", stuff: "aaa", more: "bbb" });
+                var r = wx.route("users/:id/foo/*stuff/:other/*more");
+                expect(r.parse("users/123/foo/aaa/456/bbb")).toEqual({ id: "123", other: "456", stuff: "aaa", more: "bbb" });
 
                 r = wx.route("users/:id/:other/*stuff/*more");
                 expect(r.parse("users/123/456/aaa/bbb/ccc")).toEqual({ id: "123", other: "456", stuff: "aaa/bbb", more: "ccc" });
