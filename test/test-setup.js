@@ -27,5 +27,3 @@ requirejs.config({
     paths: {
     }
   });
-
-wx.app.history = testutils.createHistory();

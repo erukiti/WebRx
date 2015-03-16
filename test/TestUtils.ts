@@ -232,3 +232,5 @@ module testutils {
         }
     }
 }
+
+createMockHistory = testutils.createHistory;

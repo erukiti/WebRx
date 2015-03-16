@@ -3,6 +3,8 @@
 /// <reference path="Injector.ts" />
 /// <reference path="Resources.ts" />
 
+declare var createMockHistory: () => wx.IHistory;
+
 module wx {
     class Module implements IModule {
         constructor(name: string) {
@@ -89,6 +91,8 @@ module wx {
 
             if (!isInUnitTest()) {
                 this.history = this.createHistory();
+            } else {
+                this.history = createMockHistory();
             }
         }
 
