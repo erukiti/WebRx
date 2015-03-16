@@ -569,9 +569,9 @@ module wx {
 
     export interface IRouterState {
         name: string;
-        views: { [view: string]: string|{ component: string; params?: any } };
-        absoluteUri: string;
+        uri: string;
         params: any;
+        views: { [view: string]: string|{ component: string; params?: any } };
     }
 
     export interface IStateOptions {

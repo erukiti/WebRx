@@ -15,17 +15,17 @@ module wx {
 
             this.resetStates();
 
-            // hook into navigation events
             app.history.onPopState.subscribe((e) => {
                 var stateName = e.state;
 
                 if (stateName) {
-                    // extract params from current uri
                     var uri = app.history.location.pathname + app.history.location.search;
                     var route = this.getAbsoluteRouteForState(stateName);
+
+                    // extract params by parsing current uri
                     var params = route.parse(uri);
 
-                    // enter state
+                    // enter state using extracted params
                     this.go(stateName, params, { location: false });
                 }
             });
@@ -112,9 +112,15 @@ module wx {
 
                 // is registered?
                 var state = this.states[stateName];
-                if (state != null) {
-                    result.push(state);
+                if (state == null) {
+                    // introduce fake state to keep hierarchy intact
+                    state = {
+                        name: stateName,
+                        route: route(stateName)
+                    };
                 }
+
+                result.push(state);
             }
 
             return result;
@@ -165,11 +171,11 @@ module wx {
             }
 
             // construct resulting state
-            var absoluteRoute: IRoute = this.getAbsoluteRouteForState(to, hierarchy);
+            var route = this.getAbsoluteRouteForState(to, hierarchy);
             var state = <IRouterState> extend(this.states[to], {});
             state.views = stateViews;
             state.params = stateParams;
-            state.absoluteUri = absoluteRoute.stringify(state.params);
+            state.uri = route.stringify(state.params);
 
             // perform deep equal against current state
             if (this.currentState() == null ||
@@ -179,9 +185,9 @@ module wx {
                 // update history
                 if (options && options.location) {
                     if(typeof options.location === "string" && options.location === "replace")
-                        app.history.replaceState(state.name, "", state.absoluteUri);
+                        app.history.replaceState(state.name, "", state.uri);
                     else
-                        app.history.pushState(state.name, "", state.absoluteUri);
+                        app.history.pushState(state.name, "", state.uri);
                 }
 
                 // activate
