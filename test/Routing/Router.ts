@@ -9,7 +9,7 @@ describe('Routing',() => {
     var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
 
     beforeEach(() => {
-        router.resetStates();
+        router.reset();
         wx.app.history.reset();
     });
 
@@ -19,7 +19,7 @@ describe('Routing',() => {
 
     describe('Router',() => {
         it('inferres route from state-name if not specified',() => {
-            router.registerState({
+            router.state({
                 name: "foo",
                 views: {
                     'main': "foo"
@@ -27,11 +27,11 @@ describe('Routing',() => {
             });
 
             router.go("foo");
-            expect(router.currentState().uri).toEqual("/foo");
+            expect(router.current().uri).toEqual("/foo");
 
-            router.resetStates();
+            router.reset();
 
-            router.registerState({
+            router.state({
                 name: "foo.bar",
                 views: {
                     'main': "bar"
@@ -39,18 +39,18 @@ describe('Routing',() => {
             });
 
             router.go("foo.bar");
-            expect(router.currentState().uri).toEqual("/foo/bar");
+            expect(router.current().uri).toEqual("/foo/bar");
         });
 
         it('child state override views of parent',() => {
-            router.registerState({
+            router.state({
                 name: "foo",
                 views: {
                     'main': "foo"
                 }
             });
 
-            router.registerState({
+            router.state({
                 name: "foo.bar",
                 views: {
                     'main': "bar"
@@ -58,21 +58,21 @@ describe('Routing',() => {
             });
 
             router.go("foo");
-            expect(router.currentState().views['main']).toEqual("foo");
+            expect(router.current().views['main']).toEqual("foo");
 
             router.go("foo.bar");
-            expect(router.currentState().views['main']).toEqual("bar");
+            expect(router.current().views['main']).toEqual("bar");
         });
 
         it('child states can override absolute-Uri',() => {
-            router.registerState({
+            router.state({
                 name: "foo",
                 views: {
                     'main': "foo"
                 }
             });
 
-            router.registerState({
+            router.state({
                 name: "foo.bar",
                 route: "/baz/:id",
                 views: {
@@ -81,18 +81,18 @@ describe('Routing',() => {
             });
 
             router.go("foo.bar", { id: 5 });
-            expect(router.currentState().uri).toEqual("/baz/5");
+            expect(router.current().uri).toEqual("/baz/5");
         });
 
-        it('currentState-route should reflect state-route hierarchy',() => {
-            router.registerState({
+        it('current-route should reflect state-route hierarchy',() => {
+            router.state({
                 name: "foo",
                 views: {
                     'main': "foo"
                 }
             });
 
-            router.registerState({
+            router.state({
                 name: "foo.bar",
                 views: {
                     'main': "bar"
@@ -100,14 +100,14 @@ describe('Routing',() => {
             });
 
             router.go("foo");
-            expect(router.currentState().uri).toEqual("/foo");
+            expect(router.current().uri).toEqual("/foo");
 
             router.go("foo.bar");
-            expect(router.currentState().uri).toEqual("/foo/bar");
+            expect(router.current().uri).toEqual("/foo/bar");
 
-            router.resetStates();
+            router.reset();
 
-            router.registerState({
+            router.state({
                 name: "foo",
                 route: "foo/:fooId",
                 views: {
@@ -115,7 +115,7 @@ describe('Routing',() => {
                 }
             });
 
-            router.registerState({
+            router.state({
                 name: "foo.bar",
                 route: "bar/:barId",
                 views: {
@@ -124,11 +124,11 @@ describe('Routing',() => {
             });
 
             router.go("foo.bar", { fooId: 3, barId: 5 });
-            expect(router.currentState().uri).toEqual("/foo/3/bar/5");
+            expect(router.current().uri).toEqual("/foo/3/bar/5");
         });
 
         it('go() with history = true should push a history record',() => {
-            router.registerState({
+            router.state({
                 name: "foo",
                 views: {
                     'main': "foo"
@@ -141,12 +141,12 @@ describe('Routing',() => {
             });
 
             router.go("foo", {}, { location: true });
-            expect(router.currentState().uri).toEqual("/foo");
+            expect(router.current().uri).toEqual("/foo");
             expect(fireCount).toEqual(1);
         });
 
         it('browser navigation picks up the correct state',() => {
-            router.registerState({
+            router.state({
                 name: "foo",
                 route: "foo/:fooId",
                 views: {
@@ -154,7 +154,7 @@ describe('Routing',() => {
                 }
             });
 
-            router.registerState({
+            router.state({
                 name: "foo.bar",
                 route: "bar/:barId",
                 views: {
@@ -163,15 +163,15 @@ describe('Routing',() => {
             });
 
             router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
-            expect(router.currentState().name).toEqual("foo.bar");
+            expect(router.current().name).toEqual("foo.bar");
             expect(wx.app.history.length).toEqual(1);
 
             router.go("foo", { fooId: 3 }, { location: true });
-            expect(router.currentState().name).toEqual("foo");
+            expect(router.current().name).toEqual("foo");
             expect(wx.app.history.length).toEqual(2);
 
             wx.app.history.back();
-            expect(router.currentState().name).toEqual("foo.bar");
+            expect(router.current().name).toEqual("foo.bar");
             expect(wx.app.history.length).toEqual(2);
         });
     });

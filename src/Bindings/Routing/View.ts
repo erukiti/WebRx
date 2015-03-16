@@ -37,7 +37,7 @@ module wx {
                 internal.throwError("views needs to have a name!");
 
             // subscribe to router-state changes
-            state.cleanup.add(this.router.currentState.changed.startWith(this.router.currentState()).subscribe(newState => {
+            state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(newState => {
                 if (newState.views != null) {
                     var component = newState.views[viewName];
 

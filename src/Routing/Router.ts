@@ -13,7 +13,7 @@ module wx {
         constructor(domService: IDomService) {
             this.domService = domService;
 
-            this.resetStates();
+            this.reset();
 
             app.history.onPopState.subscribe((e) => {
                 var stateName = e.state;
@@ -31,23 +31,31 @@ module wx {
             });
         }
 
-        public registerState(config: IRouterStateConfig): IRouter {
+        public state(config: IRouterStateConfig): IRouter {
             this.registerStateInternal(config);
             return this;
         }
 
-        public go(to: string, params?: {}, options?: IStateOptions): void {
+        public go(to: string, params?: {}, options?: IStateChangeOptions): void {
             if (this.states[to] == null)
                 internal.throwError("state '{0}' is not registered", to);
 
             this.activateState(to, params, options);
         }
 
-        public getState(state: string): IRouterStateConfig {
+        public get(state: string): IRouterStateConfig {
             return this.states[state];
         }
 
-        public resetStates(): void {
+        public uri(state: string, params?: {}): string {
+            var route = this.getAbsoluteRouteForState(state);
+            if (route != null)
+                return route.stringify(params);
+
+            return null;
+        }
+
+        public reset(): void {
             this.states = {};
 
             // Implicit root state that is always active
@@ -56,11 +64,14 @@ module wx {
                 route: route("/")
             });
 
-            //this.root.navigable = null;
             this.go(this.rootStateName);
         }
 
-        public currentState = wx.property<IRouterState>();
+        public reload(): void {
+            this.go(this.current().name, this.current().params, { force: true, location: false });
+        }
+
+        public current = wx.property<IRouterState>();
 
         //////////////////////////////////
         // Implementation
@@ -146,7 +157,7 @@ module wx {
             return result;
         }
 
-        private activateState(to: string, params?: {}, options?: IStateOptions): void {
+        private activateState(to: string, params?: Object, options?: IStateChangeOptions): void {
             var hierarchy = this.getStateHierarchy(to);
             var stateViews: { [view: string]: string|{ component: string; params?: any } } = {};
             var stateParams = {};
@@ -176,9 +187,9 @@ module wx {
             state.params = stateParams;
 
             // perform deep equal against current state
-            if (this.currentState() == null ||
-                this.currentState().name !== to ||
-                !isEqual(this.currentState().params, state.params)) {
+            if ((options && options.force) || this.current() == null ||
+                this.current().name !== to ||
+                !isEqual(this.current().params, state.params)) {
 
                 // update history
                 if (options && options.location) {
@@ -189,7 +200,7 @@ module wx {
                 }
 
                 // activate
-                this.currentState(state);
+                this.current(state);
             }
         }
     }

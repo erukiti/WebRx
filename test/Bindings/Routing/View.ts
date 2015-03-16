@@ -6,7 +6,7 @@ describe('Routing', () => {
     var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
 
     beforeEach(() => {
-        router.resetStates();
+        router.reset();
         wx.app.history.reset();
     });
 
@@ -29,7 +29,7 @@ describe('Routing', () => {
 
                 var items = [3, 2, 1];
 
-                router.registerState({
+                router.state({
                     name: "foo",
                     views: {
                         'main': {

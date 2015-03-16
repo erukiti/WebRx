@@ -576,35 +576,21 @@ module wx {
 
     export const enum RouterLocationChangeMode {
         add = 1,
-        replace = 2,
+        replace = 2
     }
 
-    export interface IStateOptions {
+    export interface IStateChangeOptions {
         /**
-        *  If true will update the url in the location bar, if false will not. If string, must be "replace", 
+        * If true will update the url in the location bar, if false will not. If string, must be "replace", 
         * which will update url and also replace last history record.
         **/
         location?: boolean|RouterLocationChangeMode; 
 
         /**
-        *  If true will inherit url parameters from current url.
+        * If true will force transition even if the state or params have not changed, aka a reload of the same state. 
         **/
-        inherit?: boolean;
-
-        /**
-        *  When transitioning with relative path (e.g '^'), defines which state to be relative from.
-        **/
-        //relative?: IState;
+        force?: boolean;
     }
-
-    /*
-    export interface IHrefOptions {
-        lossy?: boolean;
-        inherit?: boolean;
-        relative?: IState;
-        absolute?: boolean;
-    }
-    */
 
     export interface IHistory {
         onPopState: Rx.Observable<PopStateEvent>;        
@@ -622,7 +608,7 @@ module wx {
         /**
         * Registers a state configuration under a given state name.
         **/
-        registerState(config: IRouterStateConfig): IRouter;
+        state(config: IRouterStateConfig): IRouter;
 
         /**
         * Convenience method for transitioning to a new state. IRouter.go calls IRouter.transitionTo internally 
@@ -630,53 +616,33 @@ module wx {
         * This allows you to easily use an absolute or relative to path and specify only the parameters you'd like 
         * to update (while letting unspecified parameters inherit from the currently active ancestor states).
         **/
-        go(to: string, params?: any, options?: IStateOptions): void;    // Rx.Observable<any>
+        go(to: string, params?: Object, options?: IStateChangeOptions): void;    // Rx.Observable<any>
 
-        /**
-        * Low-level method for transitioning to a new state. IRouter.go uses transitionTo internally. 
-        * IRouter.go is recommended in most situations.
+         /**
+        * An uri generation method that returns the uri for the given state populated with the given params.
         **/
-        //transitionTo(state: string, params?: {}, updateLocation?: boolean): void;
-        //transitionTo(state: string, params?: {}, options?: IStateOptions): void;
-
-        /**
-        * A method to determine if the current active state is equal to or is the child of the state stateName. 
-        * If any params are passed then they will be tested for a match as well. Not all the parameters need to 
-        * be passed, just the ones you'd like to test for equality.
-        **/
-        //includes(state: string, params?: {}): boolean;
-
-        /**
-        * Similar to IRouter.includes, but only checks for the full state name. 
-        * If params is supplied then it will be tested for strict equality against the current 
-        * active params object, so all params must match with none missing and no extras.
-        **/
-        //is(state: string, params?: {}): boolean;
-        //is(state: IState, params?: {}): boolean;
-
-        /**
-        * A url generation method that returns the compiled url for the given state populated with the given params.
-        **/
-        //href(state: IState, params?: {}, options?: IHrefOptions): string;
-        //href(state: string, params?: {}, options?: IHrefOptions): string;
+        uri(state: string, params?: {}): string;
 
         /**
         * A method that force reloads the current state. All resolves are re-resolved, events are not re-fired, 
         * and components reinstantiated.
         **/
-        //reload(): void;
+        reload(): void;
 
         /**
         * Returns the state configuration object for any specific state or all states.
         **/
-        getState(state: string): IRouterStateConfig;
+        get(state: string): IRouterStateConfig;
 
-        resetStates(): void;
+        /**
+        * Resets internal state configuration to defaults
+        **/
+        reset(): void;
 
         /**
         * A reference to the current state's config object. However you passed it in. Useful for accessing custom data.
         **/
-        currentState: IObservableProperty<IRouterState>;
+        current: IObservableProperty<IRouterState>;
     }
 }
 
