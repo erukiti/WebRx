@@ -607,19 +607,33 @@ module wx {
     export interface IRouter {
         /**
         * Registers a state configuration under a given state name.
+        * @param {IRouterStateConfig} config State configuration to register
         **/
         state(config: IRouterStateConfig): IRouter;
+
+        /**
+        * Current state's configuration.
+        **/
+        current: IObservableProperty<IRouterState>;
 
         /**
         * Convenience method for transitioning to a new state. IRouter.go calls IRouter.transitionTo internally 
         * but automatically sets options to { location: true, inherit: true, relative: IRouter.current, notify: true }. 
         * This allows you to easily use an absolute or relative to path and specify only the parameters you'd like 
         * to update (while letting unspecified parameters inherit from the currently active ancestor states).
+        * @param {string} to Absolute or relative destination state path. 'contact.detail' - will go to the 
+        * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
+        * '.child.grandchild' will go to grandchild state
+        * @param {Object} params A map of the parameters that will be sent to the state. 
+        * Any parameters that are not specified will be inherited from currently defined parameters. 
+        * @param {IStateChangeOptions} options Options controlling how the state transition will be performed
         **/
         go(to: string, params?: Object, options?: IStateChangeOptions): void;    // Rx.Observable<any>
 
-         /**
+        /**
         * An uri generation method that returns the uri for the given state populated with the given params.
+        * @param {string} state Absolute state path.
+        * @param {Object} params An object of parameter values to fill the state's required parameters.
         **/
         uri(state: string, params?: {}): string;
 
@@ -630,19 +644,15 @@ module wx {
         reload(): void;
 
         /**
-        * Returns the state configuration object for any specific state or all states.
+        * Returns the state configuration object for any specific state.
+        * @param {string} state Absolute state path.
         **/
         get(state: string): IRouterStateConfig;
 
         /**
-        * Resets internal state configuration to defaults
+        * Resets internal state configuration to defaults (for unit-testing)
         **/
         reset(): void;
-
-        /**
-        * A reference to the current state's config object. However you passed it in. Useful for accessing custom data.
-        **/
-        current: IObservableProperty<IRouterState>;
     }
 }
 
