@@ -17,11 +17,17 @@ module wx {
 
             // hook into navigation events
             app.history.onPopState.subscribe((e) => {
-                // construct relative url from location
-                //var url = document.location.pathname + document.location.search;
+                var stateName = e.state;
 
-                // navigate
-                //this.navigate(url, false, e.state);
+                if (stateName) {
+                    // extract params from current uri
+                    var uri = app.history.location.pathname + app.history.location.search;
+                    var route = this.getAbsoluteRouteForState(stateName);
+                    var params = route.parse(uri);
+
+                    // enter state
+                    this.go(stateName, params, { location: false });
+                }
             });
         }
 
@@ -115,7 +121,7 @@ module wx {
         }
 
         private getAbsoluteRouteForState(name: string, hierarchy?: IRouterStateConfig[]): IRoute {
-            hierarchy = hierarchy || this.getStateHierarchy(name);
+            hierarchy = hierarchy != null ? hierarchy : this.getStateHierarchy(name);
             var result: IRoute = null;
 
             hierarchy.forEach(state => {
@@ -173,9 +179,9 @@ module wx {
                 // update history
                 if (options && options.location) {
                     if(typeof options.location === "string" && options.location === "replace")
-                        app.history.pushState(state.name, "", state.absolutePath);
-                    else
                         app.history.replaceState(state.name, "", state.absolutePath);
+                    else
+                        app.history.pushState(state.name, "", state.absolutePath);
                 }
 
                 // activate

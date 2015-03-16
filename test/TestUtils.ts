@@ -112,7 +112,7 @@ module testutils {
     export function createHistory(): wx.IHistory {
         var stack:Array<{ data: any; url: string }> = [];
         var location: Location = <Location> {};
-        var current: number = -1;
+        var current: number = 0;
         var popStateSubject = new Rx.Subject<PopStateEvent>();
         var pushStateSubject = new Rx.Subject<PopStateEvent>();
 
@@ -148,11 +148,11 @@ module testutils {
         }
 
         function pushState(statedata: any, title: string, url?: string) {
-            if (current < stack.length) {
-                stack[current] = statedata;
+            if (current < stack.length - 1) {
+                stack[current] = { data: statedata, url: url };
             } else {
                 stack.push({ data: statedata, url: url });
-                current++;
+                current = stack.length - 1;
             }
 
             updateLocation(stack[current].url);
@@ -168,7 +168,7 @@ module testutils {
 
         function reset() {
             stack = [];
-            current = -1;
+            current = 0;
         }
 
         // inherit default implementation

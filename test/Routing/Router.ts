@@ -40,7 +40,7 @@ describe('Routing',() => {
             expect(router.currentState().views['main']).toEqual("bar");
         });
 
-        it('currentState path should reflect state url hierarchy',() => {
+        it('currentState-path should reflect state-path hierarchy',() => {
             router.registerState({
                 name: "foo",
                 views: {
@@ -99,6 +99,36 @@ describe('Routing',() => {
             router.go("foo", {}, { location: true });
             expect(router.currentState().absolutePath).toEqual("/foo");
             expect(fireCount).toEqual(1);
+        });
+
+        it('navigating back should pick up the correct state',() => {
+            router.registerState({
+                name: "foo",
+                path: "foo/:fooId",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.registerState({
+                name: "foo.bar",
+                path: "bar/:barId",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(router.currentState().name).toEqual("foo.bar");
+            expect(wx.app.history.length).toEqual(1);
+
+            router.go("foo", { fooId: 3 }, { location: true });
+            expect(router.currentState().name).toEqual("foo");
+            expect(wx.app.history.length).toEqual(2);
+
+            wx.app.history.back();
+            expect(router.currentState().name).toEqual("foo.bar");
+            expect(wx.app.history.length).toEqual(2);
         });
     });
 });
