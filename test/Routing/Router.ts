@@ -18,7 +18,7 @@ describe('Routing',() => {
     });
 
     describe('Router',() => {
-        it('inferres route from state-name if not specified',() => {
+        it('inferes route from state-name if not specified',() => {
             router.state({
                 name: "foo",
                 views: {
@@ -42,7 +42,7 @@ describe('Routing',() => {
             expect(router.current().uri).toEqual("/foo/bar");
         });
 
-        it('child state override views of parent',() => {
+        it('child states can override views of parent',() => {
             router.state({
                 name: "foo",
                 views: {
@@ -64,7 +64,7 @@ describe('Routing',() => {
             expect(router.current().views['main']).toEqual("bar");
         });
 
-        it('child states can override absolute-Uri',() => {
+        it('child states can override current.uri',() => {
             router.state({
                 name: "foo",
                 views: {
@@ -84,7 +84,7 @@ describe('Routing',() => {
             expect(router.current().uri).toEqual("/baz/5");
         });
 
-        it('current-route should reflect state-route hierarchy',() => {
+        it('current.uri reflects state-hierarchy',() => {
             router.state({
                 name: "foo",
                 views: {
@@ -127,7 +127,7 @@ describe('Routing',() => {
             expect(router.current().uri).toEqual("/foo/3/bar/5");
         });
 
-        it('go() with history = true should push a history record',() => {
+        it('go() with history = true pushes a history record',() => {
             router.state({
                 name: "foo",
                 views: {
@@ -145,7 +145,7 @@ describe('Routing',() => {
             expect(fireCount).toEqual(1);
         });
 
-        it('browser navigation picks up the correct state',() => {
+        it('transitions to the the correct state on history.popstate event',() => {
             router.state({
                 name: "foo",
                 route: "foo/:fooId",
