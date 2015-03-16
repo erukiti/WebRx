@@ -151,6 +151,29 @@ describe('Routing',() => {
             expect(fireCount).toEqual(1);
         });
 
+        it('activating current state again only notifies if forced',() => {
+            router.state({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            var fireCount = 0;
+            wx.app.history.onPushState.subscribe(x => {
+                fireCount++;
+            });
+
+            router.go("foo", {}, { location: true });
+            expect(fireCount).toEqual(1);
+
+            router.go("foo", {}, { location: true });
+            expect(fireCount).toEqual(1);
+
+            router.go("foo", {}, { location: true, force: true });
+            expect(fireCount).toEqual(2);
+        });
+
         it('transitions to the the correct state on history.popstate event',() => {
             router.state({
                 name: "foo",
@@ -179,6 +202,125 @@ describe('Routing',() => {
             wx.app.history.back();
             expect(router.current().name).toEqual("foo.bar");
             expect(wx.app.history.length).toEqual(2);
+
+            wx.app.history.forward();
+            expect(router.current().name).toEqual("foo");
+            expect(wx.app.history.length).toEqual(2);
+        });
+
+        it('correctly maps parent path if parent is registered',() => {
+            router.state({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(router.current().name).toEqual("foo.bar");
+
+            // now go "up"
+            router.go("^");
+            expect(router.current().name).toEqual("foo");
+        });
+
+        it('correctly maps parent path to root if parent is _not_ registered',() => {
+            router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(router.current().name).toEqual("foo.bar");
+
+            // now go "up"
+            router.go("^");
+            expect(router.current().name).toEqual("$");
+        });
+
+        it('correctly maps sibling-path if both sibling and parent are registered',() => {
+            router.state({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.state({
+                name: "foo.baz",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(router.current().name).toEqual("foo.bar");
+
+            // now go "up"
+            router.go("^.baz");
+            expect(router.current().name).toEqual("foo.baz");
+        });
+
+        it('correctly maps sibling-path if sibling is registered and parent is not',() => {
+            router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.state({
+                name: "foo.baz",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(router.current().name).toEqual("foo.bar");
+
+            // now go "up"
+            router.go("^.baz");
+            expect(router.current().name).toEqual("foo.baz");
+        });
+
+        it('correctly maps child-path if child is registered',() => {
+            router.state({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo");
+            expect(router.current().name).toEqual("foo");
+
+            // now go "down"
+            router.go(".bar");
+            expect(router.current().name).toEqual("foo.bar");
         });
     });
 });

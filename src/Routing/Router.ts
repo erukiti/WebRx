@@ -37,6 +37,8 @@ module wx {
         }
 
         public go(to: string, params?: {}, options?: IStateChangeOptions): void {
+            to = this.mapPath(to);
+
             if (this.states[to] == null)
                 internal.throwError("state '{0}' is not registered", to);
 
@@ -48,6 +50,8 @@ module wx {
         }
 
         public uri(state: string, params?: {}): string {
+            state = this.mapPath(state);
+
             var route = this.getAbsoluteRouteForState(state);
             if (route != null)
                 return route.stringify(params);
@@ -79,11 +83,14 @@ module wx {
         private states: { [name: string]: IRouterStateConfig } = {};
         private root: IRouterStateConfig;
         private domService: IDomService;
+
+        private pathSeparator = ".";
+        private parentPathDirective = "^";
         private rootStateName = "$";
         private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
 
         private registerStateInternal(state: IRouterStateConfig) {
-            var parts = state.name.split(".");
+            var parts = state.name.split(this.pathSeparator);
 
             if (state.name !== this.rootStateName) {
                 // validate name
@@ -115,8 +122,41 @@ module wx {
             return state;
         }
 
+        private mapPath(path: string) {
+            // child-relative
+            if (path.indexOf(this.pathSeparator) === 0) {
+                return this.current().name + path;
+            } else if (path.indexOf(this.parentPathDirective) === 0) {
+                // parent-relative                
+                var parent = this.current().name;
+
+                // can't go further up than root
+                if (parent === this.rootStateName)
+                    return parent;
+
+                // test parents and siblings until one is found that is registered
+                var parts = parent.split(this.pathSeparator);
+
+                for (var i = parts.length - 1; i > 0; i--) {
+                    var tmp = parts.slice(0, i).join(this.pathSeparator);
+
+                    // check if parant or sibling relative to current parent exists 
+                    if (this.get(tmp) || this.get(tmp + path.substr(1))) {
+                        path = tmp + path.substr(1);
+                        return path;
+                    }
+                }
+
+                // make it root relative
+                path = this.rootStateName + path.substr(1);
+                return path;
+            } 
+
+            return path;
+        }
+
         private getStateHierarchy(name: string): IRouterStateConfig[] {
-            var parts = name.split(".");
+            var parts = name.split(this.pathSeparator);
             var stateName: string = "";
             var result = [];
             var state: IRouterStateConfig;
@@ -126,7 +166,7 @@ module wx {
 
             for (var i = 0; i < parts.length; i++) {
                 if (i > 0)
-                    stateName += "." + parts[i];
+                    stateName += this.pathSeparator + parts[i];
                 else
                     stateName = parts[i];
 

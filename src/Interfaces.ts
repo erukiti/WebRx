@@ -581,8 +581,7 @@ module wx {
 
     export interface IStateChangeOptions {
         /**
-        * If true will update the url in the location bar, if false will not. If string, must be "replace", 
-        * which will update url and also replace last history record.
+        * If true will update the url in the location bar, if false will not.
         **/
         location?: boolean|RouterLocationChangeMode; 
 
@@ -632,7 +631,9 @@ module wx {
 
         /**
         * An uri generation method that returns the uri for the given state populated with the given params.
-        * @param {string} state Absolute state path.
+        * @param {string} state Absolute or relative destination state path. 'contact.detail' - will go to the 
+        * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
+        * '.child.grandchild' will go to grandchild state
         * @param {Object} params An object of parameter values to fill the state's required parameters.
         **/
         uri(state: string, params?: {}): string;
