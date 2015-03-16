@@ -26,30 +26,33 @@ module wx {
 
             var el = <HTMLElement> node;
             var compiled = this.domService.compileBindingOptions(options);
+            var opt = <IComponentBindingOptions> compiled;
             var exp: ICompiledExpression;
-            var componentName: string;
-            var componentParams: Object = undefined;
+            var observables: Array<Rx.Observable<any>> = [];
+            var paramsKeys: Array<string> = [];
+            var componentName;
+            var componentParams: Object;
+            var keepComponentParams = false;
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                componentName = this.domService.evaluateExpression(exp, ctx);
+                observables.push(this.domService.expressionToObservable(exp, ctx));
             } else {
-                var opt = <IComponentBindingOptions> compiled;
+                // collect state-name observable
+                observables.push(this.domService.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
 
-                // get name
-                componentName = this.domService.evaluateExpression(<ICompiledExpression> <any> opt.name, ctx);
-
-                // build params
+                // collect params observables
                 if (opt.params) {
-                    componentParams = {};
-                    
-                    // opt params may have been an object passed by value (probably $componentParams from view-binding)
                     if (typeof opt.params === "function") {
+                        // opt params is object passed by value (probably $componentParams from view-binding)
                         componentParams = this.domService.evaluateExpression(<ICompiledExpression> opt.params, ctx);
+                        keepComponentParams = true;
                     } else if (typeof opt.params === "object") {
                         Object.keys(opt.params).forEach(x => {
-                            componentParams[x] = this.domService.evaluateExpression(opt.params[x], ctx);
+                            paramsKeys.push(x);
+
+                            observables.push(this.domService.expressionToObservable(opt.params[x], ctx));
                         });
                     } else {
                         internal.throwError("invalid component-params");
@@ -61,23 +64,37 @@ module wx {
             var oldContents = new Array<Node>();
             while (el.firstChild) { oldContents.push(el.removeChild(el.firstChild)); }
 
-            // lookup component
-            var component: IComponent = undefined;
-            if (state.module)
-                component = state.module.getComponent(componentName);
+            // subscribe to any input changes
+            state.cleanup.add(Rx.Observable.combineLatest(observables,(_) => args2Array(arguments)).subscribe(latest => {
+                // first element is always the component-name
+                componentName = latest.shift();
 
-            // fallback to "app" module if not registered with
-            if (!component)
-                component = app.getComponent(componentName);
+                if (!keepComponentParams) {
+                    // subsequent entries are latest param values
+                    componentParams = {};
 
-            if (component == null)
-                internal.throwError("component '{0}' has not been registered.", componentName);
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        componentParams[paramsKeys[i]] = latest[i];
+                    }
+                }
 
-            // resolve template & view-model
-            if (component.viewModel) {
-                state.cleanup.add(Rx.Observable.combineLatest(
-                    this.loadTemplate(component.template, componentParams),
-                    this.loadViewModel(component.viewModel, componentParams),
+                // lookup component
+                var component: IComponent = undefined;
+                if (state.module)
+                    component = state.module.getComponent(componentName);
+
+                // fallback to "app" module if not registered with
+                if (!component)
+                    component = app.getComponent(componentName);
+
+                if (component == null)
+                    internal.throwError("component '{0}' has not been registered.", componentName);
+
+                // resolve template & view-model
+                if (component.viewModel) {
+                    state.cleanup.add(Rx.Observable.combineLatest(
+                        this.loadTemplate(component.template, componentParams),
+                        this.loadViewModel(component.viewModel, componentParams),
                         (t, vm) => {
                             // if loadViewModel yields a function, we interpret that as a factory
                             if (typeof vm === "function") {
@@ -86,15 +103,16 @@ module wx {
 
                             return { template: t, viewModel: vm }
                         }).subscribe(x => {
-                            // done
-                            this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                        }, (err) => app.defaultExceptionHandler.onNext(err)));
-            } else {
-                state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
-                    // done
-                    this.applyTemplate(component, el, ctx, state, t);
-                },(err) => app.defaultExceptionHandler.onNext(err)));
-            }
+                        // done
+                        this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
+                    },(err) => app.defaultExceptionHandler.onNext(err)));
+                } else {
+                    state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
+                        // done
+                        this.applyTemplate(component, el, ctx, state, t);
+                    },(err) => app.defaultExceptionHandler.onNext(err)));
+                }
+            }));
 
             // release closure references to GC 
             state.cleanup.add(Rx.Disposable.create(() => {

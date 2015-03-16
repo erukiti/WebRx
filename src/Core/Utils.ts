@@ -84,6 +84,17 @@ module wx {
     }
 
     /**
+    * If the prop is an observable property return its value
+    * @param {any} prop
+    */
+    export function unwrapProperty(prop: any) {
+        if (isProperty(prop))
+            return prop();
+
+        return prop;
+    }
+
+    /**
     * Returns true if a Unit-Testing environment is detected
     */
     export function isInUnitTest(): boolean {

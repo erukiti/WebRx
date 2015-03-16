@@ -54,17 +54,13 @@ module wx {
             // subscribe to any input changes
             state.cleanup.add(Rx.Observable.combineLatest(observables, (_) => args2Array(arguments)).subscribe(latest => {
                 // first element is always the state-name
-                stateName = latest.shift();
-
-                // unwrap properties
-                if (isProperty(stateName))
-                    stateName = stateName();
+                stateName = unwrapProperty(latest.shift());
 
                 // subsequent entries are latest param values
                 stateParams = {};
 
                 for (var i = 0; i < paramsKeys.length; i++) {
-                    stateParams[paramsKeys[i]] = isProperty(latest[i]) ? latest[i]() : latest[i];
+                    stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                 }
 
                 // construct uri and assign
