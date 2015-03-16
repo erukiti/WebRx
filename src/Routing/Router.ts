@@ -83,11 +83,15 @@ module wx {
         private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
 
         private registerStateInternal(state: IRouterStateConfig) {
+            var parts = state.name.split(".");
+
             if (state.name !== this.rootStateName) {
                 // validate name
-                var parts = state.name.split(".");
-                if (parts.some(x => !this.validPathRegExp.test(x)))
-                    internal.throwError("a state-path must start with a character, optionally followed by one or more alphanumeric characters, dashes or underscores");
+                if (parts.forEach(path => {
+                    if (!this.validPathRegExp.test(path)) {
+                        internal.throwError("invalid state-path '{0}' (a state-path must start with a character, optionally followed by one or more alphanumeric characters, dashes or underscores)");
+                    }
+                }));
             }
 
             // wrap and store

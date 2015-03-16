@@ -18,6 +18,12 @@ describe('Routing',() => {
     });
 
     describe('Router',() => {
+        it('throws on attempt to register invalid state-path',() => {
+            expect(()=> router.state({
+                name: "fo$o"
+            })).toThrowError(/invalid state-path/);
+        });
+
         it('inferes route from state-name if not specified',() => {
             router.state({
                 name: "foo",
