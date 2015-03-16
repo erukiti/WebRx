@@ -56,7 +56,7 @@ module wx {
             // Implicit root state that is always active
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                path: route("/")
+                route: route("/")
             });
 
             //this.root.navigable = null;
@@ -78,15 +78,15 @@ module wx {
             state = <IRouterStateConfig> extend(state, {});
             this.states[state.name] = state;
 
-            if (state.path != null) {
+            if (state.route != null) {
                 // create route from string
-                if (typeof state.path === "string") {
-                    state.path = route(state.path);
+                if (typeof state.route === "string") {
+                    state.route = route(state.route);
                 }
             } else {
                 // derive relative url from name
                 var parts = state.name.split(".");
-                state.path = route(parts[parts.length - 1]);
+                state.route = route(parts[parts.length - 1]);
             }
 
             // detect root-state override
@@ -127,15 +127,15 @@ module wx {
             hierarchy.forEach(state => {
                 // concat urls
                 if (result != null) {
-                    var route = <IRoute> state.path;
+                    var route = <IRoute> state.route;
 
                     // individual states may use absolute urls as well
                     if (!route.isAbsolute)
-                        result = result.concat(<IRoute> state.path);
+                        result = result.concat(<IRoute> state.route);
                     else
                         result = route;
                 } else {
-                    result = <IRoute> state.path;
+                    result = <IRoute> state.route;
                 }
             });
 
@@ -169,7 +169,7 @@ module wx {
             var state = <IRouterState> extend(this.states[to], {});
             state.views = stateViews;
             state.params = stateParams;
-            state.absolutePath = absoluteRoute.stringify(state.params);
+            state.absoluteUri = absoluteRoute.stringify(state.params);
 
             // perform deep equal against current state
             if (this.currentState() == null ||
@@ -179,9 +179,9 @@ module wx {
                 // update history
                 if (options && options.location) {
                     if(typeof options.location === "string" && options.location === "replace")
-                        app.history.replaceState(state.name, "", state.absolutePath);
+                        app.history.replaceState(state.name, "", state.absoluteUri);
                     else
-                        app.history.pushState(state.name, "", state.absolutePath);
+                        app.history.pushState(state.name, "", state.absoluteUri);
                 }
 
                 // activate

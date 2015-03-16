@@ -114,7 +114,7 @@ module wx {
         public stringify: (params?: Object) => string;
 
         public get isAbsolute() {
-            return this.route.lastIndexOf("/") === 0;
+            return this.route.indexOf("/") === 0;
         }
 
         public concat(route: IRoute): IRoute {

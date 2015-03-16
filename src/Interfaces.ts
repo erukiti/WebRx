@@ -561,7 +561,7 @@ module wx {
 
     export interface IRouterStateConfig {
         name: string;
-        path?: string|IRoute;   // relative or absolute
+        route?: string|IRoute;   // relative or absolute
         views?: { [view: string]: string|{ component: string; params?: any } };
         params?: any;
         //reloadOnSearch?: boolean;
@@ -570,7 +570,7 @@ module wx {
     export interface IRouterState {
         name: string;
         views: { [view: string]: string|{ component: string; params?: any } };
-        absolutePath: string;
+        absoluteUri: string;
         params: any;
     }
 
