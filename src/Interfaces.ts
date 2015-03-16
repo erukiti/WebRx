@@ -574,12 +574,17 @@ module wx {
         views: { [view: string]: string|{ component: string; params?: any } };
     }
 
+    export const enum RouterLocationChangeMode {
+        add = 1,
+        replace = 2,
+    }
+
     export interface IStateOptions {
         /**
         *  If true will update the url in the location bar, if false will not. If string, must be "replace", 
         * which will update url and also replace last history record.
         **/
-        location?: any; 
+        location?: boolean|RouterLocationChangeMode; 
 
         /**
         *  If true will inherit url parameters from current url.

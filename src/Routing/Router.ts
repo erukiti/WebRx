@@ -84,7 +84,7 @@ module wx {
                     state.route = route(state.route);
                 }
             } else {
-                // derive relative url from name
+                // derive relative route from name
                 var parts = state.name.split(".");
                 state.route = route(parts[parts.length - 1]);
             }
@@ -100,6 +100,7 @@ module wx {
             var parts = name.split(".");
             var stateName: string = "";
             var result = [];
+            var state: IRouterStateConfig;
 
             if (name !== this.rootStateName)
                 result.push(this.root);
@@ -110,10 +111,10 @@ module wx {
                 else
                     stateName = parts[i];
 
-                // is registered?
-                var state = this.states[stateName];
+                state = this.states[stateName];
+
+                // if not registered, introduce fake state to keep hierarchy intact
                 if (state == null) {
-                    // introduce fake state to keep hierarchy intact
                     state = {
                         name: stateName,
                         route: route(stateName)
@@ -165,7 +166,7 @@ module wx {
                 }
             });
 
-            // finally merge params argument if present
+            // merge param overrides
             if (params) {
                 extend(params, stateParams);
             }
@@ -173,9 +174,9 @@ module wx {
             // construct resulting state
             var route = this.getAbsoluteRouteForState(to, hierarchy);
             var state = <IRouterState> extend(this.states[to], {});
+            state.uri = route.stringify(params);
             state.views = stateViews;
             state.params = stateParams;
-            state.uri = route.stringify(state.params);
 
             // perform deep equal against current state
             if (this.currentState() == null ||
@@ -184,7 +185,7 @@ module wx {
 
                 // update history
                 if (options && options.location) {
-                    if(typeof options.location === "string" && options.location === "replace")
+                    if(options.location === RouterLocationChangeMode.replace)
                         app.history.replaceState(state.name, "", state.uri);
                     else
                         app.history.pushState(state.name, "", state.uri);
