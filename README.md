@@ -18,7 +18,7 @@ WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/) and [AngularJS
 
 ##### Todo
 
-At this point we are pretty much feature complete. What's left is the router, which is is currently under development.
+- Replace RTTI implementation with Typescript 1.5's meta-data once it is released
 
 ##### WebRx vs KnockoutJS
 
