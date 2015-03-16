@@ -46,7 +46,6 @@ module.exports = function (grunt) {
         
         jasmine: {
             default: {
-                src: 'build/web.rx.js',
                 options: {
                     specs: 'build/test/**/*.js',
                     vendor: [
@@ -54,13 +53,14 @@ module.exports = function (grunt) {
                         "node_modules/rx/dist/rx.lite.extras.js",
                         "node_modules/rx/dist/rx.virtualtime.js",
                         "node_modules/rx/dist/rx.testing.js",
+                        "build/web.rx.js",
                         "node_modules/browser-jquery/jquery.js",
                         "node_modules/jasmine-jquery/lib/jasmine-jquery.js",
                         "node_modules/ix/l2o.js",
                         "node_modules/ix/ix.js",
                         "node_modules/requirejs/require.js",
-                        "test/test-setup.js",
                         "build/test/TestUtils.js",
+                        "test/test-setup.js",
                         "build/test/TestModels.js"
                     ]
                 }

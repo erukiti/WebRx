@@ -86,6 +86,10 @@ module wx {
     class App extends Module implements IWebRxApp  {
         constructor() {
             super("app");
+
+            if (!isInUnitTest()) {
+                this.history = this.createHistory();
+            }
         }
 
         /// <summary>
@@ -132,12 +136,46 @@ module wx {
             this._templateEngine = newVal;
         }
 
+        public history: IHistory;
+
         ///////////////////////
         // Implementation
 
         private _templateEngine: ITemplateEngine;
         private _mainThreadScheduler: Rx.IScheduler;
         private _unitTestMainThreadScheduler: Rx.IScheduler;
+
+        private createHistory(): IHistory {
+            // inherit default implementation
+            var result = <IHistory> {
+                back: window.history.back,
+                forward: window.history.forward,
+                //go: window.history.go,
+                pushState: window.history.pushState,
+                replaceState: window.history.replaceState
+            };
+
+            Object.defineProperty(result, "length", {
+                get() { return window.history.length; },
+                enumerable: true,
+                configurable: true
+            });
+
+            Object.defineProperty(result, "state", {
+                get() { return window.history.state; },
+                enumerable: true,
+                configurable: true
+            });
+
+            // enrich with observable
+            result.onPopState = Rx.Observable.fromEventPattern<PopStateEvent>(
+                (h) => window.addEventListener("popstate", <EventListener> h),
+                (h) => window.removeEventListener("popstate", <EventListener> h))
+                .publish()
+                .refCount();
+
+            return result;
+        }
     }
 
     export var app: IWebRxApp = new App();

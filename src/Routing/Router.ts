@@ -16,13 +16,13 @@ module wx {
             this.resetStates();
 
             // hook into navigation events
-            window.onpopstate = (e) => {
+            app.history.onPopState.subscribe((e) => {
                 // construct relative url from location
                 //var url = document.location.pathname + document.location.search;
-            
+
                 // navigate
                 //this.navigate(url, false, e.state);
-            };
+            });
         }
 
         public registerState(config: IRouterStateConfig): IRouter {
@@ -50,7 +50,7 @@ module wx {
             // Implicit root state that is always active
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                url: route("/")
+                path: route("/")
             });
 
             //this.root.navigable = null;
@@ -72,15 +72,15 @@ module wx {
             state = <IRouterStateConfig> extend(state, {});
             this.states[state.name] = state;
 
-            if (state.url != null) {
+            if (state.path != null) {
                 // create route from string
-                if (typeof state.url === "string") {
-                    state.url = route(state.url);
+                if (typeof state.path === "string") {
+                    state.path = route(state.path);
                 }
             } else {
                 // derive relative url from name
                 var parts = state.name.split(".");
-                state.url = route(parts[parts.length - 1]);
+                state.path = route(parts[parts.length - 1]);
             }
 
             // detect root-state override
@@ -114,13 +114,34 @@ module wx {
             return result;
         }
 
+        private getAbsoluteRouteForState(name: string, hierarchy?: IRouterStateConfig[]): IRoute {
+            hierarchy = hierarchy || this.getStateHierarchy(name);
+            var result: IRoute = null;
+
+            hierarchy.forEach(state => {
+                // concat urls
+                if (result != null) {
+                    var route = <IRoute> state.path;
+
+                    // individual states may use absolute urls as well
+                    if (!route.isAbsolute)
+                        result = result.concat(<IRoute> state.path);
+                    else
+                        result = route;
+                } else {
+                    result = <IRoute> state.path;
+                }
+            });
+
+            return result;
+        }
+
         private activateState(to: string, params?: {}, options?: IStateOptions): void {
-            var states = this.getStateHierarchy(to);
+            var hierarchy = this.getStateHierarchy(to);
             var stateViews: { [view: string]: string|{ component: string; params?: any } } = {};
             var stateParams = {};
-            var absoluteRoute: IRoute = null;
 
-            states.forEach(state => {
+            hierarchy.forEach(state => {
                 // merge views
                 if (state.views != null) {
                     extend(state.views, stateViews);
@@ -130,19 +151,6 @@ module wx {
                 if (state.params != null) {
                     extend(state.params, stateParams);
                 }
-
-                // concat urls
-                if (absoluteRoute != null) {
-                    var route = <IRoute> state.url;
-
-                    // individual states may use absolute urls as well
-                    if (!route.isAbsolute)
-                        absoluteRoute = absoluteRoute.concat(<IRoute> state.url);
-                    else
-                        absoluteRoute = route;
-                } else {
-                    absoluteRoute = <IRoute> state.url;
-                }
             });
 
             // finally merge params argument if present
@@ -151,10 +159,11 @@ module wx {
             }
 
             // construct resulting state
+            var absoluteRoute: IRoute = this.getAbsoluteRouteForState(to, hierarchy);
             var state = <IRouterState> extend(this.states[to], {});
             state.views = stateViews;
             state.params = stateParams;
-            state.url = absoluteRoute.stringify(state.params);
+            state.absolutePath = absoluteRoute.stringify(state.params);
 
             // perform deep equal against current state
             if (this.currentState() == null ||
@@ -162,7 +171,12 @@ module wx {
                 !isEqual(this.currentState().params, state.params)) {
 
                 // update history
-                window.history.pushState(state.name, "", state.url);
+                if (options && options.location) {
+                    if(typeof options.location === "string" && options.location === "replace")
+                        app.history.pushState(state.name, "", state.absolutePath);
+                    else
+                        app.history.replaceState(state.name, "", state.absolutePath);
+                }
 
                 // activate
                 this.currentState(state);

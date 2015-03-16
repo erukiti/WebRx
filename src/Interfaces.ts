@@ -549,6 +549,7 @@ module wx {
         defaultExceptionHandler: Rx.Observer<Error>;
         mainThreadScheduler: Rx.IScheduler;
         templateEngine: ITemplateEngine;
+        history: IHistory;
     }
 
     export interface IRoute {
@@ -560,7 +561,7 @@ module wx {
 
     export interface IRouterStateConfig {
         name: string;
-        url?: string|IRoute;
+        path?: string|IRoute;   // relative or absolute
         views?: { [view: string]: string|{ component: string; params?: any } };
         params?: any;
         //reloadOnSearch?: boolean;
@@ -569,7 +570,7 @@ module wx {
     export interface IRouterState {
         name: string;
         views: { [view: string]: string|{ component: string; params?: any } };
-        url: string;
+        absolutePath: string;
         params: any;
     }
 
@@ -599,6 +600,17 @@ module wx {
         absolute?: boolean;
     }
     */
+
+    export interface IHistory {
+        onPopState: Rx.Observable<PopStateEvent>;        
+
+        length: number;
+        state: any;
+        back(): void;
+        forward(): void;
+        replaceState(statedata: any, title: string, url?: string): void;
+        pushState(statedata: any, title: string, url?: string): void;
+    }
 
     export interface IRouter {
         /**

@@ -7,6 +7,7 @@ describe('Routing', () => {
 
     beforeEach(() => {
         router.resetStates();
+        wx.app.history.reset();
     });
 
     afterEach(() => {

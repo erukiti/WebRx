@@ -1,5 +1,12 @@
 ﻿///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
+declare module wx {
+    export interface IHistory {
+        reset(): void;
+        onPushState: Rx.Observable<PopStateEvent>;
+    }
+}
+
 module testutils {
     var knownEvents = {}, knownEventTypesByEventName = {};
     var keyEventTypeName = (navigator && /Firefox\/2/i.test(navigator.userAgent)) ? 'KeyboardEvent' : 'UIEvents';
@@ -97,6 +104,84 @@ module testutils {
             return new Rx.CompositeDisposable(sub,
                 Rx.Disposable.create(() => result.count--));
         });
+
+        return result;
+    }
+
+    export function createHistory(): wx.IHistory {
+        var stack = [];
+        var current: number = -1;
+        var popStateSubject = new Rx.Subject<PopStateEvent>();
+        var pushStateSubject = new Rx.Subject<PopStateEvent>();
+
+        function back() {
+            if (current > 0) {
+                current--;
+            }
+
+            popStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+        }
+
+        function forward() {
+            if (current < stack.length - 1) {
+                current++;
+            }
+
+            popStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+        }
+
+        function pushState(statedata: any, title: string, url?: string) {
+            if (current < stack.length) {
+                stack[current] = statedata;
+            } else {
+                stack.push(statedata);
+                current++;
+            }
+
+            pushStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+        }
+
+        function replaceState(statedata: any, title: string, url?: string) {
+            stack[current] = statedata;
+
+            pushStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+        }
+
+        function reset() {
+            stack = [];
+            current = -1;
+        }
+
+        // inherit default implementation
+        var result = <wx.IHistory> {
+            back: back,
+            forward: forward,
+            //go: window.history.go,
+            pushState: pushState,
+            replaceState: replaceState,
+            reset: reset
+        };
+
+        Object.defineProperty(result, "length", {
+            get() { return stack.length; },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(result, "state", {
+            get() { return current !== -1 ? stack[current] : undefined; },
+            enumerable: true,
+            configurable: true
+        });
+
+        // enrich with observable
+        result.onPopState = popStateSubject
+            .publish()
+            .refCount();
+
+        result.onPushState = pushStateSubject
+            .publish()
+            .refCount();
 
         return result;
     }

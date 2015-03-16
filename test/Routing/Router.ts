@@ -10,6 +10,7 @@ describe('Routing',() => {
 
     beforeEach(() => {
         router.resetStates();
+        wx.app.history.reset();
     });
 
     afterEach(() => {
@@ -55,10 +56,39 @@ describe('Routing',() => {
             });
 
             router.go("foo");
-            expect(router.currentState().url).toEqual("/foo");
+            expect(router.currentState().absolutePath).toEqual("/foo");
 
             router.go("foo.bar");
-            expect(router.currentState().url).toEqual("/foo/bar");
+            expect(router.currentState().absolutePath).toEqual("/foo/bar");
+        });
+
+        it('changing state should push a history record',() => {
+            router.registerState({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            router.registerState({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            var fireCount = 0;
+            wx.app.history.onPushState.subscribe(x => {
+                fireCount++;
+            });
+
+            router.go("foo", {}, { location: true });
+            expect(router.currentState().absolutePath).toEqual("/foo");
+            expect(fireCount).toEqual(1);
+
+            router.go("foo.bar", {}, { location: true });
+            expect(router.currentState().absolutePath).toEqual("/foo/bar");
+            expect(fireCount).toEqual(2);
         });
     });
 });
