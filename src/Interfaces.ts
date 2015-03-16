@@ -564,6 +564,8 @@ module wx {
         route?: string|IRoute;   // relative or absolute
         views?: { [view: string]: string|{ component: string; params?: any } };
         params?: any;
+        onEnter?: (config: IRouterStateConfig, params?: any)=> void;
+        onLeave?: (config: IRouterStateConfig, params?: any) => void;
         //reloadOnSearch?: boolean;
     }
 
@@ -572,6 +574,8 @@ module wx {
         uri: string;
         params: any;
         views: { [view: string]: string|{ component: string; params?: any } };
+        onEnter?: (config: IRouterStateConfig, params?: any) => void;
+        onLeave?: (config: IRouterStateConfig, params?: any) => void;
     }
 
     export const enum RouterLocationChangeMode {

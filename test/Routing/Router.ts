@@ -322,5 +322,33 @@ describe('Routing',() => {
             router.go(".bar");
             expect(router.current().name).toEqual("foo.bar");
         });
+
+        it('invokes enter- and leave-callbacks',() => {
+            var fooEntered = false;
+            var fooLeft = false;
+
+            router.state({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                },
+                onEnter: () => fooEntered = true,
+                onLeave: () => fooLeft = true
+            });
+
+            router.state({
+                name: "bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            router.go("foo");
+            expect(fooEntered).toBeTruthy();
+            expect(fooLeft).toBeFalsy();
+
+            router.go("bar");
+            expect(fooLeft).toBeTruthy();
+        });
     });
 });

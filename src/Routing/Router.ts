@@ -22,7 +22,7 @@ module wx {
                     var uri = app.history.location.pathname + app.history.location.search;
                     var route = this.getAbsoluteRouteForState(stateName);
 
-                    // extract params by parsing current uri
+                    // extract params from uri
                     var params = route.parse(uri);
 
                     // enter state using extracted params
@@ -140,7 +140,7 @@ module wx {
                 for (var i = parts.length - 1; i > 0; i--) {
                     var tmp = parts.slice(0, i).join(this.pathSeparator);
 
-                    // check if parant or sibling relative to current parent exists 
+                    // check if parent or sibling relative to current parent exists 
                     if (this.get(tmp) || this.get(tmp + path.substr(1))) {
                         path = tmp + path.substr(1);
                         return path;
@@ -238,9 +238,11 @@ module wx {
             state.params = stateParams;
 
             // perform deep equal against current state
-            if ((options && options.force) || this.current() == null ||
-                this.current().name !== to ||
-                !isEqual(this.current().params, state.params)) {
+            var _current = this.current();
+
+            if ((options && options.force) || _current == null ||
+                _current.name !== to ||
+                !isEqual(_current.params, state.params)) {
 
                 // update history
                 if (options && options.location) {
@@ -250,8 +252,16 @@ module wx {
                         app.history.pushState(state.name, "", state.uri);
                 }
 
+                if (_current != null) {
+                    if (_current.onLeave)
+                        _current.onLeave(this.get(_current.name), _current.params);
+                }
+
                 // activate
                 this.current(state);
+
+                if (state.onEnter)
+                    state.onEnter(this.get(state.name), params);
             }
         }
     }
