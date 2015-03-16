@@ -19,7 +19,7 @@ module wx {
             var compiled = this.domService.compileBindingOptions(options);
 
             if (compiled == null || typeof compiled !== "object")
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
             var observables = new Array<[string, Rx.Observable<any>]>();

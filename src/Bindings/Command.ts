@@ -21,7 +21,7 @@ module wx {
                 internal.throwError("command-binding only operates on elements!");
 
             if (options == null)
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
             var compiled = this.domService.compileBindingOptions(options);
 

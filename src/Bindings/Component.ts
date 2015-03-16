@@ -22,7 +22,7 @@ module wx {
                 internal.throwError("component-binding only operates on elements!");
 
             if (options == null)
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
             var compiled = this.domService.compileBindingOptions(options);
@@ -39,7 +39,7 @@ module wx {
 
                 observables.push(this.domService.expressionToObservable(exp, ctx));
             } else {
-                // collect state-name observable
+                // collect component-name observable
                 observables.push(this.domService.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
 
                 // collect params observables

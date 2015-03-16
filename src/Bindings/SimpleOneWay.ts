@@ -17,7 +17,7 @@ module wx {
                 internal.throwError("binding only operates on elements!");
 
             if (options == null)
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
             var self = this;

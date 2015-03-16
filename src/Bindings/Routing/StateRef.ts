@@ -22,7 +22,7 @@ module wx {
                 internal.throwError("stateRef-binding only operates on anchor-elements!");
 
             if (options == null)
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
             var el = <HTMLAnchorElement> node;
             var compiled = this.domService.compileBindingOptions(options);

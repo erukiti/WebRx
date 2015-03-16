@@ -15,7 +15,7 @@ module wx {
                 internal.throwError("hasFocus-binding only operates on elements!");
             
             if (options == null)
-                internal.throwError("invalid binding-ptions!");
+                internal.throwError("invalid binding-options!");
 
             var el = <HTMLInputElement> node;
             var prop: IObservableProperty<any>;
