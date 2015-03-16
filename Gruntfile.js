@@ -58,7 +58,7 @@ module.exports = function (grunt) {
                         "node_modules/jasmine-jquery/lib/jasmine-jquery.js",
                         "node_modules/ix/l2o.js",
                         "node_modules/ix/ix.js",
-                        "bower_components/uri.js/src/URI.js",
+                        "node_modules/URIjs/src/URI.js",
                         "node_modules/requirejs/require.js",
                         "test/test-setup.js",
                         "build/test/TestUtils.js",

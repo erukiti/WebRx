@@ -15,6 +15,6 @@
     "tests"
   ],
   "devDependencies": {
-    "uri.js": "~1.14.2"
+    "rxjs": "^2.4.3"
   }
 }

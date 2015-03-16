@@ -24,6 +24,7 @@
     "requirejs": "^2.1.16",
     "requirejs-text": "^2.0.12",
     "rsvp": "^3.0.17",
+    "URIjs": "^1.14.2",
     "rx": "^2.3.25",
     "typescript": "^1.4.1"
   },
