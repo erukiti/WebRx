@@ -8,56 +8,56 @@
 describe('DomService',() => {
     var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
 
-    describe('extractBindingsFromDataAttribute',() => {
+    describe('getBindingsForNode',() => {
         it('smoke-test',() => {
             loadFixtures('templates/Services/DomService.html');
             
              // stand-alone (no context- or model-references)
             var el = document.querySelector("#stand-alone");
             var def: any = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // model-relative
             el = document.querySelector("#model-relative");
             def = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // data-relative (same as model just with $data. qualifier)
             el = document.querySelector("#data-relative");
             def = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // parent-relative
             el = document.querySelector("#parent-relative");
             def = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[2].key).toEqual("css");
 
             // root-relative
             el = document.querySelector("#root-relative");
             def = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // model-relative-with-parent-property-ref
             el = document.querySelector("#model-relative-with-parent-property-ref");
             def = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // window-and-model-relative
             el = document.querySelector("#window-and-model-relative");
             def = null;
-            expect(() => def = domService.extractBindingsFromDataAttribute(el)).not.toThrowError();
+            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
             expect(def[2].key).toEqual("baz");

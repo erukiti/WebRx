@@ -79,7 +79,7 @@ module wx {
             return [];
         }
 
-        public compileBindingOptions(value: string): any {
+        public compileBindingOptions(value: string): Object {
             value = trimString(value);
             if (value === '') {
                 return null;
@@ -338,7 +338,7 @@ module wx {
                 _bindings = [{ key: 'component', value: componentReference }];
             } else {
                 // get definitions from attribute
-                _bindings = this.extractBindingsFromDataAttribute(el);
+                _bindings = this.getBindingsForNode(el);
             }
 
             if (_bindings != null && _bindings.length > 0) {
@@ -383,7 +383,7 @@ module wx {
             return str[0] === "{" && str[str.length - 1] === "}";
         }
 
-        public extractBindingsFromDataAttribute(node: Node): Array<{ key: string; value: string }> {
+        public getBindingsForNode(node: Node): Array<{ key: string; value: string }> {
             var bindingText = null;
 
             if (node.nodeType === 1) {  // element

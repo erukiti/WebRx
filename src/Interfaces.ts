@@ -92,14 +92,14 @@ module wx {
     * this property.
     *
     * Normally this Rx.Observable is implemented with a ScheduledSubject whose
-    * default Observer is wx.App.DefaultExceptionHandler - this means, that if
-    * you aren't listening to ThrownExceptions and one appears, the exception
+    * default Observer is wx.app.defaultExceptionHandler - this means, that if
+    * you aren't listening to thrownExceptions and one appears, the exception
     * will appear on the UI thread and crash the application.
     * @interface 
     **/
     export interface IHandleObservableErrors {
         /**
-        * Fires whenever an exception would normally terminate ReactiveUI
+        * Fires whenever an exception would normally terminate the app
         * internal state.
         **/
         thrownExceptions: Rx.Observable<Error>; //  { get; }
@@ -119,7 +119,7 @@ module wx {
     * ICommand represents an ICommand which also notifies when it is
     * executed (i.e. when Execute is called) via IObservable. Conceptually,
     * this represents an Event, so as a result this IObservable should never
-    * OnComplete or OnError.
+    * onComplete or onError.
     * @interface 
     **/
     export interface ICommand<T> extends
@@ -172,11 +172,11 @@ module wx {
     }
 
     /**
-    * IReactiveNotifyCollectionItemChanged provides notifications for collection item updates, ie when an object in
-    * a collection changes.
+    * INotifyListItemChanged provides notifications for collection item updates, ie when an object in
+    * a list changes.
     * @interface 
     **/
-    export interface INotifyCollectionItemChanged {
+    export interface INotifyListItemChanged {
         /**
         * Provides Item Changing notifications for any item in collection that
         * implements IReactiveNotifyPropertyChanged. This is only enabled when
@@ -202,8 +202,8 @@ module wx {
 
 
     /**
-    * IReactiveNotifyCollectionChanged of T provides notifications when the contents
-    * of collection are changed (items are added/removed/moved).
+    * INotifyListChanged of T provides notifications when the contents
+    * of a list are changed (items are added/removed/moved).
     * @interface 
     **/
     export interface INotifyListChanged<T> {
@@ -256,8 +256,7 @@ module wx {
         itemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /**
-        * Fires before an item is replaced
-        * indices.
+        * Fires before an item is replaced indices.
         **/
         beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
@@ -282,7 +281,7 @@ module wx {
         isEmptyChanged: Rx.Observable<boolean>; //  { get; }
 
         /**
-        * This Observable is fired when a ShouldReset fires on the list. This
+        * This Observable is fired when a shouldReset fires on the list. This
         * means that you should forget your previous knowledge of the state
         * of the collection and reread it.
         *
@@ -301,13 +300,9 @@ module wx {
     * IObservableList of T represents a list that can notify when its
     * contents are changed (either items are added/removed, or the object
     * itself changes).
-    *
-    * It is important to implement the Changing/Changed from
-    * IReactiveNotifyPropertyChanged semantically as "Fire when *anything* in
-    * the collection or any of its items have changed, in any way".
     * @interface 
     **/
-    export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyCollectionItemChanged {
+    export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
         isEmpty: boolean; //  { get; }
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;
@@ -436,12 +431,41 @@ module wx {
         */
         getDataContext(node: Node): IDataContext;
 
+        /**
+        * Returns true if the node is currently bound by one or more binding-handlers
+        * @param {Node} node The node to check
+        */
         isNodeBound(node: Node): boolean;
-        clearElementState(node: Node);
-        compileBindingOptions(value: string): any;
-        getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
-        extractBindingsFromDataAttribute(node: Node): Array<{ key: string; value: string }>;
 
+        /**
+        * Removes any binding-related state from the specified node.
+        * @param {Node} node The node to clear
+        */
+        clearElementState(node: Node);
+
+        /**
+        * Compiles a simple string expression or multiple expressions within an object-literal recursively into an expression tree
+        * @param {string} value The expression(s) to compile
+        */
+        compileBindingOptions(value: string): any;
+
+        /**
+        * Tokenizes an object-literal into an array of key-value pairs
+        * @param {string} value The object literal tokenize
+        */
+        getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
+
+        /**
+        * Returns data-binding expressions for a DOM-Node
+        * @param {Node} node The node
+        */
+        getBindingsForNode(node: Node): Array<{ key: string; value: string }>;
+
+        /**
+        * Registers hook that gets invoked whenever a new data-context gets assembled
+        * @param {Node} node The node for which the data-context gets assembled
+        * @param {IDataContext} ctx The current data-context
+        */
         registerDataContextExtension(extension:(node: Node, ctx:IDataContext)=> void);
 
         /**
