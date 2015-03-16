@@ -36,14 +36,11 @@ module wx {
             return this;
         }
 
-        public go(to: string, params?: {}, options?: IStateOptions): Rx.Observable<any> {
+        public go(to: string, params?: {}, options?: IStateOptions): void {
             if (this.states[to] == null)
                 internal.throwError("state '{0}' is not registered", to);
 
             this.activateState(to, params, options);
-
-            // TODO: transitions
-            return Rx.Observable.return<any>(false);
         }
 
         public getState(state: string): IRouterStateConfig {

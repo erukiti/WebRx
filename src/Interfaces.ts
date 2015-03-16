@@ -630,7 +630,7 @@ module wx {
         * This allows you to easily use an absolute or relative to path and specify only the parameters you'd like 
         * to update (while letting unspecified parameters inherit from the currently active ancestor states).
         **/
-        go(to: string, params?: any, options?: IStateOptions): Rx.Observable<any>;
+        go(to: string, params?: any, options?: IStateOptions): void;    // Rx.Observable<any>
 
         /**
         * Low-level method for transitioning to a new state. IRouter.go uses transitionTo internally. 
