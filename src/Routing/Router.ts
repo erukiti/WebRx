@@ -80,8 +80,16 @@ module wx {
         private root: IRouterStateConfig;
         private domService: IDomService;
         private rootStateName = "$";
+        private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
 
         private registerStateInternal(state: IRouterStateConfig) {
+            if (state.name !== this.rootStateName) {
+                // validate name
+                var parts = state.name.split(".");
+                if (parts.some(x => !this.validPathRegExp.test(x)))
+                    internal.throwError("a state-path must start with a character, optionally followed by one or more alphanumeric characters, dashes or underscores");
+            }
+
             // wrap and store
             state = <IRouterStateConfig> extend(state, {});
             this.states[state.name] = state;
@@ -93,7 +101,6 @@ module wx {
                 }
             } else {
                 // derive relative route from name
-                var parts = state.name.split(".");
                 state.route = route(parts[parts.length - 1]);
             }
 
