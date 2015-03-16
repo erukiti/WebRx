@@ -604,6 +604,7 @@ module wx {
     export interface IHistory {
         onPopState: Rx.Observable<PopStateEvent>;        
 
+        location: Location;
         length: number;
         state: any;
         back(): void;

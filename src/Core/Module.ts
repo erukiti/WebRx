@@ -171,6 +171,12 @@ module wx {
                 configurable: true
             });
 
+            Object.defineProperty(result, "location", {
+                get() { return window.location; },
+                enumerable: true,
+                configurable: true
+            });
+
             // enrich with observable
             result.onPopState = Rx.Observable.fromEventPattern<PopStateEvent>(
                 (h) => window.addEventListener("popstate", <EventListener> h),

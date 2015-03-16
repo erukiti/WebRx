@@ -1,4 +1,5 @@
 ﻿///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="typings/URI.d.ts" />
 
 declare module wx {
     export interface IHistory {
@@ -109,17 +110,32 @@ module testutils {
     }
 
     export function createHistory(): wx.IHistory {
-        var stack = [];
+        var stack:Array<{ data: any; url: string }> = [];
+        var location: Location = <Location> {};
         var current: number = -1;
         var popStateSubject = new Rx.Subject<PopStateEvent>();
         var pushStateSubject = new Rx.Subject<PopStateEvent>();
+
+        function updateLocation(uri: string) {
+            var u = new URI(uri);
+            location.host = u.host();
+            location.href = u.href();
+            location.pathname = u.pathname();
+            location.port = u.port();
+            location.protocol = u.protocol();
+            location.search = u.search();
+            location.hash = u.hash();
+
+            location.toString = () => uri;
+        } 
 
         function back() {
             if (current > 0) {
                 current--;
             }
 
-            popStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+            updateLocation(stack[current].url);
+            popStateSubject.onNext(<PopStateEvent> { state: stack[current].data });
         }
 
         function forward() {
@@ -127,24 +143,27 @@ module testutils {
                 current++;
             }
 
-            popStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+            updateLocation(stack[current].url);
+            popStateSubject.onNext(<PopStateEvent> { state: stack[current].data });
         }
 
         function pushState(statedata: any, title: string, url?: string) {
             if (current < stack.length) {
                 stack[current] = statedata;
             } else {
-                stack.push(statedata);
+                stack.push({ data: statedata, url: url });
                 current++;
             }
 
-            pushStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+            updateLocation(stack[current].url);
+            pushStateSubject.onNext(<PopStateEvent> { state: stack[current].data });
         }
 
         function replaceState(statedata: any, title: string, url?: string) {
-            stack[current] = statedata;
+            stack[current] = { data: statedata, url: url };
 
-            pushStateSubject.onNext(<PopStateEvent> { state: stack[current] });
+            updateLocation(stack[current].url);
+            pushStateSubject.onNext(<PopStateEvent> { state: stack[current].data });
         }
 
         function reset() {
@@ -169,7 +188,13 @@ module testutils {
         });
 
         Object.defineProperty(result, "state", {
-            get() { return current !== -1 ? stack[current] : undefined; },
+            get() { return current !== -1 ? stack[current].data : undefined; },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(result, "location", {
+            get() { return location; },
             enumerable: true,
             configurable: true
         });

@@ -40,7 +40,7 @@ describe('Routing',() => {
             expect(router.currentState().views['main']).toEqual("bar");
         });
 
-        it('currentState url should reflect state url hierarchy',() => {
+        it('currentState path should reflect state url hierarchy',() => {
             router.registerState({
                 name: "foo",
                 views: {
@@ -60,11 +60,12 @@ describe('Routing',() => {
 
             router.go("foo.bar");
             expect(router.currentState().absolutePath).toEqual("/foo/bar");
-        });
 
-        it('changing state should push a history record',() => {
+            router.resetStates();
+
             router.registerState({
                 name: "foo",
+                path: "foo/:fooId",
                 views: {
                     'main': "foo"
                 }
@@ -72,8 +73,21 @@ describe('Routing',() => {
 
             router.registerState({
                 name: "foo.bar",
+                path: "bar/:barId",
                 views: {
                     'main': "bar"
+                }
+            });
+
+            router.go("foo.bar", { fooId: 3, barId: 5 });
+            expect(router.currentState().absolutePath).toEqual("/foo/3/bar/5");
+        });
+
+        it('go(history: true) should push a history record',() => {
+            router.registerState({
+                name: "foo",
+                views: {
+                    'main': "foo"
                 }
             });
 
@@ -85,10 +99,6 @@ describe('Routing',() => {
             router.go("foo", {}, { location: true });
             expect(router.currentState().absolutePath).toEqual("/foo");
             expect(fireCount).toEqual(1);
-
-            router.go("foo.bar", {}, { location: true });
-            expect(router.currentState().absolutePath).toEqual("/foo/bar");
-            expect(fireCount).toEqual(2);
         });
     });
 });
