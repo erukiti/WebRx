@@ -3,6 +3,11 @@
 /// <reference path="../../Interfaces.ts" />
 
 module wx {
+    export interface IStateRefBindingOptions {
+        name: string;
+        params?: Object;
+    }
+
     class StateRefBinding implements IBindingHandler {
         constructor(domService: IDomService, router: IRouter) {
             this.domService = domService;
@@ -13,21 +18,66 @@ module wx {
         // IBinding
 
         public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
-            if (node.nodeType !== 1)
-                internal.throwError("stateRef-binding only operates on elements!");
+            if (node.nodeType !== 1 || (<HTMLElement> node).tagName.toLowerCase() !== 'a')
+                internal.throwError("stateRef-binding only operates on anchor-elements!");
 
             if (options == null)
                 internal.throwError("invalid binding-ptions!");
 
-            var exp = this.domService.compileBindingOptions(options);
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var el = <HTMLAnchorElement> node;
+            var compiled = this.domService.compileBindingOptions(options);
+            var exp: ICompiledExpression;
+            var observables: Array<Rx.Observable<any>> = [];
+            var opt = <IStateRefBindingOptions> compiled;
+            var paramsKeys: Array<string> = [];
+            var stateName;
+            var stateParams: Object;
 
-            // subscribe
-            state.cleanup.add(obs.subscribe(x => {
-                if (typeof x === "string")
-                    x = module(x);
+            if (typeof compiled === "function") {
+                exp = <ICompiledExpression> compiled;
 
-                state.module = x;
+                observables.push(this.domService.expressionToObservable(exp, ctx));
+            } else {
+                // collect state-name observable
+                observables.push(this.domService.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
+
+                // collect params observables
+                if (opt.params) {
+                    Object.keys(opt.params).forEach(x => {
+                        paramsKeys.push(x);
+
+                        observables.push(this.domService.expressionToObservable(opt.params[x], ctx));
+                    });
+                }
+            }
+
+            // subscribe to any input changes
+            state.cleanup.add(Rx.Observable.combineLatest(observables, (_) => args2Array(arguments)).subscribe(latest => {
+                // first element is always the state-name
+                stateName = latest.shift();
+
+                // unwrap properties
+                if (isProperty(stateName))
+                    stateName = stateName();
+
+                // subsequent entries are latest param values
+                stateParams = {};
+
+                for (var i = 0; i < paramsKeys.length; i++) {
+                    stateParams[paramsKeys[i]] = isProperty(latest[i]) ? latest[i]() : latest[i];
+                }
+
+                // construct uri and assign
+                var uri = this.router.uri(stateName, stateParams);
+                el.href = uri;
+            }));
+
+            // subscribe to anchor's click event
+            state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
+                // initiate state change using latest name and params
+                this.router.go(stateName, stateParams, { location: true });
+
+                e.preventDefault();
             }));
 
             // release closure references to GC 
@@ -38,9 +88,13 @@ module wx {
                 ctx = null;
                 state = null;
 
-                // nullify common locals
-                obs = null;
-                self = null;
+                // nullify locals
+                observables = null;
+                compiled = null;
+                stateName = null;
+                stateParams = null;
+                opt = null;
+                paramsKeys = null;
             }));
         }
 
@@ -48,13 +102,13 @@ module wx {
             // intentionally left blank
         }
 
-        public priority = 100;
+        public priority = 5;
 
         ////////////////////
         // Implementation
 
         protected domService: IDomService;
-        protected  router: IRouter;
+        protected router: IRouter;
     }
 
     export module internal {
