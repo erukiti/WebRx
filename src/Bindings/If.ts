@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../Services/DomService.ts" />
+/// <reference path="../Core/DomService.ts" />
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../Core/Resources.ts" />
 

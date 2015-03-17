@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Services/DomService.ts" />
+/// <reference path="../Core/DomService.ts" />
 /// <reference path="../Core/Module.ts" />
 /// <reference path="../Bindings/Module.ts" />
 

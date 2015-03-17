@@ -10,7 +10,7 @@ describe('DomService',() => {
 
     describe('getBindingsForNode',() => {
         it('smoke-test',() => {
-            loadFixtures('templates/Services/DomService.html');
+            loadFixtures('templates/Core/DomService.html');
             
              // stand-alone (no context- or model-references)
             var el = document.querySelector("#stand-alone");
@@ -66,7 +66,7 @@ describe('DomService',() => {
 
     describe('applyBindings',() => {
         it('invoking multiple on same node times throws error',() => {
-            loadFixtures('templates/Services/DomService.html');
+            loadFixtures('templates/Core/DomService.html');
 
             var el = document.querySelector("#stand-alone");
             var model1 = new Object();
@@ -80,7 +80,7 @@ describe('DomService',() => {
         });
 
         it('invoking on a node with a binding-definition referencing a non-registered directive throws an error',() => {
-            loadFixtures('templates/Services/DomService.html');
+            loadFixtures('templates/Core/DomService.html');
 
             var el = document.querySelector("#stand-alone-non-registered");
             var model1 = new Object();

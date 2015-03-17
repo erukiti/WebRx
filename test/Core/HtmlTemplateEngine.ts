@@ -9,7 +9,7 @@ describe('HtmlTemplateEngine',() => {
     var engine = wx.injector.resolve<wx.ITemplateEngine>(wx.res.htmlTemplateEngine);
 
     it('smoke-test',() => {
-        loadFixtures('templates/Services/HtmlTemplateEngine.html');
+        loadFixtures('templates/Core/HtmlTemplateEngine.html');
 
         var html;
         expect(engine.parse("")).toEqual([]);
