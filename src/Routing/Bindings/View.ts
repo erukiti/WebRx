@@ -58,8 +58,8 @@ module wx {
                         if (componentName !== currentComponentName ||
                             !isEqual(componentParams, currentComponentParams)) {
 
-                            log.info("component for view '{0}' is now '{1}', params: {2}", viewName, componentName,
-                                (componentParams != null ? JSON.stringify(componentParams) : ""));
+                            //log.info("component for view '{0}' is now '{1}', params: {2}", viewName, componentName,
+                            //    (componentParams != null ? JSON.stringify(componentParams) : ""));
 
                             this.applyTemplate(componentName, componentParams, el, ctx);
 

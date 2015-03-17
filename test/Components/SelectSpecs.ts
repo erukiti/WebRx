@@ -12,7 +12,7 @@ describe('Components', () => {
             var model = { items: items };
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
-            console.log(el.innerHTML);
+            //console.log(el.innerHTML);
             el = <HTMLElement> el.childNodes[0];
 
             expect(el.childNodes.length).toEqual(items.length);
