@@ -63,9 +63,7 @@ module wx {
                     stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                 }
 
-                // construct uri and assign
-                var uri = this.router.uri(stateName, stateParams);
-                el.href = uri;
+                el.href = this.router.uri(stateName, stateParams);
             }));
 
             // subscribe to anchor's click event
