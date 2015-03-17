@@ -17,7 +17,7 @@ describe('Routing', () => {
     describe('Bindings',() => {
         describe('View', () => {
             it('binds using view name',() => {
-                loadFixtures('templates/Bindings/Routing/View.html');
+                loadFixtures('templates/Routing/Bindings/View.html');
 
                 var el = document.querySelector("#fixture1");
                 var model = {};
@@ -25,7 +25,7 @@ describe('Routing', () => {
             });
 
             it('reacts to router state change by instantiating designated component',() => {
-                loadFixtures('templates/Bindings/Routing/View.html');
+                loadFixtures('templates/Routing/Bindings/View.html');
 
                 var items = [3, 2, 1];
 

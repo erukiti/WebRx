@@ -18,7 +18,7 @@ describe('Routing',() => {
     describe('Bindings',() => {
         describe('StateRef',() => {
             it('binds using simple options',() => {
-                loadFixtures('templates/Bindings/Routing/StateRef.html');
+                loadFixtures('templates/Routing/Bindings/StateRef.html');
 
                 router.state({
                     name: "foo"
@@ -32,7 +32,7 @@ describe('Routing',() => {
             });
 
             it('binds using complex options',() => {
-                loadFixtures('templates/Bindings/Routing/StateRef.html');
+                loadFixtures('templates/Routing/Bindings/StateRef.html');
 
                 router.state({
                     name: "foo",
@@ -56,7 +56,7 @@ describe('Routing',() => {
             });
 
             it('state-name can be observable too',() => {
-                loadFixtures('templates/Bindings/Routing/StateRef.html');
+                loadFixtures('templates/Routing/Bindings/StateRef.html');
 
                 router.state({
                     name: "foo"
@@ -74,7 +74,7 @@ describe('Routing',() => {
             });
 
             it('clicking the anchor element should change the current router state',() => {
-                loadFixtures('templates/Bindings/Routing/StateRef.html');
+                loadFixtures('templates/Routing/Bindings/StateRef.html');
 
                 router.state({
                     name: "foo"

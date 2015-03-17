@@ -11,8 +11,8 @@
 /// <reference path="Bindings/TextInput.ts" />
 /// <reference path="Bindings/SelectedValue.ts" />
 /// <reference path="Bindings/Component.ts" />
-/// <reference path="Bindings/Routing/StateRef.ts" />
-/// <reference path="Bindings/Routing/View.ts" />
+/// <reference path="Routing/Bindings/StateRef.ts" />
+/// <reference path="Routing/Bindings/View.ts" />
 /// <reference path="Routing/Router.ts" />
 
 module wx {
