@@ -33,8 +33,8 @@ module wx {
             var currentComponentName: string = null;
             var currentComponentParams: any;
 
-            if (!viewName)
-                internal.throwError("views needs to have a name!");
+            if (viewName == null || typeof viewName !== "string")
+                internal.throwError("views must be named!");
 
             // subscribe to router-state changes
             state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(newState => {
