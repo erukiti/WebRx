@@ -374,7 +374,7 @@ module wx {
     }
 
     /**
-    * The Dom services provides functionality for manipulating the browser Dom
+    * The Dom Manager coordinates everything involving browser DOM-Manipulation
     * @interface 
     **/
     export interface IDomManager {
@@ -438,7 +438,7 @@ module wx {
         isNodeBound(node: Node): boolean;
 
         /**
-        * Removes any binding-related state from the specified node.
+        * Removes any binding-related state from the specified node. Use with care! In most cases you would want to use cleanNode!
         * @param {Node} node The node to clear
         */
         clearElementState(node: Node);
@@ -459,7 +459,7 @@ module wx {
         * Returns data-binding expressions for a DOM-Node
         * @param {Node} node The node
         */
-        getBindingsForNode(node: Node): Array<{ key: string; value: string }>;
+        getBindingDefinitions(node: Node): Array<{ key: string; value: string }>;
 
         /**
         * Registers hook that gets invoked whenever a new data-context gets assembled
