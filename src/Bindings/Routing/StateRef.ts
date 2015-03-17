@@ -1,5 +1,5 @@
 ﻿///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Core/DomService.ts" />
+/// <reference path="../../Core/DomManager.ts" />
 /// <reference path="../../Interfaces.ts" />
 
 module wx {
@@ -9,8 +9,8 @@ module wx {
     }
 
     class StateRefBinding implements IBindingHandler {
-        constructor(domService: IDomService, router: IRouter) {
-            this.domService = domService;
+        constructor(domManager: IDomManager, router: IRouter) {
+            this.domManager = domManager;
             this.router = router;
         } 
 
@@ -25,7 +25,7 @@ module wx {
                 internal.throwError("invalid binding-options!");
 
             var el = <HTMLAnchorElement> node;
-            var compiled = this.domService.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options);
             var exp: ICompiledExpression;
             var observables: Array<Rx.Observable<any>> = [];
             var opt = <IStateRefBindingOptions> compiled;
@@ -36,17 +36,17 @@ module wx {
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                observables.push(this.domService.expressionToObservable(exp, ctx));
+                observables.push(this.domManager.expressionToObservable(exp, ctx));
             } else {
                 // collect state-name observable
-                observables.push(this.domService.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
+                observables.push(this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
 
                 // collect params observables
                 if (opt.params) {
                     Object.keys(opt.params).forEach(x => {
                         paramsKeys.push(x);
 
-                        observables.push(this.domService.expressionToObservable(opt.params[x], ctx));
+                        observables.push(this.domManager.expressionToObservable(opt.params[x], ctx));
                     });
                 }
             }
@@ -103,7 +103,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
         protected router: IRouter;
     }
 

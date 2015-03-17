@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 
 module wx {
@@ -9,8 +9,8 @@ module wx {
     }
 
     class ModuleBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -23,8 +23,8 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var exp = this.domService.compileBindingOptions(options);
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var exp = this.domManager.compileBindingOptions(options);
+            var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -57,7 +57,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
     }
 
     export module internal {

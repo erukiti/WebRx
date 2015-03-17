@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 
 module wx {
@@ -8,8 +8,8 @@ module wx {
     }
 
     class EventBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -25,11 +25,11 @@ module wx {
             var el = <HTMLElement> node;
 
             // create an observable for each event handler value
-            var tokens = this.domService.getObjectLiteralTokens(options);
+            var tokens = this.domManager.getObjectLiteralTokens(options);
             var eventDisposables: { [eventName: string]: Rx.Disposable } = {};
             var eventHandlers = tokens.map(token => {
-                var exp = this.domService.compileBindingOptions(token.value);
-                return this.domService.expressionToObservable(exp, ctx);
+                var exp = this.domManager.compileBindingOptions(token.value);
+                return this.domManager.expressionToObservable(exp, ctx);
             });
 
             // subscribe to all events
@@ -93,7 +93,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
     }
 
     export module internal {

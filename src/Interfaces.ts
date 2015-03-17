@@ -377,7 +377,7 @@ module wx {
     * The Dom services provides functionality for manipulating the browser Dom
     * @interface 
     **/
-    export interface IDomService {
+    export interface IDomManager {
         /**
         * Applies bindings to the specified node and all of its children using the specified data context 
         * @param {IDataContext} ctx The data context

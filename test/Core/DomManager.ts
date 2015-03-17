@@ -5,59 +5,59 @@
 /// <reference path="../typings/l2o.d.ts" />
 /// <reference path="../typings/ix.d.ts" />
 
-describe('DomService',() => {
-    var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
+describe('DomManager',() => {
+    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
 
     describe('getBindingsForNode',() => {
         it('smoke-test',() => {
-            loadFixtures('templates/Core/DomService.html');
+            loadFixtures('templates/Core/DomManager.html');
             
              // stand-alone (no context- or model-references)
             var el = document.querySelector("#stand-alone");
             var def: any = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // model-relative
             el = document.querySelector("#model-relative");
             def = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // data-relative (same as model just with $data. qualifier)
             el = document.querySelector("#data-relative");
             def = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // parent-relative
             el = document.querySelector("#parent-relative");
             def = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[2].key).toEqual("css");
 
             // root-relative
             el = document.querySelector("#root-relative");
             def = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // model-relative-with-parent-property-ref
             el = document.querySelector("#model-relative-with-parent-property-ref");
             def = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
 
             // window-and-model-relative
             el = document.querySelector("#window-and-model-relative");
             def = null;
-            expect(() => def = domService.getBindingsForNode(el)).not.toThrowError();
+            expect(() => def = domManager.getBindingsForNode(el)).not.toThrowError();
             expect(def[0].key).toEqual("text");
             expect(def[1].key).toEqual("css");
             expect(def[2].key).toEqual("baz");
@@ -66,26 +66,26 @@ describe('DomService',() => {
 
     describe('applyBindings',() => {
         it('invoking multiple on same node times throws error',() => {
-            loadFixtures('templates/Core/DomService.html');
+            loadFixtures('templates/Core/DomManager.html');
 
             var el = document.querySelector("#stand-alone");
             var model1 = new Object();
             var model2 = new Object();
 
-            expect(() => domService.applyBindings(model1, el)).not.toThrow();
+            expect(() => domManager.applyBindings(model1, el)).not.toThrow();
 
             // attempt to re-bind should throw regardless of model
-            expect(() => domService.applyBindings(model1, el)).toThrow();
-            expect(() => domService.applyBindings(model2, el)).toThrow();
+            expect(() => domManager.applyBindings(model1, el)).toThrow();
+            expect(() => domManager.applyBindings(model2, el)).toThrow();
         });
 
         it('invoking on a node with a binding-definition referencing a non-registered directive throws an error',() => {
-            loadFixtures('templates/Core/DomService.html');
+            loadFixtures('templates/Core/DomManager.html');
 
             var el = document.querySelector("#stand-alone-non-registered");
             var model1 = new Object();
 
-            expect(() => domService.applyBindings(model1, el)).toThrowError(/binding.+not.+registered/);
+            expect(() => domManager.applyBindings(model1, el)).toThrowError(/binding.+not.+registered/);
         });
     });
 
@@ -96,7 +96,7 @@ describe('DomService',() => {
             var compiled: any;
             var scope = {};
 
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
             expect(compiled).not.toBeNull();
             expect(compiled.hasOwnProperty("text")).toBeTruthy();
@@ -114,7 +114,7 @@ describe('DomService',() => {
             var def = "{ text: $scope.foo() }";
             var compiled: any;
 
-            expect(() => compiled = domService.compileBindingOptions(def)).toThrowError();
+            expect(() => compiled = domManager.compileBindingOptions(def)).toThrowError();
         });
     });
 
@@ -126,12 +126,12 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            expect(domService.expressionToObservable(compiled.ctx.data, ctx).toProperty()()).toBe(ctx.$data);
-            expect(domService.expressionToObservable(compiled.ctx.root, ctx).toProperty()()).toBe(ctx.$root);
-            expect(domService.expressionToObservable(compiled.ctx.parent, ctx).toProperty()()).toBe(ctx.$parent);
-            expect(domService.expressionToObservable(compiled.ctx.parents, ctx).toProperty()()).toBe(ctx.$parents);
+            expect(domManager.expressionToObservable(compiled.ctx.data, ctx).toProperty()()).toBe(ctx.$data);
+            expect(domManager.expressionToObservable(compiled.ctx.root, ctx).toProperty()()).toBe(ctx.$root);
+            expect(domManager.expressionToObservable(compiled.ctx.parent, ctx).toProperty()()).toBe(ctx.$parent);
+            expect(domManager.expressionToObservable(compiled.ctx.parents, ctx).toProperty()()).toBe(ctx.$parents);
         });
 
         it('returns the current value of the expression upon subscription',() => {
@@ -141,10 +141,10 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
             var value;
-            var obs = domService.expressionToObservable(compiled, ctx);
+            var obs = domManager.expressionToObservable(compiled, ctx);
 
             obs.subscribe(x => value = x);
             expect(value).toEqual(4);
@@ -160,9 +160,9 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            var prop = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            var prop = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(prop()).toEqual("42hello");
 
             model.bar("world");
@@ -181,9 +181,9 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            var prop = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            var prop = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(prop.source).toBe(model.foo);
         });
 
@@ -206,10 +206,10 @@ describe('DomService',() => {
 
             var ctx = testutils.createModelContext(model);
 
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            var text = domService.expressionToObservable(compiled['text'], ctx).toProperty();
-            var html = domService.expressionToObservable(compiled['html'], ctx).toProperty();
+            var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
+            var html = domManager.expressionToObservable(compiled['html'], ctx).toProperty();
             expect(text()).not.toBeDefined();
             expect(html()).not.toBeDefined();
 
@@ -236,15 +236,15 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            var text = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(text()).toEqual("hello");
 
             model.foo[1]("bye");
             expect(text()).toEqual("bye");
 
-            var html = domService.expressionToObservable(compiled['html'], ctx).toProperty();
+            var html = domManager.expressionToObservable(compiled['html'], ctx).toProperty();
             expect(html()).toEqual("world");
 
             model.bar['foo']("bye");
@@ -260,9 +260,9 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            var text = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
 
             // index access should be translated to list.get(index)
             expect(text()).toEqual("world");
@@ -289,13 +289,13 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
             // count evals
             var evalCount = 0;
             var evalObs = Rx.Observer.create<any>(x => evalCount++);
 
-            var obs = domService.expressionToObservable(compiled['text'], ctx, evalObs);
+            var obs = domManager.expressionToObservable(compiled['text'], ctx, evalObs);
             var val;
             var disp = obs.subscribe(x => val = x);
             expect(val).toEqual("42hello");
@@ -319,9 +319,9 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
-            var prop = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            var prop = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
 
             // number
             expect(prop()).toEqual(3);
@@ -349,12 +349,12 @@ describe('DomService',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
 
             // count evals
             var evalCount = 0;
             var evalObs = Rx.Observer.create<any>(x => evalCount++);
-            var obs = domService.expressionToObservable(compiled['text'], ctx, evalObs);
+            var obs = domManager.expressionToObservable(compiled['text'], ctx, evalObs);
 
             var val;
             obs.subscribe(x => { val = x });
@@ -374,8 +374,8 @@ describe('DomService',() => {
             var ctx = testutils.createModelContext(model);
 
             var def = "{ text: @foo }";
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
-            var result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            var result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(model.foo);
 
             // increase complexity
@@ -385,8 +385,8 @@ describe('DomService',() => {
             model.foo(childModel);
 
             def = "{ text: @foo.bar }";
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
-            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(childModel.bar);
 
             // increase complexity even more (trigger use of cspSafeGetterFn)
@@ -396,8 +396,8 @@ describe('DomService',() => {
             childModel.bar(grandChildModel);
 
             def = "{ text: @foo.bar.baz }";
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
-            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(grandChildModel.baz);
 
             // go nuts (trigger use of cspSafeGetterFn in a loop)
@@ -427,13 +427,13 @@ describe('DomService',() => {
             model4.prop4(model5);
 
             def = "{ text: @foo.bar.baz.prop1.prop2.prop3.prop4 }";
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
-            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(model4.prop4);
 
             def = "{ text: foo.bar.baz.prop1.prop2.prop3.prop4.prop5 }";
-            expect(() => compiled = domService.compileBindingOptions(def)).not.toThrow();
-            result = domService.expressionToObservable(compiled['text'], ctx).toProperty();
+            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toEqual("5");
         });
     });

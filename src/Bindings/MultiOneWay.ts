@@ -1,12 +1,12 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 
 module wx {
     class MultiOneWayChangeBindingBase implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
  
        ////////////////////
@@ -16,7 +16,7 @@ module wx {
             if (node.nodeType !== 1)
                 internal.throwError("binding only operates on elements!");
 
-            var compiled = this.domService.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options);
 
             if (compiled == null || typeof compiled !== "object")
                 internal.throwError("invalid binding-options!");
@@ -33,7 +33,7 @@ module wx {
                 var value = compiled[key];
 
                 exp = <ICompiledExpression> value;
-                obs = this.domService.expressionToObservable(exp, ctx);
+                obs = this.domManager.expressionToObservable(exp, ctx);
 
                 observables.push([key, obs]);
             }
@@ -72,7 +72,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: INodeState) {
             state.cleanup.add(obs.subscribe(x => {
@@ -86,8 +86,8 @@ module wx {
     }
 
     class CssBinding extends MultiOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {
@@ -96,8 +96,8 @@ module wx {
     }
 
     class AttrBinding extends MultiOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
 
             this.priority = 5;
         }
@@ -116,8 +116,8 @@ module wx {
     }
 
     class StyleBinding extends MultiOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {

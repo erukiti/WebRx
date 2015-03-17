@@ -1,5 +1,5 @@
 ﻿///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Core/DomService.ts" />
+/// <reference path="../../Core/DomManager.ts" />
 /// <reference path="../../Interfaces.ts" />
 /// <reference path="../../Core/Log.ts" />
 
@@ -10,8 +10,8 @@ module wx {
     }
 
     class ViewBinding implements IBindingHandler {
-        constructor(domService: IDomService, router: IRouter) {
-            this.domService = domService;
+        constructor(domManager: IDomManager, router: IRouter) {
+            this.domManager = domManager;
             this.router = router;
         } 
 
@@ -26,8 +26,8 @@ module wx {
                 internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
-            var compiled = this.domService.compileBindingOptions(options);
-            var viewName = this.domService.evaluateExpression(compiled, ctx);
+            var compiled = this.domManager.compileBindingOptions(options);
+            var viewName = this.domManager.evaluateExpression(compiled, ctx);
             var componentName: string = null;
             var componentParams: any;
             var currentComponentName: string = null;
@@ -93,13 +93,13 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
         protected router: IRouter;
 
         protected applyTemplate(componentName: string, componentParams: Object, el: HTMLElement, ctx: IDataContext) {
             // clear
             while (el.firstChild) {
-                this.domService.cleanNode(el.firstChild);
+                this.domManager.cleanNode(el.firstChild);
                 el.removeChild(el.firstChild);
             }
 
@@ -113,7 +113,7 @@ module wx {
             el.appendChild(container);
 
             // done
-            this.domService.applyBindingsToDescendants(ctx, el);
+            this.domManager.applyBindingsToDescendants(ctx, el);
         }
     }
 

@@ -1,11 +1,11 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
     class TextInputBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -25,7 +25,7 @@ module wx {
             if (tag !== 'input' && tag !== 'textarea')
                 internal.throwError("textInput-binding can only be applied to input or textarea elements");
 
-            var exp = this.domService.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options);
             var prop: IObservableProperty<any>;
             var propertySubscription: Rx.Disposable;
             var eventSubscription: Rx.Disposable;
@@ -56,7 +56,7 @@ module wx {
                 }
             }
 
-            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(src => {
+            state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(src => {
                 if (!isProperty(src)) {
                     // initial and final update
                     updateElement(src);
@@ -113,7 +113,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected getTextInputEventObservables(el: HTMLInputElement, isTextArea: boolean): Array<Rx.Observable<Object>> {
             var result: Array<Rx.Observable<Object>> = [];

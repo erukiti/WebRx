@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Core/VirtualChildNodes.ts" />
 
 module wx {
@@ -62,12 +62,12 @@ module wx {
     }
 
     class ForEachBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
 
             // hook into getDataContext() to map state['index'] to ctx['$index']
-            domService.registerDataContextExtension((node: Node, ctx: IForEachDataContext) => {
-                var state = <IForEachNodeState> domService.getNodeState(node);
+            domManager.registerDataContextExtension((node: Node, ctx: IForEachDataContext) => {
+                var state = <IForEachNodeState> domManager.getNodeState(node);
                 ctx.$index = state.index;
             });
         } 
@@ -82,7 +82,7 @@ module wx {
             if (options == null)
                 internal.throwError("** invalid binding options!");
 
-            var compiled = this.domService.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options);
 
             var el = <HTMLElement> node;
             var self = this;
@@ -98,12 +98,12 @@ module wx {
 
                 if (opt.hooks) {
                     // extract hooks
-                    hooks = this.domService.evaluateExpression(<ICompiledExpression> opt.hooks, ctx);
+                    hooks = this.domManager.evaluateExpression(<ICompiledExpression> opt.hooks, ctx);
                 }
 
                 if (opt['debug']) {
                     if (opt['debug']['setProxyFunc']) {
-                        setProxyFunc = this.domService.evaluateExpression(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx);
+                        setProxyFunc = this.domManager.evaluateExpression(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx);
                     }
                 }
 
@@ -114,7 +114,7 @@ module wx {
                 exp = compiled;
             }
 
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // add own disposables
             state.cleanup.add(Rx.Disposable.create(() => {
@@ -168,7 +168,7 @@ module wx {
         ////////////////////
         // implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected createIndexObservableForNode(proxy: internal.VirtualChildNodes, child: Node, startIndex: number,
             trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
@@ -283,17 +283,17 @@ module wx {
 
                 if (node.nodeType === 1) {
                     // save the index before cleaning
-                    var state = <IForEachNodeState> this.domService.getNodeState(node);
+                    var state = <IForEachNodeState> this.domManager.getNodeState(node);
                     savedIndex = state != null ? state.index : undefined;
 
-                    this.domService.cleanNode(node);
+                    this.domManager.cleanNode(node);
 
                     // restore index before binding
-                    state = this.domService.createNodeState(item);
+                    state = this.domManager.createNodeState(item);
                     state.index = savedIndex;
-                    this.domService.setNodeState(node, state);
+                    this.domManager.setNodeState(node, state);
 
-                    this.domService.applyBindings(item, node);
+                    this.domManager.applyBindings(item, node);
                 }
             }
         }
@@ -392,19 +392,19 @@ module wx {
                     }
 
                     // propagate index to state
-                    var state = <IForEachNodeState> self.domService.createNodeState(item);
+                    var state = <IForEachNodeState> self.domManager.createNodeState(item);
                     state.index = index;
-                    self.domService.setNodeState(node, state);
+                    self.domManager.setNodeState(node, state);
 
                     if (item) {
-                        self.domService.applyBindings(item, node);
+                        self.domManager.applyBindings(item, node);
                     }
                 }
             }
 
             function nodeRemoveCB(node: Node): void {
                 if (node.nodeType === 1) {
-                    self.domService.cleanNode(node);
+                    self.domManager.cleanNode(node);
                     indexes.delete(node);
                 }
             }

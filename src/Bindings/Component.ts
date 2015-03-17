@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Core/Module.ts" />
 /// <reference path="../Bindings/Module.ts" />
 
@@ -10,8 +10,8 @@ module wx {
     }
 
     class ComponentBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -25,7 +25,7 @@ module wx {
                 internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
-            var compiled = this.domService.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options);
             var opt = <IComponentBindingOptions> compiled;
             var exp: ICompiledExpression;
             var observables: Array<Rx.Observable<any>> = [];
@@ -37,22 +37,22 @@ module wx {
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                observables.push(this.domService.expressionToObservable(exp, ctx));
+                observables.push(this.domManager.expressionToObservable(exp, ctx));
             } else {
                 // collect component-name observable
-                observables.push(this.domService.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
+                observables.push(this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
 
                 // collect params observables
                 if (opt.params) {
                     if (typeof opt.params === "function") {
                         // opt params is object passed by value (probably $componentParams from view-binding)
-                        componentParams = this.domService.evaluateExpression(<ICompiledExpression> opt.params, ctx);
+                        componentParams = this.domManager.evaluateExpression(<ICompiledExpression> opt.params, ctx);
                         keepComponentParams = true;
                     } else if (typeof opt.params === "object") {
                         Object.keys(opt.params).forEach(x => {
                             paramsKeys.push(x);
 
-                            observables.push(this.domService.expressionToObservable(opt.params[x], ctx));
+                            observables.push(this.domManager.expressionToObservable(opt.params[x], ctx));
                         });
                     } else {
                         internal.throwError("invalid component-params");
@@ -138,7 +138,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected loadTemplate(template: any, params: Object): Rx.Observable<Node[]> {
             var syncResult: Node[];
@@ -208,7 +208,7 @@ module wx {
         protected applyTemplate(component: IComponent, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
             // clear
             while (el.firstChild) {
-                this.domService.cleanNode(el.firstChild);
+                this.domManager.cleanNode(el.firstChild);
                 el.removeChild(el.firstChild);
             }
 
@@ -222,7 +222,7 @@ module wx {
                 state.model = vm;
 
                 // refresh context
-                ctx = this.domService.getDataContext(el);
+                ctx = this.domManager.getDataContext(el);
             }
 
             // invoke preBindingInit 
@@ -231,7 +231,7 @@ module wx {
             }
 
             // done
-            this.domService.applyBindingsToDescendants(ctx, el);
+            this.domManager.applyBindingsToDescendants(ctx, el);
 
             // invoke postBindingInit 
             if (vm && component.postBindingInit && vm.hasOwnProperty(component.postBindingInit)) {

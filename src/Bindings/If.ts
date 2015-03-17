@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../Core/Resources.ts" />
 
@@ -10,8 +10,8 @@ module wx {
     }
 
     class IfBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
  
         ////////////////////
@@ -27,8 +27,8 @@ module wx {
             var el = <HTMLElement> node;
             var self = this;
             var initialApply = true;
-            var exp = this.domService.compileBindingOptions(options);
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var exp = this.domManager.compileBindingOptions(options);
+            var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // backup inner HTML
             var template = new Array<Node>();
@@ -69,7 +69,7 @@ module wx {
         // Implementation
 
         protected inverse: boolean = false;
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext, initialApply: boolean): void {
             var i;
@@ -90,7 +90,7 @@ module wx {
 
             if (!value) {
                 // clean first
-                this.domService.cleanDescendants(el);
+                this.domManager.cleanDescendants(el);
 
                 // clear
                 while (el.firstChild) {
@@ -103,14 +103,14 @@ module wx {
                     el.appendChild(node);
                 }
 
-                this.domService.applyBindingsToDescendants(ctx, el);
+                this.domManager.applyBindingsToDescendants(ctx, el);
             }
         }
     }
 
     class NotIfBinding extends IfBinding {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
 
             this.inverse = true;
         } 

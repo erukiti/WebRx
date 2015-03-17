@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 
 module wx {
     interface ISelectedValueBindingImpl {
@@ -103,8 +103,8 @@ module wx {
     impls.push(new OptionSingleSelectionImpl());
 
     class SelectedValueBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -120,7 +120,7 @@ module wx {
             var el = <HTMLInputElement> node;
             var impl: ISelectedValueBindingImpl;
             var implCleanup: Rx.CompositeDisposable;
-            var exp = this.domService.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options);
             
             function cleanupImpl() {
                 if (implCleanup) {
@@ -130,7 +130,7 @@ module wx {
             }
 
             // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(model => {
+            state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
                 cleanupImpl();
 
                 // lookup implementation
@@ -188,7 +188,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService
+        protected domManager: IDomManager
     }
 
     export module internal {

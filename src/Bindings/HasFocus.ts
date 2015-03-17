@@ -1,10 +1,10 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 
 module wx {
     class HasFocusBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -20,7 +20,7 @@ module wx {
             var el = <HTMLInputElement> node;
             var prop: IObservableProperty<any>;
             var locals: Rx.CompositeDisposable;
-            var exp = this.domService.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options);
 
             function cleanup() {
                 if (locals) {
@@ -57,7 +57,7 @@ module wx {
             }
 
             // options is supposed to be a field-access path
-            state.cleanup.add(this.domService.expressionToObservable(exp, ctx).subscribe(model => {
+            state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
                 if (!isProperty(model)) {
                     // initial and final update
                     updateElement(model);
@@ -113,7 +113,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected getFocusEventObservables(el: HTMLInputElement): Array<Rx.Observable<boolean>> {
             var result: Array<Rx.Observable<boolean>> = [];

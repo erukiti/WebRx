@@ -1,12 +1,12 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 
 module wx {
     class SingleOneWayChangeBindingBase implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
  
       ////////////////////
@@ -21,8 +21,8 @@ module wx {
 
             var el = <HTMLElement> node;
             var self = this;
-            var exp = this.domService.compileBindingOptions(options);
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var exp = this.domManager.compileBindingOptions(options);
+            var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -53,7 +53,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected applyValue(el: HTMLElement, value: any): void {
             internal.throwError("you need to override this method!");
@@ -64,8 +64,8 @@ module wx {
     // Bindings
 
     class TextBinding extends SingleOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
         } 
 
         protected applyValue(el: HTMLElement, value: any): void {
@@ -82,8 +82,8 @@ module wx {
     }
 
     class VisibleBinding extends SingleOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
 
             this.inverse = false;
         }
@@ -118,16 +118,16 @@ module wx {
     }
 
     class HiddenBinding extends VisibleBinding {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
 
             this.inverse = true;
         } 
     }
 
     class HtmlBinding extends SingleOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
         } 
 
         protected applyValue(el: HTMLElement, value: any): void {
@@ -139,8 +139,8 @@ module wx {
     }
 
     class DisableBinding extends SingleOneWayChangeBindingBase {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
 
             this.inverse = false;
         }
@@ -158,8 +158,8 @@ module wx {
     }
 
     class EnableBinding extends DisableBinding {
-        constructor(domService: IDomService) {
-            super(domService);
+        constructor(domManager: IDomManager) {
+            super(domManager);
 
             this.inverse = true;
         }

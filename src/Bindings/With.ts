@@ -1,13 +1,13 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../Core/Resources.ts" />
 
 module wx {
     class WithBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
  
         ////////////////////
@@ -22,8 +22,8 @@ module wx {
 
             var el = <HTMLElement> node;
             var self = this;
-            var exp = this.domService.compileBindingOptions(options);
-            var obs = this.domService.expressionToObservable(exp, ctx);
+            var exp = this.domManager.compileBindingOptions(options);
+            var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -57,14 +57,14 @@ module wx {
         ////////////////////
         // implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
 
         protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
             state.model = value;
-            var ctx = this.domService.getDataContext(el);
+            var ctx = this.domManager.getDataContext(el);
 
-            this.domService.cleanDescendants(el);
-            this.domService.applyBindingsToDescendants(ctx, el);
+            this.domManager.cleanDescendants(el);
+            this.domManager.applyBindingsToDescendants(ctx, el);
         }
     }
 

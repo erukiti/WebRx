@@ -10,8 +10,8 @@
 
 module wx {
     class Router implements IRouter {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
 
             this.reset();
 
@@ -82,7 +82,7 @@ module wx {
 
         private states: { [name: string]: IRouterStateConfig } = {};
         private root: IRouterStateConfig;
-        private domService: IDomService;
+        private domManager: IDomManager;
 
         private pathSeparator = ".";
         private parentPathDirective = "^";

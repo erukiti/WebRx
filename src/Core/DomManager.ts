@@ -7,7 +7,7 @@
 /// <reference path="../Core/Module.ts" />
 
 module wx {
-    class DomService implements IDomService {
+    class DomManager implements IDomManager {
         constructor(compiler: IExpressionCompiler) {
             this.elementState = createWeakMap<Node, INodeState>();
             this.compiler = compiler;
@@ -327,11 +327,11 @@ module wx {
             // check if tag represents a component
             if (module.isComponentRegistered(tagName) || app.isComponentRegistered(tagName)) {
                 // when a component is referenced by element, we just apply a virtual 'component' binding
-                var params = el.getAttribute(DomService.paramsAttributename);
+                var params = el.getAttribute(DomManager.paramsAttributename);
                 var componentReference: any;
 
                 if (params)
-                    componentReference = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomService.paramsAttributename) + "} }";
+                    componentReference = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomManager.paramsAttributename) + "} }";
                 else
                     componentReference = "{ name: '" + tagName + "' }";
 
@@ -388,7 +388,7 @@ module wx {
 
             if (node.nodeType === 1) {  // element
                 // attempt to get definition from attribute
-                var attr = (<Element> node).getAttribute(DomService.bindingAttributeName);
+                var attr = (<Element> node).getAttribute(DomManager.bindingAttributeName);
                 if (attr) {
                     bindingText = attr;
                 }
@@ -583,7 +583,7 @@ module wx {
     }
 
     export module internal {
-        export var domServiceConstructor = <any> DomService;
+        export var domManagerConstructor = <any> DomManager;
     }
 
     /**
@@ -592,13 +592,13 @@ module wx {
     * @param {Node} rootNode The node to be bound
     */
     export function applyBindings(model: any, node: Node) {
-        injector.resolve<IDomService>(res.domService).applyBindings(model, node);
+        injector.resolve<IDomManager>(res.domManager).applyBindings(model, node);
     }
     /**
     * Removes and cleans up any binding-related state from the specified node and its descendants.
     * @param {Node} rootNode The node to be cleaned
     */
     export function cleanNode(node: Node) {
-        injector.resolve<IDomService>(res.domService).cleanNode(node);
+        injector.resolve<IDomManager>(res.domManager).cleanNode(node);
     }
 }

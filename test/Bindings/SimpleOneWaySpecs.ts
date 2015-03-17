@@ -184,7 +184,7 @@ describe('Bindings', () => {
             var model = createModel();
 
             // configure handler
-            var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
+            var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
             var handler = wx.app.getBinding("visible");
             var handlerOptions: wx.IVisibleBindingOptions = { useCssClass: true, hiddenClass: 'hidden' };
             handler.configure(handlerOptions);
@@ -294,7 +294,7 @@ describe('Bindings', () => {
             var model = createModel();
 
             // configure handler
-            var domService = wx.injector.resolve<wx.IDomService>(wx.res.domService);
+            var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
             var handler = wx.app.getBinding("hidden");
             var handlerOptions: wx.IVisibleBindingOptions = { useCssClass: true, hiddenClass: 'hidden' };
             handler.configure(handlerOptions);

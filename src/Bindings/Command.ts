@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Core/DomService.ts" />
+/// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Interfaces.ts" />
 
 module wx {
@@ -9,8 +9,8 @@ module wx {
     }
 
     class CommandBinding implements IBindingHandler {
-        constructor(domService: IDomService) {
-            this.domService = domService;
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
         } 
 
         ////////////////////
@@ -23,7 +23,7 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var compiled = this.domService.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options);
 
             var el = <HTMLElement> node;
             var cmd: ICommand<any>;
@@ -33,7 +33,7 @@ module wx {
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
+                using(this.domManager.expressionToObservable(exp, ctx).toProperty(),(prop) => {
                     cmd = prop();
                     parameter = null;
                 });
@@ -41,13 +41,13 @@ module wx {
                 var opt = <ICommandBindingOptions> compiled;
 
                 exp = <ICompiledExpression> <any> opt.command;
-                using(this.domService.expressionToObservable(exp, ctx).toProperty(),(prop) => {
+                using(this.domManager.expressionToObservable(exp, ctx).toProperty(),(prop) => {
                     cmd = prop();
                 });
 
                 if (opt.parameter) {
                     exp = <ICompiledExpression> <any> opt.parameter;
-                    using(this.domService.expressionToObservable(exp, ctx).toProperty(), (prop) => {
+                    using(this.domManager.expressionToObservable(exp, ctx).toProperty(), (prop) => {
                         parameter = prop();
                     });
                 }
@@ -97,7 +97,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domService: IDomService;
+        protected domManager: IDomManager;
     }
 
     export module internal {
