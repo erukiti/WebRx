@@ -14,3 +14,4 @@ src/.baseDir.ts
 .grunt
 npm-debug.log
 _SpecRunner.html
+*.tmp.txt
