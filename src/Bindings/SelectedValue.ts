@@ -86,28 +86,29 @@ module wx {
         }
 
         public updateElement(el: HTMLElement, model: any) {
-            var option = <HTMLSelectElement> el;
+            var select = <HTMLSelectElement> el;
 
             if (isProperty(model)) {
                 var prop = <IObservableProperty<any>> model;
 
                 if (prop() === undefined) {
-                    option.selectedIndex = -1;
+                    select.selectedIndex = -1;
                 } else {
-                    this.domManager.setNodeValue(option, prop());
+                    this.domManager.setNodeValue(select, prop());
                 }
             } else {
                 if (model === undefined) {
-                    option.selectedIndex = -1;
+                    select.selectedIndex = -1;
                 } else {
-                    this.domManager.setNodeValue(option, model);
+                    this.domManager.setNodeValue(select, model);
                 }
             }
         }
 
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
-            var option = <HTMLSelectElement> el;
-            model(this.domManager.getNodeValue(option));
+            var select = <HTMLSelectElement> el;
+
+            model(this.domManager.getNodeValue(select));
         }
     }
 

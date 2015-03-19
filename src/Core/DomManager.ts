@@ -89,12 +89,12 @@ module wx {
                 // will move the cursor to the end of the input, which would be bad while the user is typing.
                 if ((<any> node).value !== value) {
                     (<any> node).value = value;
-                }
 
-                // clear state since value is stored in attribute
-                if (state != null && state.hasValue) {
-                    state.hasValue = false;
-                    state.value = undefined;
+                    // clear state since value is stored in attribute
+                    if (state != null && state.hasValue) {
+                        state.hasValue = false;
+                        state.value = undefined;
+                    }
                 }
             } else {
                 // get or create state

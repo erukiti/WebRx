@@ -23,6 +23,7 @@ module wx {
             if (tag !== 'input' && tag !== 'option' && tag !== 'select' && tag !== 'textarea')
                 internal.throwError("value-binding only operates on checkboxes and radio-buttons");
 
+            var useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
             var prop: IObservableProperty<any>;
             var locals: Rx.CompositeDisposable;
             var exp = this.domManager.compileBindingOptions(options);
@@ -34,11 +35,22 @@ module wx {
                 }
             }
 
+            function updateElement(domManager: IDomManager, value: any) {
+                if (useDomManagerForValueUpdates)
+                    domManager.setNodeValue(el, value);
+                else {
+                    if ((value === null) || (value === undefined))
+                        value = "";
+
+                    el.value = value;
+                }
+            }
+
             // options is supposed to be a field-access path
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
                 if (!isProperty(model)) {
                     // initial and final update
-                    this.domManager.setNodeValue(el, model);
+                    updateElement(this.domManager, model);
                 } else {
                     cleanup();
                     locals = new Rx.CompositeDisposable();
@@ -47,16 +59,19 @@ module wx {
                     prop = model;
 
                     locals.add(prop.changed.subscribe(x => {
-                        this.domManager.setNodeValue(el, x);
+                        updateElement(this.domManager, x);
                     }));
 
                     // initial update
-                    this.domManager.setNodeValue(el, prop());
+                    updateElement(this.domManager, prop());
 
                     // don't attempt to updated computed properties
                     if (!prop.source) {
                         locals.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
-                            prop(el.value);
+                            if (useDomManagerForValueUpdates)
+                                prop(this.domManager.getNodeValue(el));
+                            else
+                                prop(el.value);
                         }));
                     }
                 }
