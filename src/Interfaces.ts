@@ -362,7 +362,7 @@ module wx {
     }
 
     export interface ICompiledExpressionRuntimeHooks {
-        readFieldHook?: (o: any, field: any, keepObservable?: boolean) => any;
+        readFieldHook?: (o: any, field: any) => any;
         writeFieldHook?: (o: any, field: any, newValue: any) => any;
         readIndexHook?: (o: any, field: any) => any;
         writeIndexHook?: (o: any, field: any, newValue: any) => any;

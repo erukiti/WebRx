@@ -495,11 +495,19 @@ module wx {
             var result, target;
 
             var hooks: ICompiledExpressionRuntimeHooks = {
-                readFieldHook: (o: any, field: any, keepObservable?: boolean): any => {
+                readFieldHook: (o: any, field: any): any => {
+                    // handle "^propref" access-modifier
+                    var noUnwrap = false;
+
+                    if (field[0] === '@') {
+                        noUnwrap = true;
+                        field = field.substring(1);
+                    }
+
                     result = o[field];
                     
                     // intercept access to observable properties
-                    if (!keepObservable && isProperty(result)) {
+                    if (!noUnwrap && isProperty(result)) {
                         var prop = <IObservableProperty<any>> result;
 
                         // register observable

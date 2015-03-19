@@ -83,7 +83,7 @@ module wx {
 
             // selection (two-way)
             if (params.selectedValue) {
-                bindings.push({ key: "selectedValue", value: "@$parent.selectedValue" });
+                bindings.push({ key: "selectedValue", value: "$parent.@selectedValue" });
             }
 
             // label

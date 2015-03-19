@@ -364,7 +364,7 @@ describe('DomManager',() => {
             expect(evalCount).toEqual(1 + 1);   // + 1 for initial evaluation
         });
 
-        it('an expression evaluating to an observable property result, using the @-modifier should return the property itself instead of its value ',() => {
+        it('an expression evaluating to an observable property result, using the propref-modifier (@) should return the property itself instead of its value ',() => {
             var compiled: any;
 
             var model: any = {
@@ -384,7 +384,7 @@ describe('DomManager',() => {
             };
             model.foo(childModel);
 
-            def = "{ text: @foo.bar }";
+            def = "{ text: foo.@bar }";
             expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(childModel.bar);
@@ -395,7 +395,7 @@ describe('DomManager',() => {
             };
             childModel.bar(grandChildModel);
 
-            def = "{ text: @foo.bar.baz }";
+            def = "{ text: foo.bar.@baz }";
             expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(grandChildModel.baz);
@@ -426,7 +426,7 @@ describe('DomManager',() => {
             };
             model4.prop4(model5);
 
-            def = "{ text: @foo.bar.baz.prop1.prop2.prop3.prop4 }";
+            def = "{ text: foo.bar.baz.prop1.prop2.prop3.@prop4 }";
             expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(model4.prop4);

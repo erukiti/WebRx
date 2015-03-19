@@ -87,7 +87,7 @@ describe('Bindings', () => {
             var model = { myprop: wx.property<any>({ subproperty: originalSubproperty }) };
 
             // Set up a text box whose value is linked to the subproperty of the observable's current value
-            testNode.innerHTML = "<input data-bind='value: @myprop.subproperty' />";
+            testNode.innerHTML = "<input data-bind='value: myprop.@subproperty' />";
             wx.applyBindings(model, testNode);
             expect(testNode.childNodes[0].value).toEqual("original value");
 
