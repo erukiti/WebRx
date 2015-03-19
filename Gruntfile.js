@@ -129,5 +129,5 @@ module.exports = function (grunt) {
     grunt.registerTask("default", ["clean:build", "ts:default"]);
     grunt.registerTask("tests", ["ts:src", "ts:specs", "jasmine:default"]);
     grunt.registerTask("debug", ["ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["clean:build", "ts:src", "ts:specs", "jasmine:dist", "clean:dist", "ts:dist", "uglify:dist", "compress:dist"]);
+    grunt.registerTask("dist", ["clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
 };
