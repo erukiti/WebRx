@@ -5,4 +5,7 @@ module wx.res {
     export var router = "wx.router";
     export var expressionCompiler = "wx.expressioncompiler";
     export var htmlTemplateEngine = "wx.htmlTemplateEngine";
+
+    export var hasValueBindingValue = "has.wx.bindings.value";
+    export var valueBindingValue = "wx.bindings.value";
 }

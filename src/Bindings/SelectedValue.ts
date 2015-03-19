@@ -43,14 +43,14 @@ module wx {
         public updateElement(el: HTMLElement, model: any) {
             var input = <HTMLInputElement> el;
 
-            input.checked = this.domManager.getNodeValue(input) == unwrapProperty(model);
+            input.checked = internal.getNodeValue(input, this.domManager) == unwrapProperty(model);
         }
 
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
             var input = <HTMLInputElement> el;
 
             if (input.checked) {
-                model(this.domManager.getNodeValue(input));
+                model(internal.getNodeValue(input, this.domManager));
             }
         }
     }
@@ -90,7 +90,7 @@ module wx {
             } else {
                 for (var i = 0; i < length; i++) {
                     var option = select.options[i];
-                    if (this.domManager.getNodeValue(option) == value) {
+                    if (internal.getNodeValue(option, this.domManager) == value) {
                         select.selectedIndex = i;
                         break;
                     }
@@ -103,7 +103,7 @@ module wx {
 
             // selected-value comes from the option at selectedIndex
             var value = select.selectedIndex !== -1 ?
-                this.domManager.getNodeValue(select.options[select.selectedIndex]) :
+                internal.getNodeValue(select.options[select.selectedIndex], this.domManager) :
                 undefined;
 
             model(value);

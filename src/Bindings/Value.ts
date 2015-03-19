@@ -37,7 +37,7 @@ module wx {
 
             function updateElement(domManager: IDomManager, value: any) {
                 if (useDomManagerForValueUpdates)
-                    domManager.setNodeValue(el, value);
+                    internal.setNodeValue(el, value, domManager);
                 else {
                     if ((value === null) || (value === undefined))
                         value = "";
@@ -69,7 +69,7 @@ module wx {
                     if (!prop.source) {
                         locals.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
                             if (useDomManagerForValueUpdates)
-                                prop(this.domManager.getNodeValue(el));
+                                prop(internal.getNodeValue(el, this.domManager));
                             else
                                 prop(el.value);
                         }));
@@ -107,6 +107,62 @@ module wx {
         // Implementation
 
         protected domManager: IDomManager;
+    }
+
+    export module internal {
+        /**
+         * For certain elements such as select and input type=radio we store
+         * the real element value in NodeState if it is anything other than a
+         * string. This method returns that value.
+         * @param {Node} node
+         * @param {IDomManager} domManager
+         */
+        export function getNodeValue(node: Node, domManager: IDomManager): any {
+            var state = <any> domManager.getNodeState(node);
+            if (state != null && state[res.hasValueBindingValue]) {
+                return state[res.valueBindingValue];
+            }
+
+            return (<any> node).value;
+        }
+
+        /**
+         * Associate a value with an element. Either by using its value-attribute
+         * or storing it in NodeState
+         * @param {Node} node
+         * @param {any} value
+         * @param {IDomManager} domManager
+         */
+        export function setNodeValue(node: Node, value: any, domManager: IDomManager): void {
+            if ((value === null) || (value === undefined))
+                value = "";
+
+            var state = <any> domManager.getNodeState(node);
+
+            if (typeof value === "string") {
+                // Update the element only if the element and model are different. On some browsers, updating the value
+                // will move the cursor to the end of the input, which would be bad while the user is typing.
+                if ((<any> node).value !== value) {
+                    (<any> node).value = value;
+
+                    // clear state since value is stored in attribute
+                    if (state != null && state[res.hasValueBindingValue]) {
+                        state[res.hasValueBindingValue] = false;
+                        state[res.valueBindingValue] = undefined;
+                    }
+                }
+            } else {
+                // get or create state
+                if (state == null) {
+                    state = this.createNodeState();
+                    this.setNodeState(node, state);
+                }
+
+                // store value
+                state[res.valueBindingValue] = value;
+                state[res.hasValueBindingValue] = true;
+            }
+        }
     }
 
     export module internal {
