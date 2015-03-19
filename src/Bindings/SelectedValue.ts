@@ -43,12 +43,7 @@ module wx {
         public updateElement(el: HTMLElement, model: any) {
             var input = <HTMLInputElement> el;
 
-            if (isProperty(model)) {
-                var prop = <IObservableProperty<any>> model;
-                input.checked = this.domManager.getNodeValue(input) == prop();
-            } else {
-                input.checked = this.domManager.getNodeValue(input) == model;
-            }
+            input.checked = this.domManager.getNodeValue(input) == unwrapProperty(model);
         }
 
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
@@ -87,20 +82,18 @@ module wx {
 
         public updateElement(el: HTMLElement, model: any) {
             var select = <HTMLSelectElement> el;
+            var value = unwrapProperty(model);
+            var length = select.options.length;
 
-            if (isProperty(model)) {
-                var prop = <IObservableProperty<any>> model;
-
-                if (prop() === undefined) {
-                    select.selectedIndex = -1;
-                } else {
-                    this.domManager.setNodeValue(select, prop());
-                }
+            if (value == null) {
+                select.selectedIndex = -1;
             } else {
-                if (model === undefined) {
-                    select.selectedIndex = -1;
-                } else {
-                    this.domManager.setNodeValue(select, model);
+                for (var i = 0; i < length; i++) {
+                    var option = select.options[i];
+                    if (this.domManager.getNodeValue(option) == value) {
+                        select.selectedIndex = i;
+                        break;
+                    }
                 }
             }
         }
@@ -108,7 +101,12 @@ module wx {
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
             var select = <HTMLSelectElement> el;
 
-            model(this.domManager.getNodeValue(select));
+            // selected-value comes from the option at selectedIndex
+            var value = select.selectedIndex !== -1 ?
+                this.domManager.getNodeValue(select.options[select.selectedIndex]) :
+                undefined;
+
+            model(value);
         }
     }
 
