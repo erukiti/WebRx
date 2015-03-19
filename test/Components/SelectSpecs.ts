@@ -3,7 +3,9 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Components', () => {
-    describe('Select', () => {
+    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
+
+    describe('Select',() => {
         it('items only',() => {
             loadFixtures('templates/Components/Select.html');
 
@@ -17,7 +19,7 @@ describe('Components', () => {
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLOptionElement)
-                .map(x => x.getAttribute("value"))).toEqual(items.map(x=> x.toString()));
+                .map(x => domManager.getNodeValue(x))).toEqual(items);
         });
 
         it('items with label',() => {

@@ -3,7 +3,9 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Components', () => {
-    describe('RadioGroup', () => {
+    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
+
+    describe('RadioGroup',() => {
         it('items only',() => {
             loadFixtures('templates/Components/RadioGroup.html');
 
@@ -16,7 +18,7 @@ describe('Components', () => {
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
-                .map(x => x.getAttribute("value"))).toEqual(items.map(x=> x.toString()));
+                .map(x => domManager.getNodeValue(x))).toEqual(items);
 
             // should automatically assign groupname
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x => x instanceof HTMLInputElement)
@@ -40,7 +42,7 @@ describe('Components', () => {
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
-                .map(x => x.getAttribute("value"))).toEqual(items.map(x=> x.toString()));
+                .map(x => domManager.getNodeValue(x))).toEqual(items);
 
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
                 .map(x => x.getAttribute("name"))).toEqual(["foo", "foo", "foo"]);

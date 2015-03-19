@@ -338,6 +338,8 @@ module wx {
         cleanup: Rx.CompositeDisposable;
         isBound: boolean;   // true of this node has been touched by applyBindings
         model?: any;        // scope model 
+        hasValue?: boolean; // true if value property has been set
+        value?: any;        // this makes it possible to associate arbitrary values with elments like options, selects, input etc
     }
 
     export interface IObjectLiteralToken {
@@ -404,6 +406,9 @@ module wx {
         * @param {Node} rootNode The node to be cleaned
         */
         cleanDescendants(rootNode: Node): void;
+
+        getNodeValue(node: Node): any;
+        setNodeValue(node: Node, value: any): void;
 
         /**
         * Stores updated state for the specified node

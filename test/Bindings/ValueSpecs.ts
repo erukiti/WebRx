@@ -4,14 +4,16 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Bindings', () => {
-    describe('Value', () => {
+    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
+
+    describe('Value',() => {
        it('Should treat null values as empty strings', ()=> {
             loadFixtures('templates/Generic.html');
             var testNode = <any> document.querySelector("#fixture");
 
             testNode.innerHTML = "<input data-bind='value: @myProp' />";
             wx.applyBindings({ myProp: wx.property(0) }, testNode);
-            expect(testNode.childNodes[0].value).toEqual("0");
+            expect(domManager.getNodeValue(testNode.childNodes[0])).toEqual(0);
         });
 
         it('Should assign an empty string as value if the model value is undefined', ()=> {
@@ -30,9 +32,9 @@ describe('Bindings', () => {
             var myobservable = wx.property(123);
             testNode.innerHTML = "<input data-bind='value: @someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
-            expect(testNode.childNodes[0].value).toEqual("123");
+            expect(domManager.getNodeValue(testNode.childNodes[0])).toEqual(123);
             myobservable(456);
-            expect(testNode.childNodes[0].value).toEqual("456");
+            expect(domManager.getNodeValue(testNode.childNodes[0])).toEqual(456);
         });
 
         it('For observable values, should update on change if new value is \'strictly\' different from previous value', ()=> {
@@ -42,9 +44,9 @@ describe('Bindings', () => {
             var myobservable = wx.property<any>("+123");
             testNode.innerHTML = "<input data-bind='value: @someProp' />";
             wx.applyBindings({ someProp: myobservable }, testNode);
-            expect(testNode.childNodes[0].value).toEqual("+123");
+            expect(domManager.getNodeValue(testNode.childNodes[0])).toEqual("+123");
             myobservable(123);
-            expect(testNode.childNodes[0].value).toEqual("123");
+            expect(domManager.getNodeValue(testNode.childNodes[0])).toEqual(123);
         });
 
         it('For writeable observable values, should catch the node\'s onchange and write values back to the observable', ()=> {

@@ -69,6 +69,46 @@ module wx {
             }
         }
 
+        public getNodeValue(node: Node): any {
+            var state = this.getNodeState(node);
+            if (state != null && state.hasValue) {
+                return state.value;
+            }
+
+            return (<any> node).value;
+        }
+
+        public setNodeValue(node: Node, value: any): void {
+            if ((value === null) || (value === undefined))
+                value = "";
+
+            var state = this.getNodeState(node);
+            
+            if (typeof value === "string") {
+                // Update the element only if the element and model are different. On some browsers, updating the value
+                // will move the cursor to the end of the input, which would be bad while the user is typing.
+                if ((<any> node).value !== value) {
+                    (<any> node).value = value;
+                }
+
+                // clear state since value is stored in attribute
+                if (state != null && state.hasValue) {
+                    state.hasValue = false;
+                    state.value = undefined;
+                }
+            } else {
+                // get or create state
+                if (state == null) {
+                    state = this.createNodeState();
+                    this.setNodeState(node, state);
+                }
+
+                // store value
+                state.value = value;
+                state.hasValue = true;
+            }
+        }
+
         public getObjectLiteralTokens(value: string): Array<IObjectLiteralToken> {
             value = trimString(value);
 

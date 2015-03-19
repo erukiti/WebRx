@@ -4,6 +4,7 @@
 
 describe('Routing', () => {
     var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
+    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
 
     beforeEach(() => {
         router.reset();
@@ -51,7 +52,7 @@ describe('Routing', () => {
                 el = <HTMLElement> el.childNodes[0].childNodes[0];
                 expect(el.childNodes.length).toEqual(items.length);
                 expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLOptionElement)
-                    .map(x => x.getAttribute("value"))).toEqual(items.map(x=> x.toString()));
+                    .map(x => domManager.getNodeValue(x))).toEqual(items);
             });
         });
     });

@@ -34,23 +34,11 @@ module wx {
                 }
             }
 
-            function updateElement(value: any) {
-                if (value === null || value === undefined) {
-                    value = "";
-                }
-
-                // Update the element only if the element and model are different. On some browsers, updating the value
-                // will move the cursor to the end of the input, which would be bad while the user is typing.
-                if (el.value !== value) {
-                    el.value = value;
-                }
-            }
-
             // options is supposed to be a field-access path
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
                 if (!isProperty(model)) {
                     // initial and final update
-                    updateElement(model);
+                    this.domManager.setNodeValue(el, model);
                 } else {
                     cleanup();
                     locals = new Rx.CompositeDisposable();
@@ -59,11 +47,11 @@ module wx {
                     prop = model;
 
                     locals.add(prop.changed.subscribe(x => {
-                        updateElement(x);
+                        this.domManager.setNodeValue(el, x);
                     }));
 
                     // initial update
-                    updateElement(prop());
+                    this.domManager.setNodeValue(el, prop());
 
                     // don't attempt to updated computed properties
                     if (!prop.source) {

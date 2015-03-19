@@ -127,7 +127,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask("default", ["clean:build", "ts:default"]);
-    grunt.registerTask("tests", ["ts:src", "ts:specs", "jasmine"]);
+    grunt.registerTask("tests", ["ts:src", "ts:specs", "jasmine:default"]);
     grunt.registerTask("debug", ["ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
     grunt.registerTask("dist", ["clean:build", "ts:src", "ts:specs", "jasmine:dist", "clean:dist", "ts:dist", "uglify:dist", "compress:dist"]);
 };

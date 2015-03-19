@@ -13,6 +13,12 @@ module wx {
     var impls = new Array<ISelectedValueBindingImpl>();
 
     class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
+        }
+
+        protected domManager: IDomManager;
+
         public supports(el: HTMLElement, model: any): boolean {
             return (el.tagName.toLowerCase() === 'input' &&
                 el.getAttribute("type") === 'radio') &&
@@ -39,9 +45,9 @@ module wx {
 
             if (isProperty(model)) {
                 var prop = <IObservableProperty<any>> model;
-                input.checked = input.value == prop();
+                input.checked = this.domManager.getNodeValue(input) == prop();
             } else {
-                input.checked = input.value == model;
+                input.checked = this.domManager.getNodeValue(input) == model;
             }
         }
 
@@ -49,12 +55,18 @@ module wx {
             var input = <HTMLInputElement> el;
 
             if (input.checked) {
-                model(input.value);
+                model(this.domManager.getNodeValue(input));
             }
         }
     }
 
     class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
+        constructor(domManager: IDomManager) {
+            this.domManager = domManager;
+        }
+
+        protected domManager: IDomManager;
+
         public supports(el: HTMLElement, model: any): boolean {
             return el.tagName.toLowerCase() === 'select' &&
                 !isList(model);
@@ -82,29 +94,29 @@ module wx {
                 if (prop() === undefined) {
                     option.selectedIndex = -1;
                 } else {
-                    option.value = prop();
+                    this.domManager.setNodeValue(option, prop());
                 }
             } else {
                 if (model === undefined) {
                     option.selectedIndex = -1;
                 } else {
-                    option.value = model;
+                    this.domManager.setNodeValue(option, model);
                 }
             }
         }
 
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
             var option = <HTMLSelectElement> el;
-            model(option.value);
+            model(this.domManager.getNodeValue(option));
         }
     }
-
-    impls.push(new RadioSingleSelectionImpl());
-    impls.push(new OptionSingleSelectionImpl());
 
     class SelectedValueBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
+
+            impls.push(new RadioSingleSelectionImpl(domManager));
+            impls.push(new OptionSingleSelectionImpl(domManager));
         } 
 
         ////////////////////
@@ -188,7 +200,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        protected domManager: IDomManager
+        protected domManager: IDomManager;
     }
 
     export module internal {
