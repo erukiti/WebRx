@@ -14,11 +14,15 @@ module wx {
     export function property<T>(initialValue?: T): IObservableProperty<T> {
         // initialize accessor function
         var accessor: any = (newVal?: T): T => {
-            if (arguments.length !== 0 && newVal !== accessor.value) {
-                accessor.changingSubject.onNext(newVal);
-                accessor.value = newVal;
-                accessor.changedSubject.onNext(newVal);
+            if (arguments.length > 0) {
+                // set
+                if (newVal !== accessor.value) {
+                    accessor.changingSubject.onNext(newVal);
+                    accessor.value = newVal;
+                    accessor.changedSubject.onNext(newVal);
+                }
             } else {
+                // get
                 return accessor.value;
             }
         };

@@ -46,7 +46,7 @@ module wx {
                         // wire up event observable
                         if (typeof handler === "function") {
                             eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(e => {
-                                handler(ctx, e);
+                                handler.apply(ctx.$data, [ctx, e]);
                             });
                         } else {
                             // assumed to be an Rx.Observer
