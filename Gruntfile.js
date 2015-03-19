@@ -1,7 +1,7 @@
 module.exports = function (grunt) {
     "use strict";
 
-    grunt.initConfig({
+    var conf = {
         ts: {
             default: {
                 src: [ "src/**/*.ts"],
@@ -67,25 +67,7 @@ module.exports = function (grunt) {
                 }
             },
             dist: {
-                src: 'dist/web.rx.min.js',
-                options: {
-                    specs: 'build/test/**/*.js',
-                    vendor: [
-                        "node_modules/rx/dist/rx.lite.js",
-                        "node_modules/rx/dist/rx.lite.extras.js",
-                        "node_modules/rx/dist/rx.virtualtime.js",
-                        "node_modules/rx/dist/rx.testing.js",
-                        "node_modules/browser-jquery/jquery.js",
-                        "node_modules/jasmine-jquery/lib/jasmine-jquery.js",
-                        "node_modules/ix/l2o.js",
-                        "node_modules/ix/ix.js",
-                        "node_modules/URIjs/src/URI.js",
-                        "node_modules/requirejs/require.js",
-                        "test/test-setup.js",
-                        "build/test/TestUtils.js",
-                        "build/test/TestModels.js"
-                    ]
-                }
+                src: 'dist/web.rx.min.js'
             }
         },
 
@@ -130,8 +112,12 @@ module.exports = function (grunt) {
                 }
             }
         }
-    });
+    };
     
+    conf.jasmine.dist.options = conf.jasmine.default.options;
+
+    grunt.initConfig(conf);
+
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks("grunt-contrib-connect");
