@@ -25,13 +25,13 @@ module wx {
 
             var useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
             var prop: IObservableProperty<any>;
-            var locals: Rx.CompositeDisposable;
+            var cleanup: Rx.CompositeDisposable;
             var exp = this.domManager.compileBindingOptions(options);
 
-            function cleanup() {
-                if (locals) {
-                    locals.dispose();
-                    locals = null;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
                 }
             }
 
@@ -52,13 +52,13 @@ module wx {
                     // initial and final update
                     updateElement(this.domManager, model);
                 } else {
-                    cleanup();
-                    locals = new Rx.CompositeDisposable();
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
 
                     // update on property change
                     prop = model;
 
-                    locals.add(prop.changed.subscribe(x => {
+                    cleanup.add(prop.changed.subscribe(x => {
                         updateElement(this.domManager, x);
                     }));
 
@@ -67,7 +67,7 @@ module wx {
 
                     // don't attempt to updated computed properties
                     if (!prop.source) {
-                        locals.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
+                        cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
                             if (useDomManagerForValueUpdates)
                                 prop(internal.getNodeValue(el, this.domManager));
                             else
@@ -75,11 +75,6 @@ module wx {
                         }));
                     }
                 }
-            }));
-
-            // release subscriptions and handlers
-            state.cleanup.add(Rx.Disposable.create(() => {
-                cleanup();
             }));
 
             // release closure references to GC 
@@ -94,6 +89,7 @@ module wx {
                 el = null;
 
                 // nullify locals
+                doCleanup();
             }));
         }
 

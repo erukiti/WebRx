@@ -44,7 +44,7 @@ module wx {
                 }
             }
 
-            function cleanup() {
+            function doCleanup() {
                 if (propertySubscription) {
                     propertySubscription.dispose();
                     propertySubscription = null;
@@ -61,7 +61,7 @@ module wx {
                     // initial and final update
                     updateElement(src);
                 } else {
-                    cleanup();
+                    doCleanup();
 
                     // update on property change
                     prop = src;
@@ -84,11 +84,6 @@ module wx {
                 }
             }));
 
-            // release subscriptions and handlers
-            state.cleanup.add(Rx.Disposable.create(() => {
-                cleanup();
-            }));
-
             // release closure references to GC 
             state.cleanup.add(Rx.Disposable.create(() => {
                 // nullify args
@@ -101,6 +96,7 @@ module wx {
                 el = null;
 
                 // nullify locals
+                doCleanup();
             }));
         }
 

@@ -19,13 +19,13 @@ module wx {
 
             var el = <HTMLInputElement> node;
             var prop: IObservableProperty<any>;
-            var locals: Rx.CompositeDisposable;
+            var cleanup: Rx.CompositeDisposable;
             var exp = this.domManager.compileBindingOptions(options);
 
-            function cleanup() {
-                if (locals) {
-                    locals.dispose();
-                    locals = null;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
                 }
             }
 
@@ -62,13 +62,13 @@ module wx {
                     // initial and final update
                     updateElement(model);
                 } else {
-                    cleanup();
-                    locals = new Rx.CompositeDisposable();
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
 
                     // update on property change
                     prop = model;
 
-                    locals.add(prop.changed.subscribe(x => {
+                    cleanup.add(prop.changed.subscribe(x => {
                         updateElement(x);
                     }));
 
@@ -77,16 +77,11 @@ module wx {
 
                     // don't attempt to updated computed properties
                     if (!prop.source) {
-                        locals.add(Rx.Observable.merge(this.getFocusEventObservables(el)).subscribe(hasFocus => {
+                        cleanup.add(Rx.Observable.merge(this.getFocusEventObservables(el)).subscribe(hasFocus => {
                             handleElementFocusChange(hasFocus);
                         }));
                     }
                 }
-            }));
-
-            // release subscriptions and handlers
-            state.cleanup.add(Rx.Disposable.create(() => {
-                cleanup();
             }));
 
             // release closure references to GC 
@@ -101,6 +96,7 @@ module wx {
                 el = null;
 
                 // nullify locals
+                doCleanup();
             }));
         }
 
