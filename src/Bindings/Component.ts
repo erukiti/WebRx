@@ -28,31 +28,26 @@ module wx {
             var compiled = this.domManager.compileBindingOptions(options);
             var opt = <IComponentBindingOptions> compiled;
             var exp: ICompiledExpression;
-            var observables: Array<Rx.Observable<any>> = [];
-            var paramsKeys: Array<string> = [];
-            var componentName;
-            var componentParams: Object;
+            var componentObservable: Rx.Observable<string>;
+            var componentParams = {};
             var keepComponentParams = false;
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                observables.push(this.domManager.expressionToObservable(exp, ctx));
+                componentObservable = <any> this.domManager.expressionToObservable(exp, ctx);
             } else {
                 // collect component-name observable
-                observables.push(this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
+                componentObservable = <any> this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx);
 
                 // collect params observables
                 if (opt.params) {
                     if (typeof opt.params === "function") {
                         // opt params is object passed by value (probably $componentParams from view-binding)
                         componentParams = this.domManager.evaluateExpression(<ICompiledExpression> opt.params, ctx);
-                        keepComponentParams = true;
                     } else if (typeof opt.params === "object") {
                         Object.keys(opt.params).forEach(x => {
-                            paramsKeys.push(x);
-
-                            observables.push(this.domManager.expressionToObservable(opt.params[x], ctx));
+                            componentParams[x] = this.domManager.evaluateExpression(opt.params[x], ctx);
                         });
                     } else {
                         internal.throwError("invalid component-params");
@@ -65,19 +60,7 @@ module wx {
             while (el.firstChild) { oldContents.push(el.removeChild(el.firstChild)); }
 
             // subscribe to any input changes
-            state.cleanup.add(Rx.Observable.combineLatest(observables,(_) => args2Array(arguments)).subscribe(latest => {
-                // first element is always the component-name
-                componentName = latest.shift();
-
-                if (!keepComponentParams) {
-                    // subsequent entries are latest param values
-                    componentParams = {};
-
-                    for (var i = 0; i < paramsKeys.length; i++) {
-                        componentParams[paramsKeys[i]] = latest[i];
-                    }
-                }
-
+            state.cleanup.add(componentObservable.subscribe(componentName => {
                 // lookup component
                 var component: IComponent = undefined;
                 if (state.module)
