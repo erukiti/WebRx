@@ -111,6 +111,24 @@ module.exports = function (grunt) {
                     'dist/web.rx.min.js': ['dist/web.rx.js']
                 }
             }
+        },
+
+        pkg: grunt.file.readJSON('package.json'),
+
+        nugetpack: {
+            dist: {
+                src: 'nuget/webrx.nuspec',
+                dest: 'dist/',
+                options: {
+                    version: '<%= pkg.version %>'
+                }
+            }
+        },
+
+        nugetpush: {
+            dist: {
+                src: 'dist/*.nupkg'
+            }
         }
     };
     
@@ -125,9 +143,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-nuget');  
 
     grunt.registerTask("default", ["clean:build", "ts:default"]);
     grunt.registerTask("tests", ["ts:src", "ts:specs", "jasmine:default"]);
     grunt.registerTask("debug", ["ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
     grunt.registerTask("dist", ["clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask('publish', ['dist', 'nugetpack', 'nugetpush']);  
 };
