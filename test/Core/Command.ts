@@ -480,4 +480,23 @@ describe("Command", () => {
         expect(2).toEqual(canExecuteOutput.length);
         expect(true).toEqual(canExecuteOutput[1]);
     });
+
+    it("command can execute on whenAny",() => {
+        var prop = wx.property();
+        var commandExecuted = false;
+        var command = wx.command(_=> commandExecuted = true, wx.whenAny(prop, x=> !!x));
+        expect(commandExecuted).toBeFalsy();
+
+        prop(undefined);
+        expect(command.canExecute(null)).toBeFalsy();
+
+        prop(false);
+        expect(command.canExecute(null)).toBeFalsy();
+
+        prop(true);
+        expect(command.canExecute(null)).toBeTruthy();
+
+        command.execute(null);
+        expect(commandExecuted).toBeTruthy();
+    });
 });

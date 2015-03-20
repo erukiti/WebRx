@@ -510,16 +510,17 @@ module wx {
     /// the Observable is set up.
     /// </summary>
     export function whenAny<TRet>(): Rx.Observable<TRet> {
+        // no need to invoke combineLatest for the simplest case
         if (arguments.length === 2) {
-            return arguments[0].changed.select(arguments[1]);
+            return arguments[0].changed.startWith(arguments[0]()).select(arguments[1]);
         }
 
-        var args = Array.prototype.slice.call(arguments);
+        var args = args2Array(arguments);
 
         // extract selector
         var selector = args.pop();
 
-        // make sure the current value is prepended to the sequence in order to satisfy combineLatest
+        // prepend sequence with current values to satisfy combineLatest
         args = args.map(x => x.changed.startWith(x()));
 
         // finally append the selector
