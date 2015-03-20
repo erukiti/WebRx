@@ -13,13 +13,52 @@ describe('Bindings', () => {
     };
 
     describe('Command',() => {
-        it('binding to non-command source should throw', () => {
+        it('binding to non-command source throws error', () => {
             loadFixtures('templates/Bindings/Command.html');
 
             var el = document.querySelector("#command-invalid-binding-target");
             var model = createCommandModel((_) => {});
 
-            expect(() => wx.applyBindings(model, el)).toThrowError(/Reactive Command/);
+            expect(() => wx.applyBindings(model, el)).toThrowError(/only supports binding to a command/);
+        });
+
+        it('binding reacts to changes when bound to observable properties holding command and parameter',() => {
+            loadFixtures('templates/Bindings/Command.html');
+
+            var el = <HTMLButtonElement> document.querySelector("#command-button-observable");
+
+            var fooExecuteCount = 0;
+            var barExecuteCount = 0;
+            var executeParam = undefined;
+
+            var model = {
+                cmd: wx.property(),
+                param: wx.property()
+            };
+
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect(fooExecuteCount).toEqual(0);
+            expect(barExecuteCount).toEqual(0);
+
+            model.cmd(wx.command((x) => { fooExecuteCount++; executeParam = x }));
+            testutils.triggerEvent(el, "click");
+            expect(fooExecuteCount).toEqual(1);
+            expect(executeParam).toEqual(model.param());
+
+            model.param(42);
+            testutils.triggerEvent(el, "click");
+            expect(fooExecuteCount).toEqual(2);
+            expect(executeParam).toEqual(model.param());
+
+            model.cmd(wx.command((x) => { barExecuteCount++; executeParam = x }));
+            testutils.triggerEvent(el, "click");
+            expect(barExecuteCount).toEqual(1);
+            expect(executeParam).toEqual(model.param());
+
+            model.param(3);
+            testutils.triggerEvent(el, "click");
+            expect(barExecuteCount).toEqual(2);
+            expect(executeParam).toEqual(model.param());
         });
 
         function commandBindingSmokeTestImpl(sel: string) {

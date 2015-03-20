@@ -26,50 +26,64 @@ module wx {
             var compiled = this.domManager.compileBindingOptions(options);
 
             var el = <HTMLElement> node;
-            var cmd: ICommand<any>;
-            var parameter: any;
             var exp: ICompiledExpression;
+            var cmdObservable: Rx.Observable<ICommand<any>>;
+            var paramObservable: Rx.Observable<any>;
+            var cleanup: Rx.CompositeDisposable;
+
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                using(this.domManager.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    cmd = prop();
-                    parameter = null;
-                });
+                cmdObservable = <any> this.domManager.expressionToObservable(exp, ctx);
             } else {
                 var opt = <ICommandBindingOptions> compiled;
 
                 exp = <ICompiledExpression> <any> opt.command;
-                using(this.domManager.expressionToObservable(exp, ctx).toProperty(),(prop) => {
-                    cmd = prop();
-                });
+                cmdObservable = <any> this.domManager.expressionToObservable(exp, ctx);
 
                 if (opt.parameter) {
                     exp = <ICompiledExpression> <any> opt.parameter;
-                    using(this.domManager.expressionToObservable(exp, ctx).toProperty(), (prop) => {
-                        parameter = prop();
-                    });
+                    paramObservable = this.domManager.expressionToObservable(exp, ctx);
                 }
             }
 
-            if (!isCommand(cmd)) {
-                // value is not a ICommand
-                internal.throwError("Command-Binding only works when bound to a Reactive Command!");
-            } else {
-                // initial update
-                el.disabled = !cmd.canExecute(parameter);
-
-                // listen to changes
-                state.cleanup.add(cmd.canExecuteObservable.subscribe(canExecute => {
-                    el.disabled = !canExecute;
-                }));
-
-                // handle click event
-                state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(e => {
-                    cmd.execute(parameter);
-                }));
+            if (paramObservable == null) {
+                paramObservable = Rx.Observable.return<any>(undefined); 
             }
+
+            state.cleanup.add(Rx.Observable
+                .combineLatest(cmdObservable, paramObservable, (cmd, param) => ({ cmd: cmd, param: param }))
+                .subscribe(x => {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+
+                    if (x.cmd != null) {
+                        if (!isCommand(x.cmd)) {
+                            // value is not a ICommand
+                            internal.throwError("Command-Binding only supports binding to a command!");
+                        } else {
+                            // initial update
+                            el.disabled = !x.cmd.canExecute(x.param);
+
+                            // listen to changes
+                            cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
+                                el.disabled = !canExecute;
+                            }));
+
+                            // handle click event
+                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(e => {
+                                x.cmd.execute(x.param);
+                            }));
+                        }
+                    }
+            }));
 
             // release closure references to GC 
             state.cleanup.add(Rx.Disposable.create(() => {
@@ -83,8 +97,7 @@ module wx {
                 el = null;
 
                 // nullify locals
-                cmd = null;
-                parameter = null;
+                doCleanup();
             }));
         }
 

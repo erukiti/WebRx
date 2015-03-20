@@ -27,12 +27,12 @@ module wx {
 
             var exp = this.domManager.compileBindingOptions(options);
             var prop: IObservableProperty<any>;
-            var locals: Rx.CompositeDisposable;
+            var cleanup: Rx.CompositeDisposable;
 
-            function cleanup() {
-                if (locals) {
-                    locals.dispose();
-                    locals = null;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
                 }
             }
 
@@ -45,13 +45,13 @@ module wx {
                     // initial and final update
                     updateElement(model);
                 } else {
-                    cleanup();
-                    locals = new Rx.CompositeDisposable();
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
 
                     // update on property change
                     prop = model;
 
-                    locals.add(prop.changed.subscribe(x => {
+                    cleanup.add(prop.changed.subscribe(x => {
                         updateElement(x);
                     }));
 
@@ -62,16 +62,11 @@ module wx {
                     if (!prop.source) {
                         // wire change-events depending on browser and version
                         var events = this.getCheckedEventObservables(el);
-                        locals.add(Rx.Observable.merge(events).subscribe(e => {
+                        cleanup.add(Rx.Observable.merge(events).subscribe(e => {
                             prop(el.checked);
                         }));
                     }
                 }
-            }));
-
-            // release subscriptions and handlers
-            state.cleanup.add(Rx.Disposable.create(() => {
-                cleanup();
             }));
 
             // release closure references to GC 
@@ -86,6 +81,7 @@ module wx {
                 el = null;
 
                 // nullify locals
+                doCleanup();
             }));
         }
 
