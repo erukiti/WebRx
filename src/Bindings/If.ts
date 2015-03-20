@@ -27,7 +27,7 @@ module wx {
             var el = <HTMLElement> node;
             var self = this;
             var initialApply = true;
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // backup inner HTML

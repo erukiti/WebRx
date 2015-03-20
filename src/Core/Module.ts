@@ -77,7 +77,7 @@ module wx {
         }
 
         public registerExpressionFilter(name: string, filter: IExpressionFilter): void {
-            this.expressionFilters[name] = filter;
+            this.expressionFilters[name] = filter
         }
 
         public getExpressionFilters(): { [index: string]: IExpressionFilter; } {
@@ -91,7 +91,7 @@ module wx {
 
         private bindings: { [name: string]: any } = {};
         private components: { [name: string]: any } = {};
-        private expressionFilters: { [index: string]: IExpressionFilter; };
+        private expressionFilters: { [index: string]: IExpressionFilter; } = {};
     }
 
     class App extends Module implements IWebRxApp  {

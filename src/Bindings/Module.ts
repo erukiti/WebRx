@@ -23,7 +23,7 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe

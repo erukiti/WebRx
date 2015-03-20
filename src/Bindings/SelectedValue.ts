@@ -131,7 +131,7 @@ module wx {
             var el = <HTMLInputElement> node;
             var impl: ISelectedValueBindingImpl;
             var implCleanup: Rx.CompositeDisposable;
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
             
             function cleanupImpl() {
                 if (implCleanup) {

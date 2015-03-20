@@ -25,7 +25,7 @@ module wx {
             if (tag !== 'input' && tag !== 'textarea')
                 internal.throwError("textInput-binding can only be applied to input or textarea elements");
 
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
             var prop: IObservableProperty<any>;
             var propertySubscription: Rx.Disposable;
             var eventSubscription: Rx.Disposable;

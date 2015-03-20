@@ -20,7 +20,7 @@ module wx {
             var el = <HTMLInputElement> node;
             var prop: IObservableProperty<any>;
             var cleanup: Rx.CompositeDisposable;
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
 
             function doCleanup() {
                 if (cleanup) {

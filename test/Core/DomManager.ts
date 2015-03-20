@@ -96,7 +96,7 @@ describe('DomManager',() => {
             var compiled: any;
             var scope = {};
 
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             expect(compiled).not.toBeNull();
             expect(compiled.hasOwnProperty("text")).toBeTruthy();
@@ -114,7 +114,7 @@ describe('DomManager',() => {
             var def = "{ text: $scope.foo() }";
             var compiled: any;
 
-            expect(() => compiled = domManager.compileBindingOptions(def)).toThrowError();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).toThrowError();
         });
     });
 
@@ -126,7 +126,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             expect(domManager.expressionToObservable(compiled.ctx.data, ctx).toProperty()()).toBe(ctx.$data);
             expect(domManager.expressionToObservable(compiled.ctx.root, ctx).toProperty()()).toBe(ctx.$root);
@@ -141,7 +141,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var value;
             var obs = domManager.expressionToObservable(compiled, ctx);
@@ -160,7 +160,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var prop = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(prop()).toEqual("42hello");
@@ -181,7 +181,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var prop = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(prop.source).toBe(model.foo);
@@ -206,7 +206,7 @@ describe('DomManager',() => {
 
             var ctx = testutils.createModelContext(model);
 
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             var html = domManager.expressionToObservable(compiled['html'], ctx).toProperty();
@@ -236,7 +236,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(text()).toEqual("hello");
@@ -260,7 +260,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
 
@@ -289,7 +289,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             // count evals
             var evalCount = 0;
@@ -319,7 +319,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             var prop = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
 
@@ -349,7 +349,7 @@ describe('DomManager',() => {
             };
 
             var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
 
             // count evals
             var evalCount = 0;
@@ -374,7 +374,7 @@ describe('DomManager',() => {
             var ctx = testutils.createModelContext(model);
 
             var def = "{ text: @foo }";
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
             var result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(model.foo);
 
@@ -385,7 +385,7 @@ describe('DomManager',() => {
             model.foo(childModel);
 
             def = "{ text: foo.@bar }";
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(childModel.bar);
 
@@ -396,7 +396,7 @@ describe('DomManager',() => {
             childModel.bar(grandChildModel);
 
             def = "{ text: foo.bar.@baz }";
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(grandChildModel.baz);
 
@@ -427,12 +427,12 @@ describe('DomManager',() => {
             model4.prop4(model5);
 
             def = "{ text: foo.bar.baz.prop1.prop2.prop3.@prop4 }";
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toBe(model4.prop4);
 
             def = "{ text: foo.bar.baz.prop1.prop2.prop3.prop4.prop5 }";
-            expect(() => compiled = domManager.compileBindingOptions(def)).not.toThrow();
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toEqual("5");
         });

@@ -25,7 +25,7 @@ module wx {
             if (tag !== 'input' || (!isCheckBox && !isRadioButton))
                 internal.throwError("checked-binding only operates on checkboxes and radio-buttons");
 
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
             var prop: IObservableProperty<any>;
             var cleanup: Rx.CompositeDisposable;
 

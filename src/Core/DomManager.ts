@@ -79,7 +79,7 @@ module wx {
             return [];
         }
 
-        public compileBindingOptions(value: string): Object {
+        public compileBindingOptions(value: string, module: IModule): Object {
             value = trimString(value);
             if (value === '') {
                 return null;
@@ -92,12 +92,24 @@ module wx {
 
                 for (var i = 0; i < tokens.length; i++) {
                     token = tokens[i];
-                    result[token.key] = this.compileBindingOptions(token.value);
+                    result[token.key] = this.compileBindingOptions(token.value, module);
                 }
 
                 return result;
             } else {
-                return this.compiler.compileExpression(value, this.parserOptions, this.expressionCache);
+                // build compiler options
+                var options = <IExpressionCompilerOptions> extend(this.parserOptions, {});
+                options.filters = {};
+
+                // enrich with app filters
+                extend(app.getExpressionFilters(), options.filters);
+
+                // enrich with module filters
+                if (module) {
+                    extend(module.getExpressionFilters(), options.filters);
+                }
+
+                return this.compiler.compileExpression(value, options, this.expressionCache);
             }
         }
 

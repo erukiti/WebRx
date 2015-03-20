@@ -26,7 +26,7 @@ module wx {
                 internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
-            var compiled = this.domManager.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options, module);
             var viewName = this.domManager.evaluateExpression(compiled, ctx);
             var componentName: string = null;
             var componentParams: any;

@@ -22,7 +22,7 @@ module wx {
 
             var el = <HTMLElement> node;
             var self = this;
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe

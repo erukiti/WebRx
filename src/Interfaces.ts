@@ -451,7 +451,7 @@ module wx {
         * Compiles a simple string expression or multiple expressions within an object-literal recursively into an expression tree
         * @param {string} value The expression(s) to compile
         */
-        compileBindingOptions(value: string): any;
+        compileBindingOptions(value: string, module: IModule): any;
 
         /**
         * Tokenizes an object-literal into an array of key-value pairs

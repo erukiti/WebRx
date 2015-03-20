@@ -23,7 +23,7 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var compiled = this.domManager.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options, module);
 
             var el = <HTMLElement> node;
             var exp: ICompiledExpression;

@@ -28,7 +28,7 @@ module wx {
             var tokens = this.domManager.getObjectLiteralTokens(options);
             var eventDisposables: { [eventName: string]: Rx.Disposable } = {};
             var eventHandlers = tokens.map(token => {
-                var exp = this.domManager.compileBindingOptions(token.value);
+                var exp = this.domManager.compileBindingOptions(token.value, module);
                 return this.domManager.expressionToObservable(exp, ctx);
             });
 

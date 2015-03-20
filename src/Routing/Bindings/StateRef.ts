@@ -25,7 +25,7 @@ module wx {
                 internal.throwError("invalid binding-options!");
 
             var el = <HTMLAnchorElement> node;
-            var compiled = this.domManager.compileBindingOptions(options);
+            var compiled = this.domManager.compileBindingOptions(options, module);
             var exp: ICompiledExpression;
             var observables: Array<Rx.Observable<any>> = [];
             var opt = <IStateRefBindingOptions> compiled;

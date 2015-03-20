@@ -26,7 +26,7 @@ module wx {
             var useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
             var prop: IObservableProperty<any>;
             var cleanup: Rx.CompositeDisposable;
-            var exp = this.domManager.compileBindingOptions(options);
+            var exp = this.domManager.compileBindingOptions(options, module);
 
             function doCleanup() {
                 if (cleanup) {
