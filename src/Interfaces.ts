@@ -346,9 +346,13 @@ module wx {
         value?: string;
     }
 
+    export interface IExpressionFilter {
+        (...args: Array<any>): any;
+    }
+
     export interface IExpressionCompilerOptions {
         disallowFunctionCalls?: boolean;
-        filters?: { [filterName: string]: (...args: Array<any>) => any };
+        filters?: { [filterName: string]: IExpressionFilter };
     }
 
     export interface ICompiledExpression {
@@ -502,8 +506,9 @@ module wx {
         * @param {any} options The options for the handler
         * @param {IDataContext} ctx The curent data context
         * @param {IDomElementState} state State of the target element
+        * @param {IModule} module The module bound to the current binding scope
         */
-        applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void;
+        applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void;
 
         /**
         * Configures the handler using a handler-specific options object
@@ -565,7 +570,12 @@ module wx {
         getComponent(name: string): IComponent;
     }
 
-    export interface IModule extends IComponentRegistry, IBindingRegistry {
+    export interface IExpressionFilterRegistry {
+        registerExpressionFilter(name: string, filter: IExpressionFilter): void;
+        getExpressionFilters(): { [filterName: string]: IExpressionFilter };
+    }
+
+    export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
         name: string;
     }
 

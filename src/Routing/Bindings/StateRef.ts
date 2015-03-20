@@ -17,7 +17,7 @@ module wx {
         ////////////////////
         // IBinding
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
+        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
             if (node.nodeType !== 1 || (<HTMLElement> node).tagName.toLowerCase() !== 'a')
                 internal.throwError("stateRef-binding only operates on anchor-elements!");
 

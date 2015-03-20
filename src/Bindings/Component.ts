@@ -17,7 +17,7 @@ module wx {
         ////////////////////
         // IBinding
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
+        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
             if (node.nodeType !== 1)
                 internal.throwError("component-binding only operates on elements!");
 
@@ -30,7 +30,6 @@ module wx {
             var exp: ICompiledExpression;
             var componentObservable: Rx.Observable<string>;
             var componentParams = {};
-            var keepComponentParams = false;
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
@@ -63,15 +62,16 @@ module wx {
             state.cleanup.add(componentObservable.subscribe(componentName => {
                 // lookup component
                 var component: IComponent = undefined;
-                if (state.module)
-                    component = state.module.getComponent(componentName);
+                
+                if (module)
+                    component = module.getComponent(componentName);
 
                 // fallback to "app" module if not registered with
                 if (!component)
                     component = app.getComponent(componentName);
 
                 if (component == null)
-                    internal.throwError("component '{0}' has not been registered.", componentName);
+                    internal.throwError("component '{0}' is not registered.", componentName);
 
                 // resolve template & view-model
                 if (component.viewModel) {

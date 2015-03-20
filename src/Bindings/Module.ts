@@ -16,7 +16,7 @@ module wx {
         ////////////////////
         // IBinding
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
+        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
             if (node.nodeType !== 1)
                 internal.throwError("module-binding only operates on elements!");
 
@@ -29,7 +29,7 @@ module wx {
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
                 if (typeof x === "string")
-                    x = module(x);
+                    x = wx.module(x);
 
                 state.module = x;
             }));

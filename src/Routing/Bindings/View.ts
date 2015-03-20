@@ -18,7 +18,7 @@ module wx {
         ////////////////////
         // IBinding
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState): void {
+        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
             if (node.nodeType !== 1)
                 internal.throwError("view-binding only operates on elements!");
 

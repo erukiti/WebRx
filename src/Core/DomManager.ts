@@ -369,7 +369,11 @@ module wx {
                     var binding = bindings[i];
                     var handler = binding.handler;
 
-                    handler.applyBinding(el, binding.value, ctx, state);
+                    handler.applyBinding(el, binding.value, ctx, state, module);
+
+                    // module binding might have updated the state
+                    if (state.module !== module)
+                        module = state.module;
                 }
             }
 
