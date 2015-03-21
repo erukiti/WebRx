@@ -6,9 +6,9 @@ module wx {
     * @interface 
     **/
     export interface IInjector {
-        register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): void;
-        register(key: string, singleton: boolean, factory: () => any): void;
-        register(key: string, instance:any): void;
+        register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): IInjector;
+        register(key: string, singleton: boolean, factory: () => any): IInjector;
+        register(key: string, instance: any): IInjector;
 
         resolve<T>(key: string, args?: any): T;
     }
@@ -531,12 +531,11 @@ module wx {
     }
 
     export interface IBindingRegistry {
-        registerBinding(name: string, handler: IBindingHandler): void;
-        registerBinding(name: string, handler: string): void;
-        registerBinding(names: string[], handler: IBindingHandler): void;
-        registerBinding(names: string[], handler: string): void;
-        isBindingRegistered(name: string): boolean;
-        getBinding(name: string): IBindingHandler;
+        binding(name: string, handler: IBindingHandler): IBindingRegistry;
+        binding(name: string, handler: string): IBindingRegistry;
+        binding(names: string[], handler: IBindingHandler): IBindingRegistry;
+        binding(names: string[], handler: string): IBindingRegistry;
+        binding(name: string): IBindingHandler;
     }
 
     export interface IComponentTemplateDescriptor {
@@ -564,15 +563,15 @@ module wx {
     }
 
     export interface IComponentRegistry {
-        registerComponent(name: string, handler: IComponent): void;
-        registerComponent(name: string, handler: string): void;
-        isComponentRegistered(name: string): boolean;
-        getComponent(name: string): IComponent;
+        component(name: string, handler: IComponent): IComponentRegistry;
+        component(name: string, handler: string): IComponentRegistry;
+        component(name: string): IComponent;
     }
 
     export interface IExpressionFilterRegistry {
-        registerExpressionFilter(name: string, filter: IExpressionFilter): void;
-        getExpressionFilters(): { [filterName: string]: IExpressionFilter };
+        filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
+        filter(name: string): IExpressionFilter;
+        filters(): { [filterName: string]: IExpressionFilter };
     }
 
     export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {

@@ -10,11 +10,11 @@ module wx {
         //////////////////////////////////
         // IInjector implementation
 
-        public register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): void;
-        public register(key: string, singleton: boolean, factory: () => any): void;
-        public register(key: string, instance: any): void;
+        public register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): IInjector;
+        public register(key: string, singleton: boolean, factory: () => any): IInjector;
+        public register(key: string, instance: any): IInjector;
 
-        public register() {
+        public register(): IInjector {
             var args = args2Array(arguments);
             var key = args.shift();
             var factory: (deps: any, args: any) => any;
@@ -93,6 +93,8 @@ module wx {
             }
 
             this.registrations[key] = { factory: factory, isSingleton: isSingleton };
+
+            return this;
         }
 
         public resolve<T>(key: string, args: any, deps?: any): T {

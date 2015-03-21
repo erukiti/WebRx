@@ -16,64 +16,64 @@
 /// <reference path="Routing/Router.ts" />
 
 module wx {
-    injector.register(res.expressionCompiler, internal.expressionCompilerConstructor);
-    injector.register(res.htmlTemplateEngine, true, true, [internal.htmlTemplateEngineConstructor]);
-    injector.register(res.domManager, true, true, [res.expressionCompiler, internal.domManagerConstructor]);
-    injector.register(res.router, true, true, [res.domManager, internal.routerConstructor]);
+    injector.register(res.expressionCompiler, internal.expressionCompilerConstructor)
+        .register(res.htmlTemplateEngine, true, true, [internal.htmlTemplateEngineConstructor])
+        .register(res.domManager, true, true, [res.expressionCompiler, internal.domManagerConstructor])
+        .register(res.router, true, true, [res.domManager, internal.routerConstructor]);
 
-    injector.register("wx.bindings.module", true, true, [res.domManager, internal.moduleBindingConstructor]);
-    injector.register("wx.bindings.command", true, true, [res.domManager, internal.commandBindingConstructor]);
-    injector.register("wx.bindings.if", true, true, [res.domManager, internal.ifBindingConstructor]);
-    injector.register("wx.bindings.with", true, true, [res.domManager, internal.withBindingConstructor]);
-    injector.register("wx.bindings.notif", true, true, [res.domManager, internal.notifBindingConstructor]);
-    injector.register("wx.bindings.css", true, true, [res.domManager, internal.cssBindingConstructor]);
-    injector.register("wx.bindings.attr", true, true, [res.domManager, internal.attrBindingConstructor]);
-    injector.register("wx.bindings.style", true, true, [res.domManager, internal.styleBindingConstructor]);
-    injector.register("wx.bindings.text", true, true, [res.domManager, internal.textBindingConstructor]);
-    injector.register("wx.bindings.html", true, true, [res.domManager, internal.htmlBindingConstructor]);
-    injector.register("wx.bindings.visible", true, true, [res.domManager, internal.visibleBindingConstructor]);
-    injector.register("wx.bindings.hidden", true, true, [res.domManager, internal.hiddenBindingConstructor]);
-    injector.register("wx.bindings.enabled", true, true, [res.domManager, internal.enableBindingConstructor]);
-    injector.register("wx.bindings.disabled", true, true, [res.domManager, internal.disableBindingConstructor]);
-    injector.register("wx.bindings.foreach", true, true, [res.domManager, internal.forEachBindingConstructor]);
-    injector.register("wx.bindings.event", true, true, [res.domManager, internal.eventBindingConstructor]);
-    injector.register("wx.bindings.textInput", true, true, [res.domManager, internal.textInputBindingConstructor]);
-    injector.register("wx.bindings.checked", true, true, [res.domManager, internal.checkedBindingConstructor]);
-    injector.register("wx.bindings.selectedValue", true, true, [res.domManager, internal.selectedValueBindingConstructor]);
-    injector.register("wx.bindings.component", true, true, [res.domManager, internal.componentBindingConstructor]);
-    injector.register("wx.bindings.value", true, true, [res.domManager, internal.valueBindingConstructor]);
-    injector.register("wx.bindings.hasFocus", true, true, [res.domManager, internal.hasFocusBindingConstructor]);
-    injector.register("wx.bindings.view", true, true, [res.domManager, res.router, internal.viewBindingConstructor]);
-    injector.register("wx.bindings.sref", true, true, [res.domManager, res.router, internal.stateRefBindingConstructor]);
+    injector.register("wx.bindings.module", true, true, [res.domManager, internal.moduleBindingConstructor])
+        .register("wx.bindings.command", true, true, [res.domManager, internal.commandBindingConstructor])
+        .register("wx.bindings.if", true, true, [res.domManager, internal.ifBindingConstructor])
+        .register("wx.bindings.with", true, true, [res.domManager, internal.withBindingConstructor])
+        .register("wx.bindings.notif", true, true, [res.domManager, internal.notifBindingConstructor])
+        .register("wx.bindings.css", true, true, [res.domManager, internal.cssBindingConstructor])
+        .register("wx.bindings.attr", true, true, [res.domManager, internal.attrBindingConstructor])
+        .register("wx.bindings.style", true, true, [res.domManager, internal.styleBindingConstructor])
+        .register("wx.bindings.text", true, true, [res.domManager, internal.textBindingConstructor])
+        .register("wx.bindings.html", true, true, [res.domManager, internal.htmlBindingConstructor])
+        .register("wx.bindings.visible", true, true, [res.domManager, internal.visibleBindingConstructor])
+        .register("wx.bindings.hidden", true, true, [res.domManager, internal.hiddenBindingConstructor])
+        .register("wx.bindings.enabled", true, true, [res.domManager, internal.enableBindingConstructor])
+        .register("wx.bindings.disabled", true, true, [res.domManager, internal.disableBindingConstructor])
+        .register("wx.bindings.foreach", true, true, [res.domManager, internal.forEachBindingConstructor])
+        .register("wx.bindings.event", true, true, [res.domManager, internal.eventBindingConstructor])
+        .register("wx.bindings.textInput", true, true, [res.domManager, internal.textInputBindingConstructor])
+        .register("wx.bindings.checked", true, true, [res.domManager, internal.checkedBindingConstructor])
+        .register("wx.bindings.selectedValue", true, true, [res.domManager, internal.selectedValueBindingConstructor])
+        .register("wx.bindings.component", true, true, [res.domManager, internal.componentBindingConstructor])
+        .register("wx.bindings.value", true, true, [res.domManager, internal.valueBindingConstructor])
+        .register("wx.bindings.hasFocus", true, true, [res.domManager, internal.hasFocusBindingConstructor])
+        .register("wx.bindings.view", true, true, [res.domManager, res.router, internal.viewBindingConstructor])
+        .register("wx.bindings.sref", true, true, [res.domManager, res.router, internal.stateRefBindingConstructor]);
 
-    injector.register("wx.components.radiogroup", false, true, [res.htmlTemplateEngine, internal.radioGroupComponentConstructor]);
-    injector.register("wx.components.select", false, true, [res.htmlTemplateEngine, internal.selectComponentConstructor]);
+    injector.register("wx.components.radiogroup", false, true, [res.htmlTemplateEngine, internal.radioGroupComponentConstructor])
+        .register("wx.components.select", false, true, [res.htmlTemplateEngine, internal.selectComponentConstructor]);
 
-    app.registerBinding("module", "wx.bindings.module");
-    app.registerBinding("css", "wx.bindings.css");
-    app.registerBinding("attr", "wx.bindings.attr");
-    app.registerBinding("style", "wx.bindings.style");
-    app.registerBinding("command", "wx.bindings.command");
-    app.registerBinding("if", "wx.bindings.if");
-    app.registerBinding("with", "wx.bindings.with");
-    app.registerBinding("ifnot", "wx.bindings.notif");
-    app.registerBinding("text", "wx.bindings.text");
-    app.registerBinding("html", "wx.bindings.html");
-    app.registerBinding("visible", "wx.bindings.visible");
-    app.registerBinding("hidden", "wx.bindings.hidden");
-    app.registerBinding("disabled", "wx.bindings.disabled");
-    app.registerBinding("enabled", "wx.bindings.enabled");
-    app.registerBinding("foreach", "wx.bindings.foreach");
-    app.registerBinding("event", "wx.bindings.event");
-    app.registerBinding(["textInput", "textinput"], "wx.bindings.textInput");
-    app.registerBinding("checked", "wx.bindings.checked");
-    app.registerBinding("selectedValue", "wx.bindings.selectedValue");
-    app.registerBinding("component", "wx.bindings.component");
-    app.registerBinding("value", "wx.bindings.value");
-    app.registerBinding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus");
-    app.registerBinding("view", "wx.bindings.view");
-    app.registerBinding("sref", "wx.bindings.sref");
+    app.binding("module", "wx.bindings.module")
+        .binding("css", "wx.bindings.css")
+        .binding("attr", "wx.bindings.attr")
+        .binding("style", "wx.bindings.style")
+        .binding("command", "wx.bindings.command")
+        .binding("if", "wx.bindings.if")
+        .binding("with", "wx.bindings.with")
+        .binding("ifnot", "wx.bindings.notif")
+        .binding("text", "wx.bindings.text")
+        .binding("html", "wx.bindings.html")
+        .binding("visible", "wx.bindings.visible")
+        .binding("hidden", "wx.bindings.hidden")
+        .binding("disabled", "wx.bindings.disabled")
+        .binding("enabled", "wx.bindings.enabled")
+        .binding("foreach", "wx.bindings.foreach")
+        .binding("event", "wx.bindings.event")
+        .binding(["textInput", "textinput"], "wx.bindings.textInput")
+        .binding("checked", "wx.bindings.checked")
+        .binding("selectedValue", "wx.bindings.selectedValue")
+        .binding("component", "wx.bindings.component")
+        .binding("value", "wx.bindings.value")
+        .binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus")
+        .binding("view", "wx.bindings.view")
+        .binding("sref", "wx.bindings.sref");
 
-    app.registerComponent("wx-radiogroup", "wx.components.radiogroup");
-    app.registerComponent("wx-select", "wx.components.select");
+    app.component("wx-radiogroup", "wx.components.radiogroup")
+        .component("wx-select", "wx.components.select");
 }

@@ -14,73 +14,101 @@ module wx {
         //////////////////////////////////
         // IModule
 
-        public registerComponent(name: string, handler: IComponent): void;
-        public registerComponent(name: string, handler: string): void;
+        public component(name: string, handler: IComponent): IComponentRegistry;
+        public component(name: string, handler: string): IComponentRegistry;
+        public component(name: string): IComponent;
 
-        public registerComponent(): void {
+        public component() {
             var args = args2Array(arguments);
             var name = args.shift();
-            var handler = args.shift();
+            var component: IComponent;
 
-            this.components[name] = handler;
-        }
+            // lookup?
+            if (args.length === 0) {
+                // if the component has been registered as resource, resolve it now and update registry
+                component = this.components[name];
 
-        public isComponentRegistered(name: string): boolean {
-            return this.components[name] !== undefined;
-        }
+                // if the component has been registered as resource, resolve it now and update registry
+                if (typeof component === "string") {
+                    component = injector.resolve<IComponent>(<any> component);
+                    this.components[name] = component;
+                }
 
-        public getComponent(name: string): IComponent {
-            var component = this.components[name];
-
-            // if the component has been registered as resource, resolve it now and update registry
-            if (typeof component === "string") {
-                component = injector.resolve<IBindingHandler>(component);
-                this.components[name] = component;
-                return component;
+                return <any> component;
             }
 
-            return this.components[name];
+            // registration
+            component = args.shift();
+            this.components[name] = component;
+
+            return this;
         }
 
-        public registerBinding(name: string, handler: IBindingHandler): void;
-        public registerBinding(name: string, handler: string): void;
-        public registerBinding(names: string[], handler: IBindingHandler): void;
-        public registerBinding(names: string[], handler: string): void;
+        public binding(name: string, handler: IBindingHandler): IBindingRegistry;
+        public binding(name: string, handler: string): IBindingRegistry;
+        public binding(names: string[], handler: IBindingHandler): IBindingRegistry;
+        public binding(names: string[], handler: string): IBindingRegistry;
+        public binding(name: string): IBindingHandler;
 
-        public registerBinding(): void {
+        public binding() {
             var args = args2Array(arguments);
             var name = args.shift();
-            var handler = args.shift();
+            var handler: IBindingHandler;
+
+            // lookup?
+            if (args.length === 0) {
+                // if the handler has been registered as resource, resolve it now and update registry
+                handler = this.bindings[name];
+
+                if (typeof handler === "string") {
+                    handler = injector.resolve<IBindingHandler>(<any> handler);
+                    this.bindings[name] = handler;
+                }
+
+                return handler;
+            }
+
+            // registration
+            handler = args.shift();
 
             if (Array.isArray(name)) {
                 name.forEach(x => this.bindings[x] = handler);
             } else {
                 this.bindings[name] = handler;
             }
+
+            return <any> this;
         }
 
-        public isBindingRegistered(name: string): boolean {
-            return this.bindings[name] !== undefined;
-        }
+        public filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
+        public filter(name: string): IExpressionFilter;
 
-        public getBinding(name: string): IBindingHandler {
-            var directive = this.bindings[name];
+        public filter() {
+            var args = args2Array(arguments);
+            var name = args.shift();
+            var filter: IExpressionFilter;
 
-            // if the component has been registered as resource, resolve it now and update registry
-            if (typeof directive === "string") {
-                directive = injector.resolve<IBindingHandler>(directive);
-                this.bindings[name] = directive;
-                return directive;
+            // lookup?
+            if (args.length === 0) {
+                // if the filter has been registered as resource, resolve it now and update registry
+                filter = this.expressionFilters[name];
+
+                if (typeof filter === "string") {
+                    filter = injector.resolve<IExpressionFilter>(<any> filter);
+                    this.bindings[name] = filter;
+                }
+
+                return filter;
             }
 
-            return this.bindings[name];
+            // registration
+            filter = args.shift();
+            this.expressionFilters[name] = filter;
+
+            return <any> this;
         }
 
-        public registerExpressionFilter(name: string, filter: IExpressionFilter): void {
-            this.expressionFilters[name] = filter
-        }
-
-        public getExpressionFilters(): { [index: string]: IExpressionFilter; } {
+        public filters(): { [index: string]: IExpressionFilter; } {
             return this.expressionFilters;
         }
 

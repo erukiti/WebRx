@@ -8,7 +8,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Module.html');
 
             // register a binding that would not be available in default module
-            wx.module("test").registerBinding("foo", wx.app.getBinding("text"));
+            wx.module("test").binding("foo", wx.app.binding("text"));
 
             var el = document.querySelector("#module-name");
             var model = {};
@@ -21,7 +21,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Module.html');
 
             // register a binding that would not be available in default module
-            wx.module("test").registerBinding("foo", wx.app.getBinding("text"));
+            wx.module("test").binding("foo", wx.app.binding("text"));
 
             var el = document.querySelector("#module-instance");
             var model = { module: wx.module("test") };
@@ -34,8 +34,8 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Module.html');
 
             // register a binding that would not be available in default module
-            wx.module("test1").registerBinding("foo", wx.app.getBinding("text"));
-            wx.module("test2").registerBinding("bar", wx.app.getBinding("text"));
+            wx.module("test1").binding("foo", wx.app.binding("text"));
+            wx.module("test2").binding("bar", wx.app.binding("text"));
 
             var el = document.querySelector("#module-name-nested");
             var model = {};

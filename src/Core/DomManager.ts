@@ -102,11 +102,11 @@ module wx {
                 options.filters = {};
 
                 // enrich with app filters
-                extend(app.getExpressionFilters(), options.filters);
+                extend(app.filters(), options.filters);
 
                 // enrich with module filters
                 if (module) {
-                    extend(module.getExpressionFilters(), options.filters);
+                    extend(module.filters(), options.filters);
                 }
 
                 return this.compiler.compileExpression(value, options, this.expressionCache);
@@ -337,7 +337,7 @@ module wx {
             var i;
 
             // check if tag represents a component
-            if (module.isComponentRegistered(tagName) || app.isComponentRegistered(tagName)) {
+            if (module.component(tagName) != null || app.component(tagName) != null) {
                 // when a component is referenced by element, we just apply a virtual 'component' binding
                 var params = el.getAttribute(DomManager.paramsAttributename);
                 var componentReference: any;
@@ -357,7 +357,7 @@ module wx {
                 // lookup handlers
                 var bindings = _bindings.map(x=> {
                     // if handler is not registered with current module, fall-back to 'app' module 
-                    var handler = module.getBinding(x.key) || app.getBinding(x.key);
+                    var handler = module.binding(x.key) || app.binding(x.key);
                     
                     if (!handler)
                         internal.throwError("binding '{0}' has not been registered.", x.key);

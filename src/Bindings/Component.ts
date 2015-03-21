@@ -64,11 +64,11 @@ module wx {
                 var component: IComponent = undefined;
                 
                 if (module)
-                    component = module.getComponent(componentName);
+                    component = module.component(componentName);
 
                 // fallback to "app" module if not registered with
                 if (!component)
-                    component = app.getComponent(componentName);
+                    component = app.component(componentName);
 
                 if (component == null)
                     internal.throwError("component '{0}' is not registered.", componentName);

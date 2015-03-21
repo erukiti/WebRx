@@ -9,7 +9,7 @@ describe('Bindings', () => {
 
             var template = '<span>foo</span>';
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: template
             });
 
@@ -24,7 +24,7 @@ describe('Bindings', () => {
 
             var template = '<span>foo</span>';
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: template
             });
 
@@ -39,7 +39,7 @@ describe('Bindings', () => {
 
             var template = "<span data-bind='text: foo'>invalid</span>";
 
-            wx.app.registerComponent("test1", <wx.IComponent> {
+            wx.app.component("test1", <wx.IComponent> {
                 template: template
             });
 
@@ -54,7 +54,7 @@ describe('Bindings', () => {
 
             var template = '<span>foo</span>';
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: template
             });
 
@@ -69,7 +69,7 @@ describe('Bindings', () => {
 
             var template = '<span>foo</span>';
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: <any> wx.app.templateEngine.parse(template)
             });
 
@@ -82,7 +82,7 @@ describe('Bindings', () => {
         it('Loads a template from a selector',() => {
             loadFixtures('templates/Bindings/Component.html');
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: <any> { element: '#template1' }
             });
 
@@ -95,7 +95,7 @@ describe('Bindings', () => {
         it('Loads a template from a node instance',() => {
             loadFixtures('templates/Bindings/Component.html');
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: <any> { element: document.querySelector("#template1") }
             });
 
@@ -111,7 +111,7 @@ describe('Bindings', () => {
             var template = '<span>foo</span>';
             wx.injector.register("#template1", wx.app.templateEngine.parse(template));
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: <any> { resolve: "#template1" }
             });
 
@@ -133,7 +133,7 @@ describe('Bindings', () => {
                 }
             };
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: <any> {
                      require: 'text!templates/AMD/template1.html'
                 },
@@ -149,7 +149,7 @@ describe('Bindings', () => {
 
             var template = "<span data-bind='text: foo'>invalid</span>";
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> {
+            wx.module("test").component("test1", <wx.IComponent> {
                 template: template
             });
 
@@ -164,7 +164,7 @@ describe('Bindings', () => {
 
             var template = "<span data-bind='text: foo'>invalid</span>";
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> <any> {
+            wx.module("test").component("test1", <wx.IComponent> <any> {
                 template: template,
                 viewModel: (params) => { return { foo: 'bar' }; }
             });
@@ -181,7 +181,7 @@ describe('Bindings', () => {
             var template = "<span data-bind='text: foo'>invalid</span>";
             wx.injector.register("vm1", { foo: 'bar' });
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> <any> {
+            wx.module("test").component("test1", <wx.IComponent> <any> {
                 template: template,
                 viewModel: <any> { resolve: 'vm1' }
             });
@@ -197,7 +197,7 @@ describe('Bindings', () => {
 
             var template = "<span data-bind='text: foo'>invalid</span>";
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> <any> {
+            wx.module("test").component("test1", <wx.IComponent> <any> {
                 template: template,
                 viewModel: <any> { instance: { foo: 'bar' } } 
             });
@@ -213,7 +213,7 @@ describe('Bindings', () => {
 
             var template = "<span data-bind='text: foo'>invalid</span>";
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> <any>  {
+            wx.module("test").component("test1", <wx.IComponent> <any>  {
                 template: template,
                 viewModel: <any> { require: 'templates/AMD/vm1' },
                 postBindingInit: "init"
@@ -237,7 +237,7 @@ describe('Bindings', () => {
             var template = '<span>foo</span>';
             var fooVal: number;
 
-            wx.module("test").registerComponent("test1", <wx.IComponent> <any> {
+            wx.module("test").component("test1", <wx.IComponent> <any> {
                 template: template,
                 viewModel: (params) => {
                     fooVal = params.foo;
@@ -268,7 +268,7 @@ describe('Bindings', () => {
                 }
             };
 
-            wx.app.registerComponent("test1", <wx.IComponent> <any> {
+            wx.app.component("test1", <wx.IComponent> <any> {
                 template: template,
                 viewModel: { instance: vm },
                 preBindingInit: "init"
@@ -300,7 +300,7 @@ describe('Bindings', () => {
                 }
             };
 
-            wx.app.registerComponent("test1", <wx.IComponent> <any> {
+            wx.app.component("test1", <wx.IComponent> <any> {
                 template: template,
                 viewModel: { instance: vm },
                 postBindingInit: "init"
