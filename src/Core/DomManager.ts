@@ -558,7 +558,7 @@ module wx {
                             captured.add(list.listChanged);
 
                         // intercept access to observable properties
-                        if (queryInterface(target, IID.IObservableProperty)) {
+                        if (isProperty(target)) {
                             prop = <IObservableProperty<any>> target;
 
                             // register observable
@@ -573,7 +573,7 @@ module wx {
 
                     } else {
                         // intercept access to observable properties
-                        if (queryInterface(o[index], IID.IObservableProperty)) {
+                        if (isProperty(o[index])) {
                             prop = <IObservableProperty<any>> target[index];
 
                             // register observable
