@@ -5,10 +5,15 @@
 
 module wx {
     export interface ISelectComponentParams {
+        name?: string;
         items: any;
         itemText?: string;
         itemValue?: string;
         itemClass?: string;
+        multiple?: boolean;
+        required?: boolean;
+        autofocus?: boolean;
+        size?: number;
         selectedValue?: any;
         afterRender?(nodes: Node[], data: any): void;
         noCache?: boolean;
@@ -47,10 +52,15 @@ module wx {
 
             // check cache
             if (!params.noCache) {
-                key = (params.itemText != null ? params.itemText : "") + "-" +
+                key = (params.name != null ? params.name : "") + "-" +
+                    (params.itemText != null ? params.itemText : "") + "-" +
                     (params.itemValue != null ? params.itemValue : "") + "-" +
                     (params.itemClass != null ? params.itemClass : "") + "-" +
-                    (params.selectedValue != null ? "true" : "false");
+                    (params.selectedValue != null ? "true" : "false") + "-" +
+                    (params.multiple ? "true" : "false") + "-" +
+                    (params.required ? "true" : "false") + "-" +
+                    (params.autofocus ? "true" : "false") + "-" +
+                    (params.size ? params.size.toString() : "0");
 
                 nodes = templateCache[key];
  
@@ -79,6 +89,31 @@ module wx {
             // per-item css class
             if (params.itemClass) {
                 attrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
+            }
+
+            // name
+            if (params.multiple) {
+                attrs.push({ key: 'name', value: params.name });
+            }
+
+            // multi-select
+            if (params.multiple) {
+                attrs.push({ key: 'multiple', value: "true" });
+            }
+
+            // size
+            if (params.multiple !== undefined) {
+                attrs.push({ key: 'size', value: params.size.toString() });
+            }
+
+            // required
+            if (params.required) {
+                attrs.push({ key: 'required', value: "true" });
+            }
+
+            // required
+            if (params.autofocus) {
+                attrs.push({ key: 'autofocus', value: "true" });
             }
 
             // assemble attr-binding
