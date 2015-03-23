@@ -64,6 +64,7 @@ module wx {
         set(index: number, item: T);
         isReadOnly: boolean;
         add(item: T): void;
+        push(item: T): void;
         clear(): void;
         contains(item: T): boolean;
         remove(item: T): boolean;

@@ -394,6 +394,8 @@ module wx {
         //////////////////////////
         // Expose some array convenience members
 
+        public push = this.add;
+
         public sort(comparison: (a: T, b: T) => number): void {
             this.publishBeforeResetNotification();
 
