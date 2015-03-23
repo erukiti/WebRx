@@ -71,25 +71,17 @@ module wx {
             }
 
             // base-template
-            if(params.selectedValue)
-                result = '<select class="wx-select" data-bind="foreach: { data: items, hooks: hooks }, selectedValue: @selectedValue"><option data-bind="{0}"></option></select>';
-            else
-                result = '<select class="wx-select" data-bind="foreach: { data: items, hooks: hooks }"><option data-bind="{0}"></option></select>';
-
-            // construct item bindings
+            result = '<select class="wx-select" data-bind="{0}"><option data-bind="{1}"></option></select>';
             var bindings: Array<{ key: string; value: string }> = [];
             var attrs: Array<{ key: string; value: string }> = [];
+            var itemBindings: Array<{ key: string; value: string }> = [];
+            var itemAttrs: Array<{ key: string; value: string }> = [];
 
-            // value
-            bindings.push({ key: "value", value: params.itemValue || "$data" });
+            bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
 
-            // label
-            bindings.push({ key: 'text', value: params.itemText || "$data" });
-
-            // per-item css class
-            if (params.itemClass) {
-                attrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
-            }
+            // selection (two-way)
+            if (params.selectedValue)
+                bindings.push({ key: "selectedValue", value: "@selectedValue" });
 
             // name
             if (params.name) {
@@ -120,11 +112,27 @@ module wx {
             if (attrs.length)
                 bindings.push({ key: "attr", value: "{ " + attrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
 
+            // value
+            itemBindings.push({ key: "value", value: params.itemValue || "$data" });
+
+            // label
+            itemBindings.push({ key: 'text', value: params.itemText || "$data" });
+
+            // per-item css class
+            if (params.itemClass) {
+                itemAttrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
+            }
+
+            // assemble attr-binding
+            if (itemAttrs.length)
+                itemBindings.push({ key: "attr", value: "{ " + itemAttrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
+
             // assemble all bindings
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
+            var itemBindingString = itemBindings.map(x => x.key + ": " + x.value).join(", ");
 
             // assemble template
-            result = formatString(result, bindingString);
+            result = formatString(result, bindingString, itemBindingString);
             //console.log(result);
 
             // store

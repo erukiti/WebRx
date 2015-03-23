@@ -68,22 +68,28 @@ module wx {
             }
 
             // base-template
-            result = '<div class="wx-radiogroup" data-bind="foreach: { data: items, hooks: hooks }"><input type="radio" data-bind="{0}">{1}</div>';
-            var perItemExtraMarkup = "";
-
-            // construct item bindings
+            result = '<div class="wx-radiogroup" data-bind="{0}"><input type="radio" data-bind="{1}">{2}</div>';
             var bindings: Array<{ key: string; value: string }> = [];
             var attrs: Array<{ key: string; value: string }> = [];
+            var itemBindings: Array<{ key: string; value: string }> = [];
+            var itemAttrs: Array<{ key: string; value: string }> = [];
+            var perItemExtraMarkup = "";
+
+            bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
+
+            // assemble attr-binding
+            if (attrs.length)
+                bindings.push({ key: "attr", value: "{ " + attrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
 
             // value
-            bindings.push({ key: "value", value: params.itemValue || "$data" });
+            itemBindings.push({ key: "value", value: params.itemValue || "$data" });
 
             // name
-            attrs.push({ key: 'name', value: "$parent.groupName" });
+            itemAttrs.push({ key: 'name', value: "$parent.groupName" });
 
             // selection (two-way)
             if (params.selectedValue) {
-                bindings.push({ key: "selectedValue", value: "$parent.@selectedValue" });
+                itemBindings.push({ key: "selectedValue", value: "$parent.@selectedValue" });
             }
 
             // label
@@ -91,23 +97,24 @@ module wx {
                 perItemExtraMarkup += formatString('<label data-bind="text: {0}, attr: { for: {1} }"></label>',
                     params.itemText, "$parent.groupName + '-' + $index");
 
-                attrs.push({ key: 'id', value: "$parent.groupName + '-' + $index" });
+                itemAttrs.push({ key: 'id', value: "$parent.groupName + '-' + $index" });
             }
 
             // per-item css class
             if (params.itemClass) {
-                attrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
+                itemAttrs.push({ key: 'class', value: "'" + params.itemClass + "'" });
             }
 
             // assemble attr-binding
-            if (attrs.length)
-                bindings.push({ key: "attr", value: "{ " + attrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
+            if (itemAttrs.length)
+                itemBindings.push({ key: "attr", value: "{ " + itemAttrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
 
             // assemble all bindings
             var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
+            var itemBindingString = itemBindings.map(x => x.key + ": " + x.value).join(", ");
 
             // assemble template
-            result = formatString(result, bindingString, perItemExtraMarkup);
+            result = formatString(result, bindingString, itemBindingString, perItemExtraMarkup);
 
             // store
             if (!params.noCache) {
