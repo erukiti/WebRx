@@ -92,7 +92,7 @@ module wx {
             }
 
             // name
-            if (params.multiple) {
+            if (params.name) {
                 attrs.push({ key: 'name', value: params.name });
             }
 
@@ -102,7 +102,7 @@ module wx {
             }
 
             // size
-            if (params.multiple !== undefined) {
+            if (params.size !== undefined) {
                 attrs.push({ key: 'size', value: params.size.toString() });
             }
 
