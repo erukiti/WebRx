@@ -394,6 +394,14 @@ module wx {
         return result;
     }
 
+    export function nodeListToArray(nodes: NodeList): Node[] {
+        return Array.prototype.slice.call(nodes);
+    }
+
+    export function nodeChildrenToArray<T>(node: Node): T[] {
+        return <T[]> <any> nodeListToArray(node.childNodes);
+    }
+
     /**
     * Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception 
     * (mimics C# using statement)

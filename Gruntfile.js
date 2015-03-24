@@ -59,6 +59,7 @@ module.exports = function (grunt) {
                         "node_modules/ix/l2o.js",
                         "node_modules/ix/ix.js",
                         "node_modules/URIjs/src/URI.js",
+                        "node_modules/mutationobserver-shim/MutationObserver.js",
                         "node_modules/requirejs/require.js",
                         "test/test-setup.js",
                         "build/test/TestUtils.js",

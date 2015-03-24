@@ -140,6 +140,27 @@ describe('Bindings', () => {
                 // none of the radios should be checked initially
                 expect(container.selectedIndex).not.toBeDefined();
             });
+
+            it("Removing the currently selected option should reflect implicit change of selection back to model",() => {
+                loadFixtures('templates/Bindings/SelectedValue.html');
+                var container = <HTMLSelectElement> <any> document.querySelector("#fixture2");
+
+                // first option should be selected by default
+                expect(container.selectedIndex).toEqual(0);
+
+                var selected = wx.property();
+                var model = { selected: selected };
+                wx.applyBindings(model, container);
+
+                container.selectedIndex = 1;
+                testutils.triggerEvent(container, "change");
+                expect(model.selected()).toEqual('1');
+
+                // now remove the selected option
+                container.removeChild(container.options[container.selectedIndex]);                
+                expect(container.selectedIndex).toEqual(0);
+                expect(model.selected()).toEqual('0');
+            });
         });
     });
 });

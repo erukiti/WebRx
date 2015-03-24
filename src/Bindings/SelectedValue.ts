@@ -68,7 +68,35 @@ module wx {
         }
 
         public observeElement(el: HTMLElement): Rx.Observable<any> {
-            return <Rx.Observable<any>> <any> Rx.Observable.fromEvent(el, 'change');
+            var select = <HTMLSelectElement> el;
+
+            // track 'change' event
+            var obs = Rx.Observable.fromEvent<any>(select, 'change');
+
+            // if browser supports mutation-events also track DOM-modifications
+            // in order to handle implicit selection changes caused by removing options
+            if (typeof MutationObserver === "function") {
+                var moObs = Rx.Observable.create<any>(observer => {
+                    var mo = new MutationObserver(mutations => {
+                        if (mutations.some(x => x.removedNodes != null && x.removedNodes.length > 0)) {
+                            observer.onNext(true);
+                        }
+                    });
+ 
+                    // go
+                    mo.observe(select, { childList: true });
+
+                    return Rx.Disposable.create(() => {
+                        mo.disconnect();
+                        mo = null;
+                    });
+                });
+
+                // combine
+                obs = Rx.Observable.merge(obs, moObs);
+            }
+
+            return obs;
         }
 
         public observeModel(model: any): Rx.Observable<any> {
