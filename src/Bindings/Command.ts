@@ -30,6 +30,7 @@ module wx {
             var cmdObservable: Rx.Observable<ICommand<any>>;
             var paramObservable: Rx.Observable<any>;
             var cleanup: Rx.CompositeDisposable;
+            var isAnchor = el.tagName.toLowerCase() === "a";
 
             function doCleanup() {
                 if (cleanup) {
@@ -78,8 +79,13 @@ module wx {
                             }));
 
                             // handle click event
-                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(e => {
+                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
                                 x.cmd.execute(x.param);
+
+                                if (isAnchor) {
+                                    // prevent default for anchors
+                                    e.preventDefault();
+                                }
                             }));
                         }
                     }
