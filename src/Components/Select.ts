@@ -1,7 +1,7 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
 /// <reference path="../Core/DomManager.ts" />
-/// <reference path="../Core/List.ts" />
+/// <reference path="../Collections/List.ts" />
 
 module wx {
     export interface ISelectComponentParams {
