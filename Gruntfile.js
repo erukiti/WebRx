@@ -145,9 +145,15 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-nuget');  
 
-    grunt.registerTask("default", ["clean:build", "ts:default"]);
-    grunt.registerTask("tests", ["ts:src", "ts:specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
+        var template = "module wx {\n\texport var version = '<%= pkg.version %>';\n}";
+
+        grunt.file.write('src/Version.ts', grunt.template.process(template));
+    });
+
+    grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
+    grunt.registerTask("tests", ["gen-ver", "ts:src", "ts:specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("dist", ["gen-ver", "clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
     grunt.registerTask('publish', ['dist', 'nugetpack', 'nugetpush']);  
 };
