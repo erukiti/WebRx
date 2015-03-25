@@ -86,9 +86,18 @@ module wx.env {
         firefox = { version: version };
     }
 
+    var hasES5 = typeof Array.isArray === "function" &&
+        typeof [].forEach === "function" &&
+        typeof [].map === "function" &&
+        typeof [].some === "function" &&
+        typeof [].indexOf === "function" &&
+        typeof Object.keys === "function" &&
+        typeof Object.defineProperty === "function";
+
     export var isSupported = (!ie || ie.version >= 9) ||
         (!safari || safari.version >= 5) ||
-        (!firefox || firefox.version >= 5);
+        (!firefox || firefox.version >= 5) &&
+        hasES5;
 
     // Special support for jQuery here because it's so commonly used.
     export var jQueryInstance = window["jQuery"];
