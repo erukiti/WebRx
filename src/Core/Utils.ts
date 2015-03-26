@@ -443,6 +443,7 @@ module wx {
             } catch (e) {
                 observer.onError(e);
             }
+
             return Rx.Disposable.empty;
         });
     }

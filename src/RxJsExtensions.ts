@@ -15,6 +15,10 @@ module wx {
                 internal.throwError("attempt to write to a read-only observable property");
             }
 
+            if (accessor.sub == null) {
+                accessor.sub = accessor._source.connect();
+            }
+
             return accessor.value;
         };
 
@@ -57,29 +61,33 @@ module wx {
             .refCount();
 
         accessor.source = this;
+        accessor.thrownExceptions = Rx.Subject.create(app.defaultExceptionHandler);
 
         //////////////////////////////////
         // implementation
 
         var firedInitial = false;
-        accessor.thrownExceptions = Rx.Subject.create(app.defaultExceptionHandler);
+        var subj = new Rx.Subject<any>();
 
-        accessor.sub = this
-            //.startWith(initialValue)
-            .distinctUntilChanged()
-            .subscribe(x => {
-                // Suppress a non-change between initialValue and the first value
-                // from a Subscribe
-            if (firedInitial && x === accessor.value) {
+        subj.subscribe(x => {
+            // Suppress a non-change between initialValue and the first value
+            // from a Subscribe
+            if (firedInitial && x === accessor.value)// isEqual(x, accessor.value))
                 return;
-            }
 
+            accessor.changingSubject.onNext(x);
+            accessor.value = x;
+            accessor.changedSubject.onNext(x);
             firedInitial = true;
+        }, ex=> accessor.thrownExceptions.onNext(ex));
 
-                accessor.changingSubject.onNext(x);
-                accessor.value = x;
-                accessor.changedSubject.onNext(x);
-        }, accessor.thrownExceptions.onNext);
+        // Fire off an initial change to make sure bindings have a value
+        subj.onNext(initialValue);
+        accessor._source = this.distinctUntilChanged().multicast(subj);
+
+        if (isInUnitTest()) {
+            accessor.sub = accessor._source.connect();
+        }
 
         return accessor;
     }
