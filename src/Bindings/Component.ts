@@ -79,7 +79,7 @@ module wx {
                         this.loadTemplate(component.template, componentParams),
                         this.loadViewModel(component.viewModel, componentParams),
                         (t, vm) => {
-                            // if loadViewModel yields a function, we interpret that as a factory
+                            // if loadViewModel yields a function, treat it as a factory
                             if (typeof vm === "function") {
                                 vm = vm(componentParams);
                             }
