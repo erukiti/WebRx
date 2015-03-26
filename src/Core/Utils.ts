@@ -58,7 +58,7 @@ module wx {
             return false;
 
         return target instanceof internal.listConstructor ||
-            queryInterface(target, IID.IObservableList);
+            queryInterface(target, IID.IObservableList);    // really??
     }
 
     /**
