@@ -270,6 +270,14 @@ module wx {
     }
 
     /**
+     * Returns true if object is a Disposable
+     * @param obj
+     */
+    export function isDisposable(obj) {
+        return isFunction(obj["dispose"]);
+    }
+
+    /**
      * Performs an optimized deep comparison between the two objects, to determine if they should be considered equal.
      * @param a Object to compare
      * @param b Object to compare to
@@ -394,10 +402,18 @@ module wx {
         return result;
     }
 
+    /**
+     * Converts a NodeList into a javascript array
+     * @param {NodeList} nodes
+     */
     export function nodeListToArray(nodes: NodeList): Node[] {
         return Array.prototype.slice.call(nodes);
     }
 
+    /**
+     * Converts the node's children into a javascript array
+     * @param {Node} node
+     */
     export function nodeChildrenToArray<T>(node: Node): T[] {
         return <T[]> <any> nodeListToArray(node.childNodes);
     }
@@ -429,7 +445,7 @@ module wx {
     * @return {Rx.Observable<any>} An observable that yields a value and completes as soon as the module has been loaded
     */
     export function observableRequire(module: string): Rx.Observable<any> {
-        if (typeof require === "undefined")
+        if (!isFunction(require))
             internal.throwError("there's no AMD-module loader available (Hint: did you forget to include RequireJS in your project?)");
 
         return Rx.Observable.create<any>(observer => {
@@ -507,11 +523,10 @@ module wx {
         property5: IObservableProperty<T5>,
         selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
-    /// <summary>
-    /// whenAny allows you to observe whenever the value of one or more
-    /// properties on an object have changed, providing an initial value when
-    /// the Observable is set up.
-    /// </summary>
+    /**
+     * whenAny allows you to observe whenever the value of one or more properties
+     * on an object have changed, providing an initial value when the Observable is set up.
+     */
     export function whenAny<TRet>(): Rx.Observable<TRet> {
         // no need to invoke combineLatest for the simplest case
         if (arguments.length === 2) {

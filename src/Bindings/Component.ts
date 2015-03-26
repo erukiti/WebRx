@@ -30,6 +30,14 @@ module wx {
             var exp: ICompiledExpression;
             var componentObservable: Rx.Observable<string>;
             var componentParams = {};
+            var cleanup: Rx.CompositeDisposable;
+
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
@@ -41,7 +49,7 @@ module wx {
 
                 // collect params observables
                 if (opt.params) {
-                    if (typeof opt.params === "function") {
+                    if (isFunction(opt.params)) {
                         // opt params is object passed by value (probably $componentParams from view-binding)
                         componentParams = this.domManager.evaluateExpression(<ICompiledExpression> opt.params, ctx);
                     } else if (typeof opt.params === "object") {
@@ -60,6 +68,9 @@ module wx {
 
             // subscribe to any input changes
             state.cleanup.add(componentObservable.subscribe(componentName => {
+                doCleanup();
+                cleanup = new Rx.CompositeDisposable();
+
                 // lookup component
                 var component: IComponent = undefined;
                 
@@ -78,20 +89,22 @@ module wx {
                     state.cleanup.add(Rx.Observable.combineLatest(
                         this.loadTemplate(component.template, componentParams),
                         this.loadViewModel(component.viewModel, componentParams),
-                        (t, vm) => {
-                            // if loadViewModel yields a function, treat it as a factory
-                            if (typeof vm === "function") {
-                                vm = vm(componentParams);
-                            }
+                    (t, vm) => {
+                        // if loadViewModel yields a function, treat it as a factory
+                        if (isFunction(vm)) {
+                            vm = vm(componentParams);
+                        }
 
-                            return { template: t, viewModel: vm }
-                        }).subscribe(x => {
-                        // done
+                        return { template: t, viewModel: vm }
+                    }).subscribe(x => {
+                        if (isDisposable(x.viewModel)) {
+                            cleanup.add(x.viewModel);
+                        }
+
                         this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
                     },(err) => app.defaultExceptionHandler.onNext(err)));
                 } else {
                     state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
-                        // done
                         this.applyTemplate(component, el, ctx, state, t);
                     },(err) => app.defaultExceptionHandler.onNext(err)));
                 }
@@ -108,6 +121,8 @@ module wx {
                 // nullify common locals
                 oldContents = null;
                 compiled = null;
+
+                doCleanup();
             }));
         }
 
@@ -126,7 +141,7 @@ module wx {
         protected loadTemplate(template: any, params: Object): Rx.Observable<Node[]> {
             var syncResult: Node[];
 
-            if (typeof template === "function") {
+            if (isFunction(template)) {
                 syncResult = template(params);
 
                 if (typeof syncResult === "string") {
@@ -167,7 +182,7 @@ module wx {
         protected loadViewModel(vm: any, componentParams: Object): Rx.Observable<any> {
             var syncResult: any;
 
-            if (typeof vm === "function") {
+            if (isFunction(vm)) {
                 return Rx.Observable.return(vm);
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;
