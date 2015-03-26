@@ -464,20 +464,14 @@ module wx {
 
                 observableProperties.forEach(x => {
                     var prop = x.property;
-
-                    // subscribe
                     var obs = onChanging ? prop.changing : prop.changed;
 
-                    result.add(obs.subscribe(newVal => {
-                        //if (!areChangeNotificationsEnabled())
-                        //    return;
-
+                    result.add(obs.subscribe(_=> {
                         var e = new internal.PropertyChangedEventArgs(self, x.propertyName);
 
                         try {
                             observer.onNext(e);
                         } catch (ex) {
-                            //rxObj.Log().ErrorException("ReactiveObject Subscriber threw exception", ex);
                             thrownExceptionsSubject.onNext(ex);
                         }
                     }));
