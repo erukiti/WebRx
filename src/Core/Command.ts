@@ -8,7 +8,7 @@ module wx {
         /// <summary>
         /// Don't use this directly, use wx.commandXYZ instead
         /// </summary>
-        constructor(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, scheduler: Rx.IScheduler = null) {
+        constructor(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, scheduler?: Rx.IScheduler) {
             this.scheduler = scheduler || app.mainThreadScheduler;
             this.func = executeAsync;
 
@@ -139,6 +139,7 @@ module wx {
         /// Implementation
 
         private func: (any) => Rx.Observable<T>;
+        private thisArg: any;
         private resultsSubject = new Rx.Subject<T>();
         private isExecutingSubject = new Rx.Subject<boolean>();
         private scheduler: Rx.IScheduler;
@@ -158,47 +159,72 @@ module wx {
     * @param {(any) => void} execute The action to executed when the command gets invoked
     * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
     * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
+    * @param {any} thisArg Object to use as this when executing the executeAsync
     * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
     */
-    export function command(execute: (any) => void, canExecute?: Rx.Observable<boolean>, scheduler?: Rx.IScheduler): ICommand<any>;
+    export function command(execute: (any) => void, canExecute?: Rx.Observable<boolean>, scheduler?: Rx.IScheduler, thisArg?:any): ICommand<any>;
+
+    /**
+    * Creates a default Command that has a synchronous action.
+    * @param {(any) => void} execute The action to executed when the command gets invoked
+    * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
+    * @param {any} thisArg Object to use as this when executing the executeAsync
+    * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
+    */
+    export function command(execute: (any) => void, canExecute?: Rx.Observable<boolean>, thisArg?: any): ICommand<any>;
+
+    /**
+    * Creates a default Command that has a synchronous action.
+    * @param {(any) => void} execute The action to executed when the command gets invoked
+    * @param {any} thisArg Object to use as this when executing the executeAsync
+    * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
+    */
+    export function command(execute: (any) => void, thisArg?: any): ICommand<any>;
 
     /**
     * Creates a default Command that has no background action.
     * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
     * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
+    * @param {any} thisArg Object to use as this when executing the executeAsync
     * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
     */
     export function command(canExecute?: Rx.Observable<boolean>, scheduler?: Rx.IScheduler): ICommand<any>;
 
     // factory method implementation
     export function command(): ICommand<any> {
+        var args = args2Array(arguments);
         var canExecute: Rx.Observable<boolean>;
         var execute: (any) => void;
         var scheduler: Rx.IScheduler;
+        var thisArg: any;
 
-        if (Rx.helpers.isFunction(arguments[0])) {
+        if (isFunction(args[0])) {
             // first overload
-            execute = arguments[0];
-            canExecute = arguments[1] || Rx.Observable.return(true);
-            scheduler = arguments[2];
+            execute = args.shift();
+            canExecute = isRxObservable(args[0]) ? args.shift() : Rx.Observable.return(true);
+            scheduler = isRxScheduler(args[0]) ? args.shift() : undefined;
+            thisArg = args.shift();
 
-            return asyncCommand(canExecute, (parameter) =>
+            if (thisArg != null)
+                execute = execute.bind(thisArg);
+
+            return asyncCommand(canExecute,(parameter) =>
                 Rx.Observable.create<any>(obs => {
-                try {
-                    execute(parameter);
+                    try {
+                        execute(parameter);
 
-                    obs.onNext(null);
-                    obs.onCompleted();
-                } catch (e) {
-                    obs.onError(e);
-                } 
-                return Rx.Disposable.empty;
-            }), scheduler);
+                        obs.onNext(null);
+                        obs.onCompleted();
+                    } catch (e) {
+                        obs.onError(e);
+                    }
+                    return Rx.Disposable.empty;
+                }), scheduler);
         }
 
         // second overload
-        canExecute = arguments[0] || Rx.Observable.return(true);
-        scheduler = arguments[1];
+        canExecute = args.shift() || Rx.Observable.return(true);
+        scheduler = isRxScheduler(args[0]) ? args.shift() : undefined;
 
         return new Command<any>(canExecute, x => Rx.Observable.return(x), scheduler);
     }
@@ -208,37 +234,62 @@ module wx {
     * @param {(any) => Rx.Observable<T>} executeAsync Method to call that creates an Observable representing an operation to execute in the background. The Command's canExecute will be false until this Observable completes. If this Observable terminates with OnError, the Exception is marshaled to ThrownExceptions
     * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
     * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
+    * @param {any} thisArg Object to use as this when executing the executeAsync
     * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
     */
     export function asyncCommand<T>(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>,
-        scheduler?: Rx.IScheduler): ICommand<T>;
+        scheduler?: Rx.IScheduler, thisArg?: any): ICommand<T>;
+
+    /**
+    * Creates a Command typed to the given executeAsync Observable method. Use this method if your background method returns Rx.IObservable
+    * @param {(any) => Rx.Observable<T>} executeAsync Method to call that creates an Observable representing an operation to execute in the background. The Command's canExecute will be false until this Observable completes. If this Observable terminates with OnError, the Exception is marshaled to ThrownExceptions
+    * @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
+    * @param {any} thisArg Object to use as this when executing the executeAsync
+    * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
+    */
+    export function asyncCommand<T>(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, thisArg?: any): ICommand<T>;
 
     /**
     * Creates a Command typed to the given executeAsync Observable method. Use this method if your background method returns Rx.IObservable
     * @param {(any) => Rx.Observable<T>} executeAsync Method to call that creates an Observable representing an operation to execute in the background. The Command's canExecute will be false until this Observable completes. If this Observable terminates with OnError, the Exception is marshaled to ThrownExceptions
     * @param {Rx.IScheduler} scheduler The scheduler to deliver events on. Defaults to wx.App.mainThreadScheduler
+    * @param {any} thisArg Object to use as this when executing the executeAsync
     * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
     */
-    export function asyncCommand<T>(executeAsync: (any) => Rx.Observable<T>, scheduler?: Rx.IScheduler): ICommand<T>;
+    export function asyncCommand<T>(executeAsync: (any) => Rx.Observable<T>, scheduler?: Rx.IScheduler, thisArg?: any): ICommand<T>;
+
+    /**
+    * Creates a Command typed to the given executeAsync Observable method. Use this method if your background method returns Rx.IObservable
+    * @param {(any) => Rx.Observable<T>} executeAsync Method to call that creates an Observable representing an operation to execute in the background. The Command's canExecute will be false until this Observable completes. If this Observable terminates with OnError, the Exception is marshaled to ThrownExceptions
+    * @param {any} thisArg Object to use as this when executing the executeAsync
+    * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
+    */
+    export function asyncCommand<T>(executeAsync: (any) => Rx.Observable<T>, thisArg?: any): ICommand<T>;
 
     // factory method implementation
     export function asyncCommand<T>(): ICommand<T> {
+        var args = args2Array(arguments);
         var canExecute: Rx.Observable<boolean>;
         var executeAsync: (any) => Rx.Observable<T>;
         var scheduler: Rx.IScheduler;
+        var thisArg: any;
 
-        if (Rx.helpers.isFunction(arguments[0])) {
+        if (isFunction(args[0])) {
             // second overload
-            executeAsync = arguments[0];
-            scheduler = arguments[1];
+            executeAsync = args.shift();
+            scheduler = isRxScheduler(args[0]) ? args.shift() : undefined;
+            thisArg = args.shift();
+
+            if (thisArg != null)
+                executeAsync = executeAsync.bind(thisArg);
 
             return new Command<T>(Rx.Observable.return(true), executeAsync, scheduler);
         }
 
         // first overload
-        canExecute = arguments[0];
-        executeAsync = arguments[1];
-        scheduler = arguments[2];
+        canExecute = args.shift();
+        executeAsync = args.shift();
+        scheduler = isRxScheduler(args[0]) ? args.shift() : undefined;
 
         return new Command<T>(canExecute, executeAsync, scheduler);
     }
