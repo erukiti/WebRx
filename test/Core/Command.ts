@@ -499,4 +499,27 @@ describe("Command", () => {
         command.execute(null);
         expect(commandExecuted).toBeTruthy();
     });
+
+    it("command executes in context of thisArg",() => {
+        var vm = new Object();
+
+        // test wx.command() overload
+        var thisWas: any = undefined;
+        // WARNING: don't convert this to a lamba or the test will suddenly fail due to Typescript's this-capturing
+        var command = wx.command(function (_) { thisWas = this }, Rx.Observable.return(true), vm);   
+        command.execute(null);
+        expect(thisWas).toBe(vm);
+
+        // test wx.command() overload
+        thisWas = undefined;
+        command = wx.command(function (_) { thisWas = this }, Rx.Observable.return(true), Rx.Scheduler.immediate, vm);
+        command.execute(null);
+        expect(thisWas).toBe(vm);
+
+        // test wx.command() overload
+        thisWas = undefined;
+        command = wx.command(function (_) { thisWas = this }, vm);
+        command.execute(null);
+        expect(thisWas).toBe(vm);
+    });
 });
