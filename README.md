@@ -16,7 +16,7 @@ WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/) and [AngularJS
 - Integrated state-based routing engine inspired by Angular's [UI-Router](https://github.com/angular-ui/ui-router)
 - No dependencies besides RxJS-Lite
 - Compact (~20Kb minified & compressed)
-- First class TypeScript support
+- First class [TypeScript](http://www.typescriptlang.org/) support
 
 #### Installation
 
