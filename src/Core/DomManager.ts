@@ -9,7 +9,7 @@
 module wx {
     class DomManager implements IDomManager {
         constructor(compiler: IExpressionCompiler) {
-            this.elementState = createWeakMap<Node, INodeState>();
+            this.nodeState = createWeakMap<Node, INodeState>();
             this.compiler = compiler;
         }
 
@@ -64,7 +64,7 @@ module wx {
                     if (node.nodeType !== 1)
                         continue;
 
-                    this.clearElementState(child);
+                    this.clearNodeState(child);
                 }
             }
         }
@@ -189,20 +189,20 @@ module wx {
         }
 
         public isNodeBound(node: Node): boolean {
-            var state = this.elementState.get(node);
+            var state = this.nodeState.get(node);
             return state && state.isBound;
         }
 
         public setNodeState(node: Node, state: INodeState): void {
-            this.elementState.set(node, state);
+            this.nodeState.set(node, state);
         }
 
         public getNodeState(node: Node): INodeState {
-            return this.elementState.get(node);
+            return this.nodeState.get(node);
         }
 
-        public clearElementState(node: Node) {
-            var state = this.elementState.get(node);
+        public clearNodeState(node: Node) {
+            var state = this.nodeState.get(node);
 
             if (state) {
                 if (state.cleanup != null) {
@@ -219,7 +219,7 @@ module wx {
                 }
             }
 
-            this.elementState.delete(node);
+            this.nodeState.delete(node);
 
             // support external per-node cleanup
             env.cleanExternalData(node);
@@ -309,7 +309,7 @@ module wx {
 
         private static bindingAttributeName = "data-bind";
         private static paramsAttributename = "params";
-        private elementState: IWeakMap<Node, INodeState>;
+        private nodeState: IWeakMap<Node, INodeState>;
         private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
         private compiler: IExpressionCompiler;
         private dataContextExtensions = createSet<(node: Node, ctx: IDataContext) => void>();
@@ -461,7 +461,7 @@ module wx {
             }
 
             // clear parent after childs
-            this.clearElementState(node);
+            this.clearNodeState(node);
         }
 
         private createLocals(captured: ISet<Rx.Observable<any>>, ctx: IDataContext) {

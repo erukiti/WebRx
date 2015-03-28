@@ -418,6 +418,13 @@ module wx {
         setNodeState(node: Node, state: INodeState): void;
 
         /**
+        * Computes the actual data context starting at the specified node
+        * @param {Node} node The node to be bound
+        * @return {IDataContext} The data context to evaluate the expression against
+        */
+        getDataContext(node: Node): IDataContext;
+
+        /**
         * Retrieves the current node state for the specified node
         * @param {Node} node The target node
         */
@@ -430,13 +437,6 @@ module wx {
         createNodeState(model?: any): INodeState;
 
         /**
-        * Computes the actual data context starting at the specified node
-        * @param {Node} node The node to be bound
-        * @return {IDataContext} The data context to evaluate the expression against
-        */
-        getDataContext(node: Node): IDataContext;
-
-        /**
         * Returns true if the node is currently bound by one or more binding-handlers
         * @param {Node} node The node to check
         */
@@ -446,7 +446,7 @@ module wx {
         * Removes any binding-related state from the specified node. Use with care! In most cases you would want to use cleanNode!
         * @param {Node} node The node to clear
         */
-        clearElementState(node: Node);
+        clearNodeState(node: Node);
 
         /**
         * Compiles a simple string expression or multiple expressions within an object-literal recursively into an expression tree
