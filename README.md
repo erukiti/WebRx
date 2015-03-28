@@ -31,7 +31,7 @@ Make sure to include script-references to rx.lite.js and rx.lite.extras.js **bef
 #### Documentation
 
 WebRx's documentation can be found on [here](http://webrxjs.org/docs).
-.
+
 ### License
 
 MIT license - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
