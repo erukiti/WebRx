@@ -4,7 +4,7 @@
 
 # WebRx
 
-WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/) and [AngularJS](https://angularjs.org/) with [ReactiveX for Javascript (rxjs)](http://reactivex.io) (rxjs) into a MVC framework that enables developers to create responsive, structured and testable Web-Applications that run in any **modern** browser.
+WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/) and [AngularJS](https://angularjs.org/) with [ReactiveX for Javascript (rxjs)](http://reactivex.io) (rxjs) into a MVC framework that enables developers to create responsive, structured and testable Web-Applications that run in any modern browser.
 
 #### Features
 
@@ -26,11 +26,11 @@ PM> Install-Package WebRx
 ```
 - or download the [latest release as zip](http://webrxjs.org/downloads/web.rx.zip)
 
-Make sure to include script-references to rx.lite.js and rx.lite.extras.js *before* web.rx.js when integrating WebRx into your projects.
+Make sure to include script-references to rx.lite.js and rx.lite.extras.js **before** web.rx.js when integrating WebRx into your projects.
 
 #### Documentation
 
-WebRx's documentation can be found on [here](http://webrxjs.org/docs)
+WebRx's documentation can be found on [here](http://webrxjs.org/docs).
 .
 ### License
 
