@@ -86,6 +86,7 @@ module wx {
             super(domManager);
 
             this.inverse = false;
+            this.priority = 10;
         }
 
         public configure(_options): void {

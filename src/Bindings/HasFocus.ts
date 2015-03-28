@@ -50,7 +50,18 @@ module wx {
 
             function updateElement(value: any) {
                 if (value) {
-                    el.focus();
+                    // Note: If the element is currently hidden, we schedule the focus change
+                    // to occur "soonish". Technically this is a hack because it hides the fact
+                    // that we make tricky assumption about the presence of a "visible" binding 
+                    // on the same element who's subscribe handler runs after us 
+
+                    if (el.style.display !== 'none') {
+                        el.focus();
+                    } else {
+                        Rx.Scheduler.currentThread.schedule(() => {
+                            el.focus();
+                        });
+                    }
                 } else {
                     el.blur();
                 }
@@ -104,7 +115,7 @@ module wx {
             // intentionally left blank
         }
 
-        public priority = 0;
+        public priority = -1;
 
         ////////////////////
         // Implementation
