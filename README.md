@@ -32,10 +32,6 @@ Make sure to include script-references to rx.lite.js and rx.lite.extras.js *befo
 
 WebRx's documentation can be found on [here](http://webrxjs.org/docs)
 .
-#### Todo
-
-- Replace RTTI implementation with Typescript 1.5's meta-data once it is released
-
 ### License
 
 MIT license - [http://www.opensource.org/licenses/mit-license.php](http://www.opensource.org/licenses/mit-license.php)
