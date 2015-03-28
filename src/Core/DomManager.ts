@@ -472,7 +472,7 @@ module wx {
 
             var hooks: ICompiledExpressionRuntimeHooks = {
                 readFieldHook: (o: any, field: any): any => {
-                    // handle "^propref" access-modifier
+                    // handle "@propref" access-modifier
                     var noUnwrap = false;
 
                     if (field[0] === '@') {
@@ -498,6 +498,11 @@ module wx {
                 },
 
                 writeFieldHook: (o: any, field: any, newValue: any): any => {
+                    // ignore @propref access-modifier on writes
+                    if (field[0] === '@') {
+                        field = field.substring(1);
+                    }
+
                     target = o[field];
 
                     // intercept access to observable properties
