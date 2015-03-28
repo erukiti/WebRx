@@ -8,14 +8,20 @@ WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/) and [AngularJS
 
 ##### Features
 
-- Extensible data-binding
-- Built using- and around [Rx Observables](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/gettingstarted/creating.md) 
-- Supports partitioning larger projects into 'modules' which are very similar to AngularJS's module concept. Please note that, using modules is completely optional.
-- Integrated support for "Components". A component allows you to asynchronously combine a template and a view model for rendering on the page.   
-- Includes state-based routing engine inspired by Angular's [ui-router](https://github.com/angular-ui/ui-router) project
-- Light-weight dependency injection 
-- Developed in Typescript but can just as easily consumed in plain Javascript
+- Compatible with IE9+, Firefox 5+, Chrome 5+, Safari 5+
+- Comprehensive [online documentation](http://webrxjs.org/docs)
+- Extensible data-binding with many built-in operators
+- Supports modules for partitioning larger projects into managable units
+- Supports components for organizing UI code into self-contained, reusable chunks
+- Integrated state-based routing engine inspired by Angular's [UI-Router](https://github.com/angular-ui/ui-router)
+- No dependencies besides RxJS-Lite
+- Compact (~20Kb minified & compressed)
+- First class TypeScript support
 
+#### Documentation
+
+WebRx's documentation can be found on [here](http://webrxjs.org/docs)
+.
 ##### Todo
 
 - Replace RTTI implementation with Typescript 1.5's meta-data once it is released
