@@ -142,7 +142,6 @@ module wx {
 
             // app.templateEngine can be altered by developer therefore we make sure to parse using HtmlTemplateEngine
             nodes = this.htmlTemplateEngine.parse(result);
-
             return nodes;
         }
     }

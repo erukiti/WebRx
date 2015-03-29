@@ -68,7 +68,7 @@ module wx {
             }
 
             // base-template
-            result = '<div class="wx-radiogroup" data-bind="{0}"><input type="radio" data-bind="{1}">{2}</div>';
+            result = '<div class="wx-radiogroup" data-bind="{0}"><input type="radio" data-bind="{1}"/>{2}</div>';
             var bindings: Array<{ key: string; value: string }> = [];
             var attrs: Array<{ key: string; value: string }> = [];
             var itemBindings: Array<{ key: string; value: string }> = [];
@@ -123,7 +123,6 @@ module wx {
 
             // app.templateEngine can be altered by developer therefore we make sure to parse using HtmlTemplateEngine
             nodes = this.htmlTemplateEngine.parse(result);
-
             return nodes;
         }
     }
