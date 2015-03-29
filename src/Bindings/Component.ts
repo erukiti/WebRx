@@ -90,12 +90,6 @@ module wx {
                         this.loadTemplate(component.template, componentParams),
                         this.loadViewModel(component.viewModel, componentParams),
                     (t, vm) => {
-                        // if loadViewModel yields a function, treat it as a factory
-                        if (isFunction(vm)) {
-                            var vmProps = {};
-                            vm = vm.call(vmProps, componentParams) || vmProps;
-                        }
-
                         return { template: t, viewModel: vm }
                     }).subscribe(x => {
                         if (isDisposable(x.viewModel)) {
@@ -184,7 +178,7 @@ module wx {
             var syncResult: any;
 
             if (isFunction(vm)) {
-                return Rx.Observable.return(vm);
+                return Rx.Observable.return(new vm(componentParams));
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;
 
