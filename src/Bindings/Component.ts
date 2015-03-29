@@ -92,7 +92,8 @@ module wx {
                     (t, vm) => {
                         // if loadViewModel yields a function, treat it as a factory
                         if (isFunction(vm)) {
-                            vm = vm(componentParams);
+                            var vmProps = {};
+                            vm = vm.call(vmProps, componentParams) || vmProps;
                         }
 
                         return { template: t, viewModel: vm }
