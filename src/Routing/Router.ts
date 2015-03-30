@@ -266,6 +266,11 @@ module wx {
         }
     }
 
+    export var router: IRouter;
+    Object.defineProperty(wx, "router", {
+        get() { return injector.resolve<IRouter>(res.router); }
+    });
+
     export module internal {
         export var routerConstructor = <any> Router;
     }
