@@ -20,6 +20,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-nuget": "^0.1.4",
     "grunt-ts": "^3.0.0",
+    "grunt-typedoc": "^0.2.2",
     "ix": "^1.0.6",
     "jasmine-jquery": "^2.0.6",
     "jasmine-node": "^2.0.0-beta4",

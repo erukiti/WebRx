@@ -113,6 +113,21 @@ module.exports = function (grunt) {
             }
         },
 
+        typedoc: {
+            build: {
+                options: {
+                    module: 'amd',
+                    target: 'es5',
+                    out: '../WebRx-Site/api/',
+                    name: 'WebRx',
+                    mode: 'modules',
+                    gaID: "UA-60860613-1",
+                    readme: "none"
+                },
+                src: ['src/Interfaces.ts']
+            }
+        },
+
         pkg: grunt.file.readJSON('package.json'),
 
         nugetpack: {
@@ -144,6 +159,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-nuget');  
+    grunt.loadNpmTasks('grunt-typedoc');
 
     grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
         var template = "module wx {\n\texport var version = '<%= pkg.version %>';\n}";
