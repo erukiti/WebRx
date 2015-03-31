@@ -68,10 +68,10 @@ module wx {
 
             // subscribe to anchor's click event
             state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
+                e.preventDefault();
+
                 // initiate state change using latest name and params
                 this.router.go(stateName, stateParams, { location: true });
-
-                e.preventDefault();
             }));
 
             // release closure references to GC 

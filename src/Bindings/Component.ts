@@ -135,6 +135,8 @@ module wx {
 
         protected loadTemplate(template: any, params: Object): Rx.Observable<Node[]> {
             var syncResult: Node[];
+            var el: Element;
+            var script: HTMLScriptElement;
 
             if (isFunction(template)) {
                 syncResult = template(params);
@@ -162,10 +164,30 @@ module wx {
                     return observableRequire(options.require).select(x=> app.templateEngine.parse(x));
                 } else if (options.element) {
                     if (typeof options.element === "string") {
-                        syncResult = [document.querySelector(<string> options.element)];
+                        // try both getElementById & querySelector
+                        el = document.getElementById(<string> options.element) ||
+                            document.querySelector(<string> options.element);
+
+                        // unwrap text/html script nodes
+                        if (isHtmlScriptTemplate(el)) {
+                            script = <HTMLScriptElement> el;
+                            syncResult = app.templateEngine.parse(script.innerHTML);
+                        } else {
+                            syncResult = [el];
+                        }
+
                         return Rx.Observable.return(syncResult);
                     } else {
-                        syncResult = [<Node> <any> options.element];
+                        el = <Element> <any> options.element;
+
+                        // unwrap text/html script nodes
+                        if (isHtmlScriptTemplate(el)) {
+                            script = <HTMLScriptElement> el;
+                            syncResult = app.templateEngine.parse(script.innerHTML);
+                        } else {
+                            syncResult = [el];
+                        }
+
                         return Rx.Observable.return(syncResult);
                     }
                 }

@@ -419,6 +419,24 @@ module wx {
     }
 
     /**
+     * Returns true if the specified element is of type "script type="text/html"
+     * @param {Node} node
+     */
+    export function isHtmlScriptTemplate(el: Element) {
+        if (el == null)
+            return false;
+
+        if (el.tagName.toLowerCase() !== "script")
+            return false;
+
+        var script = <HTMLScriptElement> el;
+        if (script.type == null)
+            return false;
+
+        return script.type.toLowerCase() === "text/html";
+    }
+
+    /**
     * Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception 
     * (mimics C# using statement)
     * @param {Rx.IDisposable} disp The resource to dispose after action completes
