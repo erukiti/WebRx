@@ -523,6 +523,26 @@ module wx {
         property5: IObservableProperty<T5>,
         selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
+    export function whenAny<TRet, T1, T2, T3, T4, T5, T6>(
+        property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
+        property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
+        property5: IObservableProperty<T5>, property6: IObservableProperty<T6>,
+        selector: (T1, T2, T3, T4, T5, T6) => TRet): Rx.Observable<TRet>;
+
+    export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7>(
+        property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
+        property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
+        property5: IObservableProperty<T5>, property6: IObservableProperty<T6>,
+        property7: IObservableProperty<T7>,
+        selector: (T1, T2, T3, T4, T5, T6, T7) => TRet): Rx.Observable<TRet>;
+
+    export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
+        property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
+        property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
+        property5: IObservableProperty<T5>, property6: IObservableProperty<T6>,
+        property7: IObservableProperty<T7>, property8: IObservableProperty<T8>,
+        selector: (T1, T2, T3, T4, T5, T6, T7, T8) => TRet): Rx.Observable<TRet>;
+
     /**
      * whenAny allows you to observe whenever the value of one or more properties
      * on an object have changed, providing an initial value when the Observable is set up.

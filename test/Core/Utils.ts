@@ -118,4 +118,32 @@ describe("Utils",() => {
         // everything should be as it was when we began
         expect($(el)).toHaveClass("foo bar");
     });
+
+    it("whenAny smoke-test",() => {
+        function ViewModel() {
+            this.prop1 = wx.property('Homer');
+            this.prop2 = wx.property('Bart');
+            this.prop3 = wx.property('Apu');
+        }
+
+        var vm = new ViewModel();
+
+        var combined1 = wx.whenAny(vm.prop1, (prop1) => {
+            return prop1;
+        }).toProperty();
+
+        expect(combined1()).toEqual(vm.prop1());
+
+        var combined2 = wx.whenAny(vm.prop1, vm.prop2, (prop1, prop2) => {
+            return prop1+prop2;
+        }).toProperty();
+
+        expect(combined2()).toEqual(vm.prop1() + vm.prop2());
+
+        var combined3 = wx.whenAny(vm.prop1, vm.prop2, vm.prop3,(prop1, prop2, prop3) => {
+            return prop1 + prop2 + prop3;
+        }).toProperty();
+
+        expect(combined3()).toEqual(vm.prop1() + vm.prop2() + vm.prop3());
+    });
 });
