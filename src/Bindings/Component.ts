@@ -9,6 +9,11 @@ module wx {
         params?: Object;
     }
 
+    // Binding contributions to data-context
+    interface IComponentDataContext extends IDataContext {
+        $component: any;
+    }
+
     class ComponentBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
@@ -136,7 +141,6 @@ module wx {
         protected loadTemplate(template: any, params: Object): Rx.Observable<Node[]> {
             var syncResult: Node[];
             var el: Element;
-            var script: HTMLScriptElement;
 
             if (isFunction(template)) {
                 syncResult = template(params);
@@ -237,6 +241,7 @@ module wx {
 
                 // refresh context
                 ctx = this.domManager.getDataContext(el);
+                (<IComponentDataContext> ctx).$component = vm;
             }
 
             // invoke preBindingInit 

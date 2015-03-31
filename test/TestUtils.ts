@@ -217,7 +217,8 @@ module testutils {
             $root: models[models.length - 1],
             $parent: models.length > 1 ? models[1] : null,
             $parents: models.slice(1),
-            $index: undefined
+            $index: undefined,
+            $state: wx.router.current
         };
 
         return ctx;

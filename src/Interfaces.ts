@@ -329,6 +329,7 @@ module wx {
         $root: any;
         $parent: any;
         $parents: any[];
+        $state: IObservableProperty<IRouterState>;
     }
 
     /**

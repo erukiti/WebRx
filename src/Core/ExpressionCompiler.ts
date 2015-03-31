@@ -1098,9 +1098,8 @@ module wx {
             ensureSafeMemberName(key0, fullExp);
 
             return (scope: any, locals: any) => {
-                if (scope == null) return undefined;
-
                 scope = ((locals && locals.hasOwnProperty(key0)) ? locals : scope);
+                if (scope == null) return undefined;
 
                 var hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook)
@@ -1115,11 +1114,11 @@ module wx {
             ensureSafeMemberName(key1, fullExp);
 
             return (scope: any, locals: any) => {
-                if (scope == null) return undefined;
-
                 var hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook) {
                     scope = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
+                    if (scope == null) return undefined;
+
                     scope = hooks.readFieldHook(scope, key0);
                     return scope == null ? undefined : hooks.readFieldHook(scope, key1);
                 }
