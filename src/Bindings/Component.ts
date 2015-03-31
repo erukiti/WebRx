@@ -168,12 +168,11 @@ module wx {
                         el = document.getElementById(<string> options.element) ||
                             document.querySelector(<string> options.element);
 
-                        // unwrap text/html script nodes
-                        if (isHtmlScriptTemplate(el)) {
-                            script = <HTMLScriptElement> el;
-                            syncResult = app.templateEngine.parse(script.innerHTML);
+                        if (el != null) {
+                            // only the nodes inside the specified element will be cloned for use as the component’s template
+                            syncResult = app.templateEngine.parse((<HTMLElement> el).innerHTML);
                         } else {
-                            syncResult = [el];
+                            syncResult = [];
                         }
 
                         return Rx.Observable.return(syncResult);
@@ -181,11 +180,11 @@ module wx {
                         el = <Element> <any> options.element;
 
                         // unwrap text/html script nodes
-                        if (isHtmlScriptTemplate(el)) {
-                            script = <HTMLScriptElement> el;
-                            syncResult = app.templateEngine.parse(script.innerHTML);
+                        if (el != null) {
+                            // only the nodes inside the specified element will be cloned for use as the component’s template
+                            syncResult = app.templateEngine.parse((<HTMLElement> el).innerHTML);
                         } else {
-                            syncResult = [el];
+                            syncResult = [];
                         }
 
                         return Rx.Observable.return(syncResult);

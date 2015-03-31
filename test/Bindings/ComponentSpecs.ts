@@ -89,7 +89,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect((<HTMLElement> el.children[0]).innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).outerHTML);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).innerHTML);
         });
 
         it('Loads a template from a node instance',() => {
@@ -102,7 +102,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect((<HTMLElement> el.children[0]).innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).outerHTML);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).innerHTML);
         });
 
         it('Loads a template through injector',() => {
