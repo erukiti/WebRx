@@ -46,6 +46,46 @@ describe('Routing',() => {
             expect(wx.router.current().uri).toEqual("/foo/bar");
         });
 
+        it('child states inherit views of parent',() => {
+            wx.router.state({
+                name: "foo",
+                views: {
+                    'main': "foo",
+                    'details': "baz"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("foo.bar");
+            expect(wx.router.current().views['details']).toEqual("baz");
+        });
+
+        it('child states inherit params of parent',() => {
+            wx.router.state({
+                name: "foo",
+                params: {
+                    'main': "foo",
+                    'details': "baz"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bar",
+                params: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("foo.bar");
+            expect(wx.router.current().params['details']).toEqual("baz");
+        });
+
         it('child states can override views of parent',() => {
             wx.router.state({
                 name: "foo",
