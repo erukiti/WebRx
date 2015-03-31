@@ -162,16 +162,14 @@ module wx {
                     $data: models[0],
                     $root: models[models.length - 1],
                     $parent: models.length > 1 ? models[1] : null,
-                    $parents: models.slice(1),
-                    $state: router.current
+                    $parents: models.slice(1)
                 };
             } else {
                 ctx = {
                     $data: null,
                     $root: null,
                     $parent: null,
-                    $parents: [],
-                    $state: router.current
+                    $parents: []
                 };
             }
 

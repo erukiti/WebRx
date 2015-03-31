@@ -11,6 +11,7 @@
 /// <reference path="Bindings/TextInput.ts" />
 /// <reference path="Bindings/SelectedValue.ts" />
 /// <reference path="Bindings/Component.ts" />
+/// <reference path="Routing/Bindings/StateActive.ts" />
 /// <reference path="Routing/Bindings/StateRef.ts" />
 /// <reference path="Routing/Bindings/View.ts" />
 /// <reference path="Routing/Router.ts" />
@@ -44,7 +45,8 @@ module wx {
         .register("wx.bindings.value", true, true, [res.domManager, internal.valueBindingConstructor])
         .register("wx.bindings.hasFocus", true, true, [res.domManager, internal.hasFocusBindingConstructor])
         .register("wx.bindings.view", true, true, [res.domManager, res.router, internal.viewBindingConstructor])
-        .register("wx.bindings.sref", true, true, [res.domManager, res.router, internal.stateRefBindingConstructor]);
+        .register("wx.bindings.sref", true, true, [res.domManager, res.router, internal.stateRefBindingConstructor])
+        .register("wx.bindings.sactive", true, true, [res.domManager, res.router, internal.stateActiveBindingConstructor]);
 
     injector.register("wx.components.radiogroup", false, true, [res.htmlTemplateEngine, internal.radioGroupComponentConstructor])
         .register("wx.components.select", false, true, [res.htmlTemplateEngine, internal.selectComponentConstructor]);
@@ -72,7 +74,8 @@ module wx {
         .binding("value", "wx.bindings.value")
         .binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus")
         .binding("view", "wx.bindings.view")
-        .binding("sref", "wx.bindings.sref");
+        .binding("sref", "wx.bindings.sref")
+        .binding(["sactive", "state-active"], "wx.bindings.sactive");
 
     app.component("wx-radiogroup", "wx.components.radiogroup")
         .component("wx-select", "wx.components.select");
