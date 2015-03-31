@@ -189,11 +189,11 @@ module wx {
         private createHistory(): IHistory {
             // inherit default implementation
             var result = <IHistory> {
-                back: window.history.back,
-                forward: window.history.forward,
+                back: window.history.back.bind(window.history),
+                forward: window.history.forward.bind(window.history),
                 //go: window.history.go,
-                pushState: window.history.pushState,
-                replaceState: window.history.replaceState
+                pushState: window.history.pushState.bind(window.history),
+                replaceState: window.history.replaceState.bind(window.history)
             };
 
             Object.defineProperty(result, "length", {
