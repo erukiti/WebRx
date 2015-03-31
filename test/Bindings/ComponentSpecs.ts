@@ -16,7 +16,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture1");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual(template);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual(template);
         });
 
         it('Loads a component using object-literal options',() => {
@@ -31,7 +31,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual(template);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual(template);
         });
 
         it('Loads a component using its name as tag',() => {
@@ -61,7 +61,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual(template);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual(template);
         });
 
         it('Loads a template from a node-array',() => {
@@ -76,7 +76,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual(template);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual(template);
         });
 
         it('Loads a template from a selector',() => {
@@ -89,7 +89,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).outerHTML);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).outerHTML);
         });
 
         it('Loads a template from a node instance',() => {
@@ -102,7 +102,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).outerHTML);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual((<HTMLElement> document.querySelector("#template1")).outerHTML);
         });
 
         it('Loads a template through injector',() => {
@@ -118,7 +118,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.innerHTML).toEqual(template);
+            expect((<HTMLElement> el.children[0]).innerHTML).toEqual(template);
         });
 
         it("Loads a template through an AMD module loader",(done) => {
@@ -128,7 +128,7 @@ describe('Bindings', () => {
 
             var vm = {
                 init: function () {
-                    expect(el.innerHTML).toEqual("<span>foo</span>");
+                    expect((<HTMLElement> el.children[0]).innerHTML).toEqual("<span>foo</span>");
                     done();
                 }
             };
@@ -156,7 +156,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings({ foo: 'bar' }, el)).not.toThrow();
 
-            expect(el.children[0].textContent).toEqual('bar');
+            expect((<HTMLElement> el.children[0]).children[0].textContent).toEqual('bar');
         });
 
         it("Loads a view-model from a factory method",() => {
@@ -172,7 +172,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
             
-            expect(el.childNodes[0].textContent).toEqual('bar');
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
 
         it("Loads a view-model through injector",() => {
@@ -189,7 +189,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.childNodes[0].textContent).toEqual('bar');
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
 
         it("Loads a view-model from an instance",() => {
@@ -205,7 +205,7 @@ describe('Bindings', () => {
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            expect(el.childNodes[0].textContent).toEqual('bar');
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
 
         it("Loads a view-model through an AMD module loader",(done) => {
@@ -224,7 +224,7 @@ describe('Bindings', () => {
             window["vm1Hook"] = () => {
                 delete window["vm1Hook"];
 
-                expect(el.childNodes[0].textContent).toEqual('bar');
+                expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
                 done();
             }
 

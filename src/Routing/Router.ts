@@ -75,7 +75,7 @@ module wx {
             this.go(this.current().name, this.current().params, { force: true, location: false });
         }
 
-        public current = wx.property<IRouterState>();
+        public current = property<IRouterState>();
 
         //////////////////////////////////
         // Implementation

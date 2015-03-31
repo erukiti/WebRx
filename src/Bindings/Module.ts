@@ -23,15 +23,20 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
+            var el = <HTMLElement> node;
+            var self = this;
             var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
+            var initialApply = true;
+
+            // backup inner HTML
+            var template = new Array<Node>();
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
-                if (typeof x === "string")
-                    x = wx.module(x);
+                self.applyValue(el, x, template, ctx, state, initialApply);
 
-                state.module = x;
+                initialApply = false;
             }));
 
             // release closure references to GC 
@@ -53,11 +58,45 @@ module wx {
         }
 
         public priority = 100;
+        public name = "module";
+        public controlsDescendants = true;
 
         ////////////////////
         // Implementation
 
         protected domManager: IDomManager;
+
+        protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
+            var i;
+
+            if (initialApply) {
+                // clone to template
+                for (i = 0; i < el.childNodes.length; i++) {
+                    template.push(el.childNodes[i].cloneNode(true));
+                }
+            }
+
+            if (typeof value === "string")
+                value = wx.module(value);
+
+            state.module = value;
+
+            // clean first
+            this.domManager.cleanDescendants(el);
+
+            // clear
+            while (el.firstChild) {
+                el.removeChild(el.firstChild);
+            }
+
+            // clone nodes and inject
+            for (i = 0; i < template.length; i++) {
+                var node = template[i].cloneNode(true);
+                el.appendChild(node);
+            }
+
+            this.domManager.applyBindingsToDescendants(ctx, el);
+        }
     }
 
     export module internal {
