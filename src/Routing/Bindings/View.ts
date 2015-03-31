@@ -66,6 +66,14 @@ module wx {
                             currentComponentName = componentName;
                             currentComponentParams = componentParams;
                         }
+                    } else {
+                        currentComponentName = null;
+
+                        // we have no component to display, clear contents
+                        while (el.firstChild) {
+                            this.domManager.cleanNode(el.firstChild);
+                            el.removeChild(el.firstChild);
+                        }                        
                     }
                 }
             }));

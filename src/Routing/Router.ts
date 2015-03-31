@@ -244,6 +244,15 @@ module wx {
                 _current.name !== to ||
                 !isEqual(_current.params, state.params)) {
 
+                // reset views used by previous state that are unused by new state
+                if (_current != null && _current.views != null && state.views != null) {
+                    Object.keys(_current.views).forEach(x => {
+                        if (!state.views.hasOwnProperty(x)) {
+                            state.views[x] = null;
+                        }
+                    });
+                }
+
                 // update history
                 if (options && options.location) {
                     if(options.location === RouterLocationChangeMode.replace)
