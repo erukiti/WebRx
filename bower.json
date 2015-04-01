@@ -1,6 +1,7 @@
 {
   "name": "WebRx",
   "description": "Dynamic JavaScript UIs with ReactiveX",
+  "version": "0.0.0",
   "homepage": "http://webrxjs.org",
   "repository": {
     "type": "git",
@@ -11,6 +12,9 @@
   ],
   "license": "MIT",
   "private": false,
+  "main": [
+    "dist/web.rx.js"
+  ],
   "ignore": [
     "src",
     "test",
@@ -19,7 +23,10 @@
     ".travis.yml",
     ".inch.yml",
     "package.json",
-    "gruntfile.js"
+    ".npmignore",
+    ".gitignore",
+    ".gitattributes",
+    "Gruntfile.js"
   ],
   "devDependencies": {
     "rxjs": "^2.4.3"
