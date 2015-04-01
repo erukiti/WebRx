@@ -1372,7 +1372,7 @@ var wx;
             var initialApply = true;
             var template = new Array();
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, x, template, ctx, state, initialApply);
+                self.applyValue(el, wx.unwrapProperty(x), template, ctx, state, initialApply);
                 initialApply = false;
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -1637,6 +1637,7 @@ var wx;
                         if (eventDisposables[eventName]) {
                             eventDisposables[eventName].dispose();
                         }
+                        handler = wx.unwrapProperty(handler);
                         if (typeof handler === "function") {
                             eventDisposables[eventName] = Rx.Observable.fromEvent(el, eventName).subscribe(function (e) {
                                 handler.apply(ctx.$data, [ctx, e]);
@@ -2142,7 +2143,7 @@ var wx;
             var obs = this.domManager.expressionToObservable(exp, ctx);
             var template = new Array();
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, x, template, ctx, initialApply);
+                self.applyValue(el, wx.unwrapProperty(x), template, ctx, initialApply);
                 initialApply = false;
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -2245,7 +2246,7 @@ var wx;
         MultiOneWayChangeBindingBase.prototype.subscribe = function (el, obs, key, state) {
             var _this = this;
             state.cleanup.add(obs.subscribe(function (x) {
-                _this.applyValue(el, x, key);
+                _this.applyValue(el, wx.unwrapProperty(x), key);
             }));
         };
         MultiOneWayChangeBindingBase.prototype.applyValue = function (el, key, value) {
@@ -2451,7 +2452,7 @@ var wx;
             var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, x);
+                self.applyValue(el, wx.unwrapProperty(x));
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -2798,7 +2799,7 @@ var wx;
             var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, x, state);
+                self.applyValue(el, wx.unwrapProperty(x), state);
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -5544,6 +5545,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.44';
+    wx.version = '0.9.45';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
