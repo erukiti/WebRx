@@ -7,7 +7,6 @@ vs/obj
 node_modules
 bower_components
 build
-dist
 .ntvs_analysis.dat*
 src/.baseDir.ts
 .tscache
