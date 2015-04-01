@@ -40,11 +40,11 @@ Make sure to include script-references to rx.lite.js and rx.lite.extras.js **bef
 
 WebRx's documentation can be found on [here](http://webrxjs.org/docs).
 
-### Contributing
+#### Contributing
 
 - Fork the repository
 - Make one or more well commented and clean commits to the repository. You can make a new branch here if you are modifying more than one part or feature.
-- Submit a pull request
+- Submit a [pull request](https://help.github.com/articles/using-pull-requests/)
 
 ### License
 
