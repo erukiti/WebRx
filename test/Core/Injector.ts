@@ -43,17 +43,17 @@ describe("Injector",() => {
         var injector = getInjector();
 
         var foo = new Object();
-        injector.register("foo", false,() => foo);
+        injector.register("foo", () => foo);
         var result;
         expect(() => result = injector.resolve("foo")).not.toThrowError();
         expect(result).toBe(foo);
 
         // should always return a new instance
-        injector.register("bar", false, () => new Object());
+        injector.register("bar", () => new Object());
         expect(injector.resolve("bar")).not.toBe(injector.resolve("bar"));
 
         // should always return the same instance
-        injector.register("baz", true, () => new Object());
+        injector.register("baz", () => new Object(), true);
         expect(injector.resolve("baz")).toBe(injector.resolve("baz"));
     });
 
@@ -62,20 +62,17 @@ describe("Injector",() => {
         var val;
 
         var bar = { key: "baz" };
-        injector.register("bar", false, () => bar);
+        injector.register("bar", () => bar);
 
         // foo factory method expecting dependency
-        var foo = (_bar: any) => {
+        function foo(_bar: any) {
             val = _bar.key;
+        }
 
-            return "done";
-        };
-
-        injector.register("foo", false, false, ["bar", foo]);
+        injector.register("foo", ["bar", foo]);
 
         var result;
         expect(() => result = injector.resolve("foo")).not.toThrowError();
-        expect(result).toEqual("done");
         expect(val).toEqual("baz");
     });
 
@@ -85,21 +82,18 @@ describe("Injector",() => {
         var arg1: any;
 
         var bar = { key: "baz" };
-        injector.register("bar", false, () => bar);
+        injector.register("bar", () => bar);
 
         // foo factory method expecting dependency
-        var foo = (_bar: any, _arg1: any) => {
+        function foo(_bar: any, _arg1: any) {
             val = _bar.key;
             arg1 = _arg1;
-
-            return "done";
         };
 
-        injector.register("foo", false, false, ["bar", foo]);
+        injector.register("foo", ["bar", foo]);
 
         var result;
         expect(() => result = injector.resolve("foo", ["test"])).not.toThrowError();
-        expect(result).toEqual("done");
         expect(arg1).toEqual("test");
     });
 
@@ -107,14 +101,14 @@ describe("Injector",() => {
         var injector = getInjector();
 
         var foo = new Object();
-        injector.register("foo", false, () => foo);
+        injector.register("foo", () => foo);
 
         var bar = { key: "baz" };
-        injector.register("bar", false, () => bar);
+        injector.register("bar", () => bar);
 
         // foo factory method expecting dependency
-        injector.register("test1", false, true, ["foo", "bar", Tuple]);
-        injector.register("test2", false, true, ["foo", "bar", Tuple]);
+        injector.register("test1", ["foo", "bar", Tuple]);
+        injector.register("test2", ["foo", "bar", Tuple]);
 
         var result:Tuple<any, any>;
         expect(() => result = injector.resolve<Tuple<any, any>>("test1")).not.toThrowError();
@@ -131,8 +125,8 @@ describe("Injector",() => {
     it("properly detects circular dependencies",() => {
         var injector = getInjector();
 
-        injector.register("foo", false, false, ["bar", (_bar) => 1]);
-        injector.register("bar", false, false, ["foo", (_foo) => 2]);
+        injector.register("foo", ["bar", (_bar) => 1]);
+        injector.register("bar", ["foo", (_foo) => 2]);
 
         expect(() => injector.resolve("bar")).toThrowError(/circular dependency/);
     });

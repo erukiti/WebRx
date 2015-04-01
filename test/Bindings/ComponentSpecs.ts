@@ -109,7 +109,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Component.html');
 
             var template = '<span>foo</span>';
-            wx.injector.register("#template1", wx.app.templateEngine.parse(template));
+            wx.injector.register("#template1", ()=> wx.app.templateEngine.parse(template));
 
             wx.module("test").component("test1", <wx.IComponent> {
                 template: <any> { resolve: "#template1" }

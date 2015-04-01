@@ -386,72 +386,35 @@ var wx;
             this.registrations = {};
         }
         Injector.prototype.register = function () {
-            var args = wx.args2Array(arguments);
-            var key = args.shift();
+            var key = arguments[0];
+            var val = arguments[1];
+            var isSingleton = arguments[2];
             var factory;
-            var isConstructor = false;
-            var isSingleton = false;
             if (this.registrations.hasOwnProperty(key))
                 wx.internal.throwError("'{0}' is already registered", key);
-            var val = args.shift();
-            if (typeof val !== "boolean") {
-                factory = function (args, deps) { return val; };
+            if (wx.isFunction(val)) {
+                factory = function (args, deps) { return val.apply(null, args); };
+            }
+            else if (Array.isArray(val)) {
+                var self = this;
+                var _constructor = val.pop();
+                var dependencies = val;
+                factory = function (args, deps) {
+                    var resolved = dependencies.map(function (x) {
+                        try {
+                            return self.resolve(x, undefined, deps);
+                        }
+                        catch (e) {
+                            wx.internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
+                        }
+                    });
+                    var _args = [null].concat(resolved).concat(args);
+                    var factoryFunction = _constructor.bind.apply(_constructor, _args);
+                    return new factoryFunction();
+                };
             }
             else {
-                isSingleton = val;
-                val = args.shift();
-                if (typeof val !== "boolean") {
-                    var constructorArgs;
-                    if (args) {
-                        if (Array.isArray(args)) {
-                            constructorArgs = args;
-                        }
-                        else {
-                            constructorArgs = [args];
-                        }
-                    }
-                    else {
-                        constructorArgs = [];
-                    }
-                    factory = function (args, deps) { return val.apply(null, constructorArgs); };
-                }
-                else {
-                    isConstructor = val;
-                    args = args.pop();
-                    var self = this;
-                    var _constructor = args.pop();
-                    var dependencies = args;
-                    factory = function (args, deps) {
-                        var resolved = dependencies.map(function (x) {
-                            try {
-                                return self.resolve(x, undefined, deps);
-                            }
-                            catch (e) {
-                                wx.internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
-                            }
-                        });
-                        var constructorArgs;
-                        if (args) {
-                            if (Array.isArray(args)) {
-                                constructorArgs = args;
-                            }
-                            else {
-                                constructorArgs = [args];
-                            }
-                        }
-                        else {
-                            constructorArgs = [];
-                        }
-                        if (!isConstructor) {
-                            return _constructor.apply(null, resolved.concat(constructorArgs));
-                        }
-                        else {
-                            var _args = [null].concat(resolved).concat(constructorArgs);
-                            var factoryFunction = _constructor.bind.apply(_constructor, _args);
-                            return new factoryFunction();
-                        }
-                    };
-                }
+                factory = function (args, deps) { return val; };
             }
             this.registrations[key] = { factory: factory, isSingleton: isSingleton };
             return this;
@@ -476,7 +439,7 @@ var wx;
         return Injector;
     })();
     wx.injector = new Injector();
-    wx.injector.register(wx.res.injector, false, function () { return new Injector(); });
+    wx.injector.register(wx.res.injector, function () { return new Injector(); });
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
@@ -1593,7 +1556,6 @@ var wx;
             if (vm) {
                 state.model = vm;
                 ctx = this.domManager.getDataContext(el);
-                ctx.$component = vm;
             }
             if (vm && component.preBindingInit && vm.hasOwnProperty(component.preBindingInit)) {
                 vm[component.preBindingInit].call(vm, el);
@@ -5489,9 +5451,9 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, true, true, [wx.internal.htmlTemplateEngineConstructor]).register(wx.res.domManager, true, true, [wx.res.expressionCompiler, wx.internal.domManagerConstructor]).register(wx.res.router, true, true, [wx.res.domManager, wx.internal.routerConstructor]);
-    wx.injector.register("wx.bindings.module", true, true, [wx.res.domManager, wx.internal.moduleBindingConstructor]).register("wx.bindings.command", true, true, [wx.res.domManager, wx.internal.commandBindingConstructor]).register("wx.bindings.if", true, true, [wx.res.domManager, wx.internal.ifBindingConstructor]).register("wx.bindings.with", true, true, [wx.res.domManager, wx.internal.withBindingConstructor]).register("wx.bindings.notif", true, true, [wx.res.domManager, wx.internal.notifBindingConstructor]).register("wx.bindings.css", true, true, [wx.res.domManager, wx.internal.cssBindingConstructor]).register("wx.bindings.attr", true, true, [wx.res.domManager, wx.internal.attrBindingConstructor]).register("wx.bindings.style", true, true, [wx.res.domManager, wx.internal.styleBindingConstructor]).register("wx.bindings.text", true, true, [wx.res.domManager, wx.internal.textBindingConstructor]).register("wx.bindings.html", true, true, [wx.res.domManager, wx.internal.htmlBindingConstructor]).register("wx.bindings.visible", true, true, [wx.res.domManager, wx.internal.visibleBindingConstructor]).register("wx.bindings.hidden", true, true, [wx.res.domManager, wx.internal.hiddenBindingConstructor]).register("wx.bindings.enabled", true, true, [wx.res.domManager, wx.internal.enableBindingConstructor]).register("wx.bindings.disabled", true, true, [wx.res.domManager, wx.internal.disableBindingConstructor]).register("wx.bindings.foreach", true, true, [wx.res.domManager, wx.internal.forEachBindingConstructor]).register("wx.bindings.event", true, true, [wx.res.domManager, wx.internal.eventBindingConstructor]).register("wx.bindings.textInput", true, true, [wx.res.domManager, wx.internal.textInputBindingConstructor]).register("wx.bindings.checked", true, true, [wx.res.domManager, wx.internal.checkedBindingConstructor]).register("wx.bindings.selectedValue", true, true, [wx.res.domManager, wx.internal.selectedValueBindingConstructor]).register("wx.bindings.component", true, true, [wx.res.domManager, wx.internal.componentBindingConstructor]).register("wx.bindings.value", true, true, [wx.res.domManager, wx.internal.valueBindingConstructor]).register("wx.bindings.hasFocus", true, true, [wx.res.domManager, wx.internal.hasFocusBindingConstructor]).register("wx.bindings.view", true, true, [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor]).register("wx.bindings.sref", true, true, [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor]).register("wx.bindings.sactive", true, true, [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor]);
-    wx.injector.register("wx.components.radiogroup", false, true, [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", false, true, [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
+    wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true).register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true).register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true);
+    wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true).register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true).register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true).register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true).register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true).register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true).register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true).register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true).register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true).register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true).register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true).register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true).register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true).register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true).register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true).register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true).register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true).register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true).register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true).register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true).register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true).register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true).register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true).register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true).register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
+    wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
     wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding("sref", "wx.bindings.sref").binding(["sactive", "state-active"], "wx.bindings.sactive");
     wx.app.component("wx-radiogroup", "wx.components.radiogroup").component("wx-select", "wx.components.select");
 })(wx || (wx = {}));

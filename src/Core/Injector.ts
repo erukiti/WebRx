@@ -10,86 +10,49 @@ module wx {
         //////////////////////////////////
         // IInjector implementation
 
-        public register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): IInjector;
-        public register(key: string, singleton: boolean, factory: () => any): IInjector;
+        public register(key: string, factory: Array<any>, singleton: boolean): IInjector;
+        public register(key: string, factory: () => any, singleton: boolean): IInjector;
         public register(key: string, instance: any): IInjector;
 
         public register(): IInjector {
-            var args = args2Array(arguments);
-            var key = args.shift();
+            var key = arguments[0];
+            var val = arguments[1];
+            var isSingleton: boolean = arguments[2];
             var factory: (deps: any, args: any) => any;
-            var isConstructor = false;
-            var isSingleton = false;
 
             if (this.registrations.hasOwnProperty(key))
                 internal.throwError("'{0}' is already registered", key);
 
-            var val = args.shift();
+            if (isFunction(val)) {
+                // second overload
+                // it's a factory function
+                factory = (args: any, deps) => val.apply(null, args);
+            } else if(Array.isArray(val)) {
+                // first overload
+                // array assumed to be inline array notation with constructor
+                var self = this;
+                var _constructor = val.pop();
+                var dependencies = val;
 
-            if (typeof val !== "boolean") {
+                factory = (args: any, deps) => {
+                    // resolve dependencies
+                    var resolved = dependencies.map(x => {
+                        try {
+                            return self.resolve(x, undefined, deps);
+                        } catch (e) {
+                            internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
+                        }
+                    });
+                    
+                    // invoke constructor
+                    var _args = [null].concat(resolved).concat(args);
+                    var factoryFunction = _constructor.bind.apply(_constructor, _args);
+                    return new factoryFunction();
+                };
+            } else {
                 // third overload
                 // singleton
                 factory = (args: any, deps) => val;
-            } else {
-                isSingleton = val;
-                val = args.shift();
-
-                if (typeof val !== "boolean") {
-                    // second overload
-                    // it's a factory function
-                    var constructorArgs: Array<any>;
-                    if (args) {
-                        if (Array.isArray(args)) {
-                            constructorArgs = args;
-                        } else {
-                            constructorArgs = [args];
-                        }
-                    } else {
-                        constructorArgs = [];
-                    }
-
-                    factory = (args: any, deps) => val.apply(null, constructorArgs);
-                } else {
-                    // first overload
-                    // array assumed to be inline array notation
-                    isConstructor = val;
-                    args = args.pop();
-                    var self = this;
-                    var _constructor = args.pop();
-                    var dependencies = args;
-
-                    factory = (args: any, deps) => {
-                        // resolve dependencies
-                        var resolved = dependencies.map(x => {
-                            try {
-                                return self.resolve(x, undefined, deps);
-                            } catch (e) {
-                                internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
-                            }
-                        });
-                    
-                        // invoke constructor
-                        var constructorArgs: Array<any>;
-                        if (args) {
-                            if (Array.isArray(args)) {
-                                constructorArgs = args;
-                            } else {
-                                constructorArgs = [args];
-                            }
-                        } else {
-                            constructorArgs = [];
-                        }
-
-                        if (!isConstructor) {
-                            return _constructor.apply(null, resolved.concat(constructorArgs));
-                        }
-                        else {
-                            var _args = [null].concat(resolved).concat(constructorArgs);
-                            var factoryFunction = _constructor.bind.apply(_constructor, _args);
-                            return new factoryFunction();
-                        }
-                    };
-                }
             }
 
             this.registrations[key] = { factory: factory, isSingleton: isSingleton };
@@ -134,5 +97,5 @@ module wx {
 
     export var injector: IInjector = new Injector();
 
-    injector.register(res.injector, false, () => new Injector());
+    injector.register(res.injector, () => new Injector());
 }

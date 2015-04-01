@@ -14,8 +14,8 @@ declare module wx.res {
 }
 declare module wx {
     interface IInjector {
-        register(key: string, singleton: boolean, isConstructor: boolean, factory: Array<any>): IInjector;
-        register(key: string, singleton: boolean, factory: () => any): IInjector;
+        register(key: string, factory: Array<any>, singleton?: boolean): IInjector;
+        register(key: string, factory: () => any, singleton?: boolean): IInjector;
         register(key: string, instance: any): IInjector;
         resolve<T>(key: string, args?: any): T;
     }
