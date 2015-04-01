@@ -1,7 +1,6 @@
 {
   "name": "WebRx",
   "description": "Dynamic JavaScript UIs with ReactiveX",
-  "version": "0.0.0",
   "homepage": "http://webrxjs.org",
   "repository": {
     "type": "git",
