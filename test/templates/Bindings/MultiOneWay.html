@@ -3,16 +3,19 @@
 <div id="css-observable-model-property" data-bind="css: {'foo': observableBool }">empty</div>
 <div id="css-observable-model" data-bind="css: {'foo': changed,  }">empty</div>
 <div id="css-observable-model-property2" data-bind="css: {'foo': observableBool, 'bar': observableBool2 }">empty</div>
+<div id="css-observable-model-propref" data-bind="css: {'foo': @observableBool }">empty</div>
 
 <div id="attr-constant-string" data-bind="attr: {'data-foo': true }">empty</div>
 <div id="attr-non-observable-model-property" data-bind="attr: {'data-foo': constantString }">empty</div>
 <div id="attr-observable-model-property" data-bind="attr: {'data-foo': observableString }">empty</div>
 <div id="attr-observable-model" data-bind="attr: {'data-foo': changed,  }">empty</div>
 <div id="attr-observable-model-property2" data-bind="attr: {'data-foo': observableString, 'data-bar': observableString2 }">empty</div>
+<div id="attr-observable-model-propref" data-bind="attr: {'data-foo': @observableString }">empty</div>
 
-<div id="attr-constant-string" data-bind="attr: {'color': true }">empty</div>
-<div id="attr-non-observable-model-property" data-bind="attr: {'color': constantString }">empty</div>
-<div id="attr-observable-model-property" data-bind="attr: {'color': observableString }">empty</div>
-<div id="attr-observable-model" data-bind="attr: {'color': changed,  }">empty</div>
-<div id="attr-observable-model-property2" data-bind="attr: {'color': observableString, 'background': observableString2 }">empty</div>
+<div id="style-constant-string" data-bind="style: {'color': true }">empty</div>
+<div id="style-non-observable-model-property" data-bind="style: {'color': constantString }">empty</div>
+<div id="style-observable-model-property" data-bind="style: {'color': observableString }">empty</div>
+<div id="style-observable-model" data-bind="style: {'color': changed,  }">empty</div>
+<div id="style-observable-model-property2" data-bind="style: {'color': observableString, 'background': observableString2 }">empty</div>
+<div id="style-observable-model-propref" data-bind="style: {'color': @observableString }">empty</div>
 

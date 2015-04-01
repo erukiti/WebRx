@@ -44,6 +44,8 @@ module wx {
                         }
 
                         // wire up event observable
+                        handler = unwrapProperty(handler);
+
                         if (typeof handler === "function") {
                             eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(e => {
                                 handler.apply(ctx.$data, [ctx, e]);

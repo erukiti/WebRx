@@ -27,7 +27,7 @@ module wx {
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
-                self.applyValue(el, x, state);
+                self.applyValue(el, unwrapProperty(x), state);
             }));
 
             // release closure references to GC 

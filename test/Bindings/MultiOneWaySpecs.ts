@@ -60,6 +60,17 @@ describe('Bindings', () => {
             expect($(el)).not.toHaveClass('foo');
         });
 
+        it('binding to a observable model @propref',() => {
+            loadFixtures('templates/Bindings/MultiOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#css-observable-model-propref");
+            var model = createCssModel();
+
+            expect($(el)).not.toHaveClass('foo');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toHaveClass('foo');
+        });
+
         it('binding to a model observable', () => {
             loadFixtures('templates/Bindings/MultiOneWay.html');
 
@@ -164,6 +175,18 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             model.observableString('voodoo');
             expect($(el)).toHaveAttr('data-foo', '');
+        });
+
+        it('binding to a observable model @propref',() => {
+            loadFixtures('templates/Bindings/MultiOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#attr-observable-model-propref");
+            var model = createCssModel();
+
+            expect($(el)).not.toHaveAttr('data-foo');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toHaveAttr('data-foo');
+
         });
 
         it('binding to a model observable', () => {

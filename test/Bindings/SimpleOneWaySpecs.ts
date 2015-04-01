@@ -80,6 +80,17 @@ describe('Bindings', () => {
             expect(el.textContent).toEqual(oldValue);
         });
 
+        it('binding to a observable model @propref',() => {
+            loadFixtures('templates/Bindings/SimpleOneWay.html');
+
+            var el = document.querySelector("#text-observable-model-propref");
+            var model = createModel();
+
+            expect(el.textContent).toEqual('invalid');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect(el.textContent).toEqual(model.observableString());
+        });
+
         it('binding to a model observable', () => {
             loadFixtures('templates/Bindings/SimpleOneWay.html');
 
@@ -155,6 +166,17 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             model.observableBool(true);
             expect($(el)).toBeHidden();
+        });
+
+        it('binding to a observable model @propref',() => {
+            loadFixtures('templates/Bindings/SimpleOneWay.html');
+
+            var el = document.querySelector("#visible-observable-model-propref");
+            var model = createModel();
+
+            expect($(el)).toBeHidden();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toBeVisible();
         });
 
         it('binding to a model observable', () => {
@@ -379,6 +401,17 @@ describe('Bindings', () => {
             expect($(el)).not.toBeDisabled();
         });
 
+        it('binding to a observable model @propref',() => {
+            loadFixtures('templates/Bindings/SimpleOneWay.html');
+
+            var el = document.querySelector("#enabled-observable-model-propref");
+            var model = createModel();
+
+            expect($(el)).toBeDisabled();
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).not.toBeDisabled();
+        });
+
         it('binding to a model observable', () => {
             loadFixtures('templates/Bindings/SimpleOneWay.html');
 
@@ -525,6 +558,18 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             model.observableString("nope");
             expect(el.innerHTML).toEqual(oldValue);
+        });
+
+        it('binding to a observable model propref',() => {
+            loadFixtures('templates/Bindings/SimpleOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#html-observable-model-propref");
+            var model = createModel();
+            model.observableString('<span>bla</span>');
+
+            expect(el.innerHTML).toEqual('invalid');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect(el.innerHTML).toEqual(model.observableString());
         });
 
         it('binding to a model observable', () => {

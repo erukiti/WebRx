@@ -35,7 +35,7 @@ module wx {
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
-                self.applyValue(el, x, template, ctx, initialApply);
+                self.applyValue(el, unwrapProperty(x), template, ctx, initialApply);
 
                 initialApply = false;
             }));
