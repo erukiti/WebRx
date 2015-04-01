@@ -9,11 +9,6 @@ module wx {
         params?: Object;
     }
 
-    // Binding contributions to data-context
-    interface IComponentDataContext extends IDataContext {
-        $component: any;
-    }
-
     class ComponentBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
@@ -241,7 +236,6 @@ module wx {
 
                 // refresh context
                 ctx = this.domManager.getDataContext(el);
-                (<IComponentDataContext> ctx).$component = vm;
             }
 
             // invoke preBindingInit 
