@@ -2219,8 +2219,9 @@ var wx;
             var exp;
             var keys = Object.keys(compiled);
             var i;
+            var key;
             for (i = 0; i < keys.length; i++) {
-                var key = keys[i];
+                key = keys[i];
                 var value = compiled[key];
                 exp = value;
                 obs = this.domManager.expressionToObservable(exp, ctx);

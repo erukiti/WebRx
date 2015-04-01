@@ -27,9 +27,10 @@ module wx {
             var exp: ICompiledExpression;
             var keys = Object.keys(compiled);
             var i;
+            var key;
 
             for (i = 0; i < keys.length; i++) {
-                var key = keys[i];
+                key = keys[i];
                 var value = compiled[key];
 
                 exp = <ICompiledExpression> value;
