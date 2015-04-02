@@ -11,7 +11,7 @@ module wx {
         register(key: string, instance: any): IInjector;
 
         get<T>(key: string, args?: any): T;
-        resolve<T>(iaa: Array<any>, args?: Array<any>): T;
+        resolve<T>(iaa: Array<any>, args?: any): T;
     }
 
    /**

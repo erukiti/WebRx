@@ -192,6 +192,26 @@ describe('Bindings', () => {
             expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
 
+        it("Loads a view-model through injector using inline-annotated-array",() => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = "<span data-bind='text: childVm.foo'>invalid</span>";
+            wx.injector.register("vm2", { foo: 'bar' });
+
+            wx.module("test").component("test1", <wx.IComponent> <any> {
+                template: template,
+                viewModel: ["vm2", function(childVm, params) {
+                    this.childVm = childVm;
+                    this.params = params;
+                }]
+            });
+
+            var el = <HTMLElement> document.querySelector("#fixture4");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
+        });
+
         it("Loads a view-model from an instance",() => {
             loadFixtures('templates/Bindings/Component.html');
 

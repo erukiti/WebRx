@@ -40,7 +40,7 @@ module wx {
                         try {
                             return self.get(x, undefined, deps);
                         } catch (e) {
-                            internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
+                            internal.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                         }
                     });
                     
@@ -63,7 +63,7 @@ module wx {
         public get<T>(key: string, args: any, deps?: any): T {
             deps = deps || {};
             if (deps.hasOwnProperty(key))
-                internal.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
+                internal.throwError("Detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
 
             // registered?
             var registration = this.registrations[key];
@@ -89,8 +89,11 @@ module wx {
             return result;
         }
 
-        public resolve<T>(iaa: Array<any>, args?: Array<any>): T {
+        public resolve<T>(iaa: Array<any>, args?: any): T {
             var ctor = iaa.pop();
+            if (!isFunction(ctor))
+                internal.throwError("Error resolving inline-annotated-array. Constructor must be of type 'function' but is '{0}", typeof ctor);
+
             var self = this;
 
             // resolve dependencies
@@ -98,7 +101,7 @@ module wx {
                 try {
                     return self.get(x, undefined, iaa);
                 } catch (e) {
-                    internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
+                    internal.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
                 }
             });
                     

@@ -199,6 +199,9 @@ module wx {
 
             if (isFunction(vm)) {
                 return Rx.Observable.return(new vm(componentParams));
+            } else if (Array.isArray(vm)) {
+                // assumed to be inline-annotated-array
+                return Rx.Observable.return(injector.resolve<any>(vm, componentParams));
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;
 
