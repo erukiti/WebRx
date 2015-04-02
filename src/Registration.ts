@@ -1,5 +1,4 @@
-﻿/// <reference path="core/Utils.ts" />
-/// <reference path="Core/Injector.ts" />
+﻿/// <reference path="Core/Injector.ts" />
 /// <reference path="Core/ExpressionCompiler.ts" />
 /// <reference path="Core/DomManager.ts" />
 /// <reference path="Core/HtmlTemplateEngine.ts" />
