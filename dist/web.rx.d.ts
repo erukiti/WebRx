@@ -301,6 +301,7 @@ declare module wx {
         reset(): void;
     }
     interface IMessageBus {
+        registerScheduler(scheduler: Rx.IScheduler, contract: string): void;
         listen<T>(contract: string): Rx.IObservable<T>;
         isRegistered(contract: string): boolean;
         registerMessageSource<T>(source: Rx.Observable<T>, contract: string): Rx.IDisposable;

@@ -4954,6 +4954,9 @@ var wx;
         MessageBus.prototype.sendMessage = function (message, contract) {
             this.setupSubjectIfNecessary(contract).onNext(message);
         };
+        MessageBus.prototype.registerScheduler = function (scheduler, contract) {
+            this.schedulerMappings[contract] = scheduler;
+        };
         MessageBus.prototype.setupSubjectIfNecessary = function (contract) {
             var ret = this.messageBus[contract];
             if (ret == null) {

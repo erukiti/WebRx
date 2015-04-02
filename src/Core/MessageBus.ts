@@ -25,6 +25,10 @@ module wx {
             this.setupSubjectIfNecessary(contract).onNext(message);
         }
 
+        public registerScheduler(scheduler: Rx.IScheduler, contract: string): void {
+            this.schedulerMappings[contract] = scheduler;
+        }
+
         //////////////////////////////////
         // Implementation
 

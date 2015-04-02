@@ -723,7 +723,7 @@ module wx {
         * @param {string} contract A unique string to distinguish messages with
         * identical types (i.e. "MyCoolViewModel")
         **/
-        //registerScheduler(scheduler: Rx.IScheduler, contract: string): void;
+        registerScheduler(scheduler: Rx.IScheduler, contract: string): void;
 
         /**
         * Listen provides an Observable that will fire whenever a Message is
