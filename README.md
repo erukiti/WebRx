@@ -6,7 +6,7 @@
 
 # WebRx
 
-WebRx is a Javascript Library built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Declarative Data-Binding using Observables, Templating and Client-Side Routing.
+WebRx is a Javascript Library built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Observable-driven declarative Data-Binding, Templating and Client-Side Routing.
 
 #### Features
 
