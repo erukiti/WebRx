@@ -4965,16 +4965,10 @@ var wx;
                 var currentState = latest.shift();
                 stateName = wx.unwrapProperty(latest.shift());
                 stateParams = {};
-                var isActive = currentState.name.indexOf(stateName) === 0;
-                if (isActive) {
-                    for (var i = 0; i < paramsKeys.length; i++) {
-                        if (currentState.params[paramsKeys[i]] != wx.unwrapProperty(latest[i])) {
-                            isActive = false;
-                            break;
-                        }
-                    }
+                for (var i = 0; i < paramsKeys.length; i++) {
+                    stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
                 }
-                wx.toggleCssClass(el, isActive, "active");
+                wx.toggleCssClass(el, _this.router.includes(stateName, stateParams), "active");
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -5288,6 +5282,20 @@ var wx;
         Router.prototype.get = function (state) {
             return this.states[state];
         };
+        Router.prototype.includes = function (state, params, options) {
+            var _current = this.current();
+            var isActive = _current.name.indexOf(state) === 0;
+            if (isActive && params != null) {
+                var paramsKeys = Object.keys(params);
+                for (var i = 0; i < paramsKeys.length; i++) {
+                    if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
+                        isActive = false;
+                        break;
+                    }
+                }
+            }
+            return isActive;
+        };
         Router.prototype.uri = function (state, params) {
             state = this.mapPath(state);
             var route = this.getAbsoluteRouteForState(state);
@@ -5508,6 +5516,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.46';
+    wx.version = '0.9.47';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
