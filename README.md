@@ -6,7 +6,7 @@
 
 # WebRx
 
-WebRx integrates concepts of [KnockoutJS](http://knockoutjs.com/) and [AngularJS](https://angularjs.org/) with [ReactiveX for Javascript (rxjs)](http://reactivex.io) (rxjs) into a MVC framework that enables developers to create responsive, structured and testable Web-Applications that run in any modern browser.
+WebRx is a Javascript Library built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Declarative Data-Binding using Observables, Templating and Client-Side Routing.
 
 #### Features
 
