@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/oliverw/WebRx.png)](https://travis-ci.org/oliverw/WebRx)
-<!-- [![Bower version](https://img.shields.io/bower/v/WebRx.svg)](https://github.com/oliverw/WebRx) -->
 [![NuGet version](https://img.shields.io/nuget/v/WebRx.svg)](https://www.nuget.org/packages/WebRx/)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
+<!-- [![Bower version](https://img.shields.io/bower/v/WebRx.svg)](https://github.com/oliverw/WebRx) -->
 
 
 # WebRx
