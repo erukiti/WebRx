@@ -31,6 +31,9 @@ module wx {
             });
         }
 
+        //////////////////////////////////
+        // IRouter
+
         public state(config: IRouterStateConfig): IRouter {
             this.registerStateInternal(config);
             return this;

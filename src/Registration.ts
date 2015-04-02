@@ -1,4 +1,5 @@
-﻿/// <reference path="Core/Injector.ts" />
+﻿/// <reference path="core/Utils.ts" />
+/// <reference path="Core/Injector.ts" />
 /// <reference path="Core/ExpressionCompiler.ts" />
 /// <reference path="Core/DomManager.ts" />
 /// <reference path="Core/HtmlTemplateEngine.ts" />
@@ -15,12 +16,14 @@
 /// <reference path="Routing/Bindings/StateRef.ts" />
 /// <reference path="Routing/Bindings/View.ts" />
 /// <reference path="Routing/Router.ts" />
+/// <reference path="Core/MessageBus.ts" />
 
 module wx {
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor)
         .register(res.htmlTemplateEngine, [internal.htmlTemplateEngineConstructor], true)
         .register(res.domManager, [res.expressionCompiler, internal.domManagerConstructor], true)
-        .register(res.router, [res.domManager, internal.routerConstructor], true);
+        .register(res.router, [res.domManager, internal.routerConstructor], true)
+        .register(res.messageBus, [internal.messageBusConstructor], true);
 
     injector.register("wx.bindings.module", [res.domManager, internal.moduleBindingConstructor], true)
         .register("wx.bindings.command", [res.domManager, internal.commandBindingConstructor], true)

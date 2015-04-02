@@ -1,6 +1,7 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../RTTI/IUnknown.ts" />
+/// <reference path="Events.ts" />
 
 /**
 * Global helpers
@@ -8,7 +9,7 @@
 
 module wx {
     var cssClassNameRegex = /\S+/g;
-    var RxObsConstructor = (<any> Rx.Observable); // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
+    var RxObsConstructor = (<new <T>() => Rx.Observable<T>> <any> Rx.Observable); // the cast is neccessary because the rx.js.d.ts declares Observable as an interface
 
     /**
     * Returns true if a ECMAScript5 strict-mode is active
@@ -148,11 +149,19 @@ module wx {
     /**
     * Copies own properties from src to dst
     */
-    export function extend(src: Object, dst: Object): Object {
-        var ownProps = Object.getOwnPropertyNames(src);
-        for (var i = 0; i < ownProps.length;i++) {
-            var prop = ownProps[i];
-            dst[prop] = src[prop];
+    export function extend(src: Object, dst: Object, inherited?: boolean): Object {
+        var prop: string;
+
+        if (!inherited) {
+            var ownProps = Object.getOwnPropertyNames(src);
+            for (var i = 0; i < ownProps.length; i++) {
+                prop = ownProps[i];
+                dst[prop] = src[prop];
+            }
+        } else {
+            for (prop in src) {
+                dst[prop] = src[prop];
+            }
         }
 
         return dst;
