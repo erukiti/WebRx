@@ -49,6 +49,24 @@ module wx {
             return this.states[state];
         }
 
+        public includes(state: string, params?: any, options?: any) {
+            var _current = this.current();
+            var isActive = _current.name.indexOf(state) === 0;
+
+            if (isActive && params != null) {
+                var paramsKeys = Object.keys(params);
+
+                for (var i = 0; i < paramsKeys.length; i++) {
+                    if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
+                        isActive = false;
+                        break;
+                    }
+                }
+            }
+
+            return isActive;
+        }
+
         public uri(state: string, params?: {}): string {
             state = this.mapPath(state);
 

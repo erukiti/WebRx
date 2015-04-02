@@ -64,18 +64,11 @@ module wx {
                 // subsequent entries are latest param values
                 stateParams = {};
 
-                var isActive = currentState.name.indexOf(stateName) === 0;
-
-                if (isActive) {
-                    for (var i = 0; i < paramsKeys.length; i++) {
-                        if(currentState.params[paramsKeys[i]] != unwrapProperty(latest[i])) {
-                            isActive = false;
-                            break;
-                        }
-                    }
+                for (var i = 0; i < paramsKeys.length; i++) {
+                    stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                 }
 
-                toggleCssClass(el, isActive, "active");
+                toggleCssClass(el, this.router.includes(stateName, stateParams), "active");
             }));
 
             // release closure references to GC 

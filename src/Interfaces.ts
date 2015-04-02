@@ -689,6 +689,14 @@ module wx {
         get(state: string): IRouterStateConfig;
 
         /**
+        * A method to determine if the current active state is equal to or is the child of the state stateName. 
+        * If any params are passed then they will be tested for a match as well. Not all the parameters need 
+        * to be passed, just the ones you'd like to test for equality.
+        * @param {string} state Absolute state path.
+        **/
+        includes(state: string, params?: any, options?: any);
+
+        /**
         * Resets internal state configuration to defaults (for unit-testing)
         **/
         reset(): void;

@@ -246,6 +246,34 @@ describe('Routing',() => {
             expect(wx.app.history.length).toEqual(2);
         });
 
+        it('includes() correctly tests child and parent states including params',() => {
+            wx.router.state({
+                name: "foo",
+                route: "foo/:fooId",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bar",
+                route: "bar/:barId",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(wx.router.includes("foo")).toBeTruthy();
+            expect(wx.router.includes("foo.bar")).toBeTruthy();
+            expect(wx.router.includes("baz")).toBeFalsy();
+
+            expect(wx.router.includes("foo.bar", { fooId: 3 })).toBeTruthy();
+            expect(wx.router.includes("foo.bar", { fooId: 5 })).toBeFalsy();
+
+            expect(wx.router.includes("foo.bar", { fooId: 3, barId: 5 })).toBeTruthy();
+        });
+
         it('correctly maps parent path if parent is registered',() => {
             wx.router.state({
                 name: "foo",
