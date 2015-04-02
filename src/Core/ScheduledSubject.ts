@@ -3,7 +3,7 @@
 
 module wx.internal {
     class ScheduledSubject<T> implements Rx.IDisposable {
-        constructor(scheduler: Rx.IScheduler, defaultObserver: Rx.Observer<T> = null, defaultSubject: Rx.ISubject<T> = null) {
+        constructor(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>) {
             this._scheduler = scheduler;
             this._defaultObserver = defaultObserver;
             this._subject = defaultSubject || new Rx.Subject<T>();
@@ -59,8 +59,7 @@ module wx.internal {
         private _defaultObserverSub = Rx.Disposable.empty;
     }
     
-    export function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver: Rx.Observer<T> = null,
-        defaultSubject: Rx.ISubject<T> = null): Rx.Subject<T> {
+    export function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>): Rx.Subject<T> {
         var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
         var result = extend(scheduled, new Rx.Subject<T>(), true);
 

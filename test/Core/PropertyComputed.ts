@@ -1,7 +1,7 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe("ObservablePropertyComputed", () => {
+describe("Output Properties", () => {
     it("can be created using factory method",() => {
         var prop = Rx.Observable.never().toProperty();
         expect(prop).toBeDefined();

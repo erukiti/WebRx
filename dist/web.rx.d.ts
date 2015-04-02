@@ -7,6 +7,7 @@ declare module wx.res {
     var injector: string;
     var domManager: string;
     var router: string;
+    var messageBus: string;
     var expressionCompiler: string;
     var htmlTemplateEngine: string;
     var hasValueBindingValue: string;
@@ -299,6 +300,12 @@ declare module wx {
         includes(state: string, params?: any, options?: any): any;
         reset(): void;
     }
+    interface IMessageBus {
+        listen<T>(contract: string): Rx.IObservable<T>;
+        isRegistered(contract: string): boolean;
+        registerMessageSource<T>(source: Rx.Observable<T>, contract: string): Rx.IDisposable;
+        sendMessage<T>(message: T, contract: string): void;
+    }
 }
 declare module Rx {
     interface Observable<T> extends IObservable<T> {
@@ -308,6 +315,13 @@ declare module Rx {
 declare module wx {
     interface IUnknown {
         queryInterface(iid: string): boolean;
+    }
+}
+declare module wx.internal {
+    class PropertyChangedEventArgs implements IPropertyChangedEventArgs {
+        constructor(sender: any, propertyName: string);
+        sender: any;
+        propertyName: string;
     }
 }
 declare module wx {
@@ -323,7 +337,7 @@ declare module wx {
     function args2Array(args: IArguments): Array<any>;
     function formatString(fmt: string, ...args: any[]): string;
     function trimString(str: string): string;
-    function extend(src: Object, dst: Object): Object;
+    function extend(src: Object, dst: Object, inherited?: boolean): Object;
     class PropertyInfo<T> {
         constructor(propertyName: string, property: T);
         propertyName: string;
@@ -520,7 +534,7 @@ declare module wx {
     module internal {
         var listConstructor: any;
     }
-    function list<T>(initialContents?: Array<T>, resetChangeThreshold?: number): IObservableList<T>;
+    function list<T>(initialContents?: Array<T>, resetChangeThreshold?: number, scheduler?: Rx.IScheduler): IObservableList<T>;
 }
 declare module wx {
     interface IRadioGroupComponentParams {
@@ -589,13 +603,6 @@ declare module wx {
     function combinedCommand(canExecute: Rx.Observable<boolean>, ...commands: ICommand<any>[]): ICommand<any>;
     function combinedCommand(...commands: ICommand<any>[]): ICommand<any>;
 }
-declare module wx.internal {
-    class PropertyChangedEventArgs implements IPropertyChangedEventArgs {
-        constructor(sender: any, propertyName: string);
-        sender: any;
-        propertyName: string;
-    }
-}
 declare module wx {
     module internal {
         var expressionCompilerConstructor: any;
@@ -619,6 +626,15 @@ declare module wx.log {
     function critical(fmt: string, ...args: any[]): void;
     function error(fmt: string, ...args: any[]): void;
     function info(fmt: string, ...args: any[]): void;
+}
+declare module wx.internal {
+    function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>): Rx.Subject<T>;
+}
+declare module wx {
+    var messageBus: IMessageBus;
+    module internal {
+        var messageBusConstructor: any;
+    }
 }
 declare module wx {
     function property<T>(initialValue?: T): IObservableProperty<T>;

@@ -45,11 +45,26 @@ var wx;
         res.injector = "wx.injector";
         res.domManager = "wx.domservice";
         res.router = "wx.router";
+        res.messageBus = "wx.messageBus";
         res.expressionCompiler = "wx.expressioncompiler";
         res.htmlTemplateEngine = "wx.htmlTemplateEngine";
         res.hasValueBindingValue = "has.wx.bindings.value";
         res.valueBindingValue = "wx.bindings.value";
     })(res = wx.res || (wx.res = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var internal;
+    (function (internal) {
+        var PropertyChangedEventArgs = (function () {
+            function PropertyChangedEventArgs(sender, propertyName) {
+                this.propertyName = propertyName;
+                this.sender = sender;
+            }
+            return PropertyChangedEventArgs;
+        })();
+        internal.PropertyChangedEventArgs = PropertyChangedEventArgs;
+    })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
@@ -133,11 +148,19 @@ var wx;
         return str.replace(/[ \t]+$/g, "").replace(/^[ \t]+/g, "");
     }
     wx.trimString = trimString;
-    function extend(src, dst) {
-        var ownProps = Object.getOwnPropertyNames(src);
-        for (var i = 0; i < ownProps.length; i++) {
-            var prop = ownProps[i];
-            dst[prop] = src[prop];
+    function extend(src, dst, inherited) {
+        var prop;
+        if (!inherited) {
+            var ownProps = Object.getOwnPropertyNames(src);
+            for (var i = 0; i < ownProps.length; i++) {
+                prop = ownProps[i];
+                dst[prop] = src[prop];
+            }
+        }
+        else {
+            for (prop in src) {
+                dst[prop] = src[prop];
+            }
         }
         return dst;
     }
@@ -2792,15 +2815,16 @@ var wx;
 var wx;
 (function (wx) {
     var ObservableList = (function () {
-        function ObservableList(initialContents, resetChangeThreshold) {
+        function ObservableList(initialContents, resetChangeThreshold, scheduler) {
             if (resetChangeThreshold === void 0) { resetChangeThreshold = 0.3; }
+            if (scheduler === void 0) { scheduler = null; }
             this.push = this.add;
             this.changeNotificationsSuppressed = 0;
             this.propertyChangeWatchers = null;
             this.resetChangeThreshold = 0;
             this.resetSubCount = 0;
             this.hasWhinedAboutNoResetSub = false;
-            this.setupRx(initialContents, resetChangeThreshold);
+            this.setupRx(initialContents, resetChangeThreshold, scheduler);
         }
         ObservableList.prototype.queryInterface = function (iid) {
             if (iid === wx.IID.IUnknown || iid === wx.IID.IDisposable || iid === wx.IID.IObservableList || iid === wx.IID.IReadOnlyList || iid === wx.IID.IList)
@@ -3170,8 +3194,10 @@ var wx;
         ObservableList.prototype.every = function (callbackfn, thisArg) {
             return this.inner.every(callbackfn, thisArg);
         };
-        ObservableList.prototype.setupRx = function (initialContents, resetChangeThreshold) {
+        ObservableList.prototype.setupRx = function (initialContents, resetChangeThreshold, scheduler) {
             if (resetChangeThreshold === void 0) { resetChangeThreshold = 0.3; }
+            if (scheduler === void 0) { scheduler = null; }
+            scheduler = scheduler || wx.app.mainThreadScheduler;
             this.resetChangeThreshold = resetChangeThreshold;
             if (this.inner === undefined)
                 this.inner = new Array();
@@ -3183,8 +3209,8 @@ var wx;
             this.itemReplacedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
             this.resetSubject = new Rx.Subject();
             this.beforeResetSubject = new Rx.Subject();
-            this.itemChangingSubject = new wx.Lazy(function () { return new Rx.Subject(); });
-            this.itemChangedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
+            this.itemChangingSubject = new wx.Lazy(function () { return internal.createScheduledSubject(scheduler); });
+            this.itemChangedSubject = new wx.Lazy(function () { return internal.createScheduledSubject(scheduler); });
             this.beforeItemsMovedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
             this.itemsMovedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
             this.listChanged = Rx.Observable.merge(this.itemsAdded.select(function (x) { return false; }), this.itemsRemoved.select(function (x) { return false; }), this.itemReplaced.select(function (x) { return false; }), this.itemsMoved.select(function (x) { return false; }), this.resetSubject.select(function (x) { return true; }));
@@ -3322,9 +3348,10 @@ var wx;
     (function (internal) {
         internal.listConstructor = ObservableList;
     })(internal = wx.internal || (wx.internal = {}));
-    function list(initialContents, resetChangeThreshold) {
+    function list(initialContents, resetChangeThreshold, scheduler) {
         if (resetChangeThreshold === void 0) { resetChangeThreshold = 0.3; }
-        return new ObservableList(initialContents, resetChangeThreshold);
+        if (scheduler === void 0) { scheduler = null; }
+        return new ObservableList(initialContents, resetChangeThreshold, scheduler);
     }
     wx.list = list;
 })(wx || (wx = {}));
@@ -3668,20 +3695,6 @@ var wx;
         return ret;
     }
     wx.combinedCommand = combinedCommand;
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    var internal;
-    (function (internal) {
-        var PropertyChangedEventArgs = (function () {
-            function PropertyChangedEventArgs(sender, propertyName) {
-                this.propertyName = propertyName;
-                this.sender = sender;
-            }
-            return PropertyChangedEventArgs;
-        })();
-        internal.PropertyChangedEventArgs = PropertyChangedEventArgs;
-    })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
 "use strict";
 var wx;
@@ -4874,6 +4887,100 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    var internal;
+    (function (internal) {
+        var ScheduledSubject = (function () {
+            function ScheduledSubject(scheduler, defaultObserver, defaultSubject) {
+                this._observerRefCount = 0;
+                this._defaultObserverSub = Rx.Disposable.empty;
+                this._scheduler = scheduler;
+                this._defaultObserver = defaultObserver;
+                this._subject = defaultSubject || new Rx.Subject();
+                if (defaultObserver != null) {
+                    this._defaultObserverSub = this._subject.observeOn(this._scheduler).subscribe(this._defaultObserver);
+                }
+            }
+            ScheduledSubject.prototype.dispose = function () {
+                if (wx.isDisposable(this._subject)) {
+                    this._subject.dispose();
+                }
+            };
+            ScheduledSubject.prototype.onCompleted = function () {
+                this._subject.onCompleted();
+            };
+            ScheduledSubject.prototype.onError = function (error) {
+                this._subject.onError(error);
+            };
+            ScheduledSubject.prototype.onNext = function (value) {
+                this._subject.onNext(value);
+            };
+            ScheduledSubject.prototype.subscribe = function (observer) {
+                var _this = this;
+                if (this._defaultObserverSub)
+                    this._defaultObserverSub.dispose();
+                this._observerRefCount++;
+                return new Rx.CompositeDisposable(this._subject.observeOn(this._scheduler).subscribe(observer), Rx.Disposable.create(function () {
+                    if ((--_this._observerRefCount) <= 0 && _this._defaultObserver != null) {
+                        _this._defaultObserverSub = _this._subject.observeOn(_this._scheduler).subscribe(_this._defaultObserver);
+                    }
+                }));
+            };
+            return ScheduledSubject;
+        })();
+        function createScheduledSubject(scheduler, defaultObserver, defaultSubject) {
+            var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
+            var result = wx.extend(scheduled, new Rx.Subject(), true);
+            return result;
+        }
+        internal.createScheduledSubject = createScheduledSubject;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var MessageBus = (function () {
+        function MessageBus() {
+            this.messageBus = {};
+            this.schedulerMappings = {};
+        }
+        MessageBus.prototype.listen = function (contract) {
+            return this.setupSubjectIfNecessary(contract).skip(1);
+        };
+        MessageBus.prototype.isRegistered = function (contract) {
+            return this.messageBus.hasOwnProperty(contract);
+        };
+        MessageBus.prototype.registerMessageSource = function (source, contract) {
+            return source.subscribe(this.setupSubjectIfNecessary(contract));
+        };
+        MessageBus.prototype.sendMessage = function (message, contract) {
+            this.setupSubjectIfNecessary(contract).onNext(message);
+        };
+        MessageBus.prototype.setupSubjectIfNecessary = function (contract) {
+            var ret = this.messageBus[contract];
+            if (ret == null) {
+                ret = internal.createScheduledSubject(this.getScheduler(contract), null, new Rx.BehaviorSubject(undefined));
+                this.messageBus[contract] = ret;
+            }
+            return ret;
+        };
+        MessageBus.prototype.getScheduler = function (contract) {
+            var scheduler = this.schedulerMappings[contract];
+            return scheduler || Rx.Scheduler.currentThread;
+        };
+        return MessageBus;
+    })();
+    wx.messageBus;
+    Object.defineProperty(wx, "messageBus", {
+        get: function () {
+            return wx.injector.resolve(wx.res.messageBus);
+        }
+    });
+    var internal;
+    (function (internal) {
+        internal.messageBusConstructor = MessageBus;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
     function property(initialValue) {
         var accessor = function (newVal) {
             if (arguments.length > 0) {
@@ -5459,7 +5566,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true).register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true).register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true);
+    wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true).register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true).register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true).register(wx.res.messageBus, [wx.internal.messageBusConstructor], true);
     wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true).register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true).register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true).register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true).register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true).register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true).register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true).register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true).register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true).register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true).register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true).register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true).register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true).register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true).register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true).register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true).register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true).register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true).register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true).register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true).register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true).register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true).register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true).register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true).register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
     wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
     wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding("sref", "wx.bindings.sref").binding(["sactive", "state-active"], "wx.bindings.sactive");
@@ -5468,7 +5575,7 @@ var wx;
 var wx;
 (function (wx) {
     var RxObsConstructor = Rx.Observable;
-    RxObsConstructor.prototype.toProperty = function (initialValue) {
+    RxObsConstructor.prototype.toProperty = function (initialValue, scheduler) {
         var accessor = function (newVal) {
             if (arguments.length > 0) {
                 wx.internal.throwError("attempt to write to a read-only observable property");
@@ -5495,9 +5602,10 @@ var wx;
         accessor.changingSubject = new Rx.Subject();
         accessor.changing = accessor.changingSubject.publish().refCount();
         accessor.source = this;
-        accessor.thrownExceptions = Rx.Subject.create(wx.app.defaultExceptionHandler);
+        accessor.thrownExceptions = wx.internal.createScheduledSubject(Rx.Scheduler.currentThread, wx.app.defaultExceptionHandler);
+        scheduler = scheduler || Rx.Scheduler.currentThread;
         var firedInitial = false;
-        var subj = new Rx.Subject();
+        var subj = wx.internal.createScheduledSubject(scheduler);
         subj.subscribe(function (x) {
             if (firedInitial && x === accessor.value)
                 return;

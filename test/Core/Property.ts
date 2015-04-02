@@ -1,7 +1,7 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 
-describe("ObservableProperty", () => {
+describe("Observable Properties", () => {
     it("can be created using factory method", () => {
         var prop = wx.property<number>();
         expect(prop).toBeDefined();

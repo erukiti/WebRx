@@ -1,4 +1,5 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="Core/ScheduledSubject.ts" />
 
 module wx {
     var RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
@@ -8,7 +9,7 @@ module wx {
     * (Note: This is the equivalent to Knockout's ko.computed)
     * @param {T} initialValue? Optional initial value, valid until the observable produces a value
     */
-    RxObsConstructor.prototype.toProperty = function(initialValue?: any) {
+    RxObsConstructor.prototype.toProperty = function(initialValue?: any, scheduler?: Rx.IScheduler) {
         // initialize accessor function (read-only)
         var accessor: any = (newVal?: any): any => {
             if (arguments.length > 0) {
@@ -61,13 +62,14 @@ module wx {
             .refCount();
 
         accessor.source = this;
-        accessor.thrownExceptions = Rx.Subject.create(app.defaultExceptionHandler);
+        accessor.thrownExceptions = internal.createScheduledSubject<Error>(Rx.Scheduler.currentThread, app.defaultExceptionHandler);
 
         //////////////////////////////////
         // implementation
 
+        scheduler = scheduler || Rx.Scheduler.currentThread;
         var firedInitial = false;
-        var subj = new Rx.Subject<any>();
+        var subj = internal.createScheduledSubject<any>(scheduler);
 
         subj.subscribe(x => {
             // Suppress a non-change between initialValue and the first value

@@ -4,7 +4,7 @@
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../TestModels.ts" />
 
-describe("ObservableList", () => {
+describe("Observable List", () => {
     it("implements IUnknown", () => {
         var o = wx.list<TestViewModel>();
         expect(wx.supportsQueryInterface(o)).toBeTruthy();

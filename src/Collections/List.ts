@@ -7,8 +7,8 @@ module wx {
     * @class
     */
     class ObservableList<T> implements IObservableList<T>, IUnknown, Rx.IDisposable {
-        constructor(initialContents?: Array<T>, resetChangeThreshold: number = 0.3 /*, scheduler: Rx.IScheduler = null */) {
-            this.setupRx(initialContents, resetChangeThreshold /*, scheduler */);
+        constructor(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
+            this.setupRx(initialContents, resetChangeThreshold, scheduler);
         }
 
         ////////////////////
@@ -460,8 +460,8 @@ module wx {
         private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
         private _itemChanged: Rx.Observable<IPropertyChangedEventArgs>;
 
-        private setupRx(initialContents: Array<T>, resetChangeThreshold: number = 0.3 /* , scheduler: Rx.IScheduler = null */) {
-            //scheduler = scheduler || wx.App.mainThreadScheduler;
+        private setupRx(initialContents: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
+            scheduler = scheduler || wx.app.mainThreadScheduler;
 
             this.resetChangeThreshold = resetChangeThreshold;
 
@@ -478,12 +478,10 @@ module wx {
             this.beforeResetSubject = new Rx.Subject<any>();
 
             this.itemChangingSubject = new Lazy<Rx.ISubject<IPropertyChangedEventArgs>>(() =>
-                <any> new Rx.Subject<IPropertyChangedEventArgs>());
-                //<any> new ScheduledSubject<ReactiveIPropertyChangedEventArgs>(scheduler));
+                <any> internal.createScheduledSubject<IPropertyChangedEventArgs>(scheduler));
 
             this.itemChangedSubject = new Lazy<Rx.ISubject<IPropertyChangedEventArgs>>(() =>
-                <any> new Rx.Subject<IPropertyChangedEventArgs>());
-                //<any> new ScheduledSubject<ReactiveIPropertyChangedEventArgs>(scheduler));
+                <any> internal.createScheduledSubject<IPropertyChangedEventArgs>(scheduler));
 
             this.beforeItemsMovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
             this.itemsMovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
@@ -695,7 +693,7 @@ module wx {
     * @param {Array<T>} initialContents The initial contents of the list
     * @param {number = 0.3} resetChangeThreshold
     */
-    export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number = 0.3 /*, scheduler: Rx.IScheduler = null */): IObservableList<T> {
-        return new ObservableList<T>(initialContents, resetChangeThreshold);
+    export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null): IObservableList<T> {
+        return new ObservableList<T>(initialContents, resetChangeThreshold, scheduler);
     }
 }
