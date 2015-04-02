@@ -3,8 +3,8 @@
 /// <reference path="../../../build/web.rx.d.ts" />
 
 describe('Routing', () => {
-    var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
-    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
+    var router = wx.injector.get<wx.IRouter>(wx.res.router);
+    var domManager = wx.injector.get<wx.IDomManager>(wx.res.domManager);
 
     beforeEach(() => {
         router.reset();

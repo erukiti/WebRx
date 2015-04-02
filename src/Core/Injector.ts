@@ -31,14 +31,14 @@ module wx {
                 // first overload
                 // array assumed to be inline array notation with constructor
                 var self = this;
-                var _constructor = val.pop();
+                var ctor = val.pop();
                 var dependencies = val;
 
                 factory = (args: any, deps) => {
                     // resolve dependencies
                     var resolved = dependencies.map(x => {
                         try {
-                            return self.resolve(x, undefined, deps);
+                            return self.get(x, undefined, deps);
                         } catch (e) {
                             internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                         }
@@ -46,8 +46,8 @@ module wx {
                     
                     // invoke constructor
                     var _args = [null].concat(resolved).concat(args);
-                    var factoryFunction = _constructor.bind.apply(_constructor, _args);
-                    return new factoryFunction();
+                    var ctorFunc = ctor.bind.apply(ctor, _args);
+                    return new ctorFunc();
                 };
             } else {
                 // third overload
@@ -60,7 +60,7 @@ module wx {
             return this;
         }
 
-        public resolve<T>(key: string, args: any, deps?: any): T {
+        public get<T>(key: string, args: any, deps?: any): T {
             deps = deps || {};
             if (deps.hasOwnProperty(key))
                 internal.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
@@ -87,6 +87,25 @@ module wx {
                 registration.value = result;
 
             return result;
+        }
+
+        public resolve<T>(iaa: Array<any>, args?: Array<any>): T {
+            var ctor = iaa.pop();
+            var self = this;
+
+            // resolve dependencies
+            var resolved = iaa.map(x => {
+                try {
+                    return self.get(x, undefined, iaa);
+                } catch (e) {
+                    internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
+                }
+            });
+                    
+            // invoke constructor
+            var _args = [null].concat(resolved).concat(args);
+            var ctorFunc = ctor.bind.apply(ctor, _args);
+            return new ctorFunc();
         }
 
         //////////////////////////////////

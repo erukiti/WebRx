@@ -40,7 +40,6 @@ module wx {
 
             if(ret == null) {
                 ret = internal.createScheduledSubject<T>(this.getScheduler(contract), null, new Rx.BehaviorSubject<T>(undefined));
-                //ret = new Rx.BehaviorSubject<T>(undefined);
                 this.messageBus[contract] = ret;
             }
 
@@ -55,7 +54,7 @@ module wx {
 
     export var messageBus: IMessageBus;
     Object.defineProperty(wx, "messageBus", {
-        get() { return injector.resolve<IMessageBus>(res.messageBus); }
+        get() { return injector.get<IMessageBus>(res.messageBus); }
     });
 
     export module internal {

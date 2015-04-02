@@ -109,7 +109,7 @@ module wx {
 
                 // optionally resolve hooks if passed as string identifier
                 if (typeof hooks === "string")
-                    hooks = injector.resolve<IForEachBindingHooks>(<string> hooks);
+                    hooks = injector.get<IForEachBindingHooks>(<string> hooks);
             } else {
                 exp = compiled;
             }

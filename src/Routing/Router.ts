@@ -298,7 +298,7 @@ module wx {
 
     export var router: IRouter;
     Object.defineProperty(wx, "router", {
-        get() { return injector.resolve<IRouter>(res.router); }
+        get() { return injector.get<IRouter>(res.router); }
     });
 
     export module internal {

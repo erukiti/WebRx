@@ -473,7 +473,7 @@ describe("ExpressionCompiler", function () {
         });
     }
 
-    var compiler = wx.injector.resolve<wx.IExpressionCompiler>(wx.res.expressionCompiler);
+    var compiler = wx.injector.get<wx.IExpressionCompiler>(wx.res.expressionCompiler);
     testImpl(compiler, false);
     testImpl(compiler, true);
 

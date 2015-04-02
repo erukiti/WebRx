@@ -4,7 +4,7 @@
 /// <reference path="../../typings/URI.d.ts" />
 
 describe('Routing',() => {
-    var router = wx.injector.resolve<wx.IRouter>(wx.res.router);
+    var router = wx.injector.get<wx.IRouter>(wx.res.router);
 
     beforeEach(() => {
         router.reset();

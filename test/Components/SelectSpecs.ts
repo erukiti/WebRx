@@ -3,7 +3,7 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Components', () => {
-    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
+    var domManager = wx.injector.get<wx.IDomManager>(wx.res.domManager);
 
     describe('Select',() => {
         it('items only',() => {

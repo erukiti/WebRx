@@ -6,7 +6,7 @@
 /// <reference path="../typings/ix.d.ts" />
 
 describe('HtmlTemplateEngine',() => {
-    var engine = wx.injector.resolve<wx.ITemplateEngine>(wx.res.htmlTemplateEngine);
+    var engine = wx.injector.get<wx.ITemplateEngine>(wx.res.htmlTemplateEngine);
 
     it('smoke-test',() => {
         loadFixtures('templates/Core/HtmlTemplateEngine.html');

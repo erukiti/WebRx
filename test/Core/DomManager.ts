@@ -6,7 +6,7 @@
 /// <reference path="../typings/ix.d.ts" />
 
 describe('DomManager',() => {
-    var domManager = wx.injector.resolve<wx.IDomManager>(wx.res.domManager);
+    var domManager = wx.injector.get<wx.IDomManager>(wx.res.domManager);
 
     describe('getBindingDefinitions',() => {
         it('smoke-test',() => {

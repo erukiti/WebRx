@@ -154,7 +154,7 @@ module wx {
                 var options = <IComponentTemplateDescriptor> template;
 
                 if (options.resolve) {
-                    syncResult = injector.resolve<Node[]>(options.resolve);
+                    syncResult = injector.get<Node[]>(options.resolve);
                     return Rx.Observable.return(syncResult);
                 } else if (options.promise) {
                     var promise = <Rx.IPromise<Node[]>> <any> options.promise;
@@ -203,7 +203,7 @@ module wx {
                 var options = <IComponentViewModelDescriptor> vm;
 
                 if (options.resolve) {
-                    syncResult = injector.resolve<any>(options.resolve, componentParams);
+                    syncResult = injector.get<any>(options.resolve, componentParams);
                     return Rx.Observable.return(syncResult);
                 } else if (options.promise) {
                     var promise = <Rx.IPromise<any>> <any> options.promise;

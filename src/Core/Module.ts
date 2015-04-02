@@ -30,7 +30,7 @@ module wx {
 
                 // if the component has been registered as resource, resolve it now and update registry
                 if (typeof component === "string") {
-                    component = injector.resolve<IComponent>(<any> component);
+                    component = injector.get<IComponent>(<any> component);
                     this.components[name] = component;
                 }
 
@@ -61,7 +61,7 @@ module wx {
                 handler = this.bindings[name];
 
                 if (typeof handler === "string") {
-                    handler = injector.resolve<IBindingHandler>(<any> handler);
+                    handler = injector.get<IBindingHandler>(<any> handler);
                     this.bindings[name] = handler;
                 }
 
@@ -94,7 +94,7 @@ module wx {
                 filter = this.expressionFilters[name];
 
                 if (typeof filter === "string") {
-                    filter = injector.resolve<IExpressionFilter>(<any> filter);
+                    filter = injector.get<IExpressionFilter>(<any> filter);
                     this.bindings[name] = filter;
                 }
 
@@ -167,7 +167,7 @@ module wx {
 
         public get templateEngine(): ITemplateEngine {
             if (!this._templateEngine) {
-                this._templateEngine = injector.resolve<ITemplateEngine>(res.htmlTemplateEngine);
+                this._templateEngine = injector.get<ITemplateEngine>(res.htmlTemplateEngine);
             }
 
             return this._templateEngine;

@@ -617,13 +617,13 @@ module wx {
     * @param {Node} rootNode The node to be bound
     */
     export function applyBindings(model: any, node?: Node) {
-        injector.resolve<IDomManager>(res.domManager).applyBindings(model, node || window.document.body);
+        injector.get<IDomManager>(res.domManager).applyBindings(model, node || window.document.body);
     }
     /**
     * Removes and cleans up any binding-related state from the specified node and its descendants.
     * @param {Node} rootNode The node to be cleaned
     */
     export function cleanNode(node: Node) {
-        injector.resolve<IDomManager>(res.domManager).cleanNode(node);
+        injector.get<IDomManager>(res.domManager).cleanNode(node);
     }
 }
