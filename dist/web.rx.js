@@ -420,20 +420,20 @@ var wx;
             }
             else if (Array.isArray(val)) {
                 var self = this;
-                var _constructor = val.pop();
+                var ctor = val.pop();
                 var dependencies = val;
                 factory = function (args, deps) {
                     var resolved = dependencies.map(function (x) {
                         try {
-                            return self.resolve(x, undefined, deps);
+                            return self.get(x, undefined, deps);
                         }
                         catch (e) {
-                            wx.internal.throwError("error resolving dependency '{0}' for '{1}': {2}", x, key, e);
+                            wx.internal.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                         }
                     });
                     var _args = [null].concat(resolved).concat(args);
-                    var factoryFunction = _constructor.bind.apply(_constructor, _args);
-                    return new factoryFunction();
+                    var ctorFunc = ctor.bind.apply(ctor, _args);
+                    return new ctorFunc();
                 };
             }
             else {
@@ -442,10 +442,10 @@ var wx;
             this.registrations[key] = { factory: factory, isSingleton: isSingleton };
             return this;
         };
-        Injector.prototype.resolve = function (key, args, deps) {
+        Injector.prototype.get = function (key, args, deps) {
             deps = deps || {};
             if (deps.hasOwnProperty(key))
-                wx.internal.throwError("detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
+                wx.internal.throwError("Detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
             var registration = this.registrations[key];
             if (registration === undefined)
                 wx.internal.throwError("'{0}' is not registered", key);
@@ -458,6 +458,23 @@ var wx;
             if (registration.isSingleton)
                 registration.value = result;
             return result;
+        };
+        Injector.prototype.resolve = function (iaa, args) {
+            var ctor = iaa.pop();
+            if (!wx.isFunction(ctor))
+                wx.internal.throwError("Error resolving inline-annotated-array. Constructor must be of type 'function' but is '{0}", typeof ctor);
+            var self = this;
+            var resolved = iaa.map(function (x) {
+                try {
+                    return self.get(x, undefined, iaa);
+                }
+                catch (e) {
+                    wx.internal.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
+                }
+            });
+            var _args = [null].concat(resolved).concat(args);
+            var ctorFunc = ctor.bind.apply(ctor, _args);
+            return new ctorFunc();
         };
         return Injector;
     })();
@@ -617,7 +634,7 @@ var wx;
             if (args.length === 0) {
                 component = this.components[name];
                 if (typeof component === "string") {
-                    component = wx.injector.resolve(component);
+                    component = wx.injector.get(component);
                     this.components[name] = component;
                 }
                 return component;
@@ -634,7 +651,7 @@ var wx;
             if (args.length === 0) {
                 handler = this.bindings[name];
                 if (typeof handler === "string") {
-                    handler = wx.injector.resolve(handler);
+                    handler = wx.injector.get(handler);
                     this.bindings[name] = handler;
                 }
                 return handler;
@@ -655,7 +672,7 @@ var wx;
             if (args.length === 0) {
                 filter = this.expressionFilters[name];
                 if (typeof filter === "string") {
-                    filter = wx.injector.resolve(filter);
+                    filter = wx.injector.get(filter);
                     this.bindings[name] = filter;
                 }
                 return filter;
@@ -704,7 +721,7 @@ var wx;
         Object.defineProperty(App.prototype, "templateEngine", {
             get: function () {
                 if (!this._templateEngine) {
-                    this._templateEngine = wx.injector.resolve(wx.res.htmlTemplateEngine);
+                    this._templateEngine = wx.injector.get(wx.res.htmlTemplateEngine);
                 }
                 return this._templateEngine;
             },
@@ -1174,11 +1191,11 @@ var wx;
         internal.domManagerConstructor = DomManager;
     })(internal = wx.internal || (wx.internal = {}));
     function applyBindings(model, node) {
-        wx.injector.resolve(wx.res.domManager).applyBindings(model, node || window.document.body);
+        wx.injector.get(wx.res.domManager).applyBindings(model, node || window.document.body);
     }
     wx.applyBindings = applyBindings;
     function cleanNode(node) {
-        wx.injector.resolve(wx.res.domManager).cleanNode(node);
+        wx.injector.get(wx.res.domManager).cleanNode(node);
     }
     wx.cleanNode = cleanNode;
 })(wx || (wx = {}));
@@ -1508,7 +1525,7 @@ var wx;
             else if (typeof template === "object") {
                 var options = template;
                 if (options.resolve) {
-                    syncResult = wx.injector.resolve(options.resolve);
+                    syncResult = wx.injector.get(options.resolve);
                     return Rx.Observable.return(syncResult);
                 }
                 else if (options.promise) {
@@ -1548,10 +1565,13 @@ var wx;
             if (wx.isFunction(vm)) {
                 return Rx.Observable.return(new vm(componentParams));
             }
+            else if (Array.isArray(vm)) {
+                return Rx.Observable.return(wx.injector.resolve(vm, componentParams));
+            }
             else if (typeof vm === "object") {
                 var options = vm;
                 if (options.resolve) {
-                    syncResult = wx.injector.resolve(options.resolve, componentParams);
+                    syncResult = wx.injector.get(options.resolve, componentParams);
                     return Rx.Observable.return(syncResult);
                 }
                 else if (options.promise) {
@@ -1779,7 +1799,7 @@ var wx;
                     }
                 }
                 if (typeof hooks === "string")
-                    hooks = wx.injector.resolve(hooks);
+                    hooks = wx.injector.get(hooks);
             }
             else {
                 exp = compiled;
@@ -4974,7 +4994,7 @@ var wx;
     wx.messageBus;
     Object.defineProperty(wx, "messageBus", {
         get: function () {
-            return wx.injector.resolve(wx.res.messageBus);
+            return wx.injector.get(wx.res.messageBus);
         }
     });
     var internal;
@@ -5559,7 +5579,7 @@ var wx;
     wx.router;
     Object.defineProperty(wx, "router", {
         get: function () {
-            return wx.injector.resolve(wx.res.router);
+            return wx.injector.get(wx.res.router);
         }
     });
     var internal;
@@ -5627,6 +5647,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.47';
+    wx.version = '0.9.48';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

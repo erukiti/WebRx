@@ -18,7 +18,8 @@ declare module wx {
         register(key: string, factory: Array<any>, singleton?: boolean): IInjector;
         register(key: string, factory: () => any, singleton?: boolean): IInjector;
         register(key: string, instance: any): IInjector;
-        resolve<T>(key: string, args?: any): T;
+        get<T>(key: string, args?: any): T;
+        resolve<T>(iaa: Array<any>, args?: any): T;
     }
     interface IWeakMap<TKey extends Object, T> {
         set(key: TKey, value: T): void;
