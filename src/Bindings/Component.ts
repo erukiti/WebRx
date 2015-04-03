@@ -198,10 +198,12 @@ module wx {
             var syncResult: any;
 
             if (isFunction(vm)) {
-                return Rx.Observable.return(new vm(componentParams));
+                syncResult = new vm(componentParams);
+                return Rx.Observable.return(syncResult);
             } else if (Array.isArray(vm)) {
                 // assumed to be inline-annotated-array
-                return Rx.Observable.return(injector.resolve<any>(vm, componentParams));
+                syncResult = injector.resolve<any>(vm, componentParams);
+                return Rx.Observable.return(syncResult);
             } else if (typeof vm === "object") {
                 var options = <IComponentViewModelDescriptor> vm;
 
