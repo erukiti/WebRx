@@ -131,6 +131,7 @@ module.exports = function (grunt) {
         bump: {  
             options: {
                 updateConfigs: ['pkg'],
+                files: ['package.json', 'bower.json'],
                 commit: false,
                 createTag: true,
                 push: false
@@ -142,7 +143,6 @@ module.exports = function (grunt) {
         nugetpack: {
             dist: {
                 src: 'nuget/webrx.nuspec',
-                files: ['package.json', 'bower.json'],
                 dest: 'dist/',
                 options: {
                     version: '<%= pkg.version %>'
