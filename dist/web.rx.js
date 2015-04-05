@@ -1563,10 +1563,12 @@ var wx;
         ComponentBinding.prototype.loadViewModel = function (vm, componentParams) {
             var syncResult;
             if (wx.isFunction(vm)) {
-                return Rx.Observable.return(new vm(componentParams));
+                syncResult = new vm(componentParams);
+                return Rx.Observable.return(syncResult);
             }
             else if (Array.isArray(vm)) {
-                return Rx.Observable.return(wx.injector.resolve(vm, componentParams));
+                syncResult = wx.injector.resolve(vm, componentParams);
+                return Rx.Observable.return(syncResult);
             }
             else if (typeof vm === "object") {
                 var options = vm;
@@ -5647,6 +5649,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.48';
+    wx.version = '0.9.52';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
