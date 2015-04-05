@@ -142,6 +142,7 @@ module.exports = function (grunt) {
         nugetpack: {
             dist: {
                 src: 'nuget/webrx.nuspec',
+                files: ['package.json', 'component.json'],
                 dest: 'dist/',
                 options: {
                     version: '<%= pkg.version %>'
