@@ -434,8 +434,6 @@ module wx {
                 recalcIndextrigger = new Rx.Subject<any>();
 
                 this.observeList(proxy, ctx, template, cleanup, list, hooks, indexes, recalcIndextrigger);
-            } else {
-                internal.throwError("forEach binding only operates on IObservableList or standard Javascript-Arrays");
             }
         }
     }

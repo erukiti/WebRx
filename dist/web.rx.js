@@ -2021,9 +2021,6 @@ var wx;
                 recalcIndextrigger = new Rx.Subject();
                 this.observeList(proxy, ctx, template, cleanup, list, hooks, indexes, recalcIndextrigger);
             }
-            else {
-                internal.throwError("forEach binding only operates on IObservableList or standard Javascript-Arrays");
-            }
         };
         return ForEachBinding;
     })();
@@ -5649,6 +5646,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.52';
+    wx.version = '0.9.54';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

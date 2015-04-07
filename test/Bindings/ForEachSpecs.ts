@@ -38,6 +38,23 @@ describe('Bindings',() => {
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
         });
 
+        it('binding to a property yielding an array',() => {
+            loadFixtures('templates/Bindings/ForEach.html');
+
+            var el = <HTMLElement> document.querySelector("#foreach-array-with-index");
+            var templateLength = el.children.length;
+            var prop = wx.property([]);
+
+            expect(() => wx.applyBindings({ src: prop }, el)).not.toThrowError();
+            expect(el.children.length).toEqual(prop().length * templateLength);
+            expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, prop().length).toArray());
+
+            var list = [1, 5, 7];
+            prop(list);
+            expect(el.children.length).toEqual(prop().length * templateLength);
+            expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, prop().length).toArray());
+        });
+
         it('binding to a standard array - inline',() => {
             loadFixtures('templates/Bindings/ForEach.html');
 
