@@ -55,20 +55,24 @@ module wx {
 
             // subscribe to any input changes
             state.cleanup.add(Rx.Observable.combineLatest(observables, (_) => args2Array(arguments)).subscribe(latest => {
-                // first element is the current state
-                var currentState = latest.shift();
+                try {
+                    // first element is the current state
+                    var currentState = latest.shift();
 
-                // second element is the state-name
-                stateName = unwrapProperty(latest.shift());
+                    // second element is the state-name
+                    stateName = unwrapProperty(latest.shift());
 
-                // subsequent entries are latest param values
-                stateParams = {};
+                    // subsequent entries are latest param values
+                    stateParams = {};
 
-                for (var i = 0; i < paramsKeys.length; i++) {
-                    stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
-                }
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
+                    }
 
-                toggleCssClass(el, this.router.includes(stateName, stateParams), "active");
+                    toggleCssClass(el, this.router.includes(stateName, stateParams), "active");
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

@@ -57,31 +57,35 @@ module wx {
             }
 
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(src => {
-                if (!isProperty(src)) {
-                    // initial and final update
-                    updateElement(src);
-                } else {
-                    doCleanup();
+                try {
+                    if (!isProperty(src)) {
+                        // initial and final update
+                        updateElement(src);
+                    } else {
+                        doCleanup();
 
-                    // update on property change
-                    prop = src;
+                        // update on property change
+                        prop = src;
 
-                    propertySubscription = prop.changed.subscribe(x => {
-                        updateElement(x);
-                    });
-
-                    // initial update
-                    updateElement(prop());
-
-                    // don't attempt to updated computed properties
-                    if (!prop.source) {
-                        // wire change-events depending on browser and version
-                        var events = this.getTextInputEventObservables(el, isTextArea);
-                        eventSubscription = Rx.Observable.merge(events).subscribe(e => {
-                            prop(el.value);
+                        propertySubscription = prop.changed.subscribe(x => {
+                            updateElement(x);
                         });
+
+                        // initial update
+                        updateElement(prop());
+
+                        // don't attempt to updated computed properties
+                        if (!prop.source) {
+                            // wire change-events depending on browser and version
+                            var events = this.getTextInputEventObservables(el, isTextArea);
+                            eventSubscription = Rx.Observable.merge(events).subscribe(e => {
+                                prop(el.value);
+                            });
+                        }
                     }
-                }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

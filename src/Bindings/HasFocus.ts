@@ -69,30 +69,34 @@ module wx {
 
             // options is supposed to be a field-access path
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
-                if (!isProperty(model)) {
-                    // initial and final update
-                    updateElement(model);
-                } else {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
+                try {
+                    if (!isProperty(model)) {
+                        // initial and final update
+                        updateElement(model);
+                    } else {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
 
-                    // update on property change
-                    prop = model;
+                        // update on property change
+                        prop = model;
 
-                    cleanup.add(prop.changed.subscribe(x => {
-                        updateElement(x);
-                    }));
-
-                    // initial update
-                    updateElement(prop());
-
-                    // don't attempt to updated computed properties
-                    if (!prop.source) {
-                        cleanup.add(Rx.Observable.merge(this.getFocusEventObservables(el)).subscribe(hasFocus => {
-                            handleElementFocusChange(hasFocus);
+                        cleanup.add(prop.changed.subscribe(x => {
+                            updateElement(x);
                         }));
+
+                        // initial update
+                        updateElement(prop());
+
+                        // don't attempt to updated computed properties
+                        if (!prop.source) {
+                            cleanup.add(Rx.Observable.merge(this.getFocusEventObservables(el)).subscribe(hasFocus => {
+                                handleElementFocusChange(hasFocus);
+                            }));
+                        }
                     }
-                }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

@@ -77,7 +77,11 @@ module wx {
 
         private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: INodeState) {
             state.cleanup.add(obs.subscribe(x => {
-                this.applyValue(el, unwrapProperty(x), key);
+                try {
+                    this.applyValue(el, unwrapProperty(x), key);
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
         }
 

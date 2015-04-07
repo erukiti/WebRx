@@ -36,27 +36,31 @@ module wx {
             for (var i = 0; i < tokens.length; i++) {
                 ((_i => {
                     state.cleanup.add(eventHandlers[_i].subscribe(handler => {
-                        var eventName = tokens[_i].key;
+                        try {
+                            var eventName = tokens[_i].key;
 
-                        // unwire previous event subscription
-                        if (eventDisposables[eventName]) {
-                            eventDisposables[eventName].dispose();
-                        }
+                            // unwire previous event subscription
+                            if (eventDisposables[eventName]) {
+                                eventDisposables[eventName].dispose();
+                            }
 
-                        // wire up event observable
-                        handler = unwrapProperty(handler);
+                            // wire up event observable
+                            handler = unwrapProperty(handler);
 
-                        if (typeof handler === "function") {
-                            eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(e => {
-                                handler.apply(ctx.$data, [ctx, e]);
-                            });
-                        } else {
-                            // assumed to be an Rx.Observer
-                            var observer = <Rx.Observer<Event>> handler;
+                            if (typeof handler === "function") {
+                                eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(e => {
+                                    handler.apply(ctx.$data, [ctx, e]);
+                                });
+                            } else {
+                                // assumed to be an Rx.Observer
+                                var observer = <Rx.Observer<Event>> handler;
 
-                            // subscribe event directly to observer
-                            eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(observer);
-                        }
+                                // subscribe event directly to observer
+                                eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(observer);
+                            }
+                        } catch (e) {
+                            wx.app.defaultExceptionHandler.onNext(e);
+                        } 
                     }));
                 })(i));
             }

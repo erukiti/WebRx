@@ -13,15 +13,6 @@ describe('Bindings', () => {
     };
 
     describe('Command',() => {
-        it('binding to non-command source throws error', () => {
-            loadFixtures('templates/Bindings/Command.html');
-
-            var el = document.querySelector("#command-invalid-binding-target");
-            var model = createCommandModel((_) => {});
-
-            expect(() => wx.applyBindings(model, el)).toThrowError(/only supports binding to a command/);
-        });
-
         it('binding reacts to changes when bound to observable properties holding command and parameter',() => {
             loadFixtures('templates/Bindings/Command.html');
 

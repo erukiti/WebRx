@@ -142,36 +142,48 @@ module wx {
 
             // options is supposed to be a field-access path
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
-                cleanupImpl();
+                try {
+                    cleanupImpl();
 
-                // lookup implementation
-                impl = undefined;
-                for (var i = 0; i < impls.length; i++) {
-                    if (impls[i].supports(el, model)) {
-                        impl = impls[i];
-                        break;
+                    // lookup implementation
+                    impl = undefined;
+                    for (var i = 0; i < impls.length; i++) {
+                        if (impls[i].supports(el, model)) {
+                            impl = impls[i];
+                            break;
+                        }
                     }
-                }
 
-                if (!impl)
-                    internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
+                    if (!impl)
+                        internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
 
-                implCleanup = new Rx.CompositeDisposable();
+                    implCleanup = new Rx.CompositeDisposable();
 
-                // initial update
-                impl.updateElement(el, model);
-
-                // update on model change
-                implCleanup.add(impl.observeModel(model).subscribe(x => {
+                    // initial update
                     impl.updateElement(el, model);
-                }));
 
-                // wire change-events
-                if (isProperty(model)) {
-                    implCleanup.add(impl.observeElement(el).subscribe(e => {
-                        impl.updateModel(el, model, e);
+                    // update on model change
+                    implCleanup.add(impl.observeModel(model).subscribe(x => {
+                        try {
+                            impl.updateElement(el, model);
+                        } catch (e) {
+                            wx.app.defaultExceptionHandler.onNext(e);
+                        } 
                     }));
-                }
+
+                    // wire change-events
+                    if (isProperty(model)) {
+                        implCleanup.add(impl.observeElement(el).subscribe(e => {
+                            try {
+                                impl.updateModel(el, model, e);
+                            } catch (e) {
+                                wx.app.defaultExceptionHandler.onNext(e);
+                            } 
+                        }));
+                    }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

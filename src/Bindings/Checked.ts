@@ -41,32 +41,36 @@ module wx {
             }
 
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
-                if (!isProperty(model)) {
-                    // initial and final update
-                    updateElement(model);
-                } else {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
+                try {
+                    if (!isProperty(model)) {
+                        // initial and final update
+                        updateElement(model);
+                    } else {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
 
-                    // update on property change
-                    prop = model;
+                        // update on property change
+                        prop = model;
 
-                    cleanup.add(prop.changed.subscribe(x => {
-                        updateElement(x);
-                    }));
-
-                    // initial update
-                    updateElement(prop());
-
-                    // don't attempt to updated computed properties
-                    if (!prop.source) {
-                        // wire change-events depending on browser and version
-                        var events = this.getCheckedEventObservables(el);
-                        cleanup.add(Rx.Observable.merge(events).subscribe(e => {
-                            prop(el.checked);
+                        cleanup.add(prop.changed.subscribe(x => {
+                            updateElement(x);
                         }));
+
+                        // initial update
+                        updateElement(prop());
+
+                        // don't attempt to updated computed properties
+                        if (!prop.source) {
+                            // wire change-events depending on browser and version
+                            var events = this.getCheckedEventObservables(el);
+                            cleanup.add(Rx.Observable.merge(events).subscribe(e => {
+                                prop(el.checked);
+                            }));
+                        }
                     }
-                }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

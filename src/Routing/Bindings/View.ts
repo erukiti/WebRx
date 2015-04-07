@@ -38,44 +38,48 @@ module wx {
 
             // subscribe to router-state changes
             state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(newState => {
-                if (newState.views != null) {
-                    var component = newState.views[viewName];
+                try {
+                    if (newState.views != null) {
+                        var component = newState.views[viewName];
 
-                    if (component != null) {
-                        if (typeof component === "object") {
-                            componentName = component.component;
-                            componentParams = component.params;
+                        if (component != null) {
+                            if (typeof component === "object") {
+                                componentName = component.component;
+                                componentParams = component.params;
+                            } else {
+                                componentName = <string> component;
+                                componentParams = {};
+                            }
+
+                            // merge state params into component params
+                            if (newState.params != null)
+                                componentParams = extend(newState.params, extend(componentParams, {}));
+
+                            // only update if changed
+                            if (componentName !== currentComponentName ||
+                                !isEqual(componentParams, currentComponentParams)) {
+
+                                //log.info("component for view '{0}' is now '{1}', params: {2}", viewName, componentName,
+                                //    (componentParams != null ? JSON.stringify(componentParams) : ""));
+
+                                this.applyTemplate(componentName, componentParams, el, ctx);
+
+                                currentComponentName = componentName;
+                                currentComponentParams = componentParams;
+                            }
                         } else {
-                            componentName = <string> component;
-                            componentParams = {};
+                            currentComponentName = null;
+
+                            // we have no component to display, clear contents
+                            while (el.firstChild) {
+                                this.domManager.cleanNode(el.firstChild);
+                                el.removeChild(el.firstChild);
+                            }
                         }
-
-                        // merge state params into component params
-                        if (newState.params != null)
-                            componentParams = extend(newState.params, extend(componentParams, {}));
-
-                        // only update if changed
-                        if (componentName !== currentComponentName ||
-                            !isEqual(componentParams, currentComponentParams)) {
-
-                            //log.info("component for view '{0}' is now '{1}', params: {2}", viewName, componentName,
-                            //    (componentParams != null ? JSON.stringify(componentParams) : ""));
-
-                            this.applyTemplate(componentName, componentParams, el, ctx);
-
-                            currentComponentName = componentName;
-                            currentComponentParams = componentParams;
-                        }
-                    } else {
-                        currentComponentName = null;
-
-                        // we have no component to display, clear contents
-                        while (el.firstChild) {
-                            this.domManager.cleanNode(el.firstChild);
-                            el.removeChild(el.firstChild);
-                        }                        
                     }
-                }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

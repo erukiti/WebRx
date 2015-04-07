@@ -129,14 +129,18 @@ module wx {
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
-                if (cleanup) {
-                    cleanup.dispose();
-                }
+                try {
+                    if (cleanup) {
+                        cleanup.dispose();
+                    }
 
-                cleanup = new Rx.CompositeDisposable();
+                    cleanup = new Rx.CompositeDisposable();
 
-                self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
-                initialApply = false;
+                    self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
+                    initialApply = false;
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

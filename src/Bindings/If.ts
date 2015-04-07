@@ -35,9 +35,13 @@ module wx {
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
-                self.applyValue(el, unwrapProperty(x), template, ctx, initialApply);
+                try {
+                    self.applyValue(el, unwrapProperty(x), template, ctx, initialApply);
 
-                initialApply = false;
+                    initialApply = false;
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

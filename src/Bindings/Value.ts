@@ -48,33 +48,37 @@ module wx {
 
             // options is supposed to be a field-access path
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
-                if (!isProperty(model)) {
-                    // initial and final update
-                    updateElement(this.domManager, model);
-                } else {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
+                try {
+                    if (!isProperty(model)) {
+                        // initial and final update
+                        updateElement(this.domManager, model);
+                    } else {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
 
-                    // update on property change
-                    prop = model;
+                        // update on property change
+                        prop = model;
 
-                    cleanup.add(prop.changed.subscribe(x => {
-                        updateElement(this.domManager, x);
-                    }));
-
-                    // initial update
-                    updateElement(this.domManager, prop());
-
-                    // don't attempt to updated computed properties
-                    if (!prop.source) {
-                        cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
-                            if (useDomManagerForValueUpdates)
-                                prop(internal.getNodeValue(el, this.domManager));
-                            else
-                                prop(el.value);
+                        cleanup.add(prop.changed.subscribe(x => {
+                            updateElement(this.domManager, x);
                         }));
+
+                        // initial update
+                        updateElement(this.domManager, prop());
+
+                        // don't attempt to updated computed properties
+                        if (!prop.source) {
+                            cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
+                                if (useDomManagerForValueUpdates)
+                                    prop(internal.getNodeValue(el, this.domManager));
+                                else
+                                    prop(el.value);
+                            }));
+                        }
                     }
-                }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

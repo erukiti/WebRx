@@ -53,17 +53,21 @@ module wx {
 
             // subscribe to any input changes
             state.cleanup.add(Rx.Observable.combineLatest(observables, (_) => args2Array(arguments)).subscribe(latest => {
-                // first element is always the state-name
-                stateName = unwrapProperty(latest.shift());
+                try {
+                    // first element is always the state-name
+                    stateName = unwrapProperty(latest.shift());
 
-                // subsequent entries are latest param values
-                stateParams = {};
+                    // subsequent entries are latest param values
+                    stateParams = {};
 
-                for (var i = 0; i < paramsKeys.length; i++) {
-                    stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
-                }
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
+                    }
 
-                el.href = this.router.uri(stateName, stateParams);
+                    el.href = this.router.uri(stateName, stateParams);
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // subscribe to anchor's click event

@@ -68,41 +68,45 @@ module wx {
 
             // subscribe to any input changes
             state.cleanup.add(componentObservable.subscribe(componentName => {
-                doCleanup();
-                cleanup = new Rx.CompositeDisposable();
+                try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
 
-                // lookup component
-                var component: IComponent = undefined;
-                
-                if (module)
-                    component = module.component(componentName);
+                    // lookup component
+                    var component: IComponent = undefined;
 
-                // fallback to "app" module if not registered with
-                if (!component)
-                    component = app.component(componentName);
+                    if (module)
+                        component = module.component(componentName);
 
-                if (component == null)
-                    internal.throwError("component '{0}' is not registered.", componentName);
+                    // fallback to "app" module if not registered with
+                    if (!component)
+                        component = app.component(componentName);
 
-                // resolve template & view-model
-                if (component.viewModel) {
-                    state.cleanup.add(Rx.Observable.combineLatest(
-                        this.loadTemplate(component.template, componentParams),
-                        this.loadViewModel(component.viewModel, componentParams),
-                    (t, vm) => {
-                        return { template: t, viewModel: vm }
-                    }).subscribe(x => {
-                        if (isDisposable(x.viewModel)) {
-                            cleanup.add(x.viewModel);
-                        }
+                    if (component == null)
+                        internal.throwError("component '{0}' is not registered.", componentName);
 
-                        this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                    },(err) => app.defaultExceptionHandler.onNext(err)));
-                } else {
-                    state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
-                        this.applyTemplate(component, el, ctx, state, t);
-                    },(err) => app.defaultExceptionHandler.onNext(err)));
-                }
+                    // resolve template & view-model
+                    if (component.viewModel) {
+                        state.cleanup.add(Rx.Observable.combineLatest(
+                            this.loadTemplate(component.template, componentParams),
+                            this.loadViewModel(component.viewModel, componentParams),
+                            (t, vm) => {
+                                return { template: t, viewModel: vm }
+                            }).subscribe(x => {
+                            if (isDisposable(x.viewModel)) {
+                                cleanup.add(x.viewModel);
+                            }
+
+                            this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
+                        },(err) => app.defaultExceptionHandler.onNext(err)));
+                    } else {
+                        state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
+                            this.applyTemplate(component, el, ctx, state, t);
+                        },(err) => app.defaultExceptionHandler.onNext(err)));
+                    }
+                } catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                } 
             }));
 
             // release closure references to GC 

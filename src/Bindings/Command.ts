@@ -62,33 +62,37 @@ module wx {
             state.cleanup.add(Rx.Observable
                 .combineLatest(cmdObservable, paramObservable, (cmd, param) => ({ cmd: cmd, param: param }))
                 .subscribe(x => {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
+                    try {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
 
-                    if (x.cmd != null) {
-                        if (!isCommand(x.cmd)) {
-                            // value is not a ICommand
-                            internal.throwError("Command-Binding only supports binding to a command!");
-                        } else {
-                            // initial update
-                            el.disabled = !x.cmd.canExecute(x.param);
+                        if (x.cmd != null) {
+                            if (!isCommand(x.cmd)) {
+                                // value is not a ICommand
+                                internal.throwError("Command-Binding only supports binding to a command!");
+                            } else {
+                                // initial update
+                                el.disabled = !x.cmd.canExecute(x.param);
 
-                            // listen to changes
-                            cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
-                                el.disabled = !canExecute;
-                            }));
+                                // listen to changes
+                                cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
+                                    el.disabled = !canExecute;
+                                }));
 
-                            // handle click event
-                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
-                                x.cmd.execute(x.param);
+                                // handle click event
+                                cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
+                                    x.cmd.execute(x.param);
 
-                                if (isAnchor) {
-                                    // prevent default for anchors
-                                    e.preventDefault();
-                                }
-                            }));
+                                    if (isAnchor) {
+                                        // prevent default for anchors
+                                        e.preventDefault();
+                                    }
+                                }));
+                            }
                         }
-                    }
+                    } catch (e) {
+                        wx.app.defaultExceptionHandler.onNext(e);
+                    } 
             }));
 
             // release closure references to GC 
