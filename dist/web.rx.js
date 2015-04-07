@@ -5646,6 +5646,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.54';
+    wx.version = '0.9.55';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
