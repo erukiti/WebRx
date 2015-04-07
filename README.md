@@ -6,7 +6,7 @@
 
 # WebRx
 
-WebRx is a Javascript MVC-Framework built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Observable-driven declarative Data-Binding, Templating and Client-Side Routing.
+WebRx is a Javascript MVVM-Framework built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Observable-driven declarative Data-Binding, Templating and Client-Side Routing.
 
 #### Features
 
