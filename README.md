@@ -40,6 +40,10 @@ Make sure to include script-references to rx.lite.js and rx.lite.extras.js **bef
 
 WebRx's documentation can be found on [here](http://webrxjs.org/docs).
 
+#### Support 
+
+[Stackoverflow](https://stackoverflow.com/questions/tagged/webrx) is WebRx's primary support-hub. Simply post your question under the <code>webrx</code> tag and we'll do our best to help.
+
 #### Contributing
 
 - Fork the repository
