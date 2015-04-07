@@ -1,5 +1,8 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
+/// <reference path="../RTTI/IID.ts" />
+/// <reference path="../Core/Lazy.ts" />
+/// <reference path="../Core/RefCountDisposeWrapper.ts" />
 
 module wx {
     /**
@@ -95,18 +98,18 @@ module wx {
             return this._itemsMoved;
         }
 
-        public get countChanging(): Rx.Observable<number> {
-            if (!this._countChanging)
-                this._countChanging = this.listChanging.select(_ => this.inner.length).distinctUntilChanged();
+        public get lengthChanging(): Rx.Observable<number> {
+            if (!this._lengthChanging)
+                this._lengthChanging = this.listChanging.select(_ => this.inner.length).distinctUntilChanged();
 
-            return this._countChanging;
+            return this._lengthChanging;
         }
 
-        public get countChanged(): Rx.Observable<number> {
-            if (!this._countChanged)
-                this._countChanged = this.listChanged.select(_ => this.inner.length).distinctUntilChanged();
+        public get lengthChanged(): Rx.Observable<number> {
+            if (!this._lengthChanged)
+                this._lengthChanged = this.listChanged.select(_ => this.inner.length).distinctUntilChanged();
 
-            return this._countChanged;
+            return this._lengthChanged;
         }
 
         public isEmptyChanged: Rx.Observable<boolean>;
@@ -455,8 +458,8 @@ module wx {
         private _itemReplaced: Rx.Observable<IListChangeInfo<T>>;
         private _beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>;
         private _itemsMoved: Rx.Observable<IListChangeInfo<T>>;
-        private _countChanging: Rx.Observable<number>;
-        private _countChanged: Rx.Observable<number>;
+        private _lengthChanging: Rx.Observable<number>;
+        private _lengthChanged: Rx.Observable<number>;
         private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
         private _itemChanged: Rx.Observable<IPropertyChangedEventArgs>;
 

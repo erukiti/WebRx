@@ -268,14 +268,14 @@ module wx {
         itemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
 
         /**
-        * Fires when the list count changes, regardless of reason
+        * Fires when the list length changes, regardless of reason
         **/
-        countChanging: Rx.Observable<number>; //  { get; }
+        lengthChanging: Rx.Observable<number>; //  { get; }
 
         /**
-        * Fires when the collection count changes, regardless of reason
+        * Fires when the list length changes, regardless of reason
         **/
-        countChanged: Rx.Observable<number>; //  { get; }
+        lengthChanged: Rx.Observable<number>; //  { get; }
 
         /**
         * Fires when the empty state changes, regardless of reason

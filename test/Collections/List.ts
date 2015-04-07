@@ -70,8 +70,8 @@ describe("Observable List", () => {
         var before_output = new Array<number>();
         var output = new Array<number>();
 
-        fixture.countChanging.subscribe(x=> before_output.push(x));
-        fixture.countChanged.subscribe(x=> output.push(x));
+        fixture.lengthChanging.subscribe(x=> before_output.push(x));
+        fixture.lengthChanged.subscribe(x=> output.push(x));
 
         fixture.add(10);
         fixture.add(20);
@@ -90,12 +90,12 @@ describe("Observable List", () => {
 
     it("collection count changed fires when clearing",() => {
         var items = wx.list<Object>([new Object()]);
-        var countChanged = false;
-        items.countChanged.subscribe(_ => { countChanged = true; });
+        var lengthChanged = false;
+        items.lengthChanged.subscribe(_ => { lengthChanged = true; });
 
         items.clear();
 
-        expect(countChanged).toBeTruthy();
+        expect(lengthChanged).toBeTruthy();
     });
 
     it("when adding range of null error is thrown",() => {
