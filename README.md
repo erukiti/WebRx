@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/oliverw/WebRx.png)](https://travis-ci.org/oliverw/WebRx)
+[![Build Status](https://ci.appveyor.com/api/projects/status/hm6sojygo41lbiln?svg=true)](https://ci.appveyor.com/project/oliverw/webrx)
 [![Bower version](https://img.shields.io/bower/v/WebRx.svg)](https://github.com/oliverw/WebRx)
 [![NuGet version](https://img.shields.io/nuget/v/WebRx.svg)](https://www.nuget.org/packages/WebRx/)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
