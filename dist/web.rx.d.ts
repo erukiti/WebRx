@@ -37,25 +37,6 @@ declare module wx {
         size: number;
         isEmulated: boolean;
     }
-    interface ITemplateEngine {
-        parse(templateSource: string): Node[];
-    }
-    interface IReadOnlyList<T> {
-        length: number;
-        get(index: number): T;
-    }
-    interface IList<T> extends IReadOnlyList<T> {
-        set(index: number, item: T): any;
-        isReadOnly: boolean;
-        add(item: T): void;
-        push(item: T): void;
-        clear(): void;
-        contains(item: T): boolean;
-        remove(item: T): boolean;
-        indexOf(item: T): number;
-        insert(index: number, item: T): void;
-        removeAt(index: number): void;
-    }
     interface IObservableProperty<T> extends Rx.IDisposable {
         (newValue: T): void;
         (): T;
@@ -63,25 +44,14 @@ declare module wx {
         changed: Rx.Observable<T>;
         source?: Rx.Observable<T>;
     }
-    interface IHandleObservableErrors {
-        thrownExceptions: Rx.Observable<Error>;
+    interface IPropertyChangedEventArgs {
+        sender: any;
+        propertyName: string;
     }
     interface IListChangeInfo<T> {
         items: T[];
         from: number;
         to?: number;
-    }
-    interface ICommand<T> extends Rx.IDisposable, IHandleObservableErrors {
-        canExecute(parameter: any): boolean;
-        execute(parameter: any): void;
-        canExecuteObservable: Rx.Observable<boolean>;
-        isExecuting: Rx.Observable<boolean>;
-        results: Rx.Observable<T>;
-        executeAsync(parameter?: any): Rx.Observable<T>;
-    }
-    interface IPropertyChangedEventArgs {
-        sender: any;
-        propertyName: string;
     }
     interface INotifyListItemChanged {
         itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
@@ -99,27 +69,52 @@ declare module wx {
         itemsMoved: Rx.Observable<IListChangeInfo<T>>;
         beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>;
         itemReplaced: Rx.Observable<IListChangeInfo<T>>;
-        countChanging: Rx.Observable<number>;
-        countChanged: Rx.Observable<number>;
+        lengthChanging: Rx.Observable<number>;
+        lengthChanged: Rx.Observable<number>;
         isEmptyChanged: Rx.Observable<boolean>;
         shouldReset: Rx.Observable<any>;
         suppressChangeNotifications(): Rx.IDisposable;
     }
-    interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
-        isEmpty: boolean;
+    interface IObservableReadOnlyList<T> extends INotifyListChanged<T>, INotifyListItemChanged {
+        length: IObservableProperty<number>;
+        get(index: number): T;
+    }
+    interface IObservableList<T> extends IObservableReadOnlyList<T> {
+        isEmpty: IObservableProperty<boolean>;
+        set(index: number, item: T): any;
+        isReadOnly: boolean;
+        add(item: T): void;
+        push(item: T): void;
+        clear(): void;
+        contains(item: T): boolean;
+        remove(item: T): boolean;
+        indexOf(item: T): number;
+        insert(index: number, item: T): void;
+        removeAt(index: number): void;
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;
         move(oldIndex: any, newIndex: any): void;
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
+        reset(): void;
+        toArray(): Array<T>;
         sort(comparison: (a: T, b: T) => number): void;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
         filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
         every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
         some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
-        reset(): void;
-        toArray(): Array<T>;
+    }
+    interface IHandleObservableErrors {
+        thrownExceptions: Rx.Observable<Error>;
+    }
+    interface ICommand<T> extends Rx.IDisposable, IHandleObservableErrors {
+        canExecute(parameter: any): boolean;
+        execute(parameter: any): void;
+        canExecuteObservable: Rx.Observable<boolean>;
+        isExecuting: Rx.Observable<boolean>;
+        results: Rx.Observable<T>;
+        executeAsync(parameter?: any): Rx.Observable<T>;
     }
     interface IDataContext {
         $data: any;
@@ -234,6 +229,9 @@ declare module wx {
     }
     interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
         name: string;
+    }
+    interface ITemplateEngine {
+        parse(templateSource: string): Node[];
     }
     interface IWebRxApp extends IModule {
         defaultExceptionHandler: Rx.Observer<Error>;
@@ -533,6 +531,47 @@ declare module wx {
     }
 }
 declare module wx {
+    class IID {
+        static IUnknown: string;
+        static IDisposable: string;
+        static IObservableProperty: string;
+        static IReactiveNotifyPropertyChanged: string;
+        static IHandleObservableErrors: string;
+        static IObservableList: string;
+        static IList: string;
+        static IReactiveNotifyCollectionChanged: string;
+        static IReactiveNotifyCollectionItemChanged: string;
+        static IReactiveDerivedList: string;
+        static IMoveInfo: string;
+        static IObservedChange: string;
+        static ICommand: string;
+        static IReadOnlyList: string;
+    }
+}
+declare module wx {
+    class Lazy<T> {
+        constructor(createValue: () => T);
+        value: T;
+        isValueCreated: boolean;
+        private createValue;
+        private createdValue;
+    }
+}
+declare module wx {
+    class RefCountDisposeWrapper {
+        constructor(inner: Rx.IDisposable);
+        private inner;
+        private refCount;
+        addRef(): void;
+        release(): number;
+    }
+}
+declare module wx.internal {
+    function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>): Rx.Subject<T>;
+}
+declare module wx {
+}
+declare module wx {
     module internal {
         var listConstructor: any;
     }
@@ -573,24 +612,6 @@ declare module wx {
     }
 }
 declare module wx {
-    class IID {
-        static IUnknown: string;
-        static IDisposable: string;
-        static IObservableProperty: string;
-        static IReactiveNotifyPropertyChanged: string;
-        static IHandleObservableErrors: string;
-        static IObservableList: string;
-        static IList: string;
-        static IReactiveNotifyCollectionChanged: string;
-        static IReactiveNotifyCollectionItemChanged: string;
-        static IReactiveDerivedList: string;
-        static IMoveInfo: string;
-        static IObservedChange: string;
-        static ICommand: string;
-        static IReadOnlyList: string;
-    }
-}
-declare module wx {
     module internal {
         var commandConstructor: any;
     }
@@ -615,22 +636,10 @@ declare module wx {
         var htmlTemplateEngineConstructor: any;
     }
 }
-declare module wx {
-    class Lazy<T> {
-        constructor(createValue: () => T);
-        value: T;
-        isValueCreated: boolean;
-        private createValue;
-        private createdValue;
-    }
-}
 declare module wx.log {
     function critical(fmt: string, ...args: any[]): void;
     function error(fmt: string, ...args: any[]): void;
     function info(fmt: string, ...args: any[]): void;
-}
-declare module wx.internal {
-    function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>): Rx.Subject<T>;
 }
 declare module wx {
     var messageBus: IMessageBus;
@@ -640,15 +649,6 @@ declare module wx {
 }
 declare module wx {
     function property<T>(initialValue?: T): IObservableProperty<T>;
-}
-declare module wx {
-    class RefCountDisposeWrapper {
-        constructor(inner: Rx.IDisposable);
-        private inner;
-        private refCount;
-        addRef(): void;
-        release(): number;
-    }
 }
 declare module wx {
     interface IStateActiveBindingOptions {
@@ -681,8 +681,6 @@ declare module wx {
     module internal {
         var routerConstructor: any;
     }
-}
-declare module wx {
 }
 declare module wx {
 }

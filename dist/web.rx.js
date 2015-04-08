@@ -1231,23 +1231,28 @@ var wx;
                 el.checked = value;
             }
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
-                if (!wx.isProperty(model)) {
-                    updateElement(model);
-                }
-                else {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-                    prop = model;
-                    cleanup.add(prop.changed.subscribe(function (x) {
-                        updateElement(x);
-                    }));
-                    updateElement(prop());
-                    if (!prop.source) {
-                        var events = _this.getCheckedEventObservables(el);
-                        cleanup.add(Rx.Observable.merge(events).subscribe(function (e) {
-                            prop(el.checked);
-                        }));
+                try {
+                    if (!wx.isProperty(model)) {
+                        updateElement(model);
                     }
+                    else {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
+                        prop = model;
+                        cleanup.add(prop.changed.subscribe(function (x) {
+                            updateElement(x);
+                        }));
+                        updateElement(prop());
+                        if (!prop.source) {
+                            var events = _this.getCheckedEventObservables(el);
+                            cleanup.add(Rx.Observable.merge(events).subscribe(function (e) {
+                                prop(el.checked);
+                            }));
+                        }
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -1316,24 +1321,29 @@ var wx;
                 paramObservable = Rx.Observable.return(undefined);
             }
             state.cleanup.add(Rx.Observable.combineLatest(cmdObservable, paramObservable, function (cmd, param) { return ({ cmd: cmd, param: param }); }).subscribe(function (x) {
-                doCleanup();
-                cleanup = new Rx.CompositeDisposable();
-                if (x.cmd != null) {
-                    if (!wx.isCommand(x.cmd)) {
-                        internal.throwError("Command-Binding only supports binding to a command!");
+                try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+                    if (x.cmd != null) {
+                        if (!wx.isCommand(x.cmd)) {
+                            internal.throwError("Command-Binding only supports binding to a command!");
+                        }
+                        else {
+                            el.disabled = !x.cmd.canExecute(x.param);
+                            cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
+                                el.disabled = !canExecute;
+                            }));
+                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
+                                x.cmd.execute(x.param);
+                                if (isAnchor) {
+                                    e.preventDefault();
+                                }
+                            }));
+                        }
                     }
-                    else {
-                        el.disabled = !x.cmd.canExecute(x.param);
-                        cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
-                            el.disabled = !canExecute;
-                        }));
-                        cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
-                            x.cmd.execute(x.param);
-                            if (isAnchor) {
-                                e.preventDefault();
-                            }
-                        }));
-                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -1375,8 +1385,13 @@ var wx;
             var initialApply = true;
             var template = new Array();
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, wx.unwrapProperty(x), template, ctx, state, initialApply);
-                initialApply = false;
+                try {
+                    self.applyValue(el, wx.unwrapProperty(x), template, ctx, state, initialApply);
+                    initialApply = false;
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -1468,29 +1483,34 @@ var wx;
                 oldContents.push(el.removeChild(el.firstChild));
             }
             state.cleanup.add(componentObservable.subscribe(function (componentName) {
-                doCleanup();
-                cleanup = new Rx.CompositeDisposable();
-                var component = undefined;
-                if (module)
-                    component = module.component(componentName);
-                if (!component)
-                    component = wx.app.component(componentName);
-                if (component == null)
-                    internal.throwError("component '{0}' is not registered.", componentName);
-                if (component.viewModel) {
-                    state.cleanup.add(Rx.Observable.combineLatest(_this.loadTemplate(component.template, componentParams), _this.loadViewModel(component.viewModel, componentParams), function (t, vm) {
-                        return { template: t, viewModel: vm };
-                    }).subscribe(function (x) {
-                        if (wx.isDisposable(x.viewModel)) {
-                            cleanup.add(x.viewModel);
-                        }
-                        _this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                    }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+                    var component = undefined;
+                    if (module)
+                        component = module.component(componentName);
+                    if (!component)
+                        component = wx.app.component(componentName);
+                    if (component == null)
+                        internal.throwError("component '{0}' is not registered.", componentName);
+                    if (component.viewModel) {
+                        state.cleanup.add(Rx.Observable.combineLatest(_this.loadTemplate(component.template, componentParams), _this.loadViewModel(component.viewModel, componentParams), function (t, vm) {
+                            return { template: t, viewModel: vm };
+                        }).subscribe(function (x) {
+                            if (wx.isDisposable(x.viewModel)) {
+                                cleanup.add(x.viewModel);
+                            }
+                            _this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
+                        }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                    }
+                    else {
+                        state.cleanup.add(_this.loadTemplate(component.template, componentParams).subscribe(function (t) {
+                            _this.applyTemplate(component, el, ctx, state, t);
+                        }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                    }
                 }
-                else {
-                    state.cleanup.add(_this.loadTemplate(component.template, componentParams).subscribe(function (t) {
-                        _this.applyTemplate(component, el, ctx, state, t);
-                    }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -1640,19 +1660,24 @@ var wx;
             for (var i = 0; i < tokens.length; i++) {
                 ((function (_i) {
                     state.cleanup.add(eventHandlers[_i].subscribe(function (handler) {
-                        var eventName = tokens[_i].key;
-                        if (eventDisposables[eventName]) {
-                            eventDisposables[eventName].dispose();
+                        try {
+                            var eventName = tokens[_i].key;
+                            if (eventDisposables[eventName]) {
+                                eventDisposables[eventName].dispose();
+                            }
+                            handler = wx.unwrapProperty(handler);
+                            if (typeof handler === "function") {
+                                eventDisposables[eventName] = Rx.Observable.fromEvent(el, eventName).subscribe(function (e) {
+                                    handler.apply(ctx.$data, [ctx, e]);
+                                });
+                            }
+                            else {
+                                var observer = handler;
+                                eventDisposables[eventName] = Rx.Observable.fromEvent(el, eventName).subscribe(observer);
+                            }
                         }
-                        handler = wx.unwrapProperty(handler);
-                        if (typeof handler === "function") {
-                            eventDisposables[eventName] = Rx.Observable.fromEvent(el, eventName).subscribe(function (e) {
-                                handler.apply(ctx.$data, [ctx, e]);
-                            });
-                        }
-                        else {
-                            var observer = handler;
-                            eventDisposables[eventName] = Rx.Observable.fromEvent(el, eventName).subscribe(observer);
+                        catch (e) {
+                            wx.app.defaultExceptionHandler.onNext(e);
                         }
                     }));
                 })(i));
@@ -1815,12 +1840,17 @@ var wx;
             }));
             var template = new Array();
             state.cleanup.add(obs.subscribe(function (x) {
-                if (cleanup) {
-                    cleanup.dispose();
+                try {
+                    if (cleanup) {
+                        cleanup.dispose();
+                    }
+                    cleanup = new Rx.CompositeDisposable();
+                    self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
+                    initialApply = false;
                 }
-                cleanup = new Rx.CompositeDisposable();
-                self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
-                initialApply = false;
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -1848,7 +1878,7 @@ var wx;
             }).startWith(startIndex).publish().refCount();
         };
         ForEachBinding.prototype.appendAllRows = function (proxy, list, ctx, template, hooks, indexes, indexTrigger, isInitial) {
-            var length = list.length;
+            var length = list.length();
             for (var i = 0; i < length; i++) {
                 this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexes, indexTrigger, isInitial);
             }
@@ -1930,7 +1960,7 @@ var wx;
             this.appendAllRows(proxy, list, ctx, template, hooks, indexes, indexTrigger, true);
             cleanup.add(list.itemsAdded.subscribe(function (e) {
                 length = e.items.length;
-                if (e.from === list.length) {
+                if (e.from === list.length()) {
                     for (i = 0; i < length; i++) {
                         _this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexes, indexTrigger, false);
                     }
@@ -2082,22 +2112,27 @@ var wx;
                 }
             }
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
-                if (!wx.isProperty(model)) {
-                    updateElement(model);
-                }
-                else {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-                    prop = model;
-                    cleanup.add(prop.changed.subscribe(function (x) {
-                        updateElement(x);
-                    }));
-                    updateElement(prop());
-                    if (!prop.source) {
-                        cleanup.add(Rx.Observable.merge(_this.getFocusEventObservables(el)).subscribe(function (hasFocus) {
-                            handleElementFocusChange(hasFocus);
-                        }));
+                try {
+                    if (!wx.isProperty(model)) {
+                        updateElement(model);
                     }
+                    else {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
+                        prop = model;
+                        cleanup.add(prop.changed.subscribe(function (x) {
+                            updateElement(x);
+                        }));
+                        updateElement(prop());
+                        if (!prop.source) {
+                            cleanup.add(Rx.Observable.merge(_this.getFocusEventObservables(el)).subscribe(function (hasFocus) {
+                                handleElementFocusChange(hasFocus);
+                            }));
+                        }
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -2147,8 +2182,13 @@ var wx;
             var obs = this.domManager.expressionToObservable(exp, ctx);
             var template = new Array();
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, wx.unwrapProperty(x), template, ctx, initialApply);
-                initialApply = false;
+                try {
+                    self.applyValue(el, wx.unwrapProperty(x), template, ctx, initialApply);
+                    initialApply = false;
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -2251,7 +2291,12 @@ var wx;
         MultiOneWayChangeBindingBase.prototype.subscribe = function (el, obs, key, state) {
             var _this = this;
             state.cleanup.add(obs.subscribe(function (x) {
-                _this.applyValue(el, wx.unwrapProperty(x), key);
+                try {
+                    _this.applyValue(el, wx.unwrapProperty(x), key);
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
         };
         MultiOneWayChangeBindingBase.prototype.applyValue = function (el, key, value) {
@@ -2401,25 +2446,40 @@ var wx;
                 }
             }
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
-                cleanupImpl();
-                impl = undefined;
-                for (var i = 0; i < impls.length; i++) {
-                    if (impls[i].supports(el, model)) {
-                        impl = impls[i];
-                        break;
+                try {
+                    cleanupImpl();
+                    impl = undefined;
+                    for (var i = 0; i < impls.length; i++) {
+                        if (impls[i].supports(el, model)) {
+                            impl = impls[i];
+                            break;
+                        }
+                    }
+                    if (!impl)
+                        internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
+                    implCleanup = new Rx.CompositeDisposable();
+                    impl.updateElement(el, model);
+                    implCleanup.add(impl.observeModel(model).subscribe(function (x) {
+                        try {
+                            impl.updateElement(el, model);
+                        }
+                        catch (e) {
+                            wx.app.defaultExceptionHandler.onNext(e);
+                        }
+                    }));
+                    if (wx.isProperty(model)) {
+                        implCleanup.add(impl.observeElement(el).subscribe(function (e) {
+                            try {
+                                impl.updateModel(el, model, e);
+                            }
+                            catch (e) {
+                                wx.app.defaultExceptionHandler.onNext(e);
+                            }
+                        }));
                     }
                 }
-                if (!impl)
-                    internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
-                implCleanup = new Rx.CompositeDisposable();
-                impl.updateElement(el, model);
-                implCleanup.add(impl.observeModel(model).subscribe(function (x) {
-                    impl.updateElement(el, model);
-                }));
-                if (wx.isProperty(model)) {
-                    implCleanup.add(impl.observeElement(el).subscribe(function (e) {
-                        impl.updateModel(el, model, e);
-                    }));
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -2457,7 +2517,12 @@ var wx;
             var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, wx.unwrapProperty(x));
+                try {
+                    self.applyValue(el, wx.unwrapProperty(x));
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -2611,22 +2676,27 @@ var wx;
                 }
             }
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (src) {
-                if (!wx.isProperty(src)) {
-                    updateElement(src);
-                }
-                else {
-                    doCleanup();
-                    prop = src;
-                    propertySubscription = prop.changed.subscribe(function (x) {
-                        updateElement(x);
-                    });
-                    updateElement(prop());
-                    if (!prop.source) {
-                        var events = _this.getTextInputEventObservables(el, isTextArea);
-                        eventSubscription = Rx.Observable.merge(events).subscribe(function (e) {
-                            prop(el.value);
-                        });
+                try {
+                    if (!wx.isProperty(src)) {
+                        updateElement(src);
                     }
+                    else {
+                        doCleanup();
+                        prop = src;
+                        propertySubscription = prop.changed.subscribe(function (x) {
+                            updateElement(x);
+                        });
+                        updateElement(prop());
+                        if (!prop.source) {
+                            var events = _this.getTextInputEventObservables(el, isTextArea);
+                            eventSubscription = Rx.Observable.merge(events).subscribe(function (e) {
+                                prop(el.value);
+                            });
+                        }
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -2713,25 +2783,30 @@ var wx;
                 }
             }
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
-                if (!wx.isProperty(model)) {
-                    updateElement(_this.domManager, model);
-                }
-                else {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-                    prop = model;
-                    cleanup.add(prop.changed.subscribe(function (x) {
-                        updateElement(_this.domManager, x);
-                    }));
-                    updateElement(_this.domManager, prop());
-                    if (!prop.source) {
-                        cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(function (e) {
-                            if (useDomManagerForValueUpdates)
-                                prop(internal.getNodeValue(el, _this.domManager));
-                            else
-                                prop(el.value);
-                        }));
+                try {
+                    if (!wx.isProperty(model)) {
+                        updateElement(_this.domManager, model);
                     }
+                    else {
+                        doCleanup();
+                        cleanup = new Rx.CompositeDisposable();
+                        prop = model;
+                        cleanup.add(prop.changed.subscribe(function (x) {
+                            updateElement(_this.domManager, x);
+                        }));
+                        updateElement(_this.domManager, prop());
+                        if (!prop.source) {
+                            cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(function (e) {
+                                if (useDomManagerForValueUpdates)
+                                    prop(internal.getNodeValue(el, _this.domManager));
+                                else
+                                    prop(el.value);
+                            }));
+                        }
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -2804,7 +2879,12 @@ var wx;
             var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
             state.cleanup.add(obs.subscribe(function (x) {
-                self.applyValue(el, wx.unwrapProperty(x), state);
+                try {
+                    self.applyValue(el, wx.unwrapProperty(x), state);
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -2830,6 +2910,171 @@ var wx;
     (function (internal) {
         internal.withBindingConstructor = WithBinding;
     })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var IID = (function () {
+        function IID() {
+        }
+        IID.IUnknown = "IUnknown";
+        IID.IDisposable = "IDisposable";
+        IID.IObservableProperty = "IObservableProperty";
+        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
+        IID.IHandleObservableErrors = "IHandleObservableErrors";
+        IID.IObservableList = "IObservableList";
+        IID.IList = "IList";
+        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
+        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
+        IID.IReactiveDerivedList = "IReactiveDerivedList";
+        IID.IMoveInfo = "IMoveInfo";
+        IID.IObservedChange = "IObservedChange";
+        IID.ICommand = "ICommand";
+        IID.IReadOnlyList = "IReadOnlyList";
+        return IID;
+    })();
+    wx.IID = IID;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var Lazy = (function () {
+        function Lazy(createValue) {
+            this.createValue = createValue;
+        }
+        Object.defineProperty(Lazy.prototype, "value", {
+            get: function () {
+                if (!this.isValueCreated) {
+                    this.createdValue = this.createValue();
+                    this.isValueCreated = true;
+                }
+                return this.createdValue;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Lazy;
+    })();
+    wx.Lazy = Lazy;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var RefCountDisposeWrapper = (function () {
+        function RefCountDisposeWrapper(inner) {
+            this.refCount = 1;
+            this.inner = inner;
+        }
+        RefCountDisposeWrapper.prototype.addRef = function () {
+            this.refCount++;
+        };
+        RefCountDisposeWrapper.prototype.release = function () {
+            if (--this.refCount === 0) {
+                this.inner.dispose();
+                this.inner = null;
+            }
+            return this.refCount;
+        };
+        return RefCountDisposeWrapper;
+    })();
+    wx.RefCountDisposeWrapper = RefCountDisposeWrapper;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var internal;
+    (function (internal) {
+        var ScheduledSubject = (function () {
+            function ScheduledSubject(scheduler, defaultObserver, defaultSubject) {
+                this._observerRefCount = 0;
+                this._defaultObserverSub = Rx.Disposable.empty;
+                this._scheduler = scheduler;
+                this._defaultObserver = defaultObserver;
+                this._subject = defaultSubject || new Rx.Subject();
+                if (defaultObserver != null) {
+                    this._defaultObserverSub = this._subject.observeOn(this._scheduler).subscribe(this._defaultObserver);
+                }
+            }
+            ScheduledSubject.prototype.dispose = function () {
+                if (wx.isDisposable(this._subject)) {
+                    this._subject.dispose();
+                }
+            };
+            ScheduledSubject.prototype.onCompleted = function () {
+                this._subject.onCompleted();
+            };
+            ScheduledSubject.prototype.onError = function (error) {
+                this._subject.onError(error);
+            };
+            ScheduledSubject.prototype.onNext = function (value) {
+                this._subject.onNext(value);
+            };
+            ScheduledSubject.prototype.subscribe = function (observer) {
+                var _this = this;
+                if (this._defaultObserverSub)
+                    this._defaultObserverSub.dispose();
+                this._observerRefCount++;
+                return new Rx.CompositeDisposable(this._subject.observeOn(this._scheduler).subscribe(observer), Rx.Disposable.create(function () {
+                    if ((--_this._observerRefCount) <= 0 && _this._defaultObserver != null) {
+                        _this._defaultObserverSub = _this._subject.observeOn(_this._scheduler).subscribe(_this._defaultObserver);
+                    }
+                }));
+            };
+            return ScheduledSubject;
+        })();
+        function createScheduledSubject(scheduler, defaultObserver, defaultSubject) {
+            var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
+            var result = wx.extend(scheduled, new Rx.Subject(), true);
+            return result;
+        }
+        internal.createScheduledSubject = createScheduledSubject;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var RxObsConstructor = Rx.Observable;
+    RxObsConstructor.prototype.toProperty = function (initialValue, scheduler) {
+        var accessor = function (newVal) {
+            if (arguments.length > 0) {
+                wx.internal.throwError("attempt to write to a read-only observable property");
+            }
+            if (accessor.sub == null) {
+                accessor.sub = accessor._source.connect();
+            }
+            return accessor.value;
+        };
+        accessor.queryInterface = function (iid) {
+            if (iid === wx.IID.IUnknown || iid === wx.IID.IObservableProperty || iid === wx.IID.IDisposable)
+                return true;
+            return false;
+        };
+        accessor.dispose = function () {
+            if (accessor.sub) {
+                accessor.sub.dispose();
+                accessor.sub = null;
+            }
+        };
+        accessor.value = initialValue;
+        accessor.changedSubject = new Rx.Subject();
+        accessor.changed = accessor.changedSubject.publish().refCount();
+        accessor.changingSubject = new Rx.Subject();
+        accessor.changing = accessor.changingSubject.publish().refCount();
+        accessor.source = this;
+        accessor.thrownExceptions = wx.internal.createScheduledSubject(Rx.Scheduler.currentThread, wx.app.defaultExceptionHandler);
+        scheduler = scheduler || Rx.Scheduler.currentThread;
+        var firedInitial = false;
+        var subj = wx.internal.createScheduledSubject(scheduler);
+        subj.subscribe(function (x) {
+            if (firedInitial && x === accessor.value)
+                return;
+            accessor.changingSubject.onNext(x);
+            accessor.value = x;
+            accessor.changedSubject.onNext(x);
+            firedInitial = true;
+        }, function (ex) { return accessor.thrownExceptions.onNext(ex); });
+        subj.onNext(initialValue);
+        accessor._source = this.distinctUntilChanged().multicast(subj);
+        if (wx.isInUnitTest()) {
+            accessor.sub = accessor._source.connect();
+        }
+        return accessor;
+    };
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
@@ -2932,22 +3177,22 @@ var wx;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ObservableList.prototype, "countChanging", {
+        Object.defineProperty(ObservableList.prototype, "lengthChanging", {
             get: function () {
                 var _this = this;
-                if (!this._countChanging)
-                    this._countChanging = this.listChanging.select(function (_) { return _this.inner.length; }).distinctUntilChanged();
-                return this._countChanging;
+                if (!this._lengthChanging)
+                    this._lengthChanging = this.listChanging.select(function (_) { return _this.inner.length; }).distinctUntilChanged();
+                return this._lengthChanging;
             },
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(ObservableList.prototype, "countChanged", {
+        Object.defineProperty(ObservableList.prototype, "lengthChanged", {
             get: function () {
                 var _this = this;
-                if (!this._countChanged)
-                    this._countChanged = this.listChanged.select(function (_) { return _this.inner.length; }).distinctUntilChanged();
-                return this._countChanged;
+                if (!this._lengthChanged)
+                    this._lengthChanged = this.listChanged.select(function (_) { return _this.inner.length; }).distinctUntilChanged();
+                return this._lengthChanged;
             },
             enumerable: true,
             configurable: true
@@ -2996,13 +3241,6 @@ var wx;
                     this.clearAllPropertyChangeWatchers();
                     this.propertyChangeWatchers = null;
                 }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(ObservableList.prototype, "length", {
-            get: function () {
-                return this.inner.length;
             },
             enumerable: true,
             configurable: true
@@ -3186,13 +3424,6 @@ var wx;
         ObservableList.prototype.get = function (index) {
             return this.inner[index];
         };
-        Object.defineProperty(ObservableList.prototype, "isEmpty", {
-            get: function () {
-                return this.inner.length === 0;
-            },
-            enumerable: true,
-            configurable: true
-        });
         ObservableList.prototype.sort = function (comparison) {
             this.publishBeforeResetNotification();
             this.inner.sort(comparison);
@@ -3237,6 +3468,8 @@ var wx;
             if (initialContents) {
                 Array.prototype.splice.apply(this.inner, [0, 0].concat(initialContents));
             }
+            this.length = this.lengthChanged.startWith(this.inner.length).toProperty();
+            this.isEmpty = this.lengthChanged.select(function (x) { return x === 0; }).startWith(this.inner.length === 0).toProperty();
         };
         ObservableList.prototype.areChangeNotificationsEnabled = function () {
             return this.changeNotificationsSuppressed === 0;
@@ -3523,29 +3756,6 @@ var wx;
     (function (internal) {
         internal.selectComponentConstructor = SelectComponent;
     })(internal = wx.internal || (wx.internal = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    var IID = (function () {
-        function IID() {
-        }
-        IID.IUnknown = "IUnknown";
-        IID.IDisposable = "IDisposable";
-        IID.IObservableProperty = "IObservableProperty";
-        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
-        IID.IHandleObservableErrors = "IHandleObservableErrors";
-        IID.IObservableList = "IObservableList";
-        IID.IList = "IList";
-        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
-        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
-        IID.IReactiveDerivedList = "IReactiveDerivedList";
-        IID.IMoveInfo = "IMoveInfo";
-        IID.IObservedChange = "IObservedChange";
-        IID.ICommand = "ICommand";
-        IID.IReadOnlyList = "IReadOnlyList";
-        return IID;
-    })();
-    wx.IID = IID;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
@@ -4829,27 +5039,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    var Lazy = (function () {
-        function Lazy(createValue) {
-            this.createValue = createValue;
-        }
-        Object.defineProperty(Lazy.prototype, "value", {
-            get: function () {
-                if (!this.isValueCreated) {
-                    this.createdValue = this.createValue();
-                    this.isValueCreated = true;
-                }
-                return this.createdValue;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Lazy;
-    })();
-    wx.Lazy = Lazy;
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
     var log;
     (function (_log) {
         function log() {
@@ -4903,56 +5092,6 @@ var wx;
         }
         _log.info = info;
     })(log = wx.log || (wx.log = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    var internal;
-    (function (internal) {
-        var ScheduledSubject = (function () {
-            function ScheduledSubject(scheduler, defaultObserver, defaultSubject) {
-                this._observerRefCount = 0;
-                this._defaultObserverSub = Rx.Disposable.empty;
-                this._scheduler = scheduler;
-                this._defaultObserver = defaultObserver;
-                this._subject = defaultSubject || new Rx.Subject();
-                if (defaultObserver != null) {
-                    this._defaultObserverSub = this._subject.observeOn(this._scheduler).subscribe(this._defaultObserver);
-                }
-            }
-            ScheduledSubject.prototype.dispose = function () {
-                if (wx.isDisposable(this._subject)) {
-                    this._subject.dispose();
-                }
-            };
-            ScheduledSubject.prototype.onCompleted = function () {
-                this._subject.onCompleted();
-            };
-            ScheduledSubject.prototype.onError = function (error) {
-                this._subject.onError(error);
-            };
-            ScheduledSubject.prototype.onNext = function (value) {
-                this._subject.onNext(value);
-            };
-            ScheduledSubject.prototype.subscribe = function (observer) {
-                var _this = this;
-                if (this._defaultObserverSub)
-                    this._defaultObserverSub.dispose();
-                this._observerRefCount++;
-                return new Rx.CompositeDisposable(this._subject.observeOn(this._scheduler).subscribe(observer), Rx.Disposable.create(function () {
-                    if ((--_this._observerRefCount) <= 0 && _this._defaultObserver != null) {
-                        _this._defaultObserverSub = _this._subject.observeOn(_this._scheduler).subscribe(_this._defaultObserver);
-                    }
-                }));
-            };
-            return ScheduledSubject;
-        })();
-        function createScheduledSubject(scheduler, defaultObserver, defaultSubject) {
-            var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
-            var result = wx.extend(scheduled, new Rx.Subject(), true);
-            return result;
-        }
-        internal.createScheduledSubject = createScheduledSubject;
-    })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
@@ -5035,27 +5174,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    var RefCountDisposeWrapper = (function () {
-        function RefCountDisposeWrapper(inner) {
-            this.refCount = 1;
-            this.inner = inner;
-        }
-        RefCountDisposeWrapper.prototype.addRef = function () {
-            this.refCount++;
-        };
-        RefCountDisposeWrapper.prototype.release = function () {
-            if (--this.refCount === 0) {
-                this.inner.dispose();
-                this.inner = null;
-            }
-            return this.refCount;
-        };
-        return RefCountDisposeWrapper;
-    })();
-    wx.RefCountDisposeWrapper = RefCountDisposeWrapper;
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
     var StateActiveBinding = (function () {
         function StateActiveBinding(domManager, router) {
             this.priority = 5;
@@ -5091,13 +5209,18 @@ var wx;
                 }
             }
             state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
-                var currentState = latest.shift();
-                stateName = wx.unwrapProperty(latest.shift());
-                stateParams = {};
-                for (var i = 0; i < paramsKeys.length; i++) {
-                    stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
+                try {
+                    var currentState = latest.shift();
+                    stateName = wx.unwrapProperty(latest.shift());
+                    stateParams = {};
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
+                    }
+                    wx.toggleCssClass(el, _this.router.includes(stateName, stateParams), "active");
                 }
-                wx.toggleCssClass(el, _this.router.includes(stateName, stateParams), "active");
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
                 node = null;
@@ -5157,12 +5280,17 @@ var wx;
                 }
             }
             state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
-                stateName = wx.unwrapProperty(latest.shift());
-                stateParams = {};
-                for (var i = 0; i < paramsKeys.length; i++) {
-                    stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
+                try {
+                    stateName = wx.unwrapProperty(latest.shift());
+                    stateParams = {};
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
+                    }
+                    el.href = _this.router.uri(stateName, stateParams);
                 }
-                el.href = _this.router.uri(stateName, stateParams);
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
             }));
             state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
                 e.preventDefault();
@@ -5215,32 +5343,37 @@ var wx;
             if (viewName == null || typeof viewName !== "string")
                 internal.throwError("views must be named!");
             state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(function (newState) {
-                if (newState.views != null) {
-                    var component = newState.views[viewName];
-                    if (component != null) {
-                        if (typeof component === "object") {
-                            componentName = component.component;
-                            componentParams = component.params;
+                try {
+                    if (newState.views != null) {
+                        var component = newState.views[viewName];
+                        if (component != null) {
+                            if (typeof component === "object") {
+                                componentName = component.component;
+                                componentParams = component.params;
+                            }
+                            else {
+                                componentName = component;
+                                componentParams = {};
+                            }
+                            if (newState.params != null)
+                                componentParams = wx.extend(newState.params, wx.extend(componentParams, {}));
+                            if (componentName !== currentComponentName || !wx.isEqual(componentParams, currentComponentParams)) {
+                                _this.applyTemplate(componentName, componentParams, el, ctx);
+                                currentComponentName = componentName;
+                                currentComponentParams = componentParams;
+                            }
                         }
                         else {
-                            componentName = component;
-                            componentParams = {};
-                        }
-                        if (newState.params != null)
-                            componentParams = wx.extend(newState.params, wx.extend(componentParams, {}));
-                        if (componentName !== currentComponentName || !wx.isEqual(componentParams, currentComponentParams)) {
-                            _this.applyTemplate(componentName, componentParams, el, ctx);
-                            currentComponentName = componentName;
-                            currentComponentParams = componentParams;
+                            currentComponentName = null;
+                            while (el.firstChild) {
+                                _this.domManager.cleanNode(el.firstChild);
+                                el.removeChild(el.firstChild);
+                            }
                         }
                     }
-                    else {
-                        currentComponentName = null;
-                        while (el.firstChild) {
-                            _this.domManager.cleanNode(el.firstChild);
-                            el.removeChild(el.firstChild);
-                        }
-                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             }));
             state.cleanup.add(Rx.Disposable.create(function () {
@@ -5596,56 +5729,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    var RxObsConstructor = Rx.Observable;
-    RxObsConstructor.prototype.toProperty = function (initialValue, scheduler) {
-        var accessor = function (newVal) {
-            if (arguments.length > 0) {
-                wx.internal.throwError("attempt to write to a read-only observable property");
-            }
-            if (accessor.sub == null) {
-                accessor.sub = accessor._source.connect();
-            }
-            return accessor.value;
-        };
-        accessor.queryInterface = function (iid) {
-            if (iid === wx.IID.IUnknown || iid === wx.IID.IObservableProperty || iid === wx.IID.IDisposable)
-                return true;
-            return false;
-        };
-        accessor.dispose = function () {
-            if (accessor.sub) {
-                accessor.sub.dispose();
-                accessor.sub = null;
-            }
-        };
-        accessor.value = initialValue;
-        accessor.changedSubject = new Rx.Subject();
-        accessor.changed = accessor.changedSubject.publish().refCount();
-        accessor.changingSubject = new Rx.Subject();
-        accessor.changing = accessor.changingSubject.publish().refCount();
-        accessor.source = this;
-        accessor.thrownExceptions = wx.internal.createScheduledSubject(Rx.Scheduler.currentThread, wx.app.defaultExceptionHandler);
-        scheduler = scheduler || Rx.Scheduler.currentThread;
-        var firedInitial = false;
-        var subj = wx.internal.createScheduledSubject(scheduler);
-        subj.subscribe(function (x) {
-            if (firedInitial && x === accessor.value)
-                return;
-            accessor.changingSubject.onNext(x);
-            accessor.value = x;
-            accessor.changedSubject.onNext(x);
-            firedInitial = true;
-        }, function (ex) { return accessor.thrownExceptions.onNext(ex); });
-        subj.onNext(initialValue);
-        accessor._source = this.distinctUntilChanged().multicast(subj);
-        if (wx.isInUnitTest()) {
-            accessor.sub = accessor._source.connect();
-        }
-        return accessor;
-    };
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    wx.version = '0.9.55';
+    wx.version = '0.9.56';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
