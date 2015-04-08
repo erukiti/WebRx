@@ -392,7 +392,7 @@ module wx {
         public listChanged: Rx.Observable<boolean>;
 
         //////////////////////////
-        // Expose some array convenience members
+        // Some array convenience members
 
         public push = this.add;
 

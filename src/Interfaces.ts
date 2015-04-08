@@ -63,7 +63,6 @@ module wx {
         propertyName: string;
     }
 
-
     /**
     * Encapsulates change notifications published by various IObservableList members
     * @interface 
@@ -209,6 +208,41 @@ module wx {
     }
 
     /**
+    * IObservableList of T represents a list that can notify when its
+    * contents are changed (either items are added/removed, or the object
+    * itself changes).
+    * @interface 
+    **/
+    export interface IObservableList<T> extends IObservableReadOnlyList<T> {
+        isEmpty: IObservableProperty<boolean>;
+        set(index: number, item: T);
+        isReadOnly: boolean;
+
+        add(item: T): void;
+        push(item: T): void;
+        clear(): void;
+        contains(item: T): boolean;
+        remove(item: T): boolean;
+        indexOf(item: T): number;
+        insert(index: number, item: T): void;
+        removeAt(index: number): void;
+        addRange(collection: Array<T>): void;
+        insertRange(index: number, collection: Array<T>): void;
+        move(oldIndex, newIndex): void;
+        removeAll(items: Array<T>): void;
+        removeRange(index: number, count: number): void;
+        reset(): void;
+        toArray(): Array<T>;
+
+        sort(comparison: (a: T, b: T) => number): void;
+        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+        map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
+        filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
+        every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+        some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+    }
+
+    /**
     * This interface is implemented by RxUI objects which are given
     * IObservables as input - when the input IObservables OnError, instead of
     * disabling the RxUI object, we catch the Rx.Observable and pipe it into
@@ -273,40 +307,6 @@ module wx {
         * @param parameter Don't use this.
         **/
         executeAsync(parameter?: any): Rx.Observable<T>;
-    }
-
-    /**
-    * IObservableList of T represents a list that can notify when its
-    * contents are changed (either items are added/removed, or the object
-    * itself changes).
-    * @interface 
-    **/
-    export interface IObservableList<T> extends IObservableReadOnlyList<T> {
-        isEmpty: IObservableProperty<boolean>;
-        set(index: number, item: T);
-        isReadOnly: boolean;
-
-        add(item: T): void;
-        push(item: T): void;
-        clear(): void;
-        contains(item: T): boolean;
-        remove(item: T): boolean;
-        indexOf(item: T): number;
-        insert(index: number, item: T): void;
-        removeAt(index: number): void;
-        addRange(collection: Array<T>): void;
-        insertRange(index: number, collection: Array<T>): void;
-        move(oldIndex, newIndex): void;
-        removeAll(items: Array<T>): void;
-        removeRange(index: number, count: number): void;
-        sort(comparison: (a: T, b: T) => number): void;
-        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-        map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
-        filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
-        every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
-        some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
-        reset(): void;
-        toArray(): Array<T>;
     }
 
     /**
