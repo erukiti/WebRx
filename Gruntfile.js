@@ -118,7 +118,7 @@ module.exports = function (grunt) {
                 options: {
                     module: 'amd',
                     target: 'es5',
-                    out: '../WebRx-Site/api/',
+                    out: '../WebRx-Site/.build/api/',
                     name: 'WebRx',
                     mode: 'modules',
                     gaID: "UA-60860613-1",
