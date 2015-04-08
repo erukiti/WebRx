@@ -505,12 +505,11 @@ module wx {
             }
 
             this.length = this.lengthChanged
-                .select(x => this.inner.length)
                 .startWith(this.inner.length)
                 .toProperty();
 
             this.isEmpty = this.lengthChanged
-                .select(x => this.inner.length === 0)
+                .select(x => x === 0)
                 .startWith(this.inner.length === 0)
                 .toProperty();
         }
