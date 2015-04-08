@@ -3,6 +3,8 @@
 /// <reference path="../../Interfaces.ts" />
 
 module wx {
+    "use strict";
+
     export interface IStateRefBindingOptions {
         name: string;
         params?: Object;

@@ -1,4 +1,6 @@
 ﻿module wx {
+    "use strict";
+
     /**
     * .Net's Lazy<T>
     * @class

@@ -7,6 +7,8 @@
 /// <reference path="../Core/Module.ts" />
 
 module wx {
+    "use strict";
+
     class DomManager implements IDomManager {
         constructor(compiler: IExpressionCompiler) {
             this.nodeState = createWeakMap<Node, INodeState>();

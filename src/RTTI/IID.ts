@@ -1,4 +1,6 @@
 ﻿module wx {
+    "use strict";
+
     /// <summary>
     /// Interface registry to be used with IUnknown.queryInterface
     /// </summary>

@@ -3,6 +3,8 @@
 /// <reference path="../Collections/WeakMap.ts" />
 
 module wx.env {
+    "use strict";
+
     var _window = <any> window;
     var userAgent = _window.navigator.userAgent;
 

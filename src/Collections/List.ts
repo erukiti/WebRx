@@ -6,6 +6,8 @@
 /// <reference path="../RxJsExtensions.ts" />
 
 module wx {
+    "use strict";
+
     /**
     * ReactiveUI's awesome ReactiveList ported to Typescript (including tests)
     * @class

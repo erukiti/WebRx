@@ -1,5 +1,7 @@
 ﻿
 module wx.res {
+    "use strict";
+
     export var injector = "wx.injector";
     export var domManager = "wx.domservice";
     export var router = "wx.router";

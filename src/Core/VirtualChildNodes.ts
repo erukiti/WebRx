@@ -1,6 +1,8 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
 module wx.internal {
+    "use strict";
+
     /**
     * VirtualChildNodes implements consisent and predictable manipulation 
     * of a DOM Node's childNodes collection regardless its the true contents

@@ -4,6 +4,8 @@
 /// <reference path="../../Core/Log.ts" />
 
 module wx {
+    "use strict";
+
     // Binding contributions to data-context
     interface IViewDataContext extends IDataContext {
         $componentParams?: Object;

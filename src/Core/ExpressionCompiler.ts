@@ -3,9 +3,9 @@
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Core/Resources.ts" />
 
-"use strict";
-
 module wx {
+    "use strict";
+
     module compiler {
         /**
         * Knockout's object-literal parser ported to Typescript

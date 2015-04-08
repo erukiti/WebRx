@@ -6,6 +6,8 @@
 declare var createMockHistory: () => wx.IHistory;
 
 module wx {
+    "use strict";
+
     class Module implements IModule {
         constructor(name: string) {
             this.name = name;

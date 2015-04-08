@@ -2,6 +2,8 @@
 /// <reference path="../Core/DomManager.ts" />
 
 module wx {
+    "use strict";
+
     class ValueBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;

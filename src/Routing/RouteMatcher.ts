@@ -16,6 +16,8 @@
  */
 
 module wx {
+    "use strict";
+
     // Characters to be escaped with \. RegExp borrowed from the Backbone router
     // but escaped (note: unnecessarily) to keep JSHint from complaining.
     var reEscape = /[\-\[\]{}()+?.,\\\^$|#\s]/g;

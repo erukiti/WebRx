@@ -1,4 +1,6 @@
 ﻿module wx {
+    "use strict";
+
     /**
     * ES6 Set Shim
     * @class

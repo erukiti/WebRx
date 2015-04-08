@@ -4,6 +4,8 @@
 /// <reference path="../Collections/List.ts" />
 
 module wx {
+    "use strict";
+
     export interface ISelectComponentParams {
         name?: string;
         items: any;

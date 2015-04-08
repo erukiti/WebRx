@@ -3,6 +3,8 @@
 /// <reference path="../../test/typings/jquery.d.ts" />
 
 module wx {
+    "use strict";
+
     /**
     * Html Template Engine based on JQuery's parseHTML
     * NOTE: This version does not support scripts in templates!

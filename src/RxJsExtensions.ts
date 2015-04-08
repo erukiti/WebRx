@@ -2,6 +2,8 @@
 /// <reference path="Core/ScheduledSubject.ts" />
 
 module wx {
+    "use strict";
+
     var RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 
     /**

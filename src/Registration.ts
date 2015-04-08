@@ -18,6 +18,8 @@
 /// <reference path="Core/MessageBus.ts" />
 
 module wx {
+    "use strict";
+
     injector.register(res.expressionCompiler, internal.expressionCompilerConstructor)
         .register(res.htmlTemplateEngine, [internal.htmlTemplateEngineConstructor], true)
         .register(res.domManager, [res.expressionCompiler, internal.domManagerConstructor], true)

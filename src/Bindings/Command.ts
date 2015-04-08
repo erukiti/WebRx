@@ -3,6 +3,8 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
+    "use strict";
+
     export interface ICommandBindingOptions {
         command: ICommand<any>;
         parameter?: any;

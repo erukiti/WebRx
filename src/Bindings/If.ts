@@ -5,6 +5,8 @@
 /// <reference path="../Core/Resources.ts" />
 
 module wx {
+    "use strict";
+
     export interface IIfBindingOptions {
         condition: string;
     }

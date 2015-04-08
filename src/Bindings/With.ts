@@ -5,6 +5,8 @@
 /// <reference path="../Core/Resources.ts" />
 
 module wx {
+    "use strict";
+
     class WithBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;

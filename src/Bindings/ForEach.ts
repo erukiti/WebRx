@@ -4,6 +4,8 @@
 /// <reference path="../Core/VirtualChildNodes.ts" />
 
 module wx {
+    "use strict";
+
     // Binding contributions to node-state
     interface IForEachNodeState extends INodeState {
         index?: any;

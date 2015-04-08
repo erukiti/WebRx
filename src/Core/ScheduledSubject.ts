@@ -2,6 +2,8 @@
 /// <reference path="Utils.ts" />
 
 module wx.internal {
+    "use strict";
+
     class ScheduledSubject<T> implements Rx.IDisposable {
         constructor(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>) {
             this._scheduler = scheduler;

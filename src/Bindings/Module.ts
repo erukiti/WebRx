@@ -3,6 +3,8 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
+    "use strict";
+
     // Binding contributions to node-state
     export interface INodeState {
         module?: IModule;

@@ -7,6 +7,8 @@
 // with a function signature in a Typescript class.
 
 module wx {
+    "use strict";
+
     /**
     * Creates an observable property with an optional default value
     * @param {T} initialValue?

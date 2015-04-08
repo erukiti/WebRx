@@ -4,6 +4,8 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
+    "use strict";
+
     class MultiOneWayChangeBindingBase implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;

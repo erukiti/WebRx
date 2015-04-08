@@ -3,6 +3,8 @@
 /// <reference path="../Interfaces.ts" />
 
 module wx {
+    "use strict";
+
     export interface IEventBindingOptions {
         [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>;
     }

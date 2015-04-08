@@ -3,6 +3,8 @@
 /// <reference path="Utils.ts" />
 
 module wx {
+    "use strict";
+
     /**
     * Simple IoC & Service Locator
     */

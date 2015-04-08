@@ -9,6 +9,8 @@
 /// <reference path="RouteMatcher.ts" />
 
 module wx {
+    "use strict";
+
     class Router implements IRouter {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;

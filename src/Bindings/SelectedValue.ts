@@ -2,6 +2,8 @@
 /// <reference path="../Core/DomManager.ts" />
 
 module wx {
+    "use strict";
+
     interface ISelectedValueBindingImpl {
         supports(el: HTMLElement, model: any): boolean;
         observeElement(el: HTMLElement): Rx.Observable<any>;

@@ -3,6 +3,8 @@
 /// <reference path="../Core/Environment.ts" />
 
 module wx {
+    "use strict";
+
     class TextInputBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;

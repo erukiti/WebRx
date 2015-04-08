@@ -4,6 +4,8 @@
 /// <reference path="../Core/Module.ts" />
 
 module wx {
+    "use strict";
+
     class Command<T> implements ICommand<T> {
         /// <summary>
         /// Don't use this directly, use wx.commandXYZ instead

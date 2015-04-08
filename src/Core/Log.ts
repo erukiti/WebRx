@@ -1,6 +1,8 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
 module wx.log {
+    "use strict";
+
     function log(...args:any[]) {
         try {
             console.log.apply(console, arguments);

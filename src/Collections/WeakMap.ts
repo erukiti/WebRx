@@ -1,5 +1,7 @@
 ﻿
 module wx {
+    "use strict";
+
     /**
     * This class emulates the semantics of a WeakMap.
     * Even though this implementation is indeed "weak", it has the drawback of

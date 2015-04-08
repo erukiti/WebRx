@@ -5,6 +5,8 @@
 // ReactiveUI's MessageBus
 
 module wx {
+    "use strict";
+
     class MessageBus implements IMessageBus {
         //////////////////////////////////
         // IMessageBus

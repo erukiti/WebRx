@@ -4,6 +4,8 @@
 /// <reference path="../Collections/List.ts" />
 
 module wx {
+    "use strict";
+
     export interface IRadioGroupComponentParams {
         items: any;
         groupName?: string;

@@ -4,6 +4,8 @@
 /// <reference path="../Bindings/Module.ts" />
 
 module wx {
+    "use strict";
+
     export interface IComponentBindingOptions {
         name: string;
         params?: Object;

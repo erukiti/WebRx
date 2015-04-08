@@ -1,6 +1,8 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
 module wx {
+    "use strict";
+
    /**
     * Dependency Injector and service locator
     * @interface 

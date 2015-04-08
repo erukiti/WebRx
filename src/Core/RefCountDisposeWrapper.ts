@@ -1,6 +1,8 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
 module wx {
+    "use strict";
+
     export class RefCountDisposeWrapper {
         constructor(inner: Rx.IDisposable) {
             this.inner = inner;
