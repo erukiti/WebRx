@@ -3,6 +3,7 @@
 /// <reference path="../RTTI/IID.ts" />
 /// <reference path="../Core/Lazy.ts" />
 /// <reference path="../Core/RefCountDisposeWrapper.ts" />
+/// <reference path="../RxJsExtensions.ts" />
 
 module wx {
     /**
@@ -387,9 +388,7 @@ module wx {
             return this.inner[index];
         }
 
-        public get isEmpty(): boolean {
-            return this.inner.length === 0;
-        }
+        public isEmpty: IObservableProperty<boolean>;
 
         public listChanging: Rx.Observable<boolean>;
         public listChanged: Rx.Observable<boolean>;
@@ -502,6 +501,11 @@ module wx {
                 this.beforeItemReplaced.select(x => false),
                 this.beforeItemsMoved.select(x => false),
                 this.beforeResetSubject.select(x => true));
+
+            this.isEmpty = this.lengthChanged
+                .select(x => this.inner.length > 0)
+                .startWith(this.inner.length > 0)
+                .toProperty();
 
             if (initialContents) {
                 Array.prototype.splice.apply(this.inner, (<T[]><any>[0, 0]).concat(initialContents));

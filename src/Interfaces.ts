@@ -305,7 +305,7 @@ module wx {
     * @interface 
     **/
     export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
-        isEmpty: boolean; //  { get; }
+        isEmpty: IObservableProperty<boolean>; //  { get; }
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;
         move(oldIndex, newIndex): void;
