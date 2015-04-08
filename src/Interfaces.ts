@@ -707,8 +707,7 @@ module wx {
     * 
     * Specifying which messages go where is done via the contract parameter
     **/
-    export interface IMessageBus
-    {
+    export interface IMessageBus {
         /**
         * Registers a scheduler for the type, which may be specified at
         * runtime, and the contract.
