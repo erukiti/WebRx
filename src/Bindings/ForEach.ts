@@ -195,7 +195,7 @@ module wx {
         protected appendAllRows(proxy: internal.VirtualChildNodes, list: IObservableList<any>, ctx: IDataContext,
             template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
-            var length = list.length;
+            var length = list.length();
 
             for (var i = 0; i < length; i++) {
                 this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexes, indexTrigger, isInitial);
@@ -317,7 +317,7 @@ module wx {
             cleanup.add(list.itemsAdded.subscribe((e) => {
                 length = e.items.length;
 
-                if (e.from === list.length) {
+                if (e.from === list.length()) {
                     for (i = 0; i < length; i++) {
                         this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexes, indexTrigger, false);
                     }

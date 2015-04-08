@@ -48,127 +48,12 @@ module wx {
         parse(templateSource: string): Node[];
     }
 
-    /**
-    * Represents a collection of objects that can be individually accessed by index.
-    * @interface 
-    **/
-    export interface IReadOnlyList<T> {
-        length: number;
-        get(index: number): T;
-    }
-
-    /**
-    * Represents a collection of objects that can be individually accessed by index.
-    * @interface 
-    **/
-    export interface IList<T> extends IReadOnlyList<T> {
-        set(index: number, item: T);
-        isReadOnly: boolean;
-        add(item: T): void;
-        push(item: T): void;
-        clear(): void;
-        contains(item: T): boolean;
-        remove(item: T): boolean;
-        indexOf(item: T): number;
-        insert(index: number, item: T): void;
-        removeAt(index: number): void;
-    }
-
-    /**
-    * IObservableProperty combines a function signature for value setting and getting with
-    * observables for monitoring value changes
-    * @interface 
-    **/
-    export interface IObservableProperty<T> extends Rx.IDisposable {
-        (newValue: T): void;
-        (): T;
-        changing: Rx.Observable<T>;
-        changed: Rx.Observable<T>;
-        source?: Rx.Observable<T>;
-    }
-
-    /**
-    * This interface is implemented by RxUI objects which are given
-    * IObservables as input - when the input IObservables OnError, instead of
-    * disabling the RxUI object, we catch the Rx.Observable and pipe it into
-    * this property.
-    *
-    * Normally this Rx.Observable is implemented with a ScheduledSubject whose
-    * default Observer is wx.app.defaultExceptionHandler - this means, that if
-    * you aren't listening to thrownExceptions and one appears, the exception
-    * will appear on the UI thread and crash the application.
-    * @interface 
-    **/
-    export interface IHandleObservableErrors {
-        /**
-        * Fires whenever an exception would normally terminate the app
-        * internal state.
-        **/
-        thrownExceptions: Rx.Observable<Error>; //  { get; }
-    }
-
-    /**
-    * Encapsulates change notifications published by various IObservableList members
-    * @interface 
-    **/
-   export interface IListChangeInfo<T> {
-        items: T[]; // { get; }
-        from: number; // { get; }
-        to?: number; // { get; }
-    }
-
-    /**
-    * ICommand represents an ICommand which also notifies when it is
-    * executed (i.e. when Execute is called) via IObservable. Conceptually,
-    * this represents an Event, so as a result this IObservable should never
-    * onComplete or onError.
-    * @interface 
-    **/
-    export interface ICommand<T> extends
-        Rx.IDisposable,
-        IHandleObservableErrors {
-        canExecute(parameter: any): boolean;
-        execute(parameter: any): void;
-
-        /**
-        * Gets a value indicating whether this instance can execute observable.
-        **/
-        canExecuteObservable: Rx.Observable<boolean>; //  { get; }
-
-        /**
-        * Gets a value indicating whether this instance is executing. This
-        * Observable is guaranteed to always return a value immediately (i.e.
-        * it is backed by a BehaviorSubject), meaning it is safe to determine
-        * the current state of the command via IsExecuting.First()
-        **/
-        isExecuting: Rx.Observable<boolean>; //  { get; }
-
-        /**
-        * Gets an observable that returns command invocation results
-        **/
-        results: Rx.Observable<T>;
-
-        /**
-        * Executes a Command and returns the result asynchronously. This method
-        * makes it *much* easier to test Command, as well as create
-        * Commands who invoke inferior commands and wait on their results.
-        *
-        * Note that you **must** Subscribe to the Observable returned by
-        * ExecuteAsync or else nothing will happen (i.e. ExecuteAsync is lazy)
-        *
-        * Note also that the command will be executed, irrespective of the current value
-        * of the command's canExecute observable.
-        * @return An Observable representing a single invocation of the Command.
-        * @param parameter Don't use this.
-        **/
-        executeAsync(parameter?: any): Rx.Observable<T>;
-    }
 
     /**
     * Provides information about a changed property value on an object
     * @interface 
     **/
-   export interface IPropertyChangedEventArgs {
+    export interface IPropertyChangedEventArgs {
         sender: any; //  { get; private set; }
         propertyName: string;
     }
@@ -299,13 +184,123 @@ module wx {
     }
 
     /**
+    * Represents a collection of objects that can be individually accessed by index.
+    * @interface 
+    **/
+    export interface IObservableReadOnlyList<T> extends INotifyListChanged<T>, INotifyListItemChanged {
+        length: IObservableProperty<number>;
+        get(index: number): T;
+    }
+
+    /**
+    * IObservableProperty combines a function signature for value setting and getting with
+    * observables for monitoring value changes
+    * @interface 
+    **/
+    export interface IObservableProperty<T> extends Rx.IDisposable {
+        (newValue: T): void;
+        (): T;
+        changing: Rx.Observable<T>;
+        changed: Rx.Observable<T>;
+        source?: Rx.Observable<T>;
+    }
+
+    /**
+    * This interface is implemented by RxUI objects which are given
+    * IObservables as input - when the input IObservables OnError, instead of
+    * disabling the RxUI object, we catch the Rx.Observable and pipe it into
+    * this property.
+    *
+    * Normally this Rx.Observable is implemented with a ScheduledSubject whose
+    * default Observer is wx.app.defaultExceptionHandler - this means, that if
+    * you aren't listening to thrownExceptions and one appears, the exception
+    * will appear on the UI thread and crash the application.
+    * @interface 
+    **/
+    export interface IHandleObservableErrors {
+        /**
+        * Fires whenever an exception would normally terminate the app
+        * internal state.
+        **/
+        thrownExceptions: Rx.Observable<Error>; //  { get; }
+    }
+
+    /**
+    * Encapsulates change notifications published by various IObservableList members
+    * @interface 
+    **/
+   export interface IListChangeInfo<T> {
+        items: T[]; // { get; }
+        from: number; // { get; }
+        to?: number; // { get; }
+    }
+
+    /**
+    * ICommand represents an ICommand which also notifies when it is
+    * executed (i.e. when Execute is called) via IObservable. Conceptually,
+    * this represents an Event, so as a result this IObservable should never
+    * onComplete or onError.
+    * @interface 
+    **/
+    export interface ICommand<T> extends
+        Rx.IDisposable,
+        IHandleObservableErrors {
+        canExecute(parameter: any): boolean;
+        execute(parameter: any): void;
+
+        /**
+        * Gets a value indicating whether this instance can execute observable.
+        **/
+        canExecuteObservable: Rx.Observable<boolean>; //  { get; }
+
+        /**
+        * Gets a value indicating whether this instance is executing. This
+        * Observable is guaranteed to always return a value immediately (i.e.
+        * it is backed by a BehaviorSubject), meaning it is safe to determine
+        * the current state of the command via IsExecuting.First()
+        **/
+        isExecuting: Rx.Observable<boolean>; //  { get; }
+
+        /**
+        * Gets an observable that returns command invocation results
+        **/
+        results: Rx.Observable<T>;
+
+        /**
+        * Executes a Command and returns the result asynchronously. This method
+        * makes it *much* easier to test Command, as well as create
+        * Commands who invoke inferior commands and wait on their results.
+        *
+        * Note that you **must** Subscribe to the Observable returned by
+        * ExecuteAsync or else nothing will happen (i.e. ExecuteAsync is lazy)
+        *
+        * Note also that the command will be executed, irrespective of the current value
+        * of the command's canExecute observable.
+        * @return An Observable representing a single invocation of the Command.
+        * @param parameter Don't use this.
+        **/
+        executeAsync(parameter?: any): Rx.Observable<T>;
+    }
+
+    /**
     * IObservableList of T represents a list that can notify when its
     * contents are changed (either items are added/removed, or the object
     * itself changes).
     * @interface 
     **/
-    export interface IObservableList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
-        isEmpty: IObservableProperty<boolean>; //  { get; }
+    export interface IObservableList<T> extends IObservableReadOnlyList<T> {
+        isEmpty: IObservableProperty<boolean>;
+        set(index: number, item: T);
+        isReadOnly: boolean;
+
+        add(item: T): void;
+        push(item: T): void;
+        clear(): void;
+        contains(item: T): boolean;
+        remove(item: T): boolean;
+        indexOf(item: T): number;
+        insert(index: number, item: T): void;
+        removeAt(index: number): void;
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;
         move(oldIndex, newIndex): void;

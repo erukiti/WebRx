@@ -154,9 +154,7 @@ module wx {
             }
         }
 
-        public get length(): number {
-            return this.inner.length;
-        }
+        public length: IObservableProperty<number>;
 
         public addRange(items: T[]): void {
             if (items == null) {
@@ -502,14 +500,19 @@ module wx {
                 this.beforeItemsMoved.select(x => false),
                 this.beforeResetSubject.select(x => true));
 
+            if (initialContents) {
+                Array.prototype.splice.apply(this.inner,(<T[]><any>[0, 0]).concat(initialContents));
+            }
+
+            this.length = this.lengthChanged
+                .select(x => this.inner.length)
+                .startWith(this.inner.length)
+                .toProperty();
+
             this.isEmpty = this.lengthChanged
                 .select(x => this.inner.length === 0)
                 .startWith(this.inner.length === 0)
                 .toProperty();
-
-            if (initialContents) {
-                Array.prototype.splice.apply(this.inner, (<T[]><any>[0, 0]).concat(initialContents));
-            }
         }
 
         private areChangeNotificationsEnabled(): boolean {

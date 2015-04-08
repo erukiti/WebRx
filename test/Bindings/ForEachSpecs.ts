@@ -3,6 +3,7 @@
 /// <reference path="../typings/jquery.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
 /// <reference path="../TestModels.ts" />
+/// <reference path="../typings/l2o.d.ts" />
 
 describe('Bindings',() => {
     function createTestList() {
@@ -74,7 +75,7 @@ describe('Bindings',() => {
             var list = wx.list([1, 5, 7]);
             expect(() => wx.applyBindings({ src: list }, el)).not.toThrowError();
 
-            expect(el.children.length).toEqual(list.length * templateLength);
+            expect(el.children.length).toEqual(list.length() * templateLength);
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(list.toArray());
         });
 
@@ -86,7 +87,7 @@ describe('Bindings',() => {
             var list = createTestList();
             expect(() => wx.applyBindings({ src: list }, el)).not.toThrowError();
 
-            expect(el.children.length).toEqual(list.length * templateLength);
+            expect(el.children.length).toEqual(list.length() * templateLength);
             expect($(el).children(".part1").map((index, node) => parseInt(node.textContent)).get()).toEqual(list.toArray().map(x=> x.foo()));
             expect($(el).children(".part2").map((index, node) => node.textContent).get()).toEqual(list.toArray().map(x=> x.bar()));
             expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual([5, 5, 5]);
@@ -100,10 +101,10 @@ describe('Bindings',() => {
             var list = createTestList();
             expect(() => wx.applyBindings({ src: list }, el)).not.toThrowError();
 
-            expect(el.children.length).toEqual(list.length * templateLength);
+            expect(el.children.length).toEqual(list.length() * templateLength);
             expect($(el).children(".part1").map((index, node) => parseInt(node.textContent)).get()).toEqual(list.toArray().map(x=> x.foo()));
             expect($(el).children(".part2").map((index, node) => node.textContent).get()).toEqual(list.toArray().map(x=> x.bar()));
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
         });
 
         it('observable list manipulation smoke-test',() => {
@@ -114,28 +115,28 @@ describe('Bindings',() => {
             var list = createTestList();
             expect(() => wx.applyBindings({ src: list }, el)).not.toThrowError();
 
-            expect(el.children.length).toEqual(list.length * templateLength);
+            expect(el.children.length).toEqual(list.length() * templateLength);
             expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
 
             list.add(new TestViewModel(3, "edfsd"));
-            expect(el.children.length).toEqual(list.length * templateLength);
+            expect(el.children.length).toEqual(list.length() * templateLength);
 
             list.set(2, new TestViewModel(42, "magic"));
             expect(parseInt(el.children[2 * templateLength].textContent)).toEqual(list.get(2).foo());
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.move(2, 0);
             expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.removeAt(1);
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             expect(parseInt(el.children[0 * templateLength].textContent)).toEqual(list.get(0).foo());
             expect(parseInt(el.children[1 * templateLength].textContent)).toEqual(list.get(1).foo());
@@ -145,7 +146,7 @@ describe('Bindings',() => {
             expect(parseInt(el.children[2 * templateLength].textContent)).toEqual(list.get(2).foo());
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.clear();
             expect(el.children.length).toEqual(0);
@@ -155,13 +156,13 @@ describe('Bindings',() => {
             expect(el.children[0 * templateLength + 1].textContent).toEqual(list.get(0).bar());
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.addRange(createTestList().toArray());
-            expect(el.children.length).toEqual(list.length * templateLength);
+            expect(el.children.length).toEqual(list.length() * templateLength);
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
         });
 
         it('$index calculation when bound to observable list smoke-test',() => {
@@ -173,16 +174,16 @@ describe('Bindings',() => {
             expect(() => wx.applyBindings({ src: list }, el)).not.toThrowError();
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.add(new TestViewModel(3, "edfsd"));
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.removeAt(0);
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
         });
 
         it('observable list item property-changes propagate to DOM',() => {
@@ -201,7 +202,6 @@ describe('Bindings',() => {
             loadFixtures('templates/Bindings/ForEach.html');
 
             var el = <HTMLElement> document.querySelector("#foreach-list-model-with-index-and-hooks");
-            var templateLength = el.children.length;
             var list = createTestList();
             var beforeRemoveCount = 0;
             var afterRenderCount = 0;
@@ -237,20 +237,20 @@ describe('Bindings',() => {
             expect(afterAddCount).toEqual(1);
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.removeAt(0);
             expect(beforeRemoveCount).toEqual(1);
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
 
             list.move(2, 0);
             expect(beforeMoveCount).toEqual(1);
             expect(afterMoveCount).toEqual(1);
 
             // verify indexes
-            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length).toArray());
+            expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
         });
     });
 });

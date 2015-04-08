@@ -17,7 +17,7 @@ describe("Observable List", () => {
 
     it("length property is not ambiguous", () => {
         var obsList = wx.list<number>();
-        expect(0).toEqual(obsList.length);
+        expect(0).toEqual(obsList.length());
         var list = obsList.toArray();
         expect(0).toEqual(list.length);
     });
