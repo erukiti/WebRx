@@ -503,8 +503,8 @@ module wx {
                 this.beforeResetSubject.select(x => true));
 
             this.isEmpty = this.lengthChanged
-                .select(x => this.inner.length > 0)
-                .startWith(this.inner.length > 0)
+                .select(x => this.inner.length === 0)
+                .startWith(this.inner.length === 0)
                 .toProperty();
 
             if (initialContents) {

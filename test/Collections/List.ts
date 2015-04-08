@@ -15,7 +15,7 @@ describe("Observable List", () => {
         expect(obsList.toArray()).toEqual([3, 2, 1]);
     });
 
-    it("count property is not ambiguous", () => {
+    it("length property is not ambiguous", () => {
         var obsList = wx.list<number>();
         expect(0).toEqual(obsList.length);
         var list = obsList.toArray();
@@ -65,7 +65,7 @@ describe("Observable List", () => {
         expect(removed).toEqual(before_removed);
     });
 
-    it("collection count changed test",() => {
+    it("length changed test",() => {
         var fixture = wx.list<number>();
         var before_output = new Array<number>();
         var output = new Array<number>();
@@ -88,7 +88,14 @@ describe("Observable List", () => {
         expect(results).toEqual(output);
     });
 
-    it("collection count changed fires when clearing",() => {
+    it("isEmpty test",() => {
+        var fixture = wx.list<number>();
+        expect(fixture.isEmpty()).toBeTruthy();
+        fixture.add(1);
+        expect(fixture.isEmpty()).toBeFalsy();
+    });
+
+    it("length changed fires when clearing",() => {
         var items = wx.list<Object>([new Object()]);
         var lengthChanged = false;
         items.lengthChanged.subscribe(_ => { lengthChanged = true; });
