@@ -41,11 +41,16 @@ module wx {
     }
 
     /**
-    * Represents an engine responsible for converting arbitrary text fragements into a collection of Dom Nodes
+    * IObservableProperty combines a function signature for value setting and getting with
+    * observables for monitoring value changes
     * @interface 
     **/
-    export interface ITemplateEngine {
-        parse(templateSource: string): Node[];
+    export interface IObservableProperty<T> extends Rx.IDisposable {
+        (newValue: T): void;
+        (): T;
+        changing: Rx.Observable<T>;
+        changed: Rx.Observable<T>;
+        source?: Rx.Observable<T>;
     }
 
 
@@ -56,6 +61,17 @@ module wx {
     export interface IPropertyChangedEventArgs {
         sender: any; //  { get; private set; }
         propertyName: string;
+    }
+
+
+    /**
+    * Encapsulates change notifications published by various IObservableList members
+    * @interface 
+    **/
+    export interface IListChangeInfo<T> {
+        items: T[]; // { get; }
+        from: number; // { get; }
+        to?: number; // { get; }
     }
 
     /**
@@ -193,19 +209,6 @@ module wx {
     }
 
     /**
-    * IObservableProperty combines a function signature for value setting and getting with
-    * observables for monitoring value changes
-    * @interface 
-    **/
-    export interface IObservableProperty<T> extends Rx.IDisposable {
-        (newValue: T): void;
-        (): T;
-        changing: Rx.Observable<T>;
-        changed: Rx.Observable<T>;
-        source?: Rx.Observable<T>;
-    }
-
-    /**
     * This interface is implemented by RxUI objects which are given
     * IObservables as input - when the input IObservables OnError, instead of
     * disabling the RxUI object, we catch the Rx.Observable and pipe it into
@@ -223,16 +226,6 @@ module wx {
         * internal state.
         **/
         thrownExceptions: Rx.Observable<Error>; //  { get; }
-    }
-
-    /**
-    * Encapsulates change notifications published by various IObservableList members
-    * @interface 
-    **/
-   export interface IListChangeInfo<T> {
-        items: T[]; // { get; }
-        from: number; // { get; }
-        to?: number; // { get; }
     }
 
     /**
@@ -573,6 +566,14 @@ module wx {
 
     export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
         name: string;
+    }
+
+    /**
+    * Represents an engine responsible for converting arbitrary text fragements into a collection of Dom Nodes
+    * @interface 
+    **/
+    export interface ITemplateEngine {
+        parse(templateSource: string): Node[];
     }
 
     export interface IWebRxApp extends IModule {
