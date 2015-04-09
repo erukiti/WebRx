@@ -8,6 +8,11 @@ declare var createMockHistory: () => wx.IHistory;
 module wx {
     "use strict";
 
+    // extend descriptor
+    interface IComponentDescriptorPrivate extends IComponentDescriptor {
+        instance: any;
+    }
+
     class Module implements IModule {
         constructor(name: string) {
             this.name = name;
@@ -45,6 +50,10 @@ module wx {
 
             // registration
             var component = args.shift();
+
+            if (component.template)
+                component.instance = component;
+
             this.components[name] = component;
 
             return <any> this;
@@ -128,7 +137,7 @@ module wx {
         // Implementation
 
         private bindings: { [name: string]: any } = {};
-        private components: { [name: string]: IComponentDescriptor } = {};
+        private components: { [name: string]: IComponentDescriptorPrivate } = {};
         private expressionFilters: { [index: string]: IExpressionFilter; } = {};
     }
 

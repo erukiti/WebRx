@@ -531,7 +531,7 @@ module wx {
     }
 
     export interface IComponentTemplateDescriptor {
-        (params: any): string|Node[];  // Factory 
+        (params?: any): string|Node[];  // Factory 
         require?: string;       // Async AMD
         promise?: Rx.IPromise<Node[]>;  // Async Promise
         resolve?: string;       // DI
@@ -557,7 +557,10 @@ module wx {
     export interface IComponentDescriptor {
         require?: string;       // Async AMD loading
         resolve?: string;       // DI
-        instance?: any;         // pre-constructed instance
+        template?: string|Node[]|IComponentTemplateDescriptor;
+        viewModel?: IComponentViewModelDescriptor;
+        preBindingInit?: string;   // name of method on view-model to invoke before bindings get applied
+        postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
     }
 
     export interface IComponentRegistry {
