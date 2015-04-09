@@ -228,7 +228,7 @@ describe('Bindings', () => {
             expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
 
-        it("Loads a view-model through an AMD module loader",(done) => {
+        it("Loads a view-model through an AMD module loader - object with postBindingInit",(done) => {
             loadFixtures('templates/Bindings/Component.html');
 
             var template = "<span data-bind='text: foo'>invalid</span>";
@@ -241,11 +241,40 @@ describe('Bindings', () => {
 
             var el = <HTMLElement> document.querySelector("#fixture2");
 
-            window["vm1Hook"] = () => {
-                delete window["vm1Hook"];
+            window["vmHook"] = () => {
+                delete window["vmHook"];
 
                 expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
                 done();
+            }
+
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+        });
+
+        it("Loads a view-model through an AMD module loader - constructor function",(done) => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = "<span data-bind='text: foo'>invalid</span>";
+
+            wx.module("test").component("test1", <wx.IComponent> <any>  {
+                template: template,
+                viewModel: <any> { require: 'templates/AMD/vm2' },
+                postBindingInit: "init"
+            });
+
+            var el = <HTMLElement> document.querySelector("#fixture4");
+
+            window["vmHook"] = (params) => {
+                expect(params).toBeDefined();
+                expect(params.foo).toEqual(42);
+
+                // now install new hook for postBindingInit
+                window["vmHook"] = () => {
+                    delete window["vmHook"];
+
+                    expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
+                    done();
+                }
             }
 
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();

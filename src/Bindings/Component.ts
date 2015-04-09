@@ -93,6 +93,11 @@ module wx {
                             this.loadTemplate(component.template, componentParams),
                             this.loadViewModel(component.viewModel, componentParams),
                             (t, vm) => {
+                                // if view-model factory yields a function, use it as constructor
+                                if (isFunction(vm)) {
+                                    vm = new vm(componentParams);
+                                }
+
                                 return { template: t, viewModel: vm }
                             }).subscribe(x => {
                             if (isDisposable(x.viewModel)) {
@@ -204,8 +209,7 @@ module wx {
             var syncResult: any;
 
             if (isFunction(vm)) {
-                syncResult = new vm(componentParams);
-                return Rx.Observable.return(syncResult);
+                return Rx.Observable.return(vm);
             } else if (Array.isArray(vm)) {
                 // assumed to be inline-annotated-array
                 syncResult = injector.resolve<any>(vm, componentParams);

@@ -93,7 +93,6 @@ module wx {
                 state = null;
 
                 // nullify common locals
-                self = null;
             }));
         }
 
