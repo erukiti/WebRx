@@ -339,7 +339,7 @@ module wx {
             var i;
 
             // check if tag represents a component
-            if (module.component(tagName) != null || app.component(tagName) != null) {
+            if (module.hasComponent(tagName) || app.hasComponent(tagName)) {
                 // when a component is referenced by element, we just apply a virtual 'component' binding
                 var params = el.getAttribute(DomManager.paramsAttributename);
                 var componentReference: any;

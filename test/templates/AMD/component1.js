@@ -1,11 +1,26 @@
 // AMD module 'some/module.js' encapsulating the configuration for a component
 define([], function () {
-    function MyComponentViewModel(params) {
-        this.personName = ko.observable(params.name);
+    function ViewModel(params) {
+        // define a binding-property
+        this.foo = 'bar';
+
+        // invoke test-case callback
+        if (window["vmHook"]) {
+            window["vmHook"](params);
+        }
+
+        // install postBindingInit that invokes second test-case callback
+        this.init = function () {
+            // interface with test-cases via global object
+            if (window["vmHook"]) {
+                window["vmHook"]();
+            }
+        }
     }
 
     return {
-        viewModel: MyComponentViewModel,
-        template: 'The name is <strong data-bind="text: personName"></strong>'
+        viewModel: ViewModel,
+        template: "<span data-bind='text: foo'>invalid</span>",
+        postBindingInit: "init"
     };
 });

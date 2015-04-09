@@ -16,34 +16,42 @@ module wx {
         //////////////////////////////////
         // IModule
 
-        public component(name: string, handler: IComponent): IComponentRegistry;
-        public component(name: string, handler: string): IComponentRegistry;
-        public component(name: string): IComponent;
+        public component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
+        public component(name: string): Rx.Observable<IComponent>;
 
         public component() {
             var args = args2Array(arguments);
             var name = args.shift();
-            var component: IComponent;
 
             // lookup?
             if (args.length === 0) {
-                // if the component has been registered as resource, resolve it now and update registry
-                component = this.components[name];
+                var descriptor = this.components[name];
 
-                // if the component has been registered as resource, resolve it now and update registry
-                if (typeof component === "string") {
-                    component = injector.get<IComponent>(<any> component);
-                    this.components[name] = component;
+                if (descriptor != null) {
+                    // if the component has been registered as resource, resolve it now and update registry
+                    if (descriptor.instance) {
+                        return Rx.Observable.return<IComponent>(descriptor.instance);
+                    } else if (descriptor.resolve) {
+                        var resolved = injector.get<IComponent>(descriptor.resolve);
+                        this.components[name] = { instance: resolved };
+                        return Rx.Observable.return<IComponent>(resolved);
+                    } else if (descriptor.require) {
+                        return observableRequire<IComponent>(descriptor.require);
+                    }
                 }
 
-                return <any> component;
+                return Rx.Observable.return<IComponent>(undefined);
             }
 
             // registration
-            component = args.shift();
+            var component = args.shift();
             this.components[name] = component;
 
-            return this;
+            return <any> this;
+        }
+
+        public hasComponent(name: string): boolean {
+            return this.components[name] != null;
         }
 
         public binding(name: string, handler: IBindingHandler): IBindingRegistry;
@@ -120,7 +128,7 @@ module wx {
         // Implementation
 
         private bindings: { [name: string]: any } = {};
-        private components: { [name: string]: any } = {};
+        private components: { [name: string]: IComponentDescriptor } = {};
         private expressionFilters: { [index: string]: IExpressionFilter; } = {};
     }
 

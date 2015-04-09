@@ -554,10 +554,16 @@ module wx {
         postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
     }
 
+    export interface IComponentDescriptor {
+        require?: string;       // Async AMD loading
+        resolve?: string;       // DI
+        instance?: any;         // pre-constructed instance
+    }
+
     export interface IComponentRegistry {
-        component(name: string, handler: IComponent): IComponentRegistry;
-        component(name: string, handler: string): IComponentRegistry;
-        component(name: string): IComponent;
+        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
+        component(name: string): Rx.Observable<IComponent>;
+        hasComponent(name: string): boolean;
     }
 
     export interface IExpressionFilterRegistry {

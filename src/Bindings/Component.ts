@@ -75,42 +75,51 @@ module wx {
                     cleanup = new Rx.CompositeDisposable();
 
                     // lookup component
-                    var component: IComponent = undefined;
+                    var componentObservable: Rx.Observable<IComponent> = undefined;
 
-                    if (module)
-                        component = module.component(componentName);
+                    if (module && module.hasComponent(componentName))
+                        componentObservable = module.component(componentName);
 
                     // fallback to "app" module if not registered with
-                    if (!component)
-                        component = app.component(componentName);
+                    if (componentObservable == null && app.hasComponent(componentName))
+                        componentObservable = app.component(componentName);
 
-                    if (component == null)
-                        internal.throwError("component '{0}' is not registered.", componentName);
+                    if (componentObservable == null)
+                        internal.throwError("component '{0}' is not registered with current module-context", componentName);
 
-                    // resolve template & view-model
-                    if (component.viewModel) {
-                        state.cleanup.add(Rx.Observable.combineLatest(
-                            this.loadTemplate(component.template, componentParams),
-                            this.loadViewModel(component.viewModel, componentParams),
-                            (t, vm) => {
-                                // if view-model factory yields a function, use it as constructor
-                                if (isFunction(vm)) {
-                                    vm = new vm(componentParams);
+                    var componentLoaderDisposable: Rx.IDisposable = undefined;
+                    componentLoaderDisposable = componentObservable.subscribe(component => {
+                        // loader cleanup
+                        if (componentLoaderDisposable != null) {
+                            componentLoaderDisposable.dispose();
+                            componentLoaderDisposable = undefined;
+                        }
+
+                        // resolve template & view-model
+                        if (component.viewModel) {
+                            state.cleanup.add(Rx.Observable.combineLatest(
+                                this.loadTemplate(component.template, componentParams),
+                                this.loadViewModel(component.viewModel, componentParams),
+                                (t, vm) => {
+                                    // if view-model factory yields a function, use it as constructor
+                                    if (isFunction(vm)) {
+                                        vm = new vm(componentParams);
+                                    }
+
+                                    return { template: t, viewModel: vm }
+                                }).subscribe(x => {
+                                if (isDisposable(x.viewModel)) {
+                                    cleanup.add(x.viewModel);
                                 }
 
-                                return { template: t, viewModel: vm }
-                            }).subscribe(x => {
-                            if (isDisposable(x.viewModel)) {
-                                cleanup.add(x.viewModel);
-                            }
-
-                            this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                        },(err) => app.defaultExceptionHandler.onNext(err)));
-                    } else {
-                        state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
-                            this.applyTemplate(component, el, ctx, state, t);
-                        },(err) => app.defaultExceptionHandler.onNext(err)));
-                    }
+                                this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
+                            },(err) => app.defaultExceptionHandler.onNext(err)));
+                        } else {
+                            state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
+                                this.applyTemplate(component, el, ctx, state, t);
+                            },(err) => app.defaultExceptionHandler.onNext(err)));
+                        }
+                    });
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
                 } 
@@ -171,7 +180,7 @@ module wx {
                     var promise = <Rx.IPromise<Node[]>> <any> options.promise;
                     return Rx.Observable.fromPromise(promise);
                 } else if (options.require) {
-                    return observableRequire(options.require).select(x=> app.templateEngine.parse(x));
+                    return observableRequire<string>(options.require).select(x=> app.templateEngine.parse(x));
                 } else if (options.element) {
                     if (typeof options.element === "string") {
                         // try both getElementById & querySelector

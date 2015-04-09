@@ -455,11 +455,11 @@ module wx {
     * @param {string} Module The module to load
     * @return {Rx.Observable<any>} An observable that yields a value and completes as soon as the module has been loaded
     */
-    export function observableRequire(module: string): Rx.Observable<any> {
+    export function observableRequire<T>(module: string): Rx.Observable<T> {
         if (!isFunction(require))
             internal.throwError("there's no AMD-module loader available (Hint: did you forget to include RequireJS in your project?)");
 
-        return Rx.Observable.create<any>(observer => {
+        return Rx.Observable.create<T>(observer => {
             try {
                 require([module],(m) => {
                     observer.onNext(m);

@@ -81,6 +81,6 @@ module wx {
         .binding("sref", "wx.bindings.sref")
         .binding(["sactive", "state-active"], "wx.bindings.sactive");
 
-    app.component("wx-radiogroup", "wx.components.radiogroup")
-        .component("wx-select", "wx.components.select");
+    app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" })
+        .component("wx-select", { resolve: "wx.components.select" });
 }
