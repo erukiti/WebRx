@@ -587,5 +587,14 @@ module wx {
             var msg = "WebRx: " + formatString(fmt, args);
             throw new Error(msg);
         }
+
+        /**
+        * FOR INTERNAL USE ONLY
+        * Throw an error containing the specified description
+        */
+        export function emitError(fmt: string, ...args: any[]): void {
+            var msg = "WebRx: " + formatString(fmt, args);
+            app.defaultExceptionHandler.onNext(Error(msg));
+        }
     }
 }

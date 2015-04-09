@@ -85,7 +85,7 @@ module wx {
                         componentObservable = app.component(componentName);
 
                     if (componentObservable == null)
-                        internal.throwError("component '{0}' is not registered with current module-context", componentName);
+                        internal.emitError("component '{0}' is not registered with current module-context", componentName);
 
                     var componentLoaderDisposable: Rx.IDisposable = undefined;
                     componentLoaderDisposable = componentObservable.subscribe(component => {
@@ -211,7 +211,7 @@ module wx {
                 }
             }
 
-            internal.throwError("invalid template descriptor");
+            internal.emitError("invalid template descriptor");
         }
 
         protected loadViewModel(vm: any, componentParams: Object): Rx.Observable<any> {
@@ -239,7 +239,7 @@ module wx {
                 }
             }
 
-            internal.throwError("invalid view-model descriptor");
+            internal.emitError("invalid view-model descriptor");
         }
 
         protected applyTemplate(component: IComponent, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {

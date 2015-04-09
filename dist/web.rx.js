@@ -412,6 +412,15 @@ var wx;
             throw new Error(msg);
         }
         internal.throwError = throwError;
+        function emitError(fmt) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            var msg = "WebRx: " + formatString(fmt, args);
+            wx.app.defaultExceptionHandler.onNext(Error(msg));
+        }
+        internal.emitError = emitError;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
 var wx;
@@ -1356,7 +1365,7 @@ var wx;
                     cleanup = new Rx.CompositeDisposable();
                     if (x.cmd != null) {
                         if (!wx.isCommand(x.cmd)) {
-                            internal.throwError("Command-Binding only supports binding to a command!");
+                            internal.emitError("Command-Binding only supports binding to a command!");
                         }
                         else {
                             el.disabled = !x.cmd.canExecute(x.param);
@@ -1524,7 +1533,7 @@ var wx;
                     if (componentObservable == null && wx.app.hasComponent(componentName))
                         componentObservable = wx.app.component(componentName);
                     if (componentObservable == null)
-                        internal.throwError("component '{0}' is not registered with current module-context", componentName);
+                        internal.emitError("component '{0}' is not registered with current module-context", componentName);
                     var componentLoaderDisposable = undefined;
                     componentLoaderDisposable = componentObservable.subscribe(function (component) {
                         if (componentLoaderDisposable != null) {
@@ -1620,7 +1629,7 @@ var wx;
                     }
                 }
             }
-            internal.throwError("invalid template descriptor");
+            internal.emitError("invalid template descriptor");
         };
         ComponentBinding.prototype.loadViewModel = function (vm, componentParams) {
             var syncResult;
@@ -1648,7 +1657,7 @@ var wx;
                     return Rx.Observable.return(options.instance);
                 }
             }
-            internal.throwError("invalid view-model descriptor");
+            internal.emitError("invalid view-model descriptor");
         };
         ComponentBinding.prototype.applyTemplate = function (component, el, ctx, state, template, vm) {
             while (el.firstChild) {
@@ -2347,7 +2356,7 @@ var wx;
             }));
         };
         MultiOneWayChangeBindingBase.prototype.applyValue = function (el, key, value) {
-            internal.throwError("you need to override this method!");
+            internal.emitError("you need to override this method!");
         };
         return MultiOneWayChangeBindingBase;
     })();
@@ -2504,7 +2513,7 @@ var wx;
                         }
                     }
                     if (!impl)
-                        internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
+                        internal.emitError("selectedValue-binding does not support this combination of bound element and model!");
                     implCleanup = new Rx.CompositeDisposable();
                     impl.updateElement(el, model);
                     implCleanup.add(impl.observeModel(model).subscribe(function (x) {
@@ -2586,7 +2595,7 @@ var wx;
         SingleOneWayChangeBindingBase.prototype.configure = function (options) {
         };
         SingleOneWayChangeBindingBase.prototype.applyValue = function (el, value) {
-            internal.throwError("you need to override this method!");
+            internal.emitError("you need to override this method!");
         };
         return SingleOneWayChangeBindingBase;
     })();

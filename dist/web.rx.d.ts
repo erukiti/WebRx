@@ -372,6 +372,7 @@ declare module wx {
     function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(property1: IObservableProperty<T1>, property2: IObservableProperty<T2>, property3: IObservableProperty<T3>, property4: IObservableProperty<T4>, property5: IObservableProperty<T5>, property6: IObservableProperty<T6>, property7: IObservableProperty<T7>, property8: IObservableProperty<T8>, selector: (T1, T2, T3, T4, T5, T6, T7, T8) => TRet): Rx.Observable<TRet>;
     module internal {
         function throwError(fmt: string, ...args: any[]): void;
+        function emitError(fmt: string, ...args: any[]): void;
     }
 }
 declare module wx {

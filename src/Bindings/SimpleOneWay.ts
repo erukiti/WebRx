@@ -62,7 +62,7 @@ module wx {
         protected domManager: IDomManager;
 
         protected applyValue(el: HTMLElement, value: any): void {
-            internal.throwError("you need to override this method!");
+            internal.emitError("you need to override this method!");
         }
     }
 
