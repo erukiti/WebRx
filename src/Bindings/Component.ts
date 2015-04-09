@@ -30,7 +30,7 @@ module wx {
             var compiled = this.domManager.compileBindingOptions(options, module);
             var opt = <IComponentBindingOptions> compiled;
             var exp: ICompiledExpression;
-            var componentObservable: Rx.Observable<string>;
+            var componentNameObservable: Rx.Observable<string>;
             var componentParams = {};
             var cleanup: Rx.CompositeDisposable;
 
@@ -44,10 +44,10 @@ module wx {
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
 
-                componentObservable = <any> this.domManager.expressionToObservable(exp, ctx);
+                componentNameObservable = <any> this.domManager.expressionToObservable(exp, ctx);
             } else {
                 // collect component-name observable
-                componentObservable = <any> this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx);
+                componentNameObservable = <any> this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx);
 
                 // collect params observables
                 if (opt.params) {
@@ -69,7 +69,7 @@ module wx {
             while (el.firstChild) { oldContents.push(el.removeChild(el.firstChild)); }
 
             // subscribe to any input changes
-            state.cleanup.add(componentObservable.subscribe(componentName => {
+            state.cleanup.add(componentNameObservable.subscribe(componentName => {
                 try {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
