@@ -1,5 +1,6 @@
 var wx;
 (function (wx) {
+    "use strict";
     var WeakMapEmulated = (function () {
         function WeakMapEmulated() {
             this.inner = {};
@@ -42,6 +43,7 @@ var wx;
 (function (wx) {
     var res;
     (function (res) {
+        "use strict";
         res.injector = "wx.injector";
         res.domManager = "wx.domservice";
         res.router = "wx.router";
@@ -54,8 +56,17 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
     var internal;
     (function (internal) {
+        "use strict";
         var PropertyChangedEventArgs = (function () {
             function PropertyChangedEventArgs(sender, propertyName) {
                 this.propertyName = propertyName;
@@ -68,6 +79,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var cssClassNameRegex = /\S+/g;
     var RxObsConstructor = Rx.Observable;
     function isStrictMode() {
@@ -404,6 +416,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var Injector = (function () {
         function Injector() {
             this.registrations = {};
@@ -483,6 +496,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var SetEmulated = (function () {
         function SetEmulated() {
             this.values = [];
@@ -552,6 +566,7 @@ var wx;
 (function (wx) {
     var env;
     (function (env) {
+        "use strict";
         var _window = window;
         var userAgent = _window.navigator.userAgent;
         env.ie;
@@ -620,6 +635,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var wx;
 (function (wx) {
+    "use strict";
     var Module = (function () {
         function Module(name) {
             this.bindings = {};
@@ -630,18 +646,29 @@ var wx;
         Module.prototype.component = function () {
             var args = wx.args2Array(arguments);
             var name = args.shift();
-            var component;
             if (args.length === 0) {
-                component = this.components[name];
-                if (typeof component === "string") {
-                    component = wx.injector.get(component);
-                    this.components[name] = component;
+                var descriptor = this.components[name];
+                if (descriptor != null) {
+                    if (descriptor.instance) {
+                        return Rx.Observable.return(descriptor.instance);
+                    }
+                    else if (descriptor.resolve) {
+                        var resolved = wx.injector.get(descriptor.resolve);
+                        this.components[name] = { instance: resolved };
+                        return Rx.Observable.return(resolved);
+                    }
+                    else if (descriptor.require) {
+                        return wx.observableRequire(descriptor.require);
+                    }
                 }
-                return component;
+                return Rx.Observable.return(undefined);
             }
-            component = args.shift();
+            var component = args.shift();
             this.components[name] = component;
             return this;
+        };
+        Module.prototype.hasComponent = function (name) {
+            return this.components[name] != null;
         };
         Module.prototype.binding = function () {
             var _this = this;
@@ -778,6 +805,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var DomManager = (function () {
         function DomManager(compiler) {
             this.expressionCache = {};
@@ -1010,7 +1038,7 @@ var wx;
             var _bindings;
             var tagName = el.tagName.toLowerCase();
             var i;
-            if (module.component(tagName) != null || wx.app.component(tagName) != null) {
+            if (module.hasComponent(tagName) || wx.app.hasComponent(tagName)) {
                 var params = el.getAttribute(DomManager.paramsAttributename);
                 var componentReference;
                 if (params)
@@ -1191,7 +1219,7 @@ var wx;
         internal.domManagerConstructor = DomManager;
     })(internal = wx.internal || (wx.internal = {}));
     function applyBindings(model, node) {
-        wx.injector.get(wx.res.domManager).applyBindings(model, node || window.document.body);
+        wx.injector.get(wx.res.domManager).applyBindings(model, node || window.document.documentElement);
     }
     wx.applyBindings = applyBindings;
     function cleanNode(node) {
@@ -1201,6 +1229,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var CheckedBinding = (function () {
         function CheckedBinding(domManager) {
             this.priority = 0;
@@ -1281,6 +1310,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var CommandBinding = (function () {
         function CommandBinding(domManager) {
             this.priority = 0;
@@ -1366,6 +1396,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var ModuleBinding = (function () {
         function ModuleBinding(domManager) {
             this.priority = 100;
@@ -1433,6 +1464,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var ComponentBinding = (function () {
         function ComponentBinding(domManager) {
             this.priority = 30;
@@ -1449,7 +1481,7 @@ var wx;
             var compiled = this.domManager.compileBindingOptions(options, module);
             var opt = compiled;
             var exp;
-            var componentObservable;
+            var componentNameObservable;
             var componentParams = {};
             var cleanup;
             function doCleanup() {
@@ -1460,10 +1492,10 @@ var wx;
             }
             if (typeof compiled === "function") {
                 exp = compiled;
-                componentObservable = this.domManager.expressionToObservable(exp, ctx);
+                componentNameObservable = this.domManager.expressionToObservable(exp, ctx);
             }
             else {
-                componentObservable = this.domManager.expressionToObservable(opt.name, ctx);
+                componentNameObservable = this.domManager.expressionToObservable(opt.name, ctx);
                 if (opt.params) {
                     if (wx.isFunction(opt.params)) {
                         componentParams = this.domManager.evaluateExpression(opt.params, ctx);
@@ -1482,32 +1514,42 @@ var wx;
             while (el.firstChild) {
                 oldContents.push(el.removeChild(el.firstChild));
             }
-            state.cleanup.add(componentObservable.subscribe(function (componentName) {
+            state.cleanup.add(componentNameObservable.subscribe(function (componentName) {
                 try {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
-                    var component = undefined;
-                    if (module)
-                        component = module.component(componentName);
-                    if (!component)
-                        component = wx.app.component(componentName);
-                    if (component == null)
-                        internal.throwError("component '{0}' is not registered.", componentName);
-                    if (component.viewModel) {
-                        state.cleanup.add(Rx.Observable.combineLatest(_this.loadTemplate(component.template, componentParams), _this.loadViewModel(component.viewModel, componentParams), function (t, vm) {
-                            return { template: t, viewModel: vm };
-                        }).subscribe(function (x) {
-                            if (wx.isDisposable(x.viewModel)) {
-                                cleanup.add(x.viewModel);
-                            }
-                            _this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                        }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
-                    }
-                    else {
-                        state.cleanup.add(_this.loadTemplate(component.template, componentParams).subscribe(function (t) {
-                            _this.applyTemplate(component, el, ctx, state, t);
-                        }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
-                    }
+                    var componentObservable = undefined;
+                    if (module && module.hasComponent(componentName))
+                        componentObservable = module.component(componentName);
+                    if (componentObservable == null && wx.app.hasComponent(componentName))
+                        componentObservable = wx.app.component(componentName);
+                    if (componentObservable == null)
+                        internal.throwError("component '{0}' is not registered with current module-context", componentName);
+                    var componentLoaderDisposable = undefined;
+                    componentLoaderDisposable = componentObservable.subscribe(function (component) {
+                        if (componentLoaderDisposable != null) {
+                            componentLoaderDisposable.dispose();
+                            componentLoaderDisposable = undefined;
+                        }
+                        if (component.viewModel) {
+                            state.cleanup.add(Rx.Observable.combineLatest(_this.loadTemplate(component.template, componentParams), _this.loadViewModel(component.viewModel, componentParams), function (t, vm) {
+                                if (wx.isFunction(vm)) {
+                                    vm = new vm(componentParams);
+                                }
+                                return { template: t, viewModel: vm };
+                            }).subscribe(function (x) {
+                                if (wx.isDisposable(x.viewModel)) {
+                                    cleanup.add(x.viewModel);
+                                }
+                                _this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
+                            }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                        }
+                        else {
+                            state.cleanup.add(_this.loadTemplate(component.template, componentParams).subscribe(function (t) {
+                                _this.applyTemplate(component, el, ctx, state, t);
+                            }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                        }
+                    });
                 }
                 catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
@@ -1583,8 +1625,7 @@ var wx;
         ComponentBinding.prototype.loadViewModel = function (vm, componentParams) {
             var syncResult;
             if (wx.isFunction(vm)) {
-                syncResult = new vm(componentParams);
-                return Rx.Observable.return(syncResult);
+                return Rx.Observable.return(vm);
             }
             else if (Array.isArray(vm)) {
                 syncResult = wx.injector.resolve(vm, componentParams);
@@ -1639,6 +1680,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var EventBinding = (function () {
         function EventBinding(domManager) {
             this.priority = 0;
@@ -1711,6 +1753,7 @@ var wx;
 (function (wx) {
     var internal;
     (function (internal) {
+        "use strict";
         var VirtualChildNodes = (function () {
             function VirtualChildNodes(targetNode, initialSyncToTarget, insertCB, removeCB) {
                 this.childNodes = [];
@@ -1791,6 +1834,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var ForEachBinding = (function () {
         function ForEachBinding(domManager) {
             this.priority = 40;
@@ -2061,6 +2105,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var HasFocusBinding = (function () {
         function HasFocusBinding(domManager) {
             this.priority = -1;
@@ -2163,6 +2208,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var IfBinding = (function () {
         function IfBinding(domManager) {
             this.priority = 50;
@@ -2246,6 +2292,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var MultiOneWayChangeBindingBase = (function () {
         function MultiOneWayChangeBindingBase(domManager) {
             this.priority = 0;
@@ -2352,6 +2399,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var impls = new Array();
     var RadioSingleSelectionImpl = (function () {
         function RadioSingleSelectionImpl(domManager) {
@@ -2502,6 +2550,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var SingleOneWayChangeBindingBase = (function () {
         function SingleOneWayChangeBindingBase(domManager) {
             this.priority = 0;
@@ -2635,6 +2684,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var TextInputBinding = (function () {
         function TextInputBinding(domManager) {
             this.priority = 0;
@@ -2748,6 +2798,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var ValueBinding = (function () {
         function ValueBinding(domManager) {
             this.priority = 5;
@@ -2863,6 +2914,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var WithBinding = (function () {
         function WithBinding(domManager) {
             this.priority = 50;
@@ -2913,6 +2965,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var IID = (function () {
         function IID() {
         }
@@ -2936,6 +2989,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var Lazy = (function () {
         function Lazy(createValue) {
             this.createValue = createValue;
@@ -2957,6 +3011,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var RefCountDisposeWrapper = (function () {
         function RefCountDisposeWrapper(inner) {
             this.refCount = 1;
@@ -2980,6 +3035,7 @@ var wx;
 (function (wx) {
     var internal;
     (function (internal) {
+        "use strict";
         var ScheduledSubject = (function () {
             function ScheduledSubject(scheduler, defaultObserver, defaultSubject) {
                 this._observerRefCount = 0;
@@ -3028,6 +3084,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var RxObsConstructor = Rx.Observable;
     RxObsConstructor.prototype.toProperty = function (initialValue, scheduler) {
         var accessor = function (newVal) {
@@ -3078,6 +3135,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var ObservableList = (function () {
         function ObservableList(initialContents, resetChangeThreshold, scheduler) {
             if (resetChangeThreshold === void 0) { resetChangeThreshold = 0.3; }
@@ -3609,6 +3667,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var groupId = 0;
     var templateCache = {};
     var RadioGroupComponent = (function () {
@@ -3681,6 +3740,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var templateCache = {};
     var SelectComponent = (function () {
         function SelectComponent(htmlTemplateEngine) {
@@ -3759,6 +3819,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var Command = (function () {
         function Command(canExecute, executeAsync, scheduler) {
             var _this = this;
@@ -3925,9 +3986,9 @@ var wx;
     }
     wx.combinedCommand = combinedCommand;
 })(wx || (wx = {}));
-"use strict";
 var wx;
 (function (wx) {
+    "use strict";
     var compiler;
     (function (compiler) {
         var stringDouble = '"(?:[^"\\\\]|\\\\.)*"';
@@ -4955,6 +5016,7 @@ var wx;
 ;
 var wx;
 (function (wx) {
+    "use strict";
     var rsingleTag = /^<([\w-]+)\s*\/?>(?:<\/\1>|)$/, rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:-]+)[^>]*)\/>/gi, rtagName = /<([\w:-]+)/, rhtml = /<|&#?\w+;/, rscriptType = /^$|\/(?:java|ecma)script/i, wrapMap = {
         option: [1, "<select multiple='multiple'>", "</select>"],
         thead: [1, "<table>", "</table>"],
@@ -5041,6 +5103,7 @@ var wx;
 (function (wx) {
     var log;
     (function (_log) {
+        "use strict";
         function log() {
             var args = [];
             for (var _i = 0; _i < arguments.length; _i++) {
@@ -5095,6 +5158,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var MessageBus = (function () {
         function MessageBus() {
             this.messageBus = {};
@@ -5142,6 +5206,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     function property(initialValue) {
         var accessor = function (newVal) {
             if (arguments.length > 0) {
@@ -5174,6 +5239,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var StateActiveBinding = (function () {
         function StateActiveBinding(domManager, router) {
             this.priority = 5;
@@ -5246,6 +5312,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var StateRefBinding = (function () {
         function StateRefBinding(domManager, router) {
             this.priority = 5;
@@ -5320,6 +5387,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var ViewBinding = (function () {
         function ViewBinding(domManager, router) {
             this.priority = 1000;
@@ -5381,7 +5449,6 @@ var wx;
                 options = null;
                 ctx = null;
                 state = null;
-                self = null;
             }));
         };
         ViewBinding.prototype.configure = function (options) {
@@ -5407,6 +5474,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var reEscape = /[\-\[\]{}()+?.,\\\^$|#\s]/g;
     var reParam = /([:*])(\w+)/g;
     var RouteMatcher = (function () {
@@ -5510,6 +5578,7 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     var Router = (function () {
         function Router(domManager) {
             var _this = this;
@@ -5721,14 +5790,15 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    "use strict";
     wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true).register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true).register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true).register(wx.res.messageBus, [wx.internal.messageBusConstructor], true);
     wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true).register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true).register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true).register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true).register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true).register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true).register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true).register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true).register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true).register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true).register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true).register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true).register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true).register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true).register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true).register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true).register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true).register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true).register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true).register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true).register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true).register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true).register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true).register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true).register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
     wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
     wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding("sref", "wx.bindings.sref").binding(["sactive", "state-active"], "wx.bindings.sactive");
-    wx.app.component("wx-radiogroup", "wx.components.radiogroup").component("wx-select", "wx.components.select");
+    wx.app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" }).component("wx-select", { resolve: "wx.components.select" });
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.56';
+    wx.version = '0.9.57';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

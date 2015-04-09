@@ -215,10 +215,15 @@ declare module wx {
         preBindingInit?: string;
         postBindingInit?: string;
     }
+    interface IComponentDescriptor {
+        require?: string;
+        resolve?: string;
+        instance?: any;
+    }
     interface IComponentRegistry {
-        component(name: string, handler: IComponent): IComponentRegistry;
-        component(name: string, handler: string): IComponentRegistry;
-        component(name: string): IComponent;
+        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
+        component(name: string): Rx.Observable<IComponent>;
+        hasComponent(name: string): boolean;
     }
     interface IExpressionFilterRegistry {
         filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
@@ -355,7 +360,7 @@ declare module wx {
     function nodeListToArray(nodes: NodeList): Node[];
     function nodeChildrenToArray<T>(node: Node): T[];
     function using<T extends Rx.Disposable>(disp: T, action: (disp?: T) => void): void;
-    function observableRequire(module: string): Rx.Observable<any>;
+    function observableRequire<T>(module: string): Rx.Observable<T>;
     function observeObject(target: any, onChanging?: boolean): Rx.Observable<IPropertyChangedEventArgs>;
     function whenAny<TRet, T1>(property1: IObservableProperty<T1>, selector: (T1) => TRet): Rx.Observable<TRet>;
     function whenAny<TRet, T1, T2>(property1: IObservableProperty<T1>, property2: IObservableProperty<T2>, selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
