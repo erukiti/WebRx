@@ -66,7 +66,9 @@ module wx {
 
             // clear children
             var oldContents = new Array<Node>();
-            while (el.firstChild) { oldContents.push(el.removeChild(el.firstChild)); }
+            while (el.firstChild) {
+                 oldContents.push(el.removeChild(el.firstChild));
+            }
 
             // subscribe to any input changes
             state.cleanup.add(componentNameObservable.subscribe(componentName => {
@@ -75,51 +77,41 @@ module wx {
                     cleanup = new Rx.CompositeDisposable();
 
                     // lookup component
-                    var componentObservable: Rx.Observable<IComponent> = undefined;
+                    var obs: Rx.Observable<IComponentInstance> = undefined;
+                    var disp: Rx.IDisposable = undefined;
 
                     if (module && module.hasComponent(componentName))
-                        componentObservable = module.component(componentName);
+                        obs = module.loadComponent(componentName, componentParams);
 
                     // fallback to "app" module if not registered with
-                    if (componentObservable == null && app.hasComponent(componentName))
-                        componentObservable = app.component(componentName);
+                    if (obs == null && app.hasComponent(componentName))
+                        obs = app.loadComponent(componentName, componentParams);
 
-                    if (componentObservable == null)
+                    if (obs == null) {
                         internal.emitError("component '{0}' is not registered with current module-context", componentName);
+                        return;
+                    }
 
-                    var componentLoaderDisposable: Rx.IDisposable = undefined;
-                    componentLoaderDisposable = componentObservable.subscribe(component => {
+                    disp = obs.subscribe(component => {
                         // loader cleanup
-                        if (componentLoaderDisposable != null) {
-                            componentLoaderDisposable.dispose();
-                            componentLoaderDisposable = undefined;
+                        if (disp != null) {
+                            disp.dispose();
+                            disp = undefined;
                         }
 
-                        // resolve template & view-model
+                        // auto-dispose view-model
                         if (component.viewModel) {
-                            state.cleanup.add(Rx.Observable.combineLatest(
-                                this.loadTemplate(component.template, componentParams),
-                                this.loadViewModel(component.viewModel, componentParams),
-                                (t, vm) => {
-                                    // if view-model factory yields a function, use it as constructor
-                                    if (isFunction(vm)) {
-                                        vm = new vm(componentParams);
-                                    }
-
-                                    return { template: t, viewModel: vm }
-                                }).subscribe(x => {
-                                if (isDisposable(x.viewModel)) {
-                                    cleanup.add(x.viewModel);
-                                }
-
-                                this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                            },(err) => app.defaultExceptionHandler.onNext(err)));
-                        } else {
-                            state.cleanup.add(this.loadTemplate(component.template, componentParams).subscribe((t) => {
-                                this.applyTemplate(component, el, ctx, state, t);
-                            },(err) => app.defaultExceptionHandler.onNext(err)));
+                            if (isDisposable(component.viewModel)) {
+                                cleanup.add(component.viewModel);
+                            }
                         }
+
+                        // done
+                        this.applyTemplate(component, el, ctx, state, component.template, component.viewModel);
                     });
+
+                    if (disp != null)
+                        cleanup.add(disp);
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
                 } 
@@ -152,95 +144,6 @@ module wx {
         // Implementation
 
         protected domManager: IDomManager;
-
-        protected loadTemplate(template: any, params: Object): Rx.Observable<Node[]> {
-            var syncResult: Node[];
-            var el: Element;
-
-            if (isFunction(template)) {
-                syncResult = template(params);
-
-                if (typeof syncResult === "string") {
-                    syncResult = app.templateEngine.parse(<string> template(params));
-                }
-
-                return Rx.Observable.return(syncResult);
-            } else if (typeof template === "string") {
-                syncResult = app.templateEngine.parse(<string> template);
-                return Rx.Observable.return(syncResult);
-            } else if (Array.isArray(template)) {
-                return Rx.Observable.return(<Node[]> template);
-            } else if(typeof template === "object") {
-                var options = <IComponentTemplateDescriptor> template;
-
-                if (options.resolve) {
-                    syncResult = injector.get<Node[]>(options.resolve);
-                    return Rx.Observable.return(syncResult);
-                } else if (options.promise) {
-                    var promise = <Rx.IPromise<Node[]>> <any> options.promise;
-                    return Rx.Observable.fromPromise(promise);
-                } else if (options.require) {
-                    return observableRequire<string>(options.require).select(x=> app.templateEngine.parse(x));
-                } else if (options.element) {
-                    if (typeof options.element === "string") {
-                        // try both getElementById & querySelector
-                        el = document.getElementById(<string> options.element) ||
-                            document.querySelector(<string> options.element);
-
-                        if (el != null) {
-                            // only the nodes inside the specified element will be cloned for use as the component’s template
-                            syncResult = app.templateEngine.parse((<HTMLElement> el).innerHTML);
-                        } else {
-                            syncResult = [];
-                        }
-
-                        return Rx.Observable.return(syncResult);
-                    } else {
-                        el = <Element> <any> options.element;
-
-                        // unwrap text/html script nodes
-                        if (el != null) {
-                            // only the nodes inside the specified element will be cloned for use as the component’s template
-                            syncResult = app.templateEngine.parse((<HTMLElement> el).innerHTML);
-                        } else {
-                            syncResult = [];
-                        }
-
-                        return Rx.Observable.return(syncResult);
-                    }
-                }
-            }
-
-            internal.emitError("invalid template descriptor");
-        }
-
-        protected loadViewModel(vm: any, componentParams: Object): Rx.Observable<any> {
-            var syncResult: any;
-
-            if (isFunction(vm)) {
-                return Rx.Observable.return(vm);
-            } else if (Array.isArray(vm)) {
-                // assumed to be inline-annotated-array
-                syncResult = injector.resolve<any>(vm, componentParams);
-                return Rx.Observable.return(syncResult);
-            } else if (typeof vm === "object") {
-                var options = <IComponentViewModelDescriptor> vm;
-
-                if (options.resolve) {
-                    syncResult = injector.get<any>(options.resolve, componentParams);
-                    return Rx.Observable.return(syncResult);
-                } else if (options.promise) {
-                    var promise = <Rx.IPromise<any>> <any> options.promise;
-                    return Rx.Observable.fromPromise(promise);
-                } else if (options.require) {
-                    return observableRequire(options.require);
-                } else if (options.instance) {
-                    return Rx.Observable.return(options.instance);
-                }
-            }
-
-            internal.emitError("invalid view-model descriptor");
-        }
 
         protected applyTemplate(component: IComponent, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
             // clear

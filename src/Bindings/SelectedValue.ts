@@ -156,8 +156,10 @@ module wx {
                         }
                     }
 
-                    if (!impl)
+                    if (!impl) {
                         internal.emitError("selectedValue-binding does not support this combination of bound element and model!");
+                        return;
+                    }
 
                     implCleanup = new Rx.CompositeDisposable();
 

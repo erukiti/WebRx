@@ -72,6 +72,7 @@ module wx {
                             if (!isCommand(x.cmd)) {
                                 // value is not a ICommand
                                 internal.emitError("Command-Binding only supports binding to a command!");
+                                return;
                             } else {
                                 // initial update
                                 el.disabled = !x.cmd.canExecute(x.param);

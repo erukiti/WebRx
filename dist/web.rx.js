@@ -652,32 +652,15 @@ var wx;
             this.expressionFilters = {};
             this.name = name;
         }
-        Module.prototype.component = function () {
-            var args = wx.args2Array(arguments);
-            var name = args.shift();
-            if (args.length === 0) {
-                var descriptor = this.components[name];
-                if (descriptor != null) {
-                    if (descriptor.instance) {
-                        return Rx.Observable.return(descriptor.instance);
-                    }
-                    else if (descriptor.resolve) {
-                        var resolved = wx.injector.get(descriptor.resolve);
-                        this.components[name] = { instance: resolved };
-                        return Rx.Observable.return(resolved);
-                    }
-                    else if (descriptor.require) {
-                        return wx.observableRequire(descriptor.require);
-                    }
-                }
-                return Rx.Observable.return(undefined);
-            }
-            var component = args.shift();
+        Module.prototype.registerComponent = function (name, component) {
             this.components[name] = component;
             return this;
         };
         Module.prototype.hasComponent = function (name) {
             return this.components[name] != null;
+        };
+        Module.prototype.loadComponent = function (name, params) {
+            return this.initializeComponent(this.instantiateComponent(name), params);
         };
         Module.prototype.binding = function () {
             var _this = this;
@@ -719,6 +702,139 @@ var wx;
         };
         Module.prototype.filters = function () {
             return this.expressionFilters;
+        };
+        Module.prototype.instantiateComponent = function (name) {
+            var _this = this;
+            var component = this.components[name];
+            var result = undefined;
+            if (component != null) {
+                if (component.instance) {
+                    result = Rx.Observable.return(component.instance);
+                }
+                else if (component.template) {
+                    result = Rx.Observable.return(component);
+                }
+                else if (component.resolve) {
+                    var resolved = wx.injector.get(component.resolve);
+                    result = Rx.Observable.return(resolved);
+                }
+                else if (component.require) {
+                    result = wx.observableRequire(component.require);
+                }
+            }
+            else {
+                result = Rx.Observable.return(undefined);
+            }
+            return result.do(function (x) { return _this.components[name].instance = x; });
+        };
+        Module.prototype.initializeComponent = function (obs, params) {
+            var _this = this;
+            return obs.take(1).selectMany(function (component) {
+                if (component == null) {
+                    return Rx.Observable.return(undefined);
+                }
+                if (component.viewModel) {
+                    return Rx.Observable.combineLatest(_this.loadComponentTemplate(component.template, params), _this.loadComponentViewModel(component.viewModel, params), function (t, vm) {
+                        if (wx.isFunction(vm)) {
+                            vm = new vm(params);
+                        }
+                        return {
+                            template: t,
+                            viewModel: vm,
+                            preBindingInit: component.preBindingInit,
+                            postBindingInit: component.postBindingInit
+                        };
+                    });
+                }
+                return _this.loadComponentTemplate(component.template, params).select(function (template) { return {
+                    template: template,
+                    preBindingInit: component.preBindingInit,
+                    postBindingInit: component.postBindingInit
+                }; });
+            }).take(1);
+        };
+        Module.prototype.loadComponentTemplate = function (template, params) {
+            var syncResult;
+            var el;
+            if (wx.isFunction(template)) {
+                syncResult = template(params);
+                if (typeof syncResult === "string") {
+                    syncResult = wx.app.templateEngine.parse(template(params));
+                }
+                return Rx.Observable.return(syncResult);
+            }
+            else if (typeof template === "string") {
+                syncResult = wx.app.templateEngine.parse(template);
+                return Rx.Observable.return(syncResult);
+            }
+            else if (Array.isArray(template)) {
+                return Rx.Observable.return(template);
+            }
+            else if (typeof template === "object") {
+                var options = template;
+                if (options.resolve) {
+                    syncResult = wx.injector.get(options.resolve);
+                    return Rx.Observable.return(syncResult);
+                }
+                else if (options.promise) {
+                    var promise = options.promise;
+                    return Rx.Observable.fromPromise(promise);
+                }
+                else if (options.require) {
+                    return wx.observableRequire(options.require).select(function (x) { return wx.app.templateEngine.parse(x); });
+                }
+                else if (options.element) {
+                    if (typeof options.element === "string") {
+                        el = document.getElementById(options.element) || document.querySelector(options.element);
+                        if (el != null) {
+                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
+                        }
+                        else {
+                            syncResult = [];
+                        }
+                        return Rx.Observable.return(syncResult);
+                    }
+                    else {
+                        el = options.element;
+                        if (el != null) {
+                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
+                        }
+                        else {
+                            syncResult = [];
+                        }
+                        return Rx.Observable.return(syncResult);
+                    }
+                }
+            }
+            wx.internal.throwError("invalid template descriptor");
+        };
+        Module.prototype.loadComponentViewModel = function (vm, componentParams) {
+            var syncResult;
+            if (wx.isFunction(vm)) {
+                return Rx.Observable.return(vm);
+            }
+            else if (Array.isArray(vm)) {
+                syncResult = wx.injector.resolve(vm, componentParams);
+                return Rx.Observable.return(syncResult);
+            }
+            else if (typeof vm === "object") {
+                var options = vm;
+                if (options.resolve) {
+                    syncResult = wx.injector.get(options.resolve, componentParams);
+                    return Rx.Observable.return(syncResult);
+                }
+                else if (options.promise) {
+                    var promise = options.promise;
+                    return Rx.Observable.fromPromise(promise);
+                }
+                else if (options.require) {
+                    return wx.observableRequire(options.require);
+                }
+                else if (options.instance) {
+                    return Rx.Observable.return(options.instance);
+                }
+            }
+            wx.internal.throwError("invalid view-model descriptor");
         };
         return Module;
     })();
@@ -1366,6 +1482,7 @@ var wx;
                     if (x.cmd != null) {
                         if (!wx.isCommand(x.cmd)) {
                             internal.emitError("Command-Binding only supports binding to a command!");
+                            return;
                         }
                         else {
                             el.disabled = !x.cmd.canExecute(x.param);
@@ -1527,38 +1644,30 @@ var wx;
                 try {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
-                    var componentObservable = undefined;
+                    var obs = undefined;
+                    var disp = undefined;
                     if (module && module.hasComponent(componentName))
-                        componentObservable = module.component(componentName);
-                    if (componentObservable == null && wx.app.hasComponent(componentName))
-                        componentObservable = wx.app.component(componentName);
-                    if (componentObservable == null)
+                        obs = module.loadComponent(componentName, componentParams);
+                    if (obs == null && wx.app.hasComponent(componentName))
+                        obs = wx.app.loadComponent(componentName, componentParams);
+                    if (obs == null) {
                         internal.emitError("component '{0}' is not registered with current module-context", componentName);
-                    var componentLoaderDisposable = undefined;
-                    componentLoaderDisposable = componentObservable.subscribe(function (component) {
-                        if (componentLoaderDisposable != null) {
-                            componentLoaderDisposable.dispose();
-                            componentLoaderDisposable = undefined;
+                        return;
+                    }
+                    disp = obs.subscribe(function (component) {
+                        if (disp != null) {
+                            disp.dispose();
+                            disp = undefined;
                         }
                         if (component.viewModel) {
-                            state.cleanup.add(Rx.Observable.combineLatest(_this.loadTemplate(component.template, componentParams), _this.loadViewModel(component.viewModel, componentParams), function (t, vm) {
-                                if (wx.isFunction(vm)) {
-                                    vm = new vm(componentParams);
-                                }
-                                return { template: t, viewModel: vm };
-                            }).subscribe(function (x) {
-                                if (wx.isDisposable(x.viewModel)) {
-                                    cleanup.add(x.viewModel);
-                                }
-                                _this.applyTemplate(component, el, ctx, state, x.template, x.viewModel);
-                            }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
+                            if (wx.isDisposable(component.viewModel)) {
+                                cleanup.add(component.viewModel);
+                            }
                         }
-                        else {
-                            state.cleanup.add(_this.loadTemplate(component.template, componentParams).subscribe(function (t) {
-                                _this.applyTemplate(component, el, ctx, state, t);
-                            }, function (err) { return wx.app.defaultExceptionHandler.onNext(err); }));
-                        }
+                        _this.applyTemplate(component, el, ctx, state, component.template, component.viewModel);
                     });
+                    if (disp != null)
+                        cleanup.add(disp);
                 }
                 catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
@@ -1575,89 +1684,6 @@ var wx;
             }));
         };
         ComponentBinding.prototype.configure = function (options) {
-        };
-        ComponentBinding.prototype.loadTemplate = function (template, params) {
-            var syncResult;
-            var el;
-            if (wx.isFunction(template)) {
-                syncResult = template(params);
-                if (typeof syncResult === "string") {
-                    syncResult = wx.app.templateEngine.parse(template(params));
-                }
-                return Rx.Observable.return(syncResult);
-            }
-            else if (typeof template === "string") {
-                syncResult = wx.app.templateEngine.parse(template);
-                return Rx.Observable.return(syncResult);
-            }
-            else if (Array.isArray(template)) {
-                return Rx.Observable.return(template);
-            }
-            else if (typeof template === "object") {
-                var options = template;
-                if (options.resolve) {
-                    syncResult = wx.injector.get(options.resolve);
-                    return Rx.Observable.return(syncResult);
-                }
-                else if (options.promise) {
-                    var promise = options.promise;
-                    return Rx.Observable.fromPromise(promise);
-                }
-                else if (options.require) {
-                    return wx.observableRequire(options.require).select(function (x) { return wx.app.templateEngine.parse(x); });
-                }
-                else if (options.element) {
-                    if (typeof options.element === "string") {
-                        el = document.getElementById(options.element) || document.querySelector(options.element);
-                        if (el != null) {
-                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
-                        }
-                        else {
-                            syncResult = [];
-                        }
-                        return Rx.Observable.return(syncResult);
-                    }
-                    else {
-                        el = options.element;
-                        if (el != null) {
-                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
-                        }
-                        else {
-                            syncResult = [];
-                        }
-                        return Rx.Observable.return(syncResult);
-                    }
-                }
-            }
-            internal.emitError("invalid template descriptor");
-        };
-        ComponentBinding.prototype.loadViewModel = function (vm, componentParams) {
-            var syncResult;
-            if (wx.isFunction(vm)) {
-                return Rx.Observable.return(vm);
-            }
-            else if (Array.isArray(vm)) {
-                syncResult = wx.injector.resolve(vm, componentParams);
-                return Rx.Observable.return(syncResult);
-            }
-            else if (typeof vm === "object") {
-                var options = vm;
-                if (options.resolve) {
-                    syncResult = wx.injector.get(options.resolve, componentParams);
-                    return Rx.Observable.return(syncResult);
-                }
-                else if (options.promise) {
-                    var promise = options.promise;
-                    return Rx.Observable.fromPromise(promise);
-                }
-                else if (options.require) {
-                    return wx.observableRequire(options.require);
-                }
-                else if (options.instance) {
-                    return Rx.Observable.return(options.instance);
-                }
-            }
-            internal.emitError("invalid view-model descriptor");
         };
         ComponentBinding.prototype.applyTemplate = function (component, el, ctx, state, template, vm) {
             while (el.firstChild) {
@@ -2512,8 +2538,10 @@ var wx;
                             break;
                         }
                     }
-                    if (!impl)
+                    if (!impl) {
                         internal.emitError("selectedValue-binding does not support this combination of bound element and model!");
+                        return;
+                    }
                     implCleanup = new Rx.CompositeDisposable();
                     impl.updateElement(el, model);
                     implCleanup.add(impl.observeModel(model).subscribe(function (x) {
@@ -5804,10 +5832,10 @@ var wx;
     wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true).register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true).register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true).register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true).register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true).register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true).register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true).register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true).register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true).register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true).register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true).register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true).register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true).register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true).register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true).register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true).register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true).register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true).register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true).register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true).register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true).register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true).register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true).register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true).register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
     wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
     wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding("sref", "wx.bindings.sref").binding(["sactive", "state-active"], "wx.bindings.sactive");
-    wx.app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" }).component("wx-select", { resolve: "wx.components.select" });
+    wx.app.registerComponent("wx-radiogroup", { resolve: "wx.components.radiogroup" }).registerComponent("wx-select", { resolve: "wx.components.select" });
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.57';
+    wx.version = '0.9.58';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

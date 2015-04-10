@@ -547,26 +547,29 @@ module wx {
     }
 
     export interface IComponent {
-        template: string|Node[]|IComponentTemplateDescriptor;
+        require?: string;       // Async AMD loading
+        resolve?: string;       // DI
+
+        // template & viewModel are mutually exclusive with require and resolve
+        template?: string|Node[]|IComponentTemplateDescriptor;
         viewModel?: IComponentViewModelDescriptor;
 
         preBindingInit?: string;   // name of method on view-model to invoke before bindings get applied
         postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
     }
 
-    export interface IComponentDescriptor {
-        require?: string;       // Async AMD loading
-        resolve?: string;       // DI
-        template?: string|Node[]|IComponentTemplateDescriptor;
-        viewModel?: IComponentViewModelDescriptor;
+    export interface IComponentInstance {
+        template: Node[];
+        viewModel?: any;
+
         preBindingInit?: string;   // name of method on view-model to invoke before bindings get applied
         postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
     }
 
     export interface IComponentRegistry {
-        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
-        component(name: string): Rx.Observable<IComponent>;
+        registerComponent(name: string, descriptor: IComponent): IComponentRegistry;
         hasComponent(name: string): boolean;
+        loadComponent(name: string, params?: Object): Rx.Observable<IComponentInstance>;
     }
 
     export interface IExpressionFilterRegistry {

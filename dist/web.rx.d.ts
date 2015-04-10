@@ -196,7 +196,7 @@ declare module wx {
         binding(name: string): IBindingHandler;
     }
     interface IComponentTemplateDescriptor {
-        (params: any): string | Node[];
+        (params?: any): string | Node[];
         require?: string;
         promise?: Rx.IPromise<Node[]>;
         resolve?: string;
@@ -210,20 +210,23 @@ declare module wx {
         instance?: any;
     }
     interface IComponent {
-        template: string | Node[] | IComponentTemplateDescriptor;
+        require?: string;
+        resolve?: string;
+        template?: string | Node[] | IComponentTemplateDescriptor;
         viewModel?: IComponentViewModelDescriptor;
         preBindingInit?: string;
         postBindingInit?: string;
     }
-    interface IComponentDescriptor {
-        require?: string;
-        resolve?: string;
-        instance?: any;
+    interface IComponentInstance {
+        template: Node[];
+        viewModel?: any;
+        preBindingInit?: string;
+        postBindingInit?: string;
     }
     interface IComponentRegistry {
-        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
-        component(name: string): Rx.Observable<IComponent>;
+        registerComponent(name: string, descriptor: IComponent): IComponentRegistry;
         hasComponent(name: string): boolean;
+        loadComponent(name: string, params?: Object): Rx.Observable<IComponentInstance>;
     }
     interface IExpressionFilterRegistry {
         filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
