@@ -21,7 +21,7 @@ module wx {
         //////////////////////////////////
         // IModule
 
-        public registerComponent(name: string, component: IComponent): IComponentRegistry {
+        public component(name: string, component: IComponent): IComponentRegistry {
             this.components[name] = <IComponentPrivate> component;
             return this;
         }
@@ -369,7 +369,7 @@ module wx {
     var modules: { [name: string]: IModule } = { 'app': app };
 
     /**
-    * Defines or retrieves an application module.
+    * Defines a module.
     * @param {string} name The module name
     * @return {IModule} The module handle
     */
@@ -382,5 +382,14 @@ module wx {
        }
 
        return result;
+   }
+
+   /**
+   * Loads a module.
+   * @param {string} name The module name
+   * @return {IModule} The module handle
+   */
+   export function loadModule(name: string): Rx.Observable<IModule> {
+       throw "Not implemented";
    }
 }

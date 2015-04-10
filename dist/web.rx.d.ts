@@ -224,7 +224,7 @@ declare module wx {
         postBindingInit?: string;
     }
     interface IComponentRegistry {
-        registerComponent(name: string, descriptor: IComponent): IComponentRegistry;
+        component(name: string, descriptor: IComponent): IComponentRegistry;
         hasComponent(name: string): boolean;
         loadComponent(name: string, params?: Object): Rx.Observable<IComponentInstance>;
     }
@@ -404,6 +404,7 @@ declare var createMockHistory: () => wx.IHistory;
 declare module wx {
     var app: IWebRxApp;
     function module(name: string): IModule;
+    function loadModule(name: string): Rx.Observable<IModule>;
 }
 declare module wx {
     module internal {
