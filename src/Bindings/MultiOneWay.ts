@@ -88,7 +88,7 @@ module wx {
         }
 
         protected applyValue(el: HTMLElement, key: string, value: any): void {
-            internal.emitError("you need to override this method!");
+            internal.throwError("you need to override this method!");
         }
     }
 

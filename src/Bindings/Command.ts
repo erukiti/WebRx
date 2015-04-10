@@ -69,29 +69,26 @@ module wx {
                         cleanup = new Rx.CompositeDisposable();
 
                         if (x.cmd != null) {
-                            if (!isCommand(x.cmd)) {
-                                // value is not a ICommand
-                                internal.emitError("Command-Binding only supports binding to a command!");
-                                return;
-                            } else {
-                                // initial update
-                                el.disabled = !x.cmd.canExecute(x.param);
+                            if (!isCommand(x.cmd))
+                                internal.throwError("Command-Binding only supports binding to a command!");
 
-                                // listen to changes
-                                cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
-                                    el.disabled = !canExecute;
-                                }));
+                            // initial update
+                            el.disabled = !x.cmd.canExecute(x.param);
 
-                                // handle click event
-                                cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
-                                    x.cmd.execute(x.param);
+                            // listen to changes
+                            cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
+                                el.disabled = !canExecute;
+                            }));
 
-                                    if (isAnchor) {
-                                        // prevent default for anchors
-                                        e.preventDefault();
-                                    }
-                                }));
-                            }
+                            // handle click event
+                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
+                                x.cmd.execute(x.param);
+
+                                if (isAnchor) {
+                                    // prevent default for anchors
+                                    e.preventDefault();
+                                }
+                            }));
                         }
                     } catch (e) {
                         wx.app.defaultExceptionHandler.onNext(e);

@@ -87,10 +87,8 @@ module wx {
                     if (obs == null && app.hasComponent(componentName))
                         obs = app.loadComponent(componentName, componentParams);
 
-                    if (obs == null) {
-                        internal.emitError("component '{0}' is not registered with current module-context", componentName);
-                        return;
-                    }
+                    if (obs == null)
+                        internal.throwError("component '{0}' is not registered with current module-context", componentName);
 
                     disp = obs.subscribe(component => {
                         // loader cleanup

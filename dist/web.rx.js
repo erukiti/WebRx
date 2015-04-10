@@ -1480,22 +1480,18 @@ var wx;
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
                     if (x.cmd != null) {
-                        if (!wx.isCommand(x.cmd)) {
-                            internal.emitError("Command-Binding only supports binding to a command!");
-                            return;
-                        }
-                        else {
-                            el.disabled = !x.cmd.canExecute(x.param);
-                            cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
-                                el.disabled = !canExecute;
-                            }));
-                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
-                                x.cmd.execute(x.param);
-                                if (isAnchor) {
-                                    e.preventDefault();
-                                }
-                            }));
-                        }
+                        if (!wx.isCommand(x.cmd))
+                            internal.throwError("Command-Binding only supports binding to a command!");
+                        el.disabled = !x.cmd.canExecute(x.param);
+                        cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
+                            el.disabled = !canExecute;
+                        }));
+                        cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
+                            x.cmd.execute(x.param);
+                            if (isAnchor) {
+                                e.preventDefault();
+                            }
+                        }));
                     }
                 }
                 catch (e) {
@@ -1650,10 +1646,8 @@ var wx;
                         obs = module.loadComponent(componentName, componentParams);
                     if (obs == null && wx.app.hasComponent(componentName))
                         obs = wx.app.loadComponent(componentName, componentParams);
-                    if (obs == null) {
-                        internal.emitError("component '{0}' is not registered with current module-context", componentName);
-                        return;
-                    }
+                    if (obs == null)
+                        internal.throwError("component '{0}' is not registered with current module-context", componentName);
                     disp = obs.subscribe(function (component) {
                         if (disp != null) {
                             disp.dispose();
@@ -2382,7 +2376,7 @@ var wx;
             }));
         };
         MultiOneWayChangeBindingBase.prototype.applyValue = function (el, key, value) {
-            internal.emitError("you need to override this method!");
+            internal.throwError("you need to override this method!");
         };
         return MultiOneWayChangeBindingBase;
     })();
@@ -2538,10 +2532,8 @@ var wx;
                             break;
                         }
                     }
-                    if (!impl) {
-                        internal.emitError("selectedValue-binding does not support this combination of bound element and model!");
-                        return;
-                    }
+                    if (!impl)
+                        internal.throwError("selectedValue-binding does not support this combination of bound element and model!");
                     implCleanup = new Rx.CompositeDisposable();
                     impl.updateElement(el, model);
                     implCleanup.add(impl.observeModel(model).subscribe(function (x) {
@@ -2623,7 +2615,7 @@ var wx;
         SingleOneWayChangeBindingBase.prototype.configure = function (options) {
         };
         SingleOneWayChangeBindingBase.prototype.applyValue = function (el, value) {
-            internal.emitError("you need to override this method!");
+            internal.throwError("you need to override this method!");
         };
         return SingleOneWayChangeBindingBase;
     })();
