@@ -53,23 +53,23 @@ module wx {
                     var disp: Rx.IDisposable = undefined;
 
                     // split names
-                    if (value)
-                        moduleNames = value.split(" ").filter(x=> x);
+                    if (value) {
+                        value = trimString(value);
+                        moduleNames = value.split(" ").filter(x => x);
+                    }
 
                     if (moduleNames.length > 0) {
                         var observables = moduleNames.map(x => loadModule(x));
 
-                        disp = Rx.Observable.combineLatest(observables, (_) => <IModule[]> args2Array(arguments)).subscribe(modules => {
-                            // loader cleanup
-                            if (disp != null) {
-                                disp.dispose();
-                                disp = undefined;
-                            }
-                            
-                            // merge modules
-                            var merged: IModule = <any> {};
-                            extend(module || wx.app, merged);
-                            modules.forEach(x => extend(x, merged));
+                        disp = Rx.Observable.combineLatest(observables,
+                            (_) => <IModule[]> args2Array(arguments)).subscribe(modules => {
+                            // create intermediate module
+                            var moduleName = (module || wx.app).name + " - " + value;
+                            var merged: IModule = new internal.moduleConstructor(moduleName);
+
+                            // merge modules into intermediate
+                            merged.merge(module || wx.app);
+                            modules.forEach(x => merged.merge(x));
 
                             // done
                             self.applyValue(el, merged, template, ctx, state, initialApply);

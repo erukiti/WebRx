@@ -12,9 +12,15 @@
     <div id="intermediate">
         <div id="child-container" data-bind="module: 'test2'">
             <div id="content" data-bind="bar: 'bar'">invalid</div>
+            <div id="content2" data-bind="foo: 'baz'">invalid</div>
         </div>
     </div>
 
     <!-- module 'test1' should be active here, not 'test2' -->
     <div id="content2" data-bind="foo: 'baz'">invalid</div>
+</div>
+
+<div id="multiple-module-names" data-bind="module: 'test test2'">
+    <div id="content" data-bind="foo: 'bar'">invalid</div>
+    <div id="content2" data-bind="bar: 'foo'">invalid</div>
 </div>

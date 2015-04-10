@@ -588,6 +588,7 @@ module wx {
 
     export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
         name: string;
+        merge(other: IModule): IModule;
     }
 
     /**

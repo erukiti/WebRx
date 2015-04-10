@@ -21,6 +21,16 @@ module wx {
         //////////////////////////////////
         // IModule
 
+        public merge(other: IModule): IModule {
+            var _other = <Module> other;
+
+            extend(_other.components, this.components);
+            extend(_other.bindings, this.bindings);
+            extend(_other.expressionFilters, this.expressionFilters);
+
+            return this;
+        }
+
         public component(name: string, component: IComponentDescriptor): IComponentRegistry {
             this.components[name] = <IComponentDescriptorEx> component;
             return this;
@@ -362,6 +372,10 @@ module wx {
 
             return result;
         }
+    }
+
+    export module internal {
+        export var moduleConstructor = <any> Module;
     }
 
     export var app: IWebRxApp = new App();
