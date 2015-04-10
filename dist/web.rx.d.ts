@@ -209,24 +209,24 @@ declare module wx {
         resolve?: string;
         instance?: any;
     }
-    interface IComponent {
+    interface IComponentDescriptor {
         require?: string;
         resolve?: string;
         template?: string | Node[] | IComponentTemplateDescriptor;
-        viewModel?: IComponentViewModelDescriptor;
+        viewModel?: Array<any> | IComponentViewModelDescriptor;
         preBindingInit?: string;
         postBindingInit?: string;
     }
-    interface IComponentInstance {
+    interface IComponent {
         template: Node[];
         viewModel?: any;
         preBindingInit?: string;
         postBindingInit?: string;
     }
     interface IComponentRegistry {
-        component(name: string, descriptor: IComponent): IComponentRegistry;
+        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
         hasComponent(name: string): boolean;
-        loadComponent(name: string, params?: Object): Rx.Observable<IComponentInstance>;
+        loadComponent(name: string, params?: Object): Rx.Observable<IComponent>;
     }
     interface IExpressionFilterRegistry {
         filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
@@ -235,8 +235,16 @@ declare module wx {
             [filterName: string]: IExpressionFilter;
         };
     }
+    interface IModuleDescriptor {
+        (module: IModule): void;
+        require?: string;
+        promise?: Rx.IPromise<string>;
+        resolve?: string;
+        instance?: any;
+    }
     interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
         name: string;
+        merge(other: IModule): IModule;
     }
     interface ITemplateEngine {
         parse(templateSource: string): Node[];
@@ -402,8 +410,11 @@ declare module wx.env {
 }
 declare var createMockHistory: () => wx.IHistory;
 declare module wx {
+    module internal {
+        var moduleConstructor: any;
+    }
     var app: IWebRxApp;
-    function module(name: string): IModule;
+    function module(name: string, descriptor: Array<any> | IModuleDescriptor): typeof wx;
     function loadModule(name: string): Rx.Observable<IModule>;
 }
 declare module wx {
