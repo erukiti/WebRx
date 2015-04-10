@@ -82,8 +82,8 @@ module wx {
                 }
             }
 
-            if (typeof value === "string")
-                value = wx.module(value);
+            //if (typeof value === "string")
+            //    value = wx.module(value);
 
             state.module = value;
 

@@ -23,7 +23,7 @@ module wx {
 
     var templateCache: { [key: string]: any } = {};
 
-    class SelectComponent implements IComponent {
+    class SelectComponent implements IComponentDescriptor {
         constructor(htmlTemplateEngine: ITemplateEngine) {
             this.htmlTemplateEngine = htmlTemplateEngine;
         }

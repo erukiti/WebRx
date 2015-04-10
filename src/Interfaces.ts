@@ -546,19 +546,19 @@ module wx {
         instance?: any;         // pre-constructed instance
     }
 
-    export interface IComponent {
+    export interface IComponentDescriptor {
         require?: string;       // Async AMD loading
         resolve?: string;       // DI
 
         // template & viewModel are mutually exclusive with require and resolve
         template?: string|Node[]|IComponentTemplateDescriptor;
-        viewModel?: IComponentViewModelDescriptor;
+        viewModel?: Array<any>|IComponentViewModelDescriptor;
 
         preBindingInit?: string;   // name of method on view-model to invoke before bindings get applied
         postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
     }
 
-    export interface IComponentInstance {
+    export interface IComponent {
         template: Node[];
         viewModel?: any;
 
@@ -567,15 +567,23 @@ module wx {
     }
 
     export interface IComponentRegistry {
-        component(name: string, descriptor: IComponent): IComponentRegistry;
+        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
         hasComponent(name: string): boolean;
-        loadComponent(name: string, params?: Object): Rx.Observable<IComponentInstance>;
+        loadComponent(name: string, params?: Object): Rx.Observable<IComponent>;
     }
 
     export interface IExpressionFilterRegistry {
         filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
         filter(name: string): IExpressionFilter;
         filters(): { [filterName: string]: IExpressionFilter };
+    }
+
+    export interface IModuleDescriptor {
+        (module: IModule): void; // Configuration function
+        require?: string;       // Async AMD loaded configuration function
+        promise?: Rx.IPromise<string>;  // Async Promise configuration function
+        resolve?: string;       // DI resolved configuration function
+        instance?: any;         // pre-constructed instance
     }
 
     export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {

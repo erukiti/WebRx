@@ -77,7 +77,7 @@ module wx {
                     cleanup = new Rx.CompositeDisposable();
 
                     // lookup component
-                    var obs: Rx.Observable<IComponentInstance> = undefined;
+                    var obs: Rx.Observable<IComponent> = undefined;
                     var disp: Rx.IDisposable = undefined;
 
                     if (module && module.hasComponent(componentName))
@@ -143,7 +143,7 @@ module wx {
 
         protected domManager: IDomManager;
 
-        protected applyTemplate(component: IComponent, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
+        protected applyTemplate(component: IComponentDescriptor, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
             // clear
             while (el.firstChild) {
                 this.domManager.cleanNode(el.firstChild);

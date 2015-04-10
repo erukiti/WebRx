@@ -20,7 +20,7 @@ module wx {
     var groupId = 0;
     var templateCache: { [key: string]: any } = {};
 
-    class RadioGroupComponent implements IComponent {
+    class RadioGroupComponent implements IComponentDescriptor {
         constructor(htmlTemplateEngine: ITemplateEngine) {
             this.htmlTemplateEngine = htmlTemplateEngine;
         }
