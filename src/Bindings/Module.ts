@@ -30,6 +30,14 @@ module wx {
             var exp = this.domManager.compileBindingOptions(options, module);
             var obs = this.domManager.expressionToObservable(exp, ctx);
             var initialApply = true;
+            var cleanup: Rx.CompositeDisposable;
+
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
 
             // backup inner HTML
             var template = new Array<Node>();
@@ -37,9 +45,40 @@ module wx {
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
                 try {
-                    self.applyValue(el, unwrapProperty(x), template, ctx, state, initialApply);
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
 
-                    initialApply = false;
+                    var value = unwrapProperty(x);
+                    var moduleNames: Array<string>;
+                    var disp: Rx.IDisposable = undefined;
+
+                    // split names
+                    if (value)
+                        moduleNames = value.split(" ").filter(x=> x);
+
+                    if (moduleNames.length > 0) {
+                        var observables = moduleNames.map(x => loadModule(x));
+
+                        disp = Rx.Observable.combineLatest(observables, (_) => <IModule[]> args2Array(arguments)).subscribe(modules => {
+                            // loader cleanup
+                            if (disp != null) {
+                                disp.dispose();
+                                disp = undefined;
+                            }
+                            
+                            // merge modules
+                            var merged: IModule = <any> {};
+                            extend(module || wx.app, merged);
+                            modules.forEach(x => extend(x, merged));
+
+                            // done
+                            self.applyValue(el, merged, template, ctx, state, initialApply);
+                            initialApply = false;
+                        });
+
+                        if (disp != null)
+                            cleanup.add(disp);
+                    }
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
                 } 
@@ -72,7 +111,7 @@ module wx {
 
         protected domManager: IDomManager;
 
-        protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
+        protected applyValue(el: HTMLElement, module: IModule, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
             var i;
 
             if (initialApply) {
@@ -82,10 +121,7 @@ module wx {
                 }
             }
 
-            //if (typeof value === "string")
-            //    value = wx.module(value);
-
-            state.module = value;
+            state.module = module;
 
             // clean first
             this.domManager.cleanDescendants(el);

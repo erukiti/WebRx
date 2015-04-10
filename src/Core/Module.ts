@@ -397,6 +397,11 @@ module wx {
                module = new Module(name);
                injector.resolve<IModule>(<Array<any>> md, module);
                result = Rx.Observable.return(module);
+           } else if (isFunction(md)) {
+               // configuration function
+               module = new Module(name);
+               (<any> md)(module);
+               result = Rx.Observable.return(module);
            } else {
                var mdd = <IModuleDescriptor> md;
 
@@ -421,6 +426,6 @@ module wx {
            result = Rx.Observable.return<IModule>(undefined);
        }
 
-       return result.do(x=> modules[name] = <IModuleDescriptor> <any> { instance: x });   // cache instantiated module
+       return result.take(1).do(x=> modules[name] = <IModuleDescriptor> <any> { instance: x });   // cache instantiated module
   }
 }
