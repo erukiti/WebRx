@@ -78,5 +78,54 @@ describe('Components', () => {
             testutils.triggerEvent(select, "change");
             expect(model.selection()).toEqual("3");
         });
+
+        it('live example 1',() => {
+            loadFixtures('templates/Components/Select.html');
+
+            var el = document.querySelector("#fixture5");
+
+            var SimpleListModel = function (items) {
+                this.items = wx.list(items);
+                this.itemToAdd = wx.property("");
+                this.selectedItem = wx.property(null);
+
+                this.addItemCmd = wx.command(function () {
+                    if (this.itemToAdd() != "") {
+                        // add the item
+                        this.items.add(this.itemToAdd());
+
+                        // clear the textbox
+                        this.itemToAdd("");
+                    }
+                }, wx.whenAny(this.itemToAdd, function (itemToAdd) {
+                    return itemToAdd.length > 0;
+                }), this);
+
+                this.removeItemCmd = wx.command(function () {
+                    // remove the item
+                    this.items.remove(this.selectedItem());
+
+                    // clear selection
+                    this.selectedItem(null);
+                }, wx.whenAny(this.selectedItem, function (selectedItem) {
+                        return selectedItem != null;
+                    }), this);
+            };
+
+            var templateLength = 5;
+            var initialContents = ["Alpha", "Beta", "Gamma"];
+            var model = new SimpleListModel(initialContents);
+
+            wx.applyBindings(model, el);
+
+            // select element should be filled
+            expect(model.items.length()).toEqual(3);
+            expect(el.childNodes.length / templateLength).toEqual(model.items.length());
+
+            // delete the first item
+            model.selectedItem(model.items.get(0));
+            testutils.triggerEvent(<any> el.querySelector(".btn-danger"), "click");
+            expect(model.items.length()).toEqual(2);
+        });
     });
 });

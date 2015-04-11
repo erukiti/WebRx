@@ -28,6 +28,12 @@ describe("Output Properties", () => {
         expect(prop()).toEqual(10);
     });
 
+    it("source observable prefixed with startWith overrides initialValue",() => {
+        var obs = Rx.Observable.never().startWith(13);
+        var prop = obs.toProperty();
+        expect(prop()).toEqual(13);
+    });
+
     it("invoking it as a function with a parameter to change it's value, throws an error",() => {
         var prop = Rx.Observable.never().toProperty();
         expect(() => prop(10)).toThrowError();

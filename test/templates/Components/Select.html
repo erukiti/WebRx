@@ -2,3 +2,12 @@
 <wx-select id="fixture2" params="items: items, itemText: 'key', itemValue: 'value'"></wx-select>
 <wx-select id="fixture3" params="items: items, itemText: 'key', itemValue: 'value', itemClass: 'select-item'"></wx-select>
 <wx-select id="fixture4" params="items: items, selectedValue: @selection, itemText: 'key', itemValue: 'value', itemClass: 'select-item'"></wx-select>
+<div id="fixture5">
+    <label>New item</label>
+    <input class="form-control" data-bind='textInput: @itemToAdd' />
+    <button class="btn btn-primary" data-bind="command: addItemCmd">Add</button>
+    <button class="btn btn-danger" data-bind="command: removeItemCmd">Remove</button>
+    <br />
+    <p>Your items:</p>
+    <wx-select params="items: items, selectedValue: @selectedItem, size: 6"></wx-select>
+</div>

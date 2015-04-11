@@ -506,14 +506,11 @@ module wx {
                 Array.prototype.splice.apply(this.inner,(<T[]><any>[0, 0]).concat(initialContents));
             }
 
-            this.length = this.lengthChanged
-                .startWith(this.inner.length)
-                .toProperty();
+            this.length = this.lengthChanged.toProperty(this.inner.length);
 
             this.isEmpty = this.lengthChanged
-                .select(x => x === 0)
-                .startWith(this.inner.length === 0)
-                .toProperty();
+                .select(x => <boolean> (x === 0))
+                .toProperty(this.inner.length === 0);
         }
 
         private areChangeNotificationsEnabled(): boolean {
