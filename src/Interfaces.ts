@@ -710,6 +710,14 @@ module wx {
         get(state: string): IRouterStateConfig;
 
         /**
+        * Similar to IRouter.includes, but only checks for the full state name. If params is supplied then it will 
+        * be tested for strict equality against the current active params object, so all params must match with none 
+        * missing and no extras.
+        * @param {string} state Absolute state path.
+        **/
+        is(state: string, params?: any, options?: any);
+
+        /**
         * A method to determine if the current active state is equal to or is the child of the state stateName. 
         * If any params are passed then they will be tested for a match as well. Not all the parameters need 
         * to be passed, just the ones you'd like to test for equality.

@@ -271,7 +271,7 @@ describe('Routing',() => {
 
             wx.app.history.forward();
             expect(document.title).toEqual("bar");
-            expect(wx.router.includes("foo.bar", { barId: 5 })).toBeTruthy();
+            expect(wx.router.is("foo.bar", { barId: 5 })).toBeTruthy();
         });
 
         it('includes() correctly tests child and parent states including params',() => {

@@ -72,12 +72,37 @@ module wx {
             return this.states[state];
         }
 
+        public is(state: string, params?: any, options?: any) {
+            var _current = this.current();
+            var isActive = _current.name === state;
+
+            if (isActive && params != null) {
+                var currentParamsKeys = Object.keys(_current.params);
+                var paramsKeys = Object.keys(params);
+
+                if (currentParamsKeys.length === paramsKeys.length) {
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
+                            isActive = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return isActive;
+        }
+
         public includes(state: string, params?: any, options?: any) {
             var _current = this.current();
             var isActive = _current.name.indexOf(state) === 0;
 
             if (isActive && params != null) {
+                var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
+
+                paramsKeys = paramsKeys.length <= currentParamsKeys.length ?
+                    paramsKeys : currentParamsKeys;
 
                 for (var i = 0; i < paramsKeys.length; i++) {
                     if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
