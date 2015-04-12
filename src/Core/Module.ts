@@ -2,6 +2,7 @@
 /// <reference path="Utils.ts" />
 /// <reference path="Injector.ts" />
 /// <reference path="Resources.ts" />
+/// <reference path="Property.ts" />
 
 declare var createMockHistory: () => wx.IHistory;
 
@@ -327,6 +328,7 @@ module wx {
         }
 
         public history: IHistory;
+        public title: IObservableProperty<string> = property("");
 
         ///////////////////////
         // Implementation

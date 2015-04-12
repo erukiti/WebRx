@@ -246,6 +246,34 @@ describe('Routing',() => {
             expect(wx.app.history.length).toEqual(2);
         });
 
+        it('monitors wx.app.title and reflects current value in document.title',() => {
+            expect(wx.app.title()).not.toEqual("foo");
+            expect(document.title).not.toEqual("foo");
+
+            wx.app.title("foo");
+            expect(document.title).toEqual(wx.app.title());
+
+            wx.router.state({
+                name: "foo.bar",
+                route: "bar/:barId",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("foo.bar", { barId: 5 }, { location: true });
+            wx.app.title("bar");
+            expect(document.title).toEqual(wx.app.title());
+
+            wx.app.history.back();
+            expect(document.title).toEqual("foo");
+            expect(document.title).toEqual(wx.app.title());
+
+            wx.app.history.forward();
+            expect(document.title).toEqual("bar");
+            expect(wx.router.includes("foo.bar", { barId: 5 })).toBeTruthy();
+        });
+
         it('includes() correctly tests child and parent states including params',() => {
             wx.router.state({
                 name: "foo",

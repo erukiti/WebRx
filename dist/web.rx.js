@@ -636,6 +636,63 @@ var wx;
         }
     })(env = wx.env || (wx.env = {}));
 })(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
+    var IID = (function () {
+        function IID() {
+        }
+        IID.IUnknown = "IUnknown";
+        IID.IDisposable = "IDisposable";
+        IID.IObservableProperty = "IObservableProperty";
+        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
+        IID.IHandleObservableErrors = "IHandleObservableErrors";
+        IID.IObservableList = "IObservableList";
+        IID.IList = "IList";
+        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
+        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
+        IID.IReactiveDerivedList = "IReactiveDerivedList";
+        IID.IMoveInfo = "IMoveInfo";
+        IID.IObservedChange = "IObservedChange";
+        IID.ICommand = "ICommand";
+        IID.IReadOnlyList = "IReadOnlyList";
+        return IID;
+    })();
+    wx.IID = IID;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
+    function property(initialValue) {
+        var accessor = function (newVal) {
+            if (arguments.length > 0) {
+                if (newVal !== accessor.value) {
+                    accessor.changingSubject.onNext(newVal);
+                    accessor.value = newVal;
+                    accessor.changedSubject.onNext(newVal);
+                }
+            }
+            else {
+                return accessor.value;
+            }
+        };
+        accessor.queryInterface = function (iid) {
+            if (iid === wx.IID.IUnknown || iid === wx.IID.IObservableProperty || iid === wx.IID.IDisposable)
+                return true;
+            return false;
+        };
+        accessor.dispose = function () {
+        };
+        if (initialValue !== undefined)
+            accessor.value = initialValue;
+        accessor.changedSubject = new Rx.Subject();
+        accessor.changed = accessor.changedSubject.publish().refCount();
+        accessor.changingSubject = new Rx.Subject();
+        accessor.changing = accessor.changingSubject.publish().refCount();
+        return accessor;
+    }
+    wx.property = property;
+})(wx || (wx = {}));
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -854,6 +911,7 @@ var wx;
                     wx.log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
                 }
             });
+            this.title = wx.property("");
             if (!wx.isInUnitTest()) {
                 this.history = this.createHistory();
             }
@@ -3081,30 +3139,6 @@ var wx;
 var wx;
 (function (wx) {
     "use strict";
-    var IID = (function () {
-        function IID() {
-        }
-        IID.IUnknown = "IUnknown";
-        IID.IDisposable = "IDisposable";
-        IID.IObservableProperty = "IObservableProperty";
-        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
-        IID.IHandleObservableErrors = "IHandleObservableErrors";
-        IID.IObservableList = "IObservableList";
-        IID.IList = "IList";
-        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
-        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
-        IID.IReactiveDerivedList = "IReactiveDerivedList";
-        IID.IMoveInfo = "IMoveInfo";
-        IID.IObservedChange = "IObservedChange";
-        IID.ICommand = "ICommand";
-        IID.IReadOnlyList = "IReadOnlyList";
-        return IID;
-    })();
-    wx.IID = IID;
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
     var Lazy = (function () {
         function Lazy(createValue) {
             this.createValue = createValue;
@@ -5321,39 +5355,6 @@ var wx;
 var wx;
 (function (wx) {
     "use strict";
-    function property(initialValue) {
-        var accessor = function (newVal) {
-            if (arguments.length > 0) {
-                if (newVal !== accessor.value) {
-                    accessor.changingSubject.onNext(newVal);
-                    accessor.value = newVal;
-                    accessor.changedSubject.onNext(newVal);
-                }
-            }
-            else {
-                return accessor.value;
-            }
-        };
-        accessor.queryInterface = function (iid) {
-            if (iid === wx.IID.IUnknown || iid === wx.IID.IObservableProperty || iid === wx.IID.IDisposable)
-                return true;
-            return false;
-        };
-        accessor.dispose = function () {
-        };
-        if (initialValue !== undefined)
-            accessor.value = initialValue;
-        accessor.changedSubject = new Rx.Subject();
-        accessor.changed = accessor.changedSubject.publish().refCount();
-        accessor.changingSubject = new Rx.Subject();
-        accessor.changing = accessor.changingSubject.publish().refCount();
-        return accessor;
-    }
-    wx.property = property;
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
     var StateActiveBinding = (function () {
         function StateActiveBinding(domManager, router) {
             this.priority = 5;
@@ -5702,16 +5703,24 @@ var wx;
             this.parentPathDirective = "^";
             this.rootStateName = "$";
             this.validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
+            this.titlePropertyName = "__wx_app_title";
             this.domManager = domManager;
             this.reset();
             wx.app.history.onPopState.subscribe(function (e) {
-                var stateName = e.state;
+                var state = e.state;
+                var stateName = state.stateName;
                 if (stateName) {
                     var uri = wx.app.history.location.pathname + wx.app.history.location.search;
                     var route = _this.getAbsoluteRouteForState(stateName);
+                    if (state.title != null)
+                        wx.app.title(state.title);
                     var params = route.parse(uri);
                     _this.go(stateName, params, { location: false });
                 }
+            });
+            wx.app.title.changed.subscribe(function (x) {
+                document.title = x;
+                _this.replaceHistoryState(_this.current(), x);
             });
         }
         Router.prototype.state = function (config) {
@@ -5783,6 +5792,20 @@ var wx;
             if (state.name === this.rootStateName)
                 this.root = state;
             return state;
+        };
+        Router.prototype.pushHistoryState = function (state, title) {
+            var hs = { stateName: state.name };
+            if (hs) {
+                hs.title = title;
+            }
+            wx.app.history.pushState(hs, "", state.uri);
+        };
+        Router.prototype.replaceHistoryState = function (state, title) {
+            var hs = { stateName: state.name };
+            if (hs) {
+                hs.title = title;
+            }
+            wx.app.history.replaceState(hs, "", state.uri);
         };
         Router.prototype.mapPath = function (path) {
             if (path.indexOf(this.pathSeparator) === 0) {
@@ -5876,9 +5899,9 @@ var wx;
                 }
                 if (options && options.location) {
                     if (options.location === 2 /* replace */)
-                        wx.app.history.replaceState(state.name, "", state.uri);
+                        this.replaceHistoryState(state, wx.app.title());
                     else
-                        wx.app.history.pushState(state.name, "", state.uri);
+                        this.pushHistoryState(state, wx.app.title());
                 }
                 if (_current != null) {
                     if (_current.onLeave)

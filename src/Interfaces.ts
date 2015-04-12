@@ -604,6 +604,7 @@ module wx {
         mainThreadScheduler: Rx.IScheduler;
         templateEngine: ITemplateEngine;
         history: IHistory;
+        title: IObservableProperty<string>;
     }
 
     export interface IRoute {

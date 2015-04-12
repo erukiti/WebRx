@@ -11,18 +11,29 @@
 module wx {
     "use strict";
 
+    interface IHistoryState {
+        stateName: string;
+        title?: string;
+    }
+
     class Router implements IRouter {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
 
             this.reset();
 
+            // monitor navigation history
             app.history.onPopState.subscribe((e) => {
-                var stateName = e.state;
+                var state = <IHistoryState> e.state;
+                var stateName = state.stateName;
 
                 if (stateName) {
                     var uri = app.history.location.pathname + app.history.location.search;
                     var route = this.getAbsoluteRouteForState(stateName);
+
+                    // update title
+                    if (state.title != null)
+                        app.title(state.title);
 
                     // extract params from uri
                     var params = route.parse(uri);
@@ -30,6 +41,13 @@ module wx {
                     // enter state using extracted params
                     this.go(stateName, params, { location: false });
                 }
+            });
+
+            // monitor title changes
+            app.title.changed.subscribe(x => {
+                document.title = x;
+
+                this.replaceHistoryState(this.current(), x);
             });
         }
 
@@ -111,6 +129,7 @@ module wx {
         private parentPathDirective = "^";
         private rootStateName = "$";
         private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
+        private titlePropertyName = "__wx_app_title";
 
         private registerStateInternal(state: IRouterStateConfig) {
             var parts = state.name.split(this.pathSeparator);
@@ -143,6 +162,26 @@ module wx {
                 this.root = state;
 
             return state;
+        }
+
+        private pushHistoryState(state: IRouterState, title?: string): void {
+            var hs = <IHistoryState> { stateName: state.name };
+
+            if (hs) {
+                hs.title = title;
+            }
+
+            app.history.pushState(hs, "", state.uri);
+        }
+
+        private replaceHistoryState(state: IRouterState, title?: string): void {
+            var hs = <IHistoryState> { stateName: state.name };
+
+            if (hs) {
+                hs.title = title;
+            }
+
+            app.history.replaceState(hs, "", state.uri);
         }
 
         private mapPath(path: string) {
@@ -279,9 +318,9 @@ module wx {
                 // update history
                 if (options && options.location) {
                     if(options.location === RouterLocationChangeMode.replace)
-                        app.history.replaceState(state.name, "", state.uri);
+                        this.replaceHistoryState(state, app.title());
                     else
-                        app.history.pushState(state.name, "", state.uri);
+                        this.pushHistoryState(state, app.title());
                 }
 
                 if (_current != null) {

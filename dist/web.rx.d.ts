@@ -254,6 +254,7 @@ declare module wx {
         mainThreadScheduler: Rx.IScheduler;
         templateEngine: ITemplateEngine;
         history: IHistory;
+        title: IObservableProperty<string>;
     }
     interface IRoute {
         parse(url: any): Object;
@@ -408,6 +409,27 @@ declare module wx.env {
     var jQueryInstance: any;
     function cleanExternalData(node: Node): any;
 }
+declare module wx {
+    class IID {
+        static IUnknown: string;
+        static IDisposable: string;
+        static IObservableProperty: string;
+        static IReactiveNotifyPropertyChanged: string;
+        static IHandleObservableErrors: string;
+        static IObservableList: string;
+        static IList: string;
+        static IReactiveNotifyCollectionChanged: string;
+        static IReactiveNotifyCollectionItemChanged: string;
+        static IReactiveDerivedList: string;
+        static IMoveInfo: string;
+        static IObservedChange: string;
+        static ICommand: string;
+        static IReadOnlyList: string;
+    }
+}
+declare module wx {
+    function property<T>(initialValue?: T): IObservableProperty<T>;
+}
 declare var createMockHistory: () => wx.IHistory;
 declare module wx {
     module internal {
@@ -552,24 +574,6 @@ declare module wx {
     }
 }
 declare module wx {
-    class IID {
-        static IUnknown: string;
-        static IDisposable: string;
-        static IObservableProperty: string;
-        static IReactiveNotifyPropertyChanged: string;
-        static IHandleObservableErrors: string;
-        static IObservableList: string;
-        static IList: string;
-        static IReactiveNotifyCollectionChanged: string;
-        static IReactiveNotifyCollectionItemChanged: string;
-        static IReactiveDerivedList: string;
-        static IMoveInfo: string;
-        static IObservedChange: string;
-        static ICommand: string;
-        static IReadOnlyList: string;
-    }
-}
-declare module wx {
     class Lazy<T> {
         constructor(createValue: () => T);
         value: T;
@@ -668,9 +672,6 @@ declare module wx {
     module internal {
         var messageBusConstructor: any;
     }
-}
-declare module wx {
-    function property<T>(initialValue?: T): IObservableProperty<T>;
 }
 declare module wx {
     interface IStateActiveBindingOptions {
