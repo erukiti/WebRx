@@ -37,6 +37,17 @@ describe('Bindings', () => {
             expect(el.textContent).toEqual('42');
         });
 
+        it('binding to a falsy numeric model property',() => {
+            loadFixtures('templates/Bindings/SimpleOneWay.html');
+
+            var el = document.querySelector("#text-model");
+            var model = 0;
+
+            expect(el.textContent).toEqual('invalid');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect(el.textContent).toEqual('0');
+        });
+
         it('binding to a boolean constant', () => {
             loadFixtures('templates/Bindings/SimpleOneWay.html');
 

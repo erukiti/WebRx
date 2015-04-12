@@ -103,14 +103,16 @@ module wx {
 
         public get lengthChanging(): Rx.Observable<number> {
             if (!this._lengthChanging)
-                this._lengthChanging = this.listChanging.select(_ => this.inner.length).distinctUntilChanged();
+                this._lengthChanging = this.listChanging.select(_ =>
+                    this.inner.length).distinctUntilChanged();
 
             return this._lengthChanging;
         }
 
         public get lengthChanged(): Rx.Observable<number> {
             if (!this._lengthChanged)
-                this._lengthChanged = this.listChanged.select(_ => this.inner.length).distinctUntilChanged();
+                this._lengthChanged = this.listChanged.select(_ =>
+                    this.inner.length).distinctUntilChanged();
 
             return this._lengthChanged;
         }

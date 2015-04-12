@@ -79,6 +79,26 @@ describe('Bindings',() => {
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(list.toArray());
         });
 
+        it('binding to a observable list containing numbers without initialContents',() => {
+            loadFixtures('templates/Bindings/ForEach.html');
+
+            var el = <HTMLElement> document.querySelector("#foreach-list-scalar");
+            var templateLength = el.children.length;
+            var list = wx.list();
+
+            for (var i = 0; i < 10; i++) {
+                list.add(i);
+            }
+
+            expect(list.length()).toEqual(10);
+            expect(() => wx.applyBindings({ src: list }, el)).not.toThrowError();
+
+            //console.log((<any> el).innerHTML);
+
+            expect(el.children.length).toEqual(list.length() * templateLength);
+            expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(list.toArray());
+        });
+
         it('binding to a observable list containing model',() => {
             loadFixtures('templates/Bindings/ForEach.html');
 

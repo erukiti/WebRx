@@ -402,9 +402,7 @@ module wx {
                     state.index = index;
                     self.domManager.setNodeState(node, state);
 
-                    if (item) {
-                        self.domManager.applyBindings(item, node);
-                    }
+                    self.domManager.applyBindings(item, node);
                 }
             }
 

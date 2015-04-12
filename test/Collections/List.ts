@@ -76,8 +76,13 @@ describe("Observable List", () => {
         fixture.add(10);
         fixture.add(20);
         fixture.add(30);
+        expect(fixture.length()).toEqual(3);
+
         fixture.removeAt(1);
+        expect(fixture.length()).toEqual(2);
+
         fixture.clear();
+        expect(fixture.length()).toEqual(0);
 
         var before_results = [0, 1, 2, 3, 2 ];
         expect(before_results.length).toEqual(before_output.length);
@@ -86,6 +91,19 @@ describe("Observable List", () => {
         var results = [1, 2, 3, 2, 0 ];
         expect(results.length).toEqual( output.length);
         expect(results).toEqual(output);
+    });
+
+    it("length changed test 2",() => {
+        var list = wx.list();
+
+        for (var i = 0; i < 100; i++) {
+            list.add(i);
+        }
+
+        expect(list.length()).toEqual(100);
+
+        list.clear();
+        expect(list.length()).toEqual(0);
     });
 
     it("isEmpty test",() => {
