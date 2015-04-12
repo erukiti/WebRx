@@ -125,6 +125,7 @@ describe('Bindings',() => {
             expect($(el).children(".part1").map((index, node) => parseInt(node.textContent)).get()).toEqual(list.toArray().map(x=> x.foo()));
             expect($(el).children(".part2").map((index, node) => node.textContent).get()).toEqual(list.toArray().map(x=> x.bar()));
             expect($(el).children(".part3").map((index, node) => parseInt(node.textContent)).get()).toEqual(Ix.Enumerable.range(0, list.length()).toArray());
+            expect($(el).children(".part4").map((index, node) => node.textContent).get()).toEqual(Ix.Enumerable.range(0, list.length()).select(x=> "foo" + x).toArray());
         });
 
         it('observable list manipulation smoke-test',() => {
