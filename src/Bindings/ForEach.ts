@@ -203,8 +203,7 @@ module wx {
         }
 
         protected appendRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext, template: Array<Node>,
-            hooks: IForEachBindingHooks,
-            indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
+            hooks: IForEachBindingHooks, indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
             var nodes = cloneNodeArray(template);
             var _index: any = index;
@@ -232,8 +231,7 @@ module wx {
         }
 
         protected insertRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachBindingHooks,
-            indexTrigger: Rx.Subject<any>): void {
+            template: Array<Node>, hooks: IForEachBindingHooks, indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
 
             var nodes = cloneNodeArray(template);
@@ -254,8 +252,7 @@ module wx {
             }
         }
 
-        protected removeRow(proxy: internal.VirtualChildNodes, index: number, item: any,
-            template: Array<Node>, hooks: IForEachBindingHooks): void {
+        protected removeRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>, hooks: IForEachBindingHooks): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
             var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
@@ -269,9 +266,8 @@ module wx {
             }
         }
 
-        protected moveRow(proxy: internal.VirtualChildNodes, from: number, to: number, item: any,
-            template: Array<Node>, hooks: IForEachBindingHooks,
-            indexTrigger: Rx.Subject<any>): void {
+        protected moveRow(proxy: internal.VirtualChildNodes, from: number, to: number, item: any, template: Array<Node>,
+            hooks: IForEachBindingHooks, indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
             var nodes = proxy.removeChilds(from * templateLength, templateLength, true);
@@ -319,9 +315,8 @@ module wx {
             }
         }
         
-        protected observeList(proxy: internal.VirtualChildNodes, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
-            list: IObservableList<any>, hooks: IForEachBindingHooks,
-            indexTrigger: Rx.Subject<any>) {
+        protected observeList(proxy: internal.VirtualChildNodes, ctx: IDataContext, template: Array<Node>,
+            cleanup: Rx.CompositeDisposable, list: IObservableList<any>, hooks: IForEachBindingHooks, indexTrigger: Rx.Subject<any>) {
             var i: number;
             var length: number;
 
