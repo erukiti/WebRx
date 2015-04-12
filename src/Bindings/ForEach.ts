@@ -176,8 +176,8 @@ module wx {
 
         protected domManager: IDomManager;
 
-        protected createIndexObservableForNode(proxy: internal.VirtualChildNodes, child: Node, startIndex: number,
-            trigger: Rx.Observable<any>, indexes: IWeakMap<Node, Rx.Observable<any>>, templateLength: number): Rx.Observable<number> {
+        protected createIndexPropertyForNode(proxy: internal.VirtualChildNodes, child: Node, startIndex: number,
+            trigger: Rx.Observable<any>, templateLength: number): IObservableProperty<number> {
                 return Rx.Observable.defer(()=> {
                     return Rx.Observable.create<number>(obs => {
                         return trigger.subscribe(_ => {
@@ -189,28 +189,38 @@ module wx {
                     });
                 });
             })
-            .startWith(startIndex)
-            .publish()
-            .refCount();
+            .toProperty(startIndex);
         }
 
         protected appendAllRows(proxy: internal.VirtualChildNodes, list: IObservableList<any>, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            template: Array<Node>, hooks: IForEachBindingHooks,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
             var length = list.length();
 
             for (var i = 0; i < length; i++) {
-                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexes, indexTrigger, isInitial);
+                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexTrigger, isInitial);
             }
         }
 
         protected appendRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext, template: Array<Node>,
-            hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            hooks: IForEachBindingHooks,
             indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
 
             var nodes = cloneNodeArray(template);
-            var _index = indexTrigger ? <any> this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length) : index;
-            proxy.appendChilds(nodes, { index: _index, item: item });
+            var _index: any = index;
+
+            var cbData = <any> {
+                item: item
+            }
+            
+            if (indexTrigger) {
+                _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
+                cbData.indexDisp = new RefCountDisposeWrapper(_index, 0);
+            }
+
+            cbData.index = _index;
+
+            proxy.appendChilds(nodes, cbData);
 
             if (hooks) {
                 if (hooks.afterRender)
@@ -222,13 +232,18 @@ module wx {
         }
 
         protected insertRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            template: Array<Node>, hooks: IForEachBindingHooks,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
 
             var nodes = cloneNodeArray(template);
-            var _index = this.createIndexObservableForNode(proxy, nodes[0], index, indexTrigger, indexes, template.length);
-            proxy.insertChilds(index * templateLength, nodes, { index: _index, item: item });
+            var _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
+
+            proxy.insertChilds(index * templateLength, nodes, {
+                index: _index,
+                item: item,
+                indexDisp: new RefCountDisposeWrapper(_index, 0)
+            });
 
             if (hooks) {
                 if(hooks.afterRender)
@@ -255,7 +270,7 @@ module wx {
         }
 
         protected moveRow(proxy: internal.VirtualChildNodes, from: number, to: number, item: any,
-            template: Array<Node>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            template: Array<Node>, hooks: IForEachBindingHooks,
             indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
@@ -271,32 +286,32 @@ module wx {
 
             // create new row
             nodes = cloneNodeArray(template);
-            var _index = this.createIndexObservableForNode(proxy, nodes[0], from, indexTrigger, indexes, template.length);
-            proxy.insertChilds(templateLength * to, nodes, { index: _index, item: item });
+            var _index = this.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
+
+            proxy.insertChilds(templateLength * to, nodes, {
+                index: _index,
+                item: item,
+                indexDisp: new RefCountDisposeWrapper(_index, 0)
+            });
             
             if (hooks && hooks.afterMove) {
                 hooks.afterMove(nodes, item, from);
             }
         }
 
-        protected rebindRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>,
-            indexes: IWeakMap<Node, Rx.Observable<any>>): void {
+        protected rebindRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>, indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
-            var savedIndex;
+            var _index = this.createIndexPropertyForNode(proxy, proxy.childNodes[(index * templateLength)], index, indexTrigger, template.length);
+            var indexDisp = new RefCountDisposeWrapper(_index, 0);
 
             for (var i = 0; i < template.length; i++) {
                 var node = proxy.childNodes[(index * templateLength) + i];
 
                 if (node.nodeType === 1) {
-                    // save the index before cleaning
-                    var state = <IForEachNodeState> this.domManager.getNodeState(node);
-                    savedIndex = state != null ? state.index : undefined;
-
-                    this.domManager.cleanNode(node);
-
-                    // restore index before binding
-                    state = this.domManager.createNodeState(item);
-                    state.index = savedIndex;
+                    var state = <IForEachNodeState> (this.domManager.getNodeState(item) || this.domManager.createNodeState(item));
+                    state.index = _index;
+                    indexDisp.addRef();
+                    state.cleanup.add(indexDisp);
                     this.domManager.setNodeState(node, state);
 
                     this.domManager.applyBindings(item, node);
@@ -305,7 +320,7 @@ module wx {
         }
         
         protected observeList(proxy: internal.VirtualChildNodes, ctx: IDataContext, template: Array<Node>, cleanup: Rx.CompositeDisposable,
-            list: IObservableList<any>, hooks: IForEachBindingHooks, indexes: IWeakMap<Node, Rx.Observable<any>>,
+            list: IObservableList<any>, hooks: IForEachBindingHooks,
             indexTrigger: Rx.Subject<any>) {
             var i: number;
             var length: number;
@@ -313,7 +328,7 @@ module wx {
             cleanup.add(indexTrigger);
 
             // initial insert
-            this.appendAllRows(proxy, list, ctx, template, hooks, indexes, indexTrigger, true);
+            this.appendAllRows(proxy, list, ctx, template, hooks, indexTrigger, true);
 
             // track changes
             cleanup.add(list.itemsAdded.subscribe((e) => {
@@ -321,11 +336,11 @@ module wx {
 
                 if (e.from === list.length()) {
                     for (i = 0; i < length; i++) {
-                        this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexes, indexTrigger, false);
+                        this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexTrigger, false);
                     }
                 } else {
                     for (i = 0; i < e.items.length; i++) {
-                        this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexes, indexTrigger);
+                        this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexTrigger);
                     }
                 }
 
@@ -343,20 +358,20 @@ module wx {
             }));
 
             cleanup.add(list.itemsMoved.subscribe((e) => {
-                this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, indexes, indexTrigger);
+                this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, indexTrigger);
  
                 indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemReplaced.subscribe((e) => {
-                this.rebindRow(proxy, e.from, e.items[0], template, indexes);
+                this.rebindRow(proxy, e.from, e.items[0], template, indexTrigger);
 
                 indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.shouldReset.subscribe((e) => {
                 proxy.clear();
-                this.appendAllRows(proxy, list, ctx, template, hooks, indexes, indexTrigger, false);
+                this.appendAllRows(proxy, list, ctx, template, hooks, indexTrigger, false);
 
                 indexTrigger.onNext(true);
             }));
@@ -384,23 +399,24 @@ module wx {
                 return; // nothing to do
 
             var proxy: internal.VirtualChildNodes;
-            var indexes: IWeakMap<Node, Rx.Observable<any>>;
             var self = this;
             var recalcIndextrigger: Rx.Subject<any>;
 
             function nodeInsertCB(node: Node, callbackData?: any): void {
                 var item: any = callbackData.item;
                 var index: Rx.Observable<any> = callbackData.index;
+                var indexDisp: RefCountDisposeWrapper = callbackData.indexDisp;
 
                 if (node.nodeType === 1) {
-                    if (recalcIndextrigger) {
-                        indexes.set(node, index);
-                    }
-
                     // propagate index to state
-                    var state = <IForEachNodeState> self.domManager.createNodeState(item);
+                    var state = <IForEachNodeState> (self.domManager.getNodeState(item) || self.domManager.createNodeState(item));
                     state.index = index;
                     self.domManager.setNodeState(node, state);
+
+                    if (recalcIndextrigger != null && indexDisp != null) {
+                        indexDisp.addRef();
+                        state.cleanup.add(indexDisp);
+                    }
 
                     self.domManager.applyBindings(item, node);
                 }
@@ -409,7 +425,6 @@ module wx {
             function nodeRemoveCB(node: Node): void {
                 if (node.nodeType === 1) {
                     self.domManager.cleanNode(node);
-                    indexes.delete(node);
                 }
             }
 
@@ -419,7 +434,6 @@ module wx {
                 setProxyFunc(proxy);
 
             cleanup.add(Rx.Disposable.create(() => {
-                indexes = null;
                 proxy = null;
             }));
 
@@ -430,14 +444,13 @@ module wx {
                 length = arr.length;
 
                 for (i = 0; i < length; i++) {
-                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, undefined, undefined, true);
+                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, undefined, true);
                 }
             } else if(isList(value)) {
                 var list = <IObservableList<any>> value;
-                indexes = createWeakMap<Node, Rx.Observable<any>>();
                 recalcIndextrigger = new Rx.Subject<any>();
 
-                this.observeList(proxy, ctx, template, cleanup, list, hooks, indexes, recalcIndextrigger);
+                this.observeList(proxy, ctx, template, cleanup, list, hooks, recalcIndextrigger);
             }
         }
     }
