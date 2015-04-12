@@ -29,6 +29,6 @@
     "Gruntfile.js"
   ],
   "devDependencies": {
-    "rxjs": "^2.4.3"
+    "rxjs": "~2.4.7"
   }
 }
