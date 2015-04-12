@@ -12,6 +12,8 @@ module wx {
     * @param {T} initialValue? Optional initial value, valid until the observable produces a value
     */
     RxObsConstructor.prototype.toProperty = function(initialValue?: any, scheduler?: Rx.IScheduler) {
+        scheduler = scheduler || Rx.Scheduler.currentThread;
+
         // initialize accessor function (read-only)
         var accessor: any = (newVal?: any): any => {
             if (arguments.length > 0) {
@@ -64,34 +66,28 @@ module wx {
             .refCount();
 
         accessor.source = this;
-        accessor.thrownExceptions = internal.createScheduledSubject<Error>(Rx.Scheduler.currentThread, app.defaultExceptionHandler);
+        accessor.thrownExceptions = internal.createScheduledSubject<Error>(scheduler, app.defaultExceptionHandler);
 
         //////////////////////////////////
         // implementation
 
-        scheduler = scheduler || Rx.Scheduler.currentThread;
         var firedInitial = false;
-        var subj = internal.createScheduledSubject<any>(scheduler);
 
-        subj.subscribe(x => {
-            // Suppress a non-change between initialValue and the first value
-            // from a Subscribe
-            if (firedInitial && x === accessor.value)// isEqual(x, accessor.value))
-                return;
+        accessor.sub = this
+            .distinctUntilChanged()
+            .subscribe(x => {
+                // Suppress a non-change between initialValue and the first value
+                // from a Subscribe
+                if (firedInitial && x === accessor.value) {
+                    return;
+                }
 
-            accessor.changingSubject.onNext(x);
-            accessor.value = x;
-            accessor.changedSubject.onNext(x);
-            firedInitial = true;
-        }, ex=> accessor.thrownExceptions.onNext(ex));
+                firedInitial = true;
 
-        // Fire off an initial change to make sure bindings have a value
-        subj.onNext(initialValue);
-        accessor._source = this.distinctUntilChanged().multicast(subj);
-
-        if (isInUnitTest()) {
-            accessor.sub = accessor._source.connect();
-        }
+                accessor.changingSubject.onNext(x);
+                accessor.value = x;
+                accessor.changedSubject.onNext(x);
+            }, x=> accessor.thrownExceptions.onNext(x));
 
         return accessor;
     }

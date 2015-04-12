@@ -2167,9 +2167,7 @@ var wx;
                     var state = self.domManager.createNodeState(item);
                     state.index = index;
                     self.domManager.setNodeState(node, state);
-                    if (item) {
-                        self.domManager.applyBindings(item, node);
-                    }
+                    self.domManager.applyBindings(item, node);
                 }
             }
             function nodeRemoveCB(node) {
@@ -3190,6 +3188,7 @@ var wx;
     "use strict";
     var RxObsConstructor = Rx.Observable;
     RxObsConstructor.prototype.toProperty = function (initialValue, scheduler) {
+        scheduler = scheduler || Rx.Scheduler.currentThread;
         var accessor = function (newVal) {
             if (arguments.length > 0) {
                 wx.internal.throwError("attempt to write to a read-only observable property");
@@ -3216,23 +3215,17 @@ var wx;
         accessor.changingSubject = new Rx.Subject();
         accessor.changing = accessor.changingSubject.publish().refCount();
         accessor.source = this;
-        accessor.thrownExceptions = wx.internal.createScheduledSubject(Rx.Scheduler.currentThread, wx.app.defaultExceptionHandler);
-        scheduler = scheduler || Rx.Scheduler.currentThread;
+        accessor.thrownExceptions = wx.internal.createScheduledSubject(scheduler, wx.app.defaultExceptionHandler);
         var firedInitial = false;
-        var subj = wx.internal.createScheduledSubject(scheduler);
-        subj.subscribe(function (x) {
-            if (firedInitial && x === accessor.value)
+        accessor.sub = this.distinctUntilChanged().subscribe(function (x) {
+            if (firedInitial && x === accessor.value) {
                 return;
+            }
+            firedInitial = true;
             accessor.changingSubject.onNext(x);
             accessor.value = x;
             accessor.changedSubject.onNext(x);
-            firedInitial = true;
-        }, function (ex) { return accessor.thrownExceptions.onNext(ex); });
-        subj.onNext(initialValue);
-        accessor._source = this.distinctUntilChanged().multicast(subj);
-        if (wx.isInUnitTest()) {
-            accessor.sub = accessor._source.connect();
-        }
+        }, function (x) { return accessor.thrownExceptions.onNext(x); });
         return accessor;
     };
 })(wx || (wx = {}));
