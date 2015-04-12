@@ -579,12 +579,13 @@ declare module wx {
     }
 }
 declare module wx {
-    class RefCountDisposeWrapper {
-        constructor(inner: Rx.IDisposable);
+    class RefCountDisposeWrapper implements Rx.IDisposable {
+        constructor(inner: Rx.IDisposable, initialRefCount?: number);
         private inner;
         private refCount;
         addRef(): void;
         release(): number;
+        dispose(): void;
     }
 }
 declare module wx.internal {
