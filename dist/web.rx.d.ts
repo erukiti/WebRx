@@ -313,6 +313,7 @@ declare module wx {
         uri(state: string, params?: {}): string;
         reload(): void;
         get(state: string): IRouterStateConfig;
+        is(state: string, params?: any, options?: any): any;
         includes(state: string, params?: any, options?: any): any;
         reset(): void;
     }

@@ -13,6 +13,7 @@ module wx {
 
     interface IHistoryState {
         stateName: string;
+        params: Object;
         title?: string;
     }
 
@@ -27,19 +28,13 @@ module wx {
                 var state = <IHistoryState> e.state;
                 var stateName = state.stateName;
 
-                if (stateName) {
-                    var uri = app.history.location.pathname + app.history.location.search;
-                    var route = this.getAbsoluteRouteForState(stateName);
-
+                if (stateName != null) {
                     // update title
                     if (state.title != null)
                         app.title(state.title);
 
-                    // extract params from uri
-                    var params = route.parse(uri);
-
                     // enter state using extracted params
-                    this.go(stateName, params, { location: false });
+                    this.go(stateName, state.params, { location: false });
                 }
             });
 
@@ -190,7 +185,10 @@ module wx {
         }
 
         private pushHistoryState(state: IRouterState, title?: string): void {
-            var hs = <IHistoryState> { stateName: state.name };
+            var hs = <IHistoryState> {
+                stateName: state.name,
+                params: state.params
+            };
 
             if (hs) {
                 hs.title = title;
@@ -200,7 +198,10 @@ module wx {
         }
 
         private replaceHistoryState(state: IRouterState, title?: string): void {
-            var hs = <IHistoryState> { stateName: state.name };
+            var hs = <IHistoryState> {
+                stateName: state.name,
+                params: state.params
+            };
 
             if (hs) {
                 hs.title = title;
@@ -330,6 +331,10 @@ module wx {
             if ((options && options.force) || _current == null ||
                 _current.name !== to ||
                 !isEqual(_current.params, state.params)) {
+
+                // update current state a final time before transitioning
+                if (_current != null)
+                    this.replaceHistoryState(_current, app.title());
 
                 // reset views used by previous state that are unused by new state
                 if (_current != null && _current.views != null && state.views != null) {

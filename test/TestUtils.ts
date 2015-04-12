@@ -156,14 +156,12 @@ module testutils {
             }
 
             updateLocation(stack[current].url);
-            pushStateSubject.onNext(<PopStateEvent> { state: stack[current].data });
         }
 
         function replaceState(statedata: any, title: string, url?: string) {
             stack[current] = { data: statedata, url: url };
 
             updateLocation(stack[current].url);
-            pushStateSubject.onNext(<PopStateEvent> { state: stack[current].data });
         }
 
         function reset() {

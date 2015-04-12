@@ -5709,13 +5709,10 @@ var wx;
             wx.app.history.onPopState.subscribe(function (e) {
                 var state = e.state;
                 var stateName = state.stateName;
-                if (stateName) {
-                    var uri = wx.app.history.location.pathname + wx.app.history.location.search;
-                    var route = _this.getAbsoluteRouteForState(stateName);
+                if (stateName != null) {
                     if (state.title != null)
                         wx.app.title(state.title);
-                    var params = route.parse(uri);
-                    _this.go(stateName, params, { location: false });
+                    _this.go(stateName, state.params, { location: false });
                 }
             });
             wx.app.title.changed.subscribe(function (x) {
@@ -5736,11 +5733,30 @@ var wx;
         Router.prototype.get = function (state) {
             return this.states[state];
         };
+        Router.prototype.is = function (state, params, options) {
+            var _current = this.current();
+            var isActive = _current.name === state;
+            if (isActive && params != null) {
+                var currentParamsKeys = Object.keys(_current.params);
+                var paramsKeys = Object.keys(params);
+                if (currentParamsKeys.length === paramsKeys.length) {
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
+                            isActive = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            return isActive;
+        };
         Router.prototype.includes = function (state, params, options) {
             var _current = this.current();
             var isActive = _current.name.indexOf(state) === 0;
             if (isActive && params != null) {
+                var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
+                paramsKeys = paramsKeys.length <= currentParamsKeys.length ? paramsKeys : currentParamsKeys;
                 for (var i = 0; i < paramsKeys.length; i++) {
                     if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
                         isActive = false;
@@ -5794,14 +5810,20 @@ var wx;
             return state;
         };
         Router.prototype.pushHistoryState = function (state, title) {
-            var hs = { stateName: state.name };
+            var hs = {
+                stateName: state.name,
+                params: state.params
+            };
             if (hs) {
                 hs.title = title;
             }
             wx.app.history.pushState(hs, "", state.uri);
         };
         Router.prototype.replaceHistoryState = function (state, title) {
-            var hs = { stateName: state.name };
+            var hs = {
+                stateName: state.name,
+                params: state.params
+            };
             if (hs) {
                 hs.title = title;
             }
@@ -5890,6 +5912,8 @@ var wx;
             state.params = stateParams;
             var _current = this.current();
             if ((options && options.force) || _current == null || _current.name !== to || !wx.isEqual(_current.params, state.params)) {
+                if (_current != null)
+                    this.replaceHistoryState(_current, wx.app.title());
                 if (_current != null && _current.views != null && state.views != null) {
                     Object.keys(_current.views).forEach(function (x) {
                         if (!state.views.hasOwnProperty(x)) {

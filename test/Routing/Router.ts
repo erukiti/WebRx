@@ -46,6 +46,29 @@ describe('Routing',() => {
             expect(wx.router.current().uri).toEqual("/foo/bar");
         });
 
+        it('preserves properties which have been manually added to current state params',() => {
+            wx.router.state({
+                name: "foo",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bar",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("foo");
+            wx.router.current().params.baz = 42;
+
+            wx.router.go("foo.bar");
+            wx.app.history.back();
+            expect(wx.router.current().params.baz).toEqual(42);
+        });
+
         it('child states inherit views of parent',() => {
             wx.router.state({
                 name: "foo",
@@ -179,37 +202,9 @@ describe('Routing',() => {
                 }
             });
 
-            var fireCount = 0;
-            wx.app.history.onPushState.subscribe(x => {
-                fireCount++;
-            });
-
             wx.router.go("foo", {}, { location: true });
             expect(wx.router.current().uri).toEqual("/foo");
-            expect(fireCount).toEqual(1);
-        });
-
-        it('activating current state again only notifies if forced',() => {
-            wx.router.state({
-                name: "foo",
-                views: {
-                    'main': "foo"
-                }
-            });
-
-            var fireCount = 0;
-            wx.app.history.onPushState.subscribe(x => {
-                fireCount++;
-            });
-
-            wx.router.go("foo", {}, { location: true });
-            expect(fireCount).toEqual(1);
-
-            wx.router.go("foo", {}, { location: true });
-            expect(fireCount).toEqual(1);
-
-            wx.router.go("foo", {}, { location: true, force: true });
-            expect(fireCount).toEqual(2);
+            expect(wx.app.history.length).toEqual(2);
         });
 
         it('transitions to the the correct state on history.popstate event',() => {
@@ -231,19 +226,15 @@ describe('Routing',() => {
 
             wx.router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
             expect(wx.router.current().name).toEqual("foo.bar");
-            expect(wx.app.history.length).toEqual(1);
 
             wx.router.go("foo", { fooId: 3 }, { location: true });
             expect(wx.router.current().name).toEqual("foo");
-            expect(wx.app.history.length).toEqual(2);
 
             wx.app.history.back();
             expect(wx.router.current().name).toEqual("foo.bar");
-            expect(wx.app.history.length).toEqual(2);
 
             wx.app.history.forward();
             expect(wx.router.current().name).toEqual("foo");
-            expect(wx.app.history.length).toEqual(2);
         });
 
         it('monitors wx.app.title and reflects current value in document.title',() => {
