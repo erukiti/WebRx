@@ -304,7 +304,9 @@ module wx {
                 var node = proxy.childNodes[(index * templateLength) + i];
 
                 if (node.nodeType === 1) {
-                    var state = <IForEachNodeState> (this.domManager.getNodeState(item) || this.domManager.createNodeState(item));
+                    this.domManager.cleanNode(node);
+
+                    var state = <IForEachNodeState> this.domManager.createNodeState(item);
                     state.index = _index;
                     indexDisp.addRef();
                     state.cleanup.add(indexDisp);
@@ -404,7 +406,8 @@ module wx {
 
                 if (node.nodeType === 1) {
                     // propagate index to state
-                    var state = <IForEachNodeState> (self.domManager.getNodeState(item) || self.domManager.createNodeState(item));
+                    var state = <IForEachNodeState> (self.domManager.getNodeState(node) || self.domManager.createNodeState());
+                    state.model = item;
                     state.index = index;
                     self.domManager.setNodeState(node, state);
 
