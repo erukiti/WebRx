@@ -60,6 +60,7 @@ module.exports = function (grunt) {
                         "node_modules/ix/ix.js",
                         "node_modules/URIjs/src/URI.js",
                         "node_modules/requirejs/require.js",
+                        "test/jasmine-jsreporter.js",
                         "test/test-setup.js",
                         "build/test/TestUtils.js",
                         "build/test/TestModels.js"
@@ -86,6 +87,42 @@ module.exports = function (grunt) {
             server: {
                 options: {
                     port: 8000,
+                }
+            }
+        },
+
+        'saucelabs-jasmine': {
+            all: {
+                options: {
+                    urls: ["http://localhost:8000/_SpecRunner.html"],
+                    tunnelTimeout: 5,
+                    concurrency: 3,
+                    build: process.env.CI_BUILD_NUMBER,
+                    browsers: [
+                        { browserName: "firefox", platform: "WIN7" }, 
+                        { browserName: "firefox", version: "5", platform: "WIN7" }, 
+
+                        { browserName: "chrome", platform: "WIN7" },
+                        { browserName: "chrome", platform: "OS X 10.10" },
+
+                        { browserName: "safari", version: "5", platform: "OS X 10.6" },
+                        { browserName: "safari", version: "6", platform: "OS X 10.8" },
+                        { browserName: "safari", version: "7", platform: "OS X 10.9" },
+                        { browserName: "safari", version: "8", platform: "OS X 10.10" },
+
+                        { browserName: "iphone", version: "5", platform: "OS X 10.7" },
+                        { browserName: "iphone", version: "6", platform: "OS X 10.8" },
+                        { browserName: "iphone", version: "7", platform: "OS X 10.8" },
+                        { browserName: "iphone", version: "8", platform: "OS X 10.10" },
+
+                        //{ browserName: "android", version: "5.0", platform: "linux" },
+
+                        { browserName: "internet explorer", version: "9", platform: "WIN7" },
+                        { browserName: "internet explorer", version: "10", platform: "WIN7" },
+                        { browserName: "internet explorer", version: "11", platform: "WIN7" }
+                    ],
+                    testname: "WebRx Tests",
+                    tags: ["master"]
                 }
             }
         },
@@ -171,6 +208,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-bump');  
     grunt.loadNpmTasks('grunt-nuget');  
     grunt.loadNpmTasks('grunt-typedoc');
+    grunt.loadNpmTasks('grunt-saucelabs');
 
     grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
         var template = "module wx {\n\texport var version = '<%= pkg.version %>';\n}";
@@ -179,9 +217,10 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
-    grunt.registerTask("tests", ["gen-ver", "ts:src", "ts:specs", "jasmine:default"]);
+    grunt.registerTask("test", ["gen-ver", "ts:src", "ts:specs", "jasmine:default"]);
     grunt.registerTask("debug", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
     grunt.registerTask("dist", ["gen-ver", "clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("xtest", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['bump:patch', 'dist', 'nugetpack', 'nugetpush']);  
     grunt.registerTask('publish:minor', ['bump:minor', 'dist', 'nugetpack', 'nugetpush']);  
