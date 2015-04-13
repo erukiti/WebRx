@@ -2164,7 +2164,8 @@ var wx;
             for (var i = 0; i < template.length; i++) {
                 var node = proxy.childNodes[(index * templateLength) + i];
                 if (node.nodeType === 1) {
-                    var state = (this.domManager.getNodeState(item) || this.domManager.createNodeState(item));
+                    this.domManager.cleanNode(node);
+                    var state = this.domManager.createNodeState(item);
                     state.index = _index;
                     indexDisp.addRef();
                     state.cleanup.add(indexDisp);
@@ -2235,7 +2236,8 @@ var wx;
                 var index = callbackData.index;
                 var indexDisp = callbackData.indexDisp;
                 if (node.nodeType === 1) {
-                    var state = (self.domManager.getNodeState(item) || self.domManager.createNodeState(item));
+                    var state = (self.domManager.getNodeState(node) || self.domManager.createNodeState());
+                    state.model = item;
                     state.index = index;
                     self.domManager.setNodeState(node, state);
                     if (recalcIndextrigger != null && indexDisp != null) {
@@ -5724,6 +5726,11 @@ var wx;
             this.registerStateInternal(config);
             return this;
         };
+        Router.prototype.updateCurrentStateParams = function (withParamsAction) {
+            var _current = this.current();
+            withParamsAction(_current.params);
+            this.replaceHistoryState(_current, wx.app.title());
+        };
         Router.prototype.go = function (to, params, options) {
             to = this.mapPath(to);
             if (this.states[to] == null)
@@ -5912,8 +5919,6 @@ var wx;
             state.params = stateParams;
             var _current = this.current();
             if ((options && options.force) || _current == null || _current.name !== to || !wx.isEqual(_current.params, state.params)) {
-                if (_current != null)
-                    this.replaceHistoryState(_current, wx.app.title());
                 if (_current != null && _current.views != null && state.views != null) {
                     Object.keys(_current.views).forEach(function (x) {
                         if (!state.views.hasOwnProperty(x)) {
@@ -5960,6 +5965,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.61';
+    wx.version = '0.9.62';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
