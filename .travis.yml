@@ -3,7 +3,7 @@ node_js:
 - '0.12'
 before_install: npm install grunt-cli
 install: npm install
-script: grunt xtest
+script: grunt test
 env:
   global:
   - secure: NZfuxNR3oA8OJOCBT69HRleq+9PeA2y519/ncZSIudPr0oiQV7Oj3+wi9ZZ2lWB9VWOz+GOxyZJbF8kpelbnQbu95K3oo9PkinbY1KixnPxRS0DaLl0eYA9SNbnhPbXmMyXOp7H9ZiePKwub9UZY+sy04WER/BSrnUYrbWVMx6I=
