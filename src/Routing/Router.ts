@@ -54,6 +54,12 @@ module wx {
             return this;
         }
 
+        public updateCurrentStateParams(withParamsAction: (params: any) => void): void {
+            var _current = this.current();
+            withParamsAction(_current.params);
+            this.replaceHistoryState(_current, app.title());
+        }
+
         public go(to: string, params?: {}, options?: IStateChangeOptions): void {
             to = this.mapPath(to);
 
@@ -331,10 +337,6 @@ module wx {
             if ((options && options.force) || _current == null ||
                 _current.name !== to ||
                 !isEqual(_current.params, state.params)) {
-
-                // update current state a final time before transitioning
-                if (_current != null)
-                    this.replaceHistoryState(_current, app.title());
 
                 // reset views used by previous state that are unused by new state
                 if (_current != null && _current.views != null && state.views != null) {

@@ -61,12 +61,18 @@ describe('Routing',() => {
                 }
             });
 
-            wx.router.go("foo");
-            wx.router.current().params.baz = 42;
+            wx.router.go("foo", {}, { location: true });
+            wx.router.updateCurrentStateParams((params) => params.baz = 42);
 
-            wx.router.go("foo.bar");
+            wx.router.go("foo.bar", {}, { location: true });
             wx.app.history.back();
             expect(wx.router.current().params.baz).toEqual(42);
+
+            wx.app.history.forward();
+            wx.router.updateCurrentStateParams((params) => params.foobar = 3);
+            wx.app.history.back();
+            wx.app.history.forward();
+            expect(wx.router.current().params.foobar).toEqual(3);
         });
 
         it('child states inherit views of parent',() => {
@@ -204,7 +210,7 @@ describe('Routing',() => {
 
             wx.router.go("foo", {}, { location: true });
             expect(wx.router.current().uri).toEqual("/foo");
-            expect(wx.app.history.length).toEqual(2);
+            expect(wx.app.history.length).toEqual(1);
         });
 
         it('transitions to the the correct state on history.popstate event',() => {

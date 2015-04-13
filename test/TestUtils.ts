@@ -149,9 +149,9 @@ module testutils {
 
         function pushState(statedata: any, title: string, url?: string) {
             if (current < stack.length - 1) {
-                stack[current] = { data: statedata, url: url };
+                stack[current] = { data: jQuery.extend(true, {}, statedata), url: url };
             } else {
-                stack.push({ data: statedata, url: url });
+                stack.push({ data: jQuery.extend(true, {}, statedata), url: url });
                 current = stack.length - 1;
             }
 
@@ -159,7 +159,7 @@ module testutils {
         }
 
         function replaceState(statedata: any, title: string, url?: string) {
-            stack[current] = { data: statedata, url: url };
+            stack[current] = { data: jQuery.extend(true, {}, statedata), url: url };
 
             updateLocation(stack[current].url);
         }

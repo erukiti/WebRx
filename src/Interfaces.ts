@@ -675,6 +675,12 @@ module wx {
         current: IObservableProperty<IRouterState>;
 
         /**
+        * Invoke this method to programatically alter or extend IRouter.current.params. 
+        * Failure to modify params through this method will result in those modifications getting lost after state transitions. 
+        **/
+        updateCurrentStateParams(withParamsAction: (params: any)=> void): void;
+
+        /**
         * Convenience method for transitioning to a new state. IRouter.go calls IRouter.transitionTo internally 
         * but automatically sets options to { location: true, inherit: true, relative: IRouter.current, notify: true }. 
         * This allows you to easily use an absolute or relative to path and specify only the parameters you'd like 
