@@ -6,13 +6,13 @@
     <!-- Automatically updated by build, keeping fixed dev build number here in case of local build -->
     <version>$version$</version>
     <authors>Oliver Weichhold</authors>
-    <description>WebRx integrates concepts of KnockoutJS and AngularJS with ReactiveX for Javascript (rxjs) into a MVC framework that enables developers to create responsive, structured and testable Web-Applications that run in any modern browser.</description>
+    <description>WebRx is a Javascript MVVM-Framework built on ReactiveX for Javascript (RxJs) that combines functional-reactive programming with observable-powered declarative Data-Binding, Templating and client-side Routing.</description>
     <projectUrl>http://webrxjs.org</projectUrl>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
     <language>en-US</language>
     <tags>Rx RxJS Reactive Extensions Observable Data-Binding Web UI SPA</tags>
     <dependencies>
-      <dependency id="RxJS-Lite" version="2.4.1" />
+      <dependency id="RxJS-Lite" version="2.4.7" />
     </dependencies>
   </metadata>
   <files>
