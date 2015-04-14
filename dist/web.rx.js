@@ -911,7 +911,7 @@ var wx;
                     wx.log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
                 }
             });
-            this.title = wx.property("");
+            this.title = wx.property();
             if (!wx.isInUnitTest()) {
                 this.history = this.createHistory();
             }
@@ -5712,9 +5712,8 @@ var wx;
                 var state = e.state;
                 var stateName = state.stateName;
                 if (stateName != null) {
-                    if (state.title != null)
-                        wx.app.title(state.title);
                     _this.go(stateName, state.params, { location: false });
+                    wx.app.title(state.title);
                 }
             });
             wx.app.title.changed.subscribe(function (x) {
@@ -5819,21 +5818,17 @@ var wx;
         Router.prototype.pushHistoryState = function (state, title) {
             var hs = {
                 stateName: state.name,
-                params: state.params
+                params: state.params,
+                title: title != null ? title : document.title
             };
-            if (hs) {
-                hs.title = title;
-            }
             wx.app.history.pushState(hs, "", state.uri);
         };
         Router.prototype.replaceHistoryState = function (state, title) {
             var hs = {
                 stateName: state.name,
-                params: state.params
+                params: state.params,
+                title: title != null ? title : document.title
             };
-            if (hs) {
-                hs.title = title;
-            }
             wx.app.history.replaceState(hs, "", state.uri);
         };
         Router.prototype.mapPath = function (path) {
