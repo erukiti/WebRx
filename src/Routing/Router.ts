@@ -29,12 +29,11 @@ module wx {
                 var stateName = state.stateName;
 
                 if (stateName != null) {
-                    // update title
-                    if (state.title != null)
-                        app.title(state.title);
-
                     // enter state using extracted params
                     this.go(stateName, state.params, { location: false });
+
+                    // update title
+                    app.title(state.title);
                 }
             });
 
@@ -193,12 +192,9 @@ module wx {
         private pushHistoryState(state: IRouterState, title?: string): void {
             var hs = <IHistoryState> {
                 stateName: state.name,
-                params: state.params
+                params: state.params,
+                title: title != null ? title : document.title
             };
-
-            if (hs) {
-                hs.title = title;
-            }
 
             app.history.pushState(hs, "", state.uri);
         }
@@ -206,12 +202,9 @@ module wx {
         private replaceHistoryState(state: IRouterState, title?: string): void {
             var hs = <IHistoryState> {
                 stateName: state.name,
-                params: state.params
+                params: state.params,
+                title: title != null ? title : document.title
             };
-
-            if (hs) {
-                hs.title = title;
-            }
 
             app.history.replaceState(hs, "", state.uri);
         }
