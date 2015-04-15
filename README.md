@@ -46,9 +46,14 @@ Post your questions to [Stackoverflow](https://stackoverflow.com/questions/tagge
 
 #### Contributing
 
-- Fork the repository
-- Make one or more well commented and clean commits to the repository. You can make a new branch here if you are modifying more than one part or feature.
-- Submit a [pull request](https://help.github.com/articles/using-pull-requests/)
+There are many ways to [contribute](https://github.com/oliverw/WebRx/blob/master/CONTRIBUTING.md) to WebRx.
+
+* [Submit bugs](https://github.com/oliverw/WebRx/issues) and help us verify fixes as they are checked in.
+* Review the [source code changes](https://github.com/oliverw/WebRx/pulls).
+* Engage with other WebRx users and developers on [StackOverflow](http://stackoverflow.com/questions/tagged/webrx). 
+* Join the [#webrx](http://twitter.com/#!/search/realtime/%23webrx) discussion on Twitter.
+* [Contribute bug fixes](https://github.com/oliverw/WebRx/blob/master/CONTRIBUTING.md).
+
 
 ### License
 
