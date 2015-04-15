@@ -10,14 +10,14 @@ WebRx is a Javascript MVVM-Framework built on [ReactiveX for Javascript (RxJs)](
 
 #### Features
 
-- Compatible with IE9+, Firefox 5+, Chrome 5+, Safari 5+
-- Comprehensive [online documentation](http://webrxjs.org/docs)
-- Extensible data-binding with many built-in operators
-- Supports modules for partitioning larger projects into managable units
-- Supports components for organizing UI code into self-contained, reusable chunks
+- Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
+- [Documentation](http://webrxjs.org/docs)
+- Declarative One-way and Two-way data-binding with many built-in operators
+- Supports self-contained, reusable *Components* modelled after the upcoming Web-Components standard
+- Out-of-the box support for *Modules* to facilitate code-reuse and separation of concerns
 - Integrated state-based routing engine inspired by Angular's [UI-Router](https://github.com/angular-ui/ui-router)
 - No dependencies besides RxJS-Lite
-- Compact (~20Kb minified & compressed)
+- Compact (~25Kb minified & compressed)
 - First class [TypeScript](http://www.typescriptlang.org/) support
 
 #### Installation
@@ -42,7 +42,7 @@ WebRx's documentation can be found on [here](http://webrxjs.org/docs).
 
 #### Support 
 
-[Stackoverflow](https://stackoverflow.com/questions/tagged/webrx) is WebRx's primary support-hub. Simply post your question under the <code>webrx</code> tag and we'll do our best to help.
+Post your questions to [Stackoverflow](https://stackoverflow.com/questions/tagged/webrx) tagged with <code>webrx</code>.
 
 #### Contributing
 
