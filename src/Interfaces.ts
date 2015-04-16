@@ -369,6 +369,12 @@ module wx {
         parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
     }
 
+    export interface IAnimation {
+        prepare(element: Node|Array<Node>|HTMLElement|HTMLCollection|Array<HTMLElement>|NodeList, params?: any): void;
+        run(element: Node|Array<Node>|HTMLElement|HTMLCollection|Array<HTMLElement>|NodeList, params?: any): Rx.Observable<any>;
+        complete(element: Node|Array<Node>|HTMLElement|HTMLCollection|Array<HTMLElement>|NodeList, params?: any): void;
+    }
+
     /**
     * The Dom Manager coordinates everything involving browser DOM-Manipulation
     * @interface 
@@ -578,6 +584,11 @@ module wx {
         filters(): { [filterName: string]: IExpressionFilter };
     }
 
+    export interface IAnimationRegistry {
+        animation(name: string, filter: IAnimation): IAnimationRegistry;
+        animation(name: string): IAnimation;
+    }
+
     export interface IModuleDescriptor {
         (module: IModule): void; // Configuration function
         require?: string;       // Async AMD loaded configuration function
@@ -586,7 +597,7 @@ module wx {
         instance?: any;         // pre-constructed instance
     }
 
-    export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
+    export interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry, IAnimationRegistry {
         name: string;
         merge(other: IModule): IModule;
     }
@@ -614,10 +625,15 @@ module wx {
         isAbsolute: boolean;
     }
 
+    export interface IViewAnimationDescriptor {
+        enter?: string|IAnimation;
+        leave?: string|IAnimation;
+    }
+
     export interface IRouterStateConfig {
         name: string;
         route?: string|IRoute;   // relative or absolute
-        views?: { [view: string]: string|{ component: string; params?: any } };
+        views?: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
         params?: any;
         onEnter?: (config: IRouterStateConfig, params?: any)=> void;
         onLeave?: (config: IRouterStateConfig, params?: any) => void;
@@ -628,7 +644,7 @@ module wx {
         name: string;
         uri: string;
         params: any;
-        views: { [view: string]: string|{ component: string; params?: any } };
+        views: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
         onEnter?: (config: IRouterStateConfig, params?: any) => void;
         onLeave?: (config: IRouterStateConfig, params?: any) => void;
     }
@@ -807,5 +823,9 @@ module wx {
 declare module Rx {
     export interface Observable<T> extends IObservable<T> {
         toProperty(initialValue?: T): wx.IObservableProperty<T>;
+    }
+
+    export interface ObservableStatic {
+        startSync<T>(action:()=> T): Rx.Observable<T>;
     }
 }

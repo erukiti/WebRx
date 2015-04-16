@@ -1,5 +1,6 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="Core/ScheduledSubject.ts" />
+/// <reference path="RTTI/IID.ts" />
 
 module wx {
     "use strict";
@@ -90,5 +91,15 @@ module wx {
             }, x=> accessor.thrownExceptions.onNext(x));
 
         return accessor;
+    }
+
+    RxObsConstructor.startSync = <T>(action: () => T): Rx.Observable<T> => {
+        return Rx.Observable.create<T>(observer => {
+            action();
+
+            observer.onNext(<any> undefined);
+            observer.onCompleted();
+            return Rx.Disposable.empty;
+        });
     }
 }

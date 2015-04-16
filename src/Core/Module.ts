@@ -28,6 +28,7 @@ module wx {
             extend(_other.components, this.components);
             extend(_other.bindings, this.bindings);
             extend(_other.expressionFilters, this.expressionFilters);
+            extend(_other.animations, this.animations);
 
             return this;
         }
@@ -113,6 +114,34 @@ module wx {
             return this.expressionFilters;
         }
 
+        public animation(name: string, animation: IAnimation): IAnimationRegistry;
+        public animation(name: string): IAnimation;
+
+        public animation() {
+            var args = args2Array(arguments);
+            var name = args.shift();
+            var animation: IAnimation;
+
+            // lookup?
+            if (args.length === 0) {
+                // if the animation has been registered as resource, resolve it now and update registry
+                animation = this.animations[name];
+
+                if (typeof animation === "string") {
+                    animation = injector.get<IAnimation>(<any> animation);
+                    this.bindings[name] = animation;
+                }
+
+                return animation;
+            }
+
+            // registration
+            animation = args.shift();
+            this.animations[name] = animation;
+
+            return <any> this;
+        }
+
         public name: string;
 
         //////////////////////////////////
@@ -121,6 +150,7 @@ module wx {
         private bindings: { [name: string]: any } = {};
         private components: { [name: string]: IComponentDescriptorEx } = {};
         private expressionFilters: { [index: string]: IExpressionFilter; } = {};
+        private animations: { [index: string]: IAnimation; } = {};
 
         private instantiateComponent(name: string): Rx.Observable<IComponentDescriptorEx> {
             var cd = this.components[name];

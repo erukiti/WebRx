@@ -1,6 +1,7 @@
 ﻿/// <reference path="../../typings/jasmine.d.ts" />
 /// <reference path="../../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../../build/web.rx.d.ts" />
+/// <reference path="../../TestUtils.ts" />
 
 describe('Routing', () => {
     var router = wx.injector.get<wx.IRouter>(wx.res.router);
@@ -53,6 +54,32 @@ describe('Routing', () => {
                 expect(el.childNodes.length).toEqual(items.length);
                 expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLOptionElement)
                     .map(x => wx.internal.getNodeValue(x, domManager))).toEqual(items);
+            });
+
+            it("cleans up view if there's no component registered for the current state",() => {
+                loadFixtures('templates/Routing/Bindings/View.html');
+
+                router.state({
+                    name: "foo",
+                    views: {
+                        'main': "wx-select"
+                    }
+                }).state({
+                    name: "foo.bar",
+                    views: {
+                        'main': null
+                    }
+                });
+
+                var el = <HTMLElement> document.querySelector("#fixture1");
+                var model = {};
+                expect(() => wx.applyBindings(model, el)).not.toThrow();
+
+                router.go("foo");
+                router.go("foo.bar");
+
+                // there should be a fully initialized wx-select component
+                expect(el.childNodes.length).toEqual(0);
             });
         });
     });

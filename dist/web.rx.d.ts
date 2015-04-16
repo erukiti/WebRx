@@ -161,6 +161,11 @@ declare module wx {
         setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void;
         parseObjectLiteral(objectLiteralString: any): Array<IObjectLiteralToken>;
     }
+    interface IAnimation {
+        prepare(element: Node | Array<Node> | HTMLElement | HTMLCollection | Array<HTMLElement> | NodeList, params?: any): void;
+        run(element: Node | Array<Node> | HTMLElement | HTMLCollection | Array<HTMLElement> | NodeList, params?: any): Rx.Observable<any>;
+        complete(element: Node | Array<Node> | HTMLElement | HTMLCollection | Array<HTMLElement> | NodeList, params?: any): void;
+    }
     interface IDomManager {
         applyBindings(model: any, rootNode: Node): void;
         applyBindingsToDescendants(ctx: IDataContext, rootNode: Node): void;
@@ -235,6 +240,10 @@ declare module wx {
             [filterName: string]: IExpressionFilter;
         };
     }
+    interface IAnimationRegistry {
+        animation(name: string, filter: IAnimation): IAnimationRegistry;
+        animation(name: string): IAnimation;
+    }
     interface IModuleDescriptor {
         (module: IModule): void;
         require?: string;
@@ -242,7 +251,7 @@ declare module wx {
         resolve?: string;
         instance?: any;
     }
-    interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry {
+    interface IModule extends IComponentRegistry, IBindingRegistry, IExpressionFilterRegistry, IAnimationRegistry {
         name: string;
         merge(other: IModule): IModule;
     }
@@ -262,6 +271,10 @@ declare module wx {
         concat(route: IRoute): IRoute;
         isAbsolute: boolean;
     }
+    interface IViewAnimationDescriptor {
+        enter?: string | IAnimation;
+        leave?: string | IAnimation;
+    }
     interface IRouterStateConfig {
         name: string;
         route?: string | IRoute;
@@ -269,6 +282,7 @@ declare module wx {
             [view: string]: string | {
                 component: string;
                 params?: any;
+                animations?: IViewAnimationDescriptor;
             };
         };
         params?: any;
@@ -283,6 +297,7 @@ declare module wx {
             [view: string]: string | {
                 component: string;
                 params?: any;
+                animations?: IViewAnimationDescriptor;
             };
         };
         onEnter?: (config: IRouterStateConfig, params?: any) => void;
@@ -330,6 +345,9 @@ declare module Rx {
     interface Observable<T> extends IObservable<T> {
         toProperty(initialValue?: T): wx.IObservableProperty<T>;
     }
+    interface ObservableStatic {
+        startSync<T>(action: () => T): Rx.Observable<T>;
+    }
 }
 declare module wx {
     interface IUnknown {
@@ -344,6 +362,7 @@ declare module wx.internal {
     }
 }
 declare module wx {
+    var noop: () => void;
     function isStrictMode(): boolean;
     function isPrimitive(target: any): boolean;
     function isProperty(target: any): boolean;

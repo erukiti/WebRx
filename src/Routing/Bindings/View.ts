@@ -32,8 +32,18 @@ module wx {
             var viewName = this.domManager.evaluateExpression(compiled, ctx);
             var componentName: string = null;
             var componentParams: any;
+            var componentAnimations: IViewAnimationDescriptor;
             var currentComponentName: string = null;
             var currentComponentParams: any;
+            var currentComponentAnimations: IViewAnimationDescriptor;
+            var cleanup: Rx.CompositeDisposable;
+
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
 
             if (viewName == null || typeof viewName !== "string")
                 internal.throwError("views must be named!");
@@ -41,16 +51,21 @@ module wx {
             // subscribe to router-state changes
             state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(newState => {
                 try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+
                     if (newState.views != null) {
                         var component = newState.views[viewName];
 
                         if (component != null) {
                             if (typeof component === "object") {
                                 componentName = component.component;
-                                componentParams = component.params;
+                                componentParams = component.params || {};
+                                componentAnimations = component.animations;
                             } else {
                                 componentName = <string> component;
                                 componentParams = {};
+                                componentAnimations = undefined;
                             }
 
                             // merge state params into component params
@@ -59,24 +74,21 @@ module wx {
 
                             // only update if changed
                             if (componentName !== currentComponentName ||
-                                !isEqual(componentParams, currentComponentParams)) {
+                                !isEqual(componentParams, currentComponentParams) ||
+                                !isEqual(componentAnimations, currentComponentAnimations)) {
 
-                                //log.info("component for view '{0}' is now '{1}', params: {2}", viewName, componentName,
-                                //    (componentParams != null ? JSON.stringify(componentParams) : ""));
-
-                                this.applyTemplate(componentName, componentParams, el, ctx);
+                                cleanup.add(this.applyTemplate(componentName, componentParams, componentAnimations, el, ctx, module || app).subscribe());
 
                                 currentComponentName = componentName;
                                 currentComponentParams = componentParams;
+                                currentComponentAnimations = componentAnimations;
                             }
                         } else {
-                            currentComponentName = null;
+                            cleanup.add(this.applyTemplate(null, null, currentComponentAnimations, el, ctx, module || app).subscribe());
 
-                            // we have no component to display, clear contents
-                            while (el.firstChild) {
-                                this.domManager.cleanNode(el.firstChild);
-                                el.removeChild(el.firstChild);
-                            }
+                            currentComponentName = null;
+                            currentComponentParams = {};
+                            currentComponentAnimations = undefined;
                         }
                     }
                 } catch (e) {
@@ -109,24 +121,92 @@ module wx {
         protected domManager: IDomManager;
         protected router: IRouter;
 
-        protected applyTemplate(componentName: string, componentParams: Object, el: HTMLElement, ctx: IDataContext) {
-            // clear
-            while (el.firstChild) {
-                this.domManager.cleanNode(el.firstChild);
-                el.removeChild(el.firstChild);
+        protected applyTemplate(componentName: string, componentParams: Object,
+            animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.Observable<any> {
+            var self = this;
+            var oldTemplateInstance = nodeChildrenToArray<Node>(el);
+
+            // get animation objects
+            var hide: IAnimation;
+            var show: IAnimation;
+
+            if (animations) {
+                if (animations.leave && oldTemplateInstance.length) {
+                    if (typeof animations.leave === "string") {
+                        hide = module.animation(<string> animations.leave);
+                    } else {
+                        hide = <IAnimation> animations.leave;
+                    }
+                }
+
+                if (animations.enter) {
+                    if (typeof animations.enter === "string") {
+                        show = module.animation(<string> animations.enter);
+                    } else {
+                        show = <IAnimation> animations.enter;
+                    }
+                }
             }
 
-            // to avoid stringifying componentParams we inject them into the data-context
-            (<IViewDataContext> ctx).$componentParams = componentParams;
+            // Animated Hide of old template instance
+            var hideAnimation: Rx.Observable<any>;
 
-            // create component container
-            var container = <HTMLElement> document.createElement("div");
-            var binding = formatString("component: { name: '{0}', params: $componentParams }", componentName);
-            container.setAttribute("data-bind", binding);
-            el.appendChild(container);
+            if (hide) {
+                hide.prepare(oldTemplateInstance);
+                hideAnimation = hide.run(oldTemplateInstance);
+            } else {
+                hideAnimation = Rx.Observable.return<any>(undefined);
+            }
 
-            // done
-            this.domManager.applyBindingsToDescendants(ctx, el);
+            // Remove old template instance from dom
+            function removeOldTemplate() {
+                if (hide)
+                    hide.complete(oldTemplateInstance);
+
+                // remove old content
+                oldTemplateInstance.forEach(x => {
+                    self.domManager.cleanNode(x);
+                    el.removeChild(x);
+                });
+            }
+
+            // Instantiate new template instance and bind it
+            function dataBind() {
+                if (componentName == null)
+                    return;
+
+                // extend the data-context
+                (<IViewDataContext> ctx).$componentParams = componentParams;
+
+                // create component container
+                var container = <HTMLElement> document.createElement("div");
+                var binding = formatString("component: { name: '{0}', params: $componentParams }", componentName);
+                container.setAttribute("data-bind", binding);
+
+                // prepare for animation
+                if (show != null && container.nodeType === 1)
+                    show.prepare(container);
+
+                el.appendChild(container);
+
+                // done
+                self.domManager.applyBindingsToDescendants(ctx, el);
+            }
+
+            // Animated show of new template instance
+            var showAnimation = show != null && componentName != null ?
+                show.run(el.childNodes) :
+                Rx.Observable.return<any>(undefined);
+
+            return Rx.Observable.combineLatest(
+                // hide current and remove
+                hideAnimation
+                    .selectMany(_=> Rx.Observable.startSync<any>(removeOldTemplate)),
+                // insert new and show
+                Rx.Observable.startSync<any>(dataBind)
+                    .selectMany(_=> showAnimation),
+                <any> noop)
+                .take(1);
         }
     }
 

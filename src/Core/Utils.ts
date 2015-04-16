@@ -13,6 +13,8 @@ module wx {
     var cssClassNameRegex = /\S+/g;
     var RxObsConstructor = (<new <T>() => Rx.Observable<T>> <any> Rx.Observable); // the cast is neccessary because the rx.js.d.ts declares Observable as an interface
 
+    export var noop = () => {};
+
     /**
     * Returns true if a ECMAScript5 strict-mode is active
     */
