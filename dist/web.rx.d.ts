@@ -162,9 +162,9 @@ declare module wx {
         parseObjectLiteral(objectLiteralString: any): Array<IObjectLiteralToken>;
     }
     interface IAnimation {
-        prepare(element: Node | Array<Node> | HTMLElement | HTMLCollection | Array<HTMLElement> | NodeList, params?: any): void;
-        run(element: Node | Array<Node> | HTMLElement | HTMLCollection | Array<HTMLElement> | NodeList, params?: any): Rx.Observable<any>;
-        complete(element: Node | Array<Node> | HTMLElement | HTMLCollection | Array<HTMLElement> | NodeList, params?: any): void;
+        prepare(element: Node | Array<Node> | HTMLElement | Array<HTMLElement> | NodeList, params?: any): void;
+        run(element: Node | Array<Node> | HTMLElement | Array<HTMLElement> | NodeList, params?: any): Rx.Observable<any>;
+        complete(element: Node | Array<Node> | HTMLElement | Array<HTMLElement> | NodeList, params?: any): void;
     }
     interface IDomManager {
         applyBindings(model: any, rootNode: Node): void;
@@ -346,7 +346,7 @@ declare module Rx {
         toProperty(initialValue?: T): wx.IObservableProperty<T>;
     }
     interface ObservableStatic {
-        startSync<T>(action: () => T): Rx.Observable<T>;
+        startDeferred<T>(action: () => T): Rx.Observable<T>;
     }
 }
 declare module wx {
@@ -386,6 +386,7 @@ declare module wx {
     function getOwnPropertiesImplementingInterface<T>(target: any, iid: string): PropertyInfo<T>[];
     function getOid(o: any): string;
     function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...classNames: string[]): void;
+    function triggerReflow(el: HTMLElement): void;
     function isFunction(obj: any): boolean;
     function isDisposable(obj: any): boolean;
     function isEqual(a: any, b: any, aStack?: any, bStack?: any): boolean;
@@ -657,6 +658,10 @@ declare module wx {
     module internal {
         var selectComponentConstructor: any;
     }
+}
+declare module wx {
+    function animation(prepare: string, run: string): IAnimation;
+    function animation(run: (element: HTMLElement, params?: any) => Rx.Observable<any>, prepare?: (element: HTMLElement, params?: any) => void, complete?: (element: HTMLElement, params?: any) => void): IAnimation;
 }
 declare module wx {
     module internal {

@@ -2,6 +2,7 @@
 /// <reference path="../../Core/DomManager.ts" />
 /// <reference path="../../Interfaces.ts" />
 /// <reference path="../../Core/Log.ts" />
+/// <reference path="../../Core/Animation.ts" />
 
 module wx {
     "use strict";
@@ -127,11 +128,13 @@ module wx {
             var oldTemplateInstance = nodeChildrenToArray<Node>(el);
 
             // get animation objects
+            var animateEnter = componentName != null;
+            var animateLeave = oldTemplateInstance.length > 0;
             var hide: IAnimation;
             var show: IAnimation;
 
             if (animations) {
-                if (animations.leave && oldTemplateInstance.length) {
+                if (animations.leave && animateLeave) {
                     if (typeof animations.leave === "string") {
                         hide = module.animation(<string> animations.leave);
                     } else {
@@ -139,7 +142,7 @@ module wx {
                     }
                 }
 
-                if (animations.enter) {
+                if (animations.enter && animateEnter) {
                     if (typeof animations.enter === "string") {
                         show = module.animation(<string> animations.enter);
                     } else {
@@ -159,7 +162,7 @@ module wx {
             }
 
             // Remove old template instance from dom
-            function removeOldTemplate() {
+            var removeOldTemplate = Rx.Observable.startDeferred<any>(() => {
                 if (hide)
                     hide.complete(oldTemplateInstance);
 
@@ -168,10 +171,10 @@ module wx {
                     self.domManager.cleanNode(x);
                     el.removeChild(x);
                 });
-            }
+            });
 
             // Instantiate new template instance and bind it
-            function dataBind() {
+            var dataBind = Rx.Observable.startDeferred<any>(() => {
                 if (componentName == null)
                     return;
 
@@ -190,21 +193,28 @@ module wx {
                 el.appendChild(container);
 
                 // done
-                self.domManager.applyBindingsToDescendants(ctx, el);
-            }
+                self.domManager.applyBindings(ctx, container);
+            });
 
             // Animated show of new template instance
-            var showAnimation = show != null && componentName != null ?
+            var showAnimation = show != null ?
                 show.run(el.childNodes) :
                 Rx.Observable.return<any>(undefined);
+
+            var cleanupAnimation = Rx.Observable.startDeferred<any>(() => {
+                if (show != null) {
+                    show.complete(el.childNodes);
+                }
+            });
 
             return Rx.Observable.combineLatest(
                 // hide current and remove
                 hideAnimation
-                    .selectMany(_=> Rx.Observable.startSync<any>(removeOldTemplate)),
+                    .selectMany(_=> removeOldTemplate),
                 // insert new and show
-                Rx.Observable.startSync<any>(dataBind)
-                    .selectMany(_=> showAnimation),
+                dataBind
+                    .selectMany(_=> showAnimation
+                        .selectMany(_=> cleanupAnimation)),
                 <any> noop)
                 .take(1);
         }

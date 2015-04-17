@@ -275,6 +275,14 @@ module wx {
     }
 
     /**
+     * Trigger a reflow on the target element
+     * @param {HTMLElement} el
+     */
+    export function triggerReflow(el: HTMLElement) {
+        el.getBoundingClientRect();
+    }
+
+    /**
      * Returns true if object is a Function.
      * @param obj
      */

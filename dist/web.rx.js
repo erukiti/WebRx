@@ -248,6 +248,10 @@ var wx;
         }
     }
     wx.toggleCssClass = toggleCssClass;
+    function triggerReflow(el) {
+        el.getBoundingClientRect();
+    }
+    wx.triggerReflow = triggerReflow;
     function isFunction(obj) {
         return typeof obj == 'function' || false;
     }
@@ -3302,12 +3306,16 @@ var wx;
         }, function (x) { return accessor.thrownExceptions.onNext(x); });
         return accessor;
     };
-    RxObsConstructor.startSync = function (action) {
-        return Rx.Observable.create(function (observer) {
-            action();
-            observer.onNext(undefined);
-            observer.onCompleted();
-            return Rx.Disposable.empty;
+    RxObsConstructor.startDeferred = function (action) {
+        return Rx.Observable.defer(function () {
+            return Rx.Observable.create(function (observer) {
+                var cancelled = false;
+                if (!cancelled)
+                    action();
+                observer.onNext(undefined);
+                observer.onCompleted();
+                return Rx.Disposable.create(function () { return cancelled = true; });
+            });
         });
     };
 })(wx || (wx = {}));
@@ -3994,6 +4002,99 @@ var wx;
     (function (internal) {
         internal.selectComponentConstructor = SelectComponent;
     })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
+    function toElementList(element) {
+        var nodes;
+        if (element instanceof Node || element instanceof HTMLElement)
+            nodes = [element];
+        else if (Array.isArray(element))
+            nodes = element;
+        else if (element instanceof NodeList)
+            nodes = wx.nodeListToArray(element);
+        else
+            wx.internal.throwError("invalid argument: element");
+        var elements = nodes.filter(function (x) { return x.nodeType === 1; });
+        return elements;
+    }
+    function getParsedMaxTransitionDuration(str) {
+        var maxValue = 0;
+        var values = str.split(/\s*,\s*/);
+        values.forEach(function (value) {
+            if (value.charAt(value.length - 1) == 's') {
+                value = value.substring(0, value.length - 1);
+            }
+            value = parseFloat(value) || 0;
+            maxValue = maxValue ? Math.max(value, maxValue) : value;
+        });
+        return maxValue * 1000;
+    }
+    function scriptedAnimation(run, prepare, complete) {
+        var result = {};
+        if (prepare) {
+            result.prepare = function (nodes, params) {
+                var elements = toElementList(nodes);
+                elements.forEach(function (x) { return prepare(x, params); });
+            };
+        }
+        result.run = function (nodes, params) {
+            return Rx.Observable.defer(function () {
+                var elements = toElementList(nodes);
+                return Rx.Observable.combineLatest(elements.map(function (x) { return run(x, params); }), wx.noop);
+            });
+        };
+        if (complete) {
+            result.complete = function (nodes, params) {
+                var elements = toElementList(nodes);
+                elements.forEach(function (x) { return complete(x, params); });
+            };
+        }
+        return result;
+    }
+    var transitionEndEventName = ('WebkitTransition' in document.documentElement.style) ? 'webkitTransitionEnd' : 'transitionend';
+    function cssAnimation(prepare, run) {
+        var result = {};
+        if (prepare) {
+            result.prepare = function (nodes, params) {
+                var elements = toElementList(nodes);
+                elements.forEach(function (x) { return wx.toggleCssClass(x, true, prepare); });
+            };
+        }
+        result.run = function (nodes, params) {
+            return Rx.Observable.defer(function () {
+                var elements = toElementList(nodes);
+                var obs = Rx.Observable.combineLatest(elements.map(function (x) {
+                    var duration = getParsedMaxTransitionDuration(getComputedStyle(x)["transitionDuration"]);
+                    return Rx.Observable.timer(duration);
+                }), wx.noop);
+                Rx.Observable.timer(1).subscribe(function () {
+                    elements.forEach(function (x) { return wx.toggleCssClass(x, true, run); });
+                });
+                return obs;
+            });
+        };
+        result.complete = function (nodes, params) {
+            var elements = toElementList(nodes);
+            elements.forEach(function (x) { return wx.toggleCssClass(x, false, prepare, run); });
+        };
+        return result;
+    }
+    function animation() {
+        var args = wx.args2Array(arguments);
+        var run = args.shift();
+        if (typeof run === "function") {
+            return scriptedAnimation(run, args.shift(), args.shift());
+        }
+        else if (typeof run === "string") {
+            return cssAnimation(run, args.shift());
+        }
+        else {
+            wx.internal.throwError("invalid arguments");
+        }
+    }
+    wx.animation = animation;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
@@ -5614,10 +5715,12 @@ var wx;
         ViewBinding.prototype.applyTemplate = function (componentName, componentParams, animations, el, ctx, module) {
             var self = this;
             var oldTemplateInstance = wx.nodeChildrenToArray(el);
+            var animateEnter = componentName != null;
+            var animateLeave = oldTemplateInstance.length > 0;
             var hide;
             var show;
             if (animations) {
-                if (animations.leave && oldTemplateInstance.length) {
+                if (animations.leave && animateLeave) {
                     if (typeof animations.leave === "string") {
                         hide = module.animation(animations.leave);
                     }
@@ -5625,7 +5728,7 @@ var wx;
                         hide = animations.leave;
                     }
                 }
-                if (animations.enter) {
+                if (animations.enter && animateEnter) {
                     if (typeof animations.enter === "string") {
                         show = module.animation(animations.enter);
                     }
@@ -5642,15 +5745,15 @@ var wx;
             else {
                 hideAnimation = Rx.Observable.return(undefined);
             }
-            function removeOldTemplate() {
+            var removeOldTemplate = Rx.Observable.startDeferred(function () {
                 if (hide)
                     hide.complete(oldTemplateInstance);
                 oldTemplateInstance.forEach(function (x) {
                     self.domManager.cleanNode(x);
                     el.removeChild(x);
                 });
-            }
-            function dataBind() {
+            });
+            var dataBind = Rx.Observable.startDeferred(function () {
                 if (componentName == null)
                     return;
                 ctx.$componentParams = componentParams;
@@ -5660,10 +5763,15 @@ var wx;
                 if (show != null && container.nodeType === 1)
                     show.prepare(container);
                 el.appendChild(container);
-                self.domManager.applyBindingsToDescendants(ctx, el);
-            }
-            var showAnimation = show != null && componentName != null ? show.run(el.childNodes) : Rx.Observable.return(undefined);
-            return Rx.Observable.combineLatest(hideAnimation.selectMany(function (_) { return Rx.Observable.startSync(removeOldTemplate); }), Rx.Observable.startSync(dataBind).selectMany(function (_) { return showAnimation; }), wx.noop).take(1);
+                self.domManager.applyBindings(ctx, container);
+            });
+            var showAnimation = show != null ? show.run(el.childNodes) : Rx.Observable.return(undefined);
+            var cleanupAnimation = Rx.Observable.startDeferred(function () {
+                if (show != null) {
+                    show.complete(el.childNodes);
+                }
+            });
+            return Rx.Observable.combineLatest(hideAnimation.selectMany(function (_) { return removeOldTemplate; }), dataBind.selectMany(function (_) { return showAnimation.selectMany(function (_) { return cleanupAnimation; }); }), wx.noop).take(1);
         };
         return ViewBinding;
     })();

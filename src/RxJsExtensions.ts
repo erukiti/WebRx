@@ -93,13 +93,19 @@ module wx {
         return accessor;
     }
 
-    RxObsConstructor.startSync = <T>(action: () => T): Rx.Observable<T> => {
-        return Rx.Observable.create<T>(observer => {
-            action();
+    RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
+        return Rx.Observable.defer(() => {
+            return Rx.Observable.create<T>(observer => {
+                var cancelled = false;
 
-            observer.onNext(<any> undefined);
-            observer.onCompleted();
-            return Rx.Disposable.empty;
+                if(!cancelled)
+                    action();
+
+                observer.onNext(<any> undefined);
+                observer.onCompleted();
+
+                return Rx.Disposable.create(()=> cancelled = true);
+            });
         });
     }
 }

@@ -370,9 +370,9 @@ module wx {
     }
 
     export interface IAnimation {
-        prepare(element: Node|Array<Node>|HTMLElement|HTMLCollection|Array<HTMLElement>|NodeList, params?: any): void;
-        run(element: Node|Array<Node>|HTMLElement|HTMLCollection|Array<HTMLElement>|NodeList, params?: any): Rx.Observable<any>;
-        complete(element: Node|Array<Node>|HTMLElement|HTMLCollection|Array<HTMLElement>|NodeList, params?: any): void;
+        prepare(element: Node|Array<Node>|HTMLElement|Array<HTMLElement>|NodeList, params?: any): void;
+        run(element: Node|Array<Node>|HTMLElement|Array<HTMLElement>|NodeList, params?: any): Rx.Observable<any>;
+        complete(element: Node|Array<Node>|HTMLElement|Array<HTMLElement>|NodeList, params?: any): void;
     }
 
     /**
@@ -826,6 +826,6 @@ declare module Rx {
     }
 
     export interface ObservableStatic {
-        startSync<T>(action:()=> T): Rx.Observable<T>;
+        startDeferred<T>(action:()=> T): Rx.Observable<T>;
     }
 }
