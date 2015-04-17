@@ -823,6 +823,10 @@ module wx {
 declare module Rx {
     export interface Observable<T> extends IObservable<T> {
         toProperty(initialValue?: T): wx.IObservableProperty<T>;
+
+        continueWith(action: () => void): Observable<any>;
+        continueWith<TResult>(action: (T) => TResult): Observable<TResult>;
+        continueWith<TOther>(obs: Rx.Observable<TOther>): Observable<TOther>;
     }
 
     export interface ObservableStatic {

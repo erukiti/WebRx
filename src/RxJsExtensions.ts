@@ -93,6 +93,21 @@ module wx {
         return accessor;
     }
 
+    RxObsConstructor.prototype.continueWith = function() {
+        var args = args2Array(arguments);
+        var val = args.shift();
+        var obs: Rx.Observable<any> = undefined;
+
+        if (isRxObservable(val)) {
+            obs = <Rx.Observable<any>> val;
+        } else if(isFunction(val)) {
+            var action = <() => any> val;
+            obs = Rx.Observable.startDeferred(action);
+        }
+
+        return this.selectMany(_ => obs);
+    }
+
     RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
         return Rx.Observable.defer(() => {
             return Rx.Observable.create<T>(observer => {

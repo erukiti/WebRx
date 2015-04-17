@@ -125,59 +125,16 @@ module wx {
         protected applyTemplate(componentName: string, componentParams: Object,
             animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.Observable<any> {
             var self = this;
-            var oldTemplateInstance = nodeChildrenToArray<Node>(el);
+            var currentComponentElements = nodeChildrenToArray<Node>(el);
 
-            // get animation objects
-            var animateEnter = componentName != null;
-            var animateLeave = oldTemplateInstance.length > 0;
-            var hide: IAnimation;
-            var show: IAnimation;
-
-            if (animations) {
-                if (animations.leave && animateLeave) {
-                    if (typeof animations.leave === "string") {
-                        hide = module.animation(<string> animations.leave);
-                    } else {
-                        hide = <IAnimation> animations.leave;
-                    }
-                }
-
-                if (animations.enter && animateEnter) {
-                    if (typeof animations.enter === "string") {
-                        show = module.animation(<string> animations.enter);
-                    } else {
-                        show = <IAnimation> animations.enter;
-                    }
-                }
-            }
-
-            // Animated Hide of old template instance
-            var hideAnimation: Rx.Observable<any>;
-
-            if (hide) {
-                hide.prepare(oldTemplateInstance);
-                hideAnimation = hide.run(oldTemplateInstance);
-            } else {
-                hideAnimation = Rx.Observable.return<any>(undefined);
-            }
-
-            // Remove old template instance from dom
-            var removeOldTemplate = Rx.Observable.startDeferred<any>(() => {
-                if (hide)
-                    hide.complete(oldTemplateInstance);
-
-                // remove old content
-                oldTemplateInstance.forEach(x => {
+            function removeCurrentComponentElements() {
+                currentComponentElements.forEach(x => {
                     self.domManager.cleanNode(x);
                     el.removeChild(x);
                 });
-            });
+            }
 
-            // Instantiate new template instance and bind it
-            var dataBind = Rx.Observable.startDeferred<any>(() => {
-                if (componentName == null)
-                    return;
-
+            function instantiateComponent(animation: IAnimation) {
                 // extend the data-context
                 (<IViewDataContext> ctx).$componentParams = componentParams;
 
@@ -187,36 +144,72 @@ module wx {
                 container.setAttribute("data-bind", binding);
 
                 // prepare for animation
-                if (show != null && container.nodeType === 1)
-                    show.prepare(container);
+                if (animation != null)
+                    animation.prepare(container);
 
                 el.appendChild(container);
 
                 // done
                 self.domManager.applyBindings(ctx, container);
-            });
+            }
 
-            // Animated show of new template instance
-            var showAnimation = show != null ?
-                show.run(el.childNodes) :
-                Rx.Observable.return<any>(undefined);
+            var combined: Array<Rx.Observable<any>> = [];
+            var obs: Rx.Observable<any>;
+            var animation: IAnimation;
 
-            var cleanupAnimation = Rx.Observable.startDeferred<any>(() => {
-                if (show != null) {
-                    show.complete(el.childNodes);
+            // construct leave-observable
+            if (currentComponentElements.length > 0) {
+                if (animations && animations.leave) {
+                    if (typeof animations.leave === "string") {
+                        animation = module.animation(<string> animations.leave);
+                    } else {
+                        animation = <IAnimation> animations.leave;
+                    }
                 }
-            });
 
-            return Rx.Observable.combineLatest(
-                // hide current and remove
-                hideAnimation
-                    .selectMany(_=> removeOldTemplate),
-                // insert new and show
-                dataBind
-                    .selectMany(_=> showAnimation
-                        .selectMany(_=> cleanupAnimation)),
-                <any> noop)
-                .take(1);
+                if (animation) {
+                    animation.prepare(currentComponentElements);
+
+                    obs = animation.run(currentComponentElements)
+                        .continueWith(() => animation.complete(currentComponentElements))
+                        .continueWith(removeCurrentComponentElements);
+                } else {
+                    obs = Rx.Observable.startDeferred<any>(removeCurrentComponentElements);
+                }
+
+                combined.push(obs);
+            }
+
+            // construct enter-observable
+            if (componentName != null) {
+                animation = null;
+
+                if (animations && animations.enter) {
+                    if (typeof animations.enter === "string") {
+                        animation = module.animation(<string> animations.enter);
+                    } else {
+                        animation = <IAnimation> animations.enter;
+                    }
+                }
+
+                obs = Rx.Observable.startDeferred<any>(()=> instantiateComponent(animation));
+
+                if (animation) {
+                    obs = obs
+                        .continueWith(animation.run(el.childNodes))
+                        .continueWith(() => animation.complete(el.childNodes));
+                }
+
+                combined.push(obs);
+            }
+
+            // optimize returned observable
+            if (combined.length > 1)
+                return Rx.Observable.combineLatest(combined, <any> noop).take(1);
+            else if (combined.length === 1)
+                return combined[0].take(1);
+
+            return Rx.Observable.return<any>(true);
         }
     }
 
