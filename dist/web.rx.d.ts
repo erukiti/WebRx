@@ -660,7 +660,7 @@ declare module wx {
     }
 }
 declare module wx {
-    function animation(prepare: string, run: string): IAnimation;
+    function animation(prepareTransitionClass: string, startTransitionClass: string): IAnimation;
     function animation(run: (element: HTMLElement, params?: any) => Rx.Observable<any>, prepare?: (element: HTMLElement, params?: any) => void, complete?: (element: HTMLElement, params?: any) => void): IAnimation;
 }
 declare module wx {

@@ -4053,8 +4053,7 @@ var wx;
         }
         return result;
     }
-    var transitionEndEventName = ('WebkitTransition' in document.documentElement.style) ? 'webkitTransitionEnd' : 'transitionend';
-    function cssAnimation(prepare, run) {
+    function cssTransitionAnimation(prepare, run) {
         var result = {};
         if (prepare) {
             result.prepare = function (nodes, params) {
@@ -4088,7 +4087,7 @@ var wx;
             return scriptedAnimation(run, args.shift(), args.shift());
         }
         else if (typeof run === "string") {
-            return cssAnimation(run, args.shift());
+            return cssTransitionAnimation(run, args.shift());
         }
         else {
             wx.internal.throwError("invalid arguments");

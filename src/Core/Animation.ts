@@ -70,7 +70,7 @@ module wx {
         return result;
     }
 
-    function cssAnimation(prepare: string, run: string): IAnimation {
+    function cssTransitionAnimation(prepare: string, run: string): IAnimation {
         var result: IAnimation = <any> {};
 
         if (prepare) {
@@ -107,12 +107,14 @@ module wx {
     }
 
     /**
-     * Registers a CSS-based animation
-     * @param {string} prepare The css classes to apply before the animation runs and to be removed automatically after the animation has completed.
-     * @param {string} run The css classes to apply for the animation
+     * Registers a CSS-Transitions based animation
+     * @param {string} prepareTransitionClass The css class(es) to apply before the animation runs. 
+     * Both prepareTransitionClass and startTransitionClass will be removed automatically from the 
+     * elements targeted by the animation as soon as the transition has ended.
+     * @param {string} startTransitionClass The css class(es) to apply to trigger the transition.
      * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
      */
-    export function animation(preparationClasses: string, runClasses: string): IAnimation;
+    export function animation(prepareTransitionClass: string, startTransitionClass: string): IAnimation;
      
     /**
      * Registers a scripted animation
@@ -132,7 +134,7 @@ module wx {
         if (typeof run === "function") {
             return scriptedAnimation(run, args.shift(), args.shift());
         } else if (typeof run === "string") {
-            return cssAnimation(run, args.shift());
+            return cssTransitionAnimation(run, args.shift());
         } else {
             internal.throwError("invalid arguments");
         }
