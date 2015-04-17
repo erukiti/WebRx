@@ -4019,14 +4019,15 @@ var wx;
         var elements = nodes.filter(function (x) { return x.nodeType === 1; });
         return elements;
     }
-    function getParsedMaxTransitionDuration(str) {
+    function getMaximumTransitionDuration(el) {
+        var str = getComputedStyle(el)["transitionDuration"];
         var maxValue = 0;
         var values = str.split(/\s*,\s*/);
-        values.forEach(function (value) {
-            if (value.charAt(value.length - 1) == 's') {
-                value = value.substring(0, value.length - 1);
+        values.forEach(function (x) {
+            if (x.charAt(x.length - 1) === "s") {
+                x = x.substring(0, x.length - 1);
             }
-            value = parseFloat(value) || 0;
+            var value = parseFloat(x) || 0;
             maxValue = maxValue ? Math.max(value, maxValue) : value;
         });
         return maxValue * 1000;
@@ -4065,7 +4066,7 @@ var wx;
             return Rx.Observable.defer(function () {
                 var elements = toElementList(nodes);
                 var obs = Rx.Observable.combineLatest(elements.map(function (x) {
-                    var duration = getParsedMaxTransitionDuration(getComputedStyle(x)["transitionDuration"]);
+                    var duration = getMaximumTransitionDuration(x);
                     return Rx.Observable.timer(duration);
                 }), wx.noop);
                 Rx.Observable.timer(1).subscribe(function () {

@@ -23,18 +23,19 @@ module wx {
         return elements;
     }
 
-    function getParsedMaxTransitionDuration(str) {
+    function getMaximumTransitionDuration(el: HTMLElement) {
+        var str = getComputedStyle(el)["transitionDuration"];
         var maxValue = 0;
         var values = str.split(/\s*,\s*/);
 
-        values.forEach(value => {
+        values.forEach(x => {
             // it's always safe to consider only second values and omit `ms` values since
             // getComputedStyle will always handle the conversion for us
-            if (value.charAt(value.length - 1) == 's') {
-                value = value.substring(0, value.length - 1);
+            if (x.charAt(x.length - 1) === "s") {
+                x = x.substring(0, x.length - 1);
             }
 
-            value = parseFloat(value) || 0;
+            var value = parseFloat(x) || 0;
             maxValue = maxValue ? Math.max(value, maxValue) : value;
         });
 
@@ -85,7 +86,7 @@ module wx {
                 var elements = toElementList(nodes);
 
                 var obs = Rx.Observable.combineLatest(elements.map(x => {
-                    var duration = getParsedMaxTransitionDuration(getComputedStyle(x)["transitionDuration"]);
+                    var duration = getMaximumTransitionDuration(x);
                     return Rx.Observable.timer(duration);
                 }), <any> noop);
 
