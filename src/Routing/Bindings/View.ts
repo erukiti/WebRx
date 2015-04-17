@@ -126,6 +126,8 @@ module wx {
             animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.Observable<any> {
             var self = this;
             var currentComponentElements = nodeChildrenToArray<Node>(el);
+            var combined: Array<Rx.Observable<any>> = [];
+            var obs: Rx.Observable<any>;
 
             function removeCurrentComponentElements() {
                 currentComponentElements.forEach(x => {
@@ -138,40 +140,39 @@ module wx {
                 // extend the data-context
                 (<IViewDataContext> ctx).$componentParams = componentParams;
 
-                // create component container
+                // create component container element
                 var container = <HTMLElement> document.createElement("div");
                 var binding = formatString("component: { name: '{0}', params: $componentParams }", componentName);
                 container.setAttribute("data-bind", binding);
 
-                // prepare for animation
+                // prepare container for animation
                 if (animation != null)
                     animation.prepare(container);
 
+                // now insert it
                 el.appendChild(container);
 
-                // done
+                // and apply bindings
                 self.domManager.applyBindings(ctx, container);
             }
 
-            var combined: Array<Rx.Observable<any>> = [];
-            var obs: Rx.Observable<any>;
-            var animation: IAnimation;
-
             // construct leave-observable
             if (currentComponentElements.length > 0) {
+                var leaveAnimation: IAnimation;
+
                 if (animations && animations.leave) {
                     if (typeof animations.leave === "string") {
-                        animation = module.animation(<string> animations.leave);
+                        leaveAnimation = module.animation(<string> animations.leave);
                     } else {
-                        animation = <IAnimation> animations.leave;
+                        leaveAnimation = <IAnimation> animations.leave;
                     }
                 }
 
-                if (animation) {
-                    animation.prepare(currentComponentElements);
+                if (leaveAnimation) {
+                    leaveAnimation.prepare(currentComponentElements);
 
-                    obs = animation.run(currentComponentElements)
-                        .continueWith(() => animation.complete(currentComponentElements))
+                    obs = leaveAnimation.run(currentComponentElements)
+                        .continueWith(() => leaveAnimation.complete(currentComponentElements))
                         .continueWith(removeCurrentComponentElements);
                 } else {
                     obs = Rx.Observable.startDeferred<any>(removeCurrentComponentElements);
@@ -182,33 +183,34 @@ module wx {
 
             // construct enter-observable
             if (componentName != null) {
-                animation = null;
+                var enterAnimation: IAnimation;
 
                 if (animations && animations.enter) {
                     if (typeof animations.enter === "string") {
-                        animation = module.animation(<string> animations.enter);
+                        enterAnimation = module.animation(<string> animations.enter);
                     } else {
-                        animation = <IAnimation> animations.enter;
+                        enterAnimation = <IAnimation> animations.enter;
                     }
                 }
 
-                obs = Rx.Observable.startDeferred<any>(()=> instantiateComponent(animation));
+                obs = Rx.Observable.startDeferred<any>(() => instantiateComponent(enterAnimation));
 
-                if (animation) {
+                if (enterAnimation) {
                     obs = obs
-                        .continueWith(animation.run(el.childNodes))
-                        .continueWith(() => animation.complete(el.childNodes));
+                        .continueWith(enterAnimation.run(el.childNodes))
+                        .continueWith(() => enterAnimation.complete(el.childNodes));
                 }
 
                 combined.push(obs);
             }
 
-            // optimize returned observable
+            // optimize return
             if (combined.length > 1)
                 return Rx.Observable.combineLatest(combined, <any> noop).take(1);
             else if (combined.length === 1)
                 return combined[0].take(1);
 
+            // no-op return
             return Rx.Observable.return<any>(true);
         }
     }
