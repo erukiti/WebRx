@@ -71,17 +71,24 @@ module wx {
         return result;
     }
 
-    function cssTransitionAnimation(prepare: string, run: string): IAnimation {
+    function cssTransitionAnimation(prepare: any, run: any, complete: any): IAnimation {
         var result: IAnimation = <any> {};
 
         if (prepare) {
+            if (typeof prepare === "string")
+                prepare = prepare.split(/\s+/).map(x=> trimString(x)).filter(x => x);
+
             result.prepare = (nodes, params) => {
                 var elements = toElementList(nodes);
-                elements.forEach(x => toggleCssClass(x, true, prepare));
+
+                elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(prepare)));
             }
         }
 
         result.run = (nodes, params) => {
+            if (typeof run === "string")
+                run = run.split(/\s+/).map(x=> trimString(x)).filter(x => x);
+
             return Rx.Observable.defer(() => {
                 var elements = toElementList(nodes);
 
@@ -92,16 +99,25 @@ module wx {
 
                 // defer animation-start to avoid problems with transitions on freshly added elements 
                 Rx.Observable.timer(1).subscribe(() => {
-                    elements.forEach(x => toggleCssClass(x, true, run));
+                    elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(run)));
                 });
 
                 return obs;
             });
         }
 
+        if (complete) {
+            if (typeof complete === "string")
+                complete = complete.split(/\s+/).map(x=> trimString(x)).filter(x => x);
+        }
+
         result.complete = (nodes, params) => {
             var elements = toElementList(nodes);
-            elements.forEach(x => toggleCssClass(x, false, prepare, run));
+
+            if (complete)
+                elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(complete)));
+
+            elements.forEach(x => toggleCssClass.apply(null, [x, false].concat(prepare).concat(run)));
         }
 
         return result;
@@ -113,9 +129,11 @@ module wx {
      * Both prepareTransitionClass and startTransitionClass will be removed automatically from the 
      * elements targeted by the animation as soon as the transition has ended.
      * @param {string} startTransitionClass The css class(es) to apply to trigger the transition.
+     * @param {string} completeTransitionClass The css class(es) to apply to trigger to the element
+     * as soon as the animation has ended. 
      * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
      */
-    export function animation(prepareTransitionClass: string, startTransitionClass: string): IAnimation;
+    export function animation(prepareTransitionClass: string, startTransitionClass: string, completeTransitionClass: string): IAnimation;
      
     /**
      * Registers a scripted animation
@@ -136,7 +154,7 @@ module wx {
         if (typeof run === "function") {
             return scriptedAnimation(run, args.shift(), args.shift());
         } else if (typeof run === "string") {
-            return cssTransitionAnimation(run, args.shift());
+            return cssTransitionAnimation(args.shift(), run, args.shift());
         } else {
             internal.throwError("invalid arguments");
         }
