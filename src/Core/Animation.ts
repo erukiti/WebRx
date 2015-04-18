@@ -23,23 +23,37 @@ module wx {
         return elements;
     }
 
+    function parseTimingValue(x: string): number {
+        // it's always safe to consider only second values and omit `ms` values since
+        // getComputedStyle will always handle the conversion for us
+        if (x.charAt(x.length - 1) === "s") {
+            x = x.substring(0, x.length - 1);
+        }
+
+        var value = parseFloat(x) || 0;
+        return value;
+    }
+
     function getMaximumTransitionDuration(el: HTMLElement) {
         var str = getComputedStyle(el)["transitionDuration"];
         var maxValue = 0;
         var values = str.split(/\s*,\s*/);
 
         values.forEach(x => {
-            // it's always safe to consider only second values and omit `ms` values since
-            // getComputedStyle will always handle the conversion for us
-            if (x.charAt(x.length - 1) === "s") {
-                x = x.substring(0, x.length - 1);
-            }
-
-            var value = parseFloat(x) || 0;
+            var value = parseTimingValue(x);
             maxValue = maxValue ? Math.max(value, maxValue) : value;
         });
 
         return maxValue * 1000;
+    }
+
+    function getKeyframeAnimationDuration(el: HTMLElement) {
+        var durationStr = getComputedStyle(el)["animationDuration"] || getComputedStyle(el)["webkitAnimationDuration"] || "0s";
+        var delayStr = getComputedStyle(el)["animationDelay"] || getComputedStyle(el)["webkitAnimationDelay"] || "0s";
+
+        var duration = parseTimingValue(durationStr);
+        var delay = parseTimingValue(delayStr);
+        return (duration + delay) * 1000;
     }
 
     function scriptedAnimation(run: (element: HTMLElement, params?: any) => Rx.Observable<any>,
@@ -93,7 +107,7 @@ module wx {
                 var elements = toElementList(nodes);
 
                 var obs = Rx.Observable.combineLatest(elements.map(x => {
-                    var duration = getMaximumTransitionDuration(x);
+                    var duration = Math.max(getMaximumTransitionDuration(x), getKeyframeAnimationDuration(x));
                     return Rx.Observable.timer(duration);
                 }), <any> noop);
 
@@ -149,12 +163,12 @@ module wx {
 
     export function animation() {
         var args = args2Array(arguments);
-        var run = args.shift();
+        var val = args.shift();
 
-        if (typeof run === "function") {
-            return scriptedAnimation(run, args.shift(), args.shift());
-        } else if (typeof run === "string") {
-            return cssTransitionAnimation(args.shift(), run, args.shift());
+        if (typeof val === "function") {
+            return scriptedAnimation(val, args.shift(), args.shift());
+        } else if (typeof val === "string") {
+            return cssTransitionAnimation(val, args.shift(), args.shift());
         } else {
             internal.throwError("invalid arguments");
         }
