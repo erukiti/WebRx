@@ -47,6 +47,19 @@ module wx {
         return maxValue * 1000;
     }
 
+    function getMaximumTransitionDelay(el: HTMLElement) {
+        var str = getComputedStyle(el)["transitionDelay"];
+        var maxValue = 0;
+        var values = str.split(/\s*,\s*/);
+
+        values.forEach(x => {
+            var value = Math.max(0, parseTimingValue(x));
+            maxValue = maxValue ? Math.max(value, maxValue) : value;
+        });
+
+        return maxValue * 1000;
+    }
+
     function getKeyframeAnimationDuration(el: HTMLElement) {
         var durationStr = getComputedStyle(el)["animationDuration"] || getComputedStyle(el)["webkitAnimationDuration"] || "0s";
         var delayStr = getComputedStyle(el)["animationDelay"] || getComputedStyle(el)["webkitAnimationDelay"] || "0s";
@@ -107,7 +120,7 @@ module wx {
                 var elements = toElementList(nodes);
 
                 var obs = Rx.Observable.combineLatest(elements.map(x => {
-                    var duration = Math.max(getMaximumTransitionDuration(x), getKeyframeAnimationDuration(x));
+                    var duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
                     return Rx.Observable.timer(duration);
                 }), <any> noop);
 
