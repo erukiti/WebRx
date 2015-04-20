@@ -167,8 +167,7 @@ module wx {
                 obs = Rx.Observable.startDeferred<any>(() => instantiateComponent(enterAnimation));
 
                 if (enterAnimation) {
-                    obs = obs
-                        .continueWith(enterAnimation.run(el.childNodes))
+                    obs = obs.continueWith(enterAnimation.run(el.childNodes))
                         .continueWith(() => enterAnimation.complete(el.childNodes));
                 }
 

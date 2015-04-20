@@ -9,6 +9,8 @@ module wx {
 
     export interface IIfBindingOptions {
         condition: string;
+        enter?: string|IAnimation;
+        leave?: string|IAnimation;
     }
 
     class IfBinding implements IBindingHandler {

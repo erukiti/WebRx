@@ -2,6 +2,7 @@
 /// <reference path="../Core/Utils.ts" />
 /// <reference path="../Core/DomManager.ts" />
 /// <reference path="../Core/VirtualChildNodes.ts" />
+/// <reference path="../Core/RefCountDisposeWrapper.ts" />
 
 module wx {
     "use strict";
@@ -16,7 +17,12 @@ module wx {
         $index: number;
     }
 
-    export interface IForEachBindingOptions {
+    export interface IForeachAnimationDescriptor {
+        itemEnter?: string|IAnimation;
+        itemLeave?: string|IAnimation;
+    }
+
+    export interface IForEachBindingOptions extends IForeachAnimationDescriptor {
         data: any;
         hooks?: IForEachBindingHooks|string;
     }
@@ -93,25 +99,43 @@ module wx {
             var hooks: IForEachBindingHooks|string;
             var exp: ICompiledExpression;
             var setProxyFunc: (VirtualChildNodes) => void;
+            var animations: IForeachAnimationDescriptor = <IForeachAnimationDescriptor> {};
 
             if (typeof compiled === "object" && compiled.hasOwnProperty("data")) {
                 var opt = <IForEachBindingOptions> compiled;
                 exp = opt.data;
+
+                // extract animations
+                if (opt.itemEnter) {
+                    animations.itemEnter = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.itemEnter, ctx);
+
+                    if (typeof animations.itemEnter === "string") {
+                        animations.itemEnter = module.animation(<string> animations.itemEnter);
+                    }
+                }
+
+                if (opt.itemLeave) {
+                    animations.itemLeave = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.itemLeave, ctx);
+
+                    if (typeof animations.itemLeave === "string") {
+                        animations.itemLeave = module.animation(<string> animations.itemLeave);
+                    }
+                }
 
                 if (opt.hooks) {
                     // extract hooks
                     hooks = this.domManager.evaluateExpression(<ICompiledExpression> opt.hooks, ctx);
                 }
 
+                // optionally resolve hooks if passed as string identifier
+                if (typeof hooks === "string")
+                    hooks = injector.get<IForEachBindingHooks>(<string> hooks);
+
                 if (opt['debug']) {
                     if (opt['debug']['setProxyFunc']) {
                         setProxyFunc = this.domManager.evaluateExpression(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx);
                     }
                 }
-
-                // optionally resolve hooks if passed as string identifier
-                if (typeof hooks === "string")
-                    hooks = injector.get<IForEachBindingHooks>(<string> hooks);
             } else {
                 exp = compiled;
             }
@@ -138,7 +162,7 @@ module wx {
 
                     cleanup = new Rx.CompositeDisposable();
 
-                    self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
+                    self.applyValue(el, x, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc);
                     initialApply = false;
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
@@ -193,20 +217,20 @@ module wx {
         }
 
         protected appendAllRows(proxy: internal.VirtualChildNodes, list: IObservableList<any>, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachBindingHooks,
+            template: Array<Node>, hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor,
             indexTrigger: Rx.Subject<any>, isInitial: boolean) {
             var length = list.length();
 
             for (var i = 0; i < length; i++) {
-                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexTrigger, isInitial);
+                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, animations, indexTrigger, isInitial);
             }
         }
 
         protected appendRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext, template: Array<Node>,
-            hooks: IForEachBindingHooks, indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
-
+            hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor, indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
             var nodes = cloneNodeArray(template);
             var _index: any = index;
+            var enterAnimation: IAnimation = <IAnimation> animations.itemEnter;
 
             var cbData = <any> {
                 item: item
@@ -219,6 +243,9 @@ module wx {
 
             cbData.index = _index;
 
+            if (enterAnimation != null) 
+                enterAnimation.prepare(nodes);
+
             proxy.appendChilds(nodes, cbData);
 
             if (hooks) {
@@ -228,14 +255,28 @@ module wx {
                 if (!isInitial && hooks.afterAdd)
                     hooks.afterAdd(nodes, item, index);
             }
+
+            if (enterAnimation) {
+                var disp = enterAnimation.run(nodes)
+                    .continueWith(() => enterAnimation.complete(nodes))
+                    .subscribe(x => {
+                        if (disp != null)
+                            disp.dispose();
+                    });
+            }
         }
 
         protected insertRow(proxy: internal.VirtualChildNodes, index: number, item: any, ctx: IDataContext,
-            template: Array<Node>, hooks: IForEachBindingHooks, indexTrigger: Rx.Subject<any>): void {
+            template: Array<Node>, hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor,
+            indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
+            var enterAnimation: IAnimation = <IAnimation> animations.itemEnter;
 
             var nodes = cloneNodeArray(template);
             var _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
+
+            if (enterAnimation != null)
+                enterAnimation.prepare(nodes);
 
             proxy.insertChilds(index * templateLength, nodes, {
                 index: _index,
@@ -250,52 +291,127 @@ module wx {
                 if (hooks.afterAdd)
                     hooks.afterAdd(nodes, item, index);
             }
+
+            if (enterAnimation) {
+                var disp = enterAnimation.run(nodes)
+                    .continueWith(() => enterAnimation.complete(nodes))
+                    .subscribe(x => {
+                    if (disp != null)
+                        disp.dispose();
+                });
+            }
         }
 
-        protected removeRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>, hooks: IForEachBindingHooks): void {
+        protected removeRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>,
+            hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
             var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
+            var leaveAnimation: IAnimation = <IAnimation> animations.itemLeave;
+
+            function removeNodes() {
+                for (var i = 0; i < templateLength; i++) {
+                    el.removeChild(nodes[i]);
+                }
+            }
 
             if (hooks && hooks.beforeRemove) {
                 hooks.beforeRemove(nodes, item, index);
             } else {
-                for (var i = 0; i < templateLength; i++) {
-                    el.removeChild(nodes[i]);
+                if (leaveAnimation != null) {
+                    leaveAnimation.prepare(nodes);
+
+                    var disp = leaveAnimation.run(nodes)
+                        .continueWith(() => leaveAnimation.complete(nodes))
+                        .continueWith(removeNodes)
+                        .subscribe(x => {
+                            if (disp != null)
+                                disp.dispose();
+                        });
+
+                } else {
+                    removeNodes();
                 }
             }
         }
 
         protected moveRow(proxy: internal.VirtualChildNodes, from: number, to: number, item: any, template: Array<Node>,
-            hooks: IForEachBindingHooks, indexTrigger: Rx.Subject<any>): void {
+            hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor, indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
             var el = <Element> proxy.targetNode;
             var nodes = proxy.removeChilds(from * templateLength, templateLength, true);
+            var leaveAnimation: IAnimation = <IAnimation> animations.itemLeave;
+            var enterAnimation: IAnimation = <IAnimation> animations.itemEnter;
+            var combined: Array<Rx.Observable<any>> = [];
+            var obs: Rx.Observable<any>;
+            var self = this;
 
             if (hooks && hooks.beforeMove) {
                 hooks.beforeMove(nodes, item, from);
             }
 
-            for (var i = 0; i < templateLength; i++) {
-                el.removeChild(nodes[i]);
+            function removeNodes() {
+                for (var i = 0; i < templateLength; i++) {
+                    el.removeChild(nodes[i]);
+                }
             }
 
-            // create new row
-            nodes = cloneNodeArray(template);
-            var _index = this.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
+            function createRow() {
+                // create new row
+                nodes = cloneNodeArray(template);
+                var _index = self.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
 
-            proxy.insertChilds(templateLength * to, nodes, {
-                index: _index,
-                item: item,
-                indexDisp: new RefCountDisposeWrapper(_index, 0)
+                if (enterAnimation != null)
+                    enterAnimation.prepare(nodes);
+
+                proxy.insertChilds(templateLength * to, nodes, {
+                    index: _index,
+                    item: item,
+                    indexDisp: new RefCountDisposeWrapper(_index, 0)
+                });
+
+                if (hooks && hooks.afterMove) {
+                    hooks.afterMove(nodes, item, from);
+                }
+            }
+
+            // construct leave-observable
+            if (leaveAnimation) {
+                leaveAnimation.prepare(nodes);
+
+                obs = leaveAnimation.run(nodes)
+                    .continueWith(() => leaveAnimation.complete(nodes))
+                    .continueWith(removeNodes);
+            } else {
+                obs = Rx.Observable.startDeferred<any>(removeNodes);
+            }
+
+            combined.push(obs);
+
+            // construct enter-observable
+            obs = Rx.Observable.startDeferred<any>(createRow);
+
+            if (enterAnimation) {
+                obs = obs.continueWith(enterAnimation.run(nodes))
+                    .continueWith(() => enterAnimation.complete(nodes));
+            }
+
+            combined.push(obs);
+
+            // optimize return
+            if (combined.length > 1)
+                obs = Rx.Observable.combineLatest(combined, <any> noop).take(1);
+            else if (combined.length === 1)
+                obs = combined[0].take(1);
+
+            var disp = obs.subscribe(x => {
+                if (disp != null)
+                    disp.dispose();
             });
-            
-            if (hooks && hooks.afterMove) {
-                hooks.afterMove(nodes, item, from);
-            }
         }
 
-        protected rebindRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>, indexTrigger: Rx.Subject<any>): void {
+        protected rebindRow(proxy: internal.VirtualChildNodes, index: number, item: any, template: Array<Node>,
+            indexTrigger: Rx.Subject<any>): void {
             var templateLength = template.length;
             var _index = this.createIndexPropertyForNode(proxy, proxy.childNodes[(index * templateLength)], index, indexTrigger, template.length);
             var indexDisp = new RefCountDisposeWrapper(_index, 0);
@@ -318,14 +434,15 @@ module wx {
         }
         
         protected observeList(proxy: internal.VirtualChildNodes, ctx: IDataContext, template: Array<Node>,
-            cleanup: Rx.CompositeDisposable, list: IObservableList<any>, hooks: IForEachBindingHooks, indexTrigger: Rx.Subject<any>) {
+            cleanup: Rx.CompositeDisposable, list: IObservableList<any>, hooks: IForEachBindingHooks,
+            animations: IForeachAnimationDescriptor, indexTrigger: Rx.Subject<any>) {
             var i: number;
             var length: number;
 
             cleanup.add(indexTrigger);
 
             // initial insert
-            this.appendAllRows(proxy, list, ctx, template, hooks, indexTrigger, true);
+            this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, true);
 
             // track changes
             cleanup.add(list.itemsAdded.subscribe((e) => {
@@ -333,11 +450,11 @@ module wx {
 
                 if (e.from === list.length()) {
                     for (i = 0; i < length; i++) {
-                        this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexTrigger, false);
+                        this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger, false);
                     }
                 } else {
                     for (i = 0; i < e.items.length; i++) {
-                        this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexTrigger);
+                        this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger);
                     }
                 }
 
@@ -348,14 +465,14 @@ module wx {
                 length = e.items.length;
 
                 for (i = 0; i < length; i++) {
-                    this.removeRow(proxy, i + e.from, e.items[i], template, hooks);
+                    this.removeRow(proxy, i + e.from, e.items[i], template, hooks, animations);
                 }
 
                 indexTrigger.onNext(true);
             }));
 
             cleanup.add(list.itemsMoved.subscribe((e) => {
-                this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, indexTrigger);
+                this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, animations, indexTrigger);
  
                 indexTrigger.onNext(true);
             }));
@@ -368,14 +485,15 @@ module wx {
 
             cleanup.add(list.shouldReset.subscribe((e) => {
                 proxy.clear();
-                this.appendAllRows(proxy, list, ctx, template, hooks, indexTrigger, false);
+                this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, false);
 
                 indexTrigger.onNext(true);
             }));
         }
 
-        protected applyValue(el: HTMLElement, value: any, hooks: IForEachBindingHooks, template: Array<Node>,
-            ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable, setProxyFunc: (VirtualChildNodes) => void): void {
+        protected applyValue(el: HTMLElement, value: any, hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor,
+            template: Array<Node>, ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable,
+            setProxyFunc: (VirtualChildNodes) => void): void {
             var i, length;
     
             if (initialApply) {
@@ -442,13 +560,13 @@ module wx {
                 length = arr.length;
 
                 for (i = 0; i < length; i++) {
-                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, undefined, true);
+                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, animations, undefined, true);
                 }
             } else if(isList(value)) {
                 var list = <IObservableList<any>> value;
                 recalcIndextrigger = new Rx.Subject<any>();
 
-                this.observeList(proxy, ctx, template, cleanup, list, hooks, recalcIndextrigger);
+                this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
             }
         }
     }
