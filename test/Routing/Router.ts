@@ -22,7 +22,7 @@ describe('Routing',() => {
             })).toThrowError(/invalid state-path/);
         });
 
-        it('inferes route from state-name if not specified',() => {
+        it('infers route from state-name if not specified',() => {
             wx.router.state({
                 name: "foo",
                 views: {
@@ -297,6 +297,35 @@ describe('Routing',() => {
             expect(wx.router.includes("foo.bar", { fooId: 5 })).toBeFalsy();
 
             expect(wx.router.includes("foo.bar", { fooId: 3, barId: 5 })).toBeTruthy();
+        });
+
+        it('is() correctly tests state including missing-, too many-, too few-params or different param values',() => {
+            wx.router.state({
+                name: "foo.bar",
+                route: "bar/:barId",
+                params: { fooId: 3 },
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            expect(wx.router.is("foo")).toBeFalsy();
+
+            // no params
+            expect(wx.router.is("foo.bar")).toBeFalsy();
+
+            // too few params
+            expect(wx.router.is("foo.bar", { fooId: 3 })).toBeFalsy();
+
+            // too many params
+            expect(wx.router.is("foo.bar", { fooId: 3, barId: 5, bazId: 10 })).toBeFalsy();
+
+            // matching names but not values
+            expect(wx.router.is("foo.bar", { fooId: 3, barId: 42 })).toBeFalsy();
+
+            // should match
+            expect(wx.router.is("foo.bar", { fooId: 3, barId: 5 })).toBeTruthy();
         });
 
         it('correctly maps parent path if parent is registered',() => {

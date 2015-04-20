@@ -75,8 +75,9 @@ module wx {
         public is(state: string, params?: any, options?: any) {
             var _current = this.current();
             var isActive = _current.name === state;
+            params = params || {};
 
-            if (isActive && params != null) {
+            if (isActive) {
                 var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
 
@@ -87,6 +88,8 @@ module wx {
                             break;
                         }
                     }
+                } else {
+                    isActive = false;
                 }
             }
 
@@ -96,8 +99,9 @@ module wx {
         public includes(state: string, params?: any, options?: any) {
             var _current = this.current();
             var isActive = _current.name.indexOf(state) === 0;
+            params = params || {};
 
-            if (isActive && params != null) {
+            if (isActive) {
                 var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
 
