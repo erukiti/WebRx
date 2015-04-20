@@ -141,7 +141,7 @@ module wx {
             this.go(this.current().name, this.current().params, { force: true, location: false });
         }
 
-        public getConfiguredParameterNamesForView(view: string, component: string): Array<string> {
+        public getViewParameterNamesFromConfig(view: string, component: string): Array<string> {
             var hierarchy = this.getStateHierarchy(this.current().name);
             var stateParams = {};
             var result = [];

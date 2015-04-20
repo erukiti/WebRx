@@ -756,7 +756,7 @@ module wx {
         /**
         * Returns the parameters configured by the state responsible for activating the component at the specified view
         **/
-        getConfiguredParameterNamesForView(view: string, component: string): Array<string>;
+        getViewParameterNamesFromConfig(view: string, component: string): Array<string>;
     }
 
 
