@@ -39,7 +39,6 @@ module wx {
             var currentComponentAnimations: IViewAnimationDescriptor;
             var currentComponentName: string = null;
             var cleanup: Rx.CompositeDisposable;
-            var configuredParamNames: Array<string>;
 
             function doCleanup() {
                 if (cleanup) {
@@ -72,11 +71,11 @@ module wx {
                             }
 
                             // build filtered-state params
-                            configuredParamNames = this.router.getViewParameterNamesFromConfig(viewName, componentName);
+                            var parameterNames = this.router.getViewParameterNamesFromConfig(viewName, componentName);
                             stateParams = {};
 
                             if (newState.params != null) {
-                                configuredParamNames.forEach(x => {
+                                parameterNames.forEach(x => {
                                     if (newState.params.hasOwnProperty(x)) {
                                         stateParams[x] = newState.params[x];
                                     }
