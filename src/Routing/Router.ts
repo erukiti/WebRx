@@ -196,7 +196,6 @@ module wx {
         private parentPathDirective = "^";
         private rootStateName = "$";
         private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
-        private titlePropertyName = "__wx_app_title";
 
         private registerStateInternal(state: IRouterStateConfig) {
             var parts = state.name.split(this.pathSeparator);

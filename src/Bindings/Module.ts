@@ -103,7 +103,6 @@ module wx {
         }
 
         public priority = 100;
-        public name = "module";
         public controlsDescendants = true;
 
         ////////////////////
