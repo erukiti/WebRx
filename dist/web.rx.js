@@ -1651,7 +1651,6 @@ var wx;
     var ModuleBinding = (function () {
         function ModuleBinding(domManager) {
             this.priority = 100;
-            this.name = "module";
             this.controlsDescendants = true;
             this.domManager = domManager;
         }
@@ -2020,6 +2019,32 @@ var wx;
 var wx;
 (function (wx) {
     "use strict";
+    var RefCountDisposeWrapper = (function () {
+        function RefCountDisposeWrapper(inner, initialRefCount) {
+            if (initialRefCount === void 0) { initialRefCount = 1; }
+            this.inner = inner;
+            this.refCount = initialRefCount;
+        }
+        RefCountDisposeWrapper.prototype.addRef = function () {
+            this.refCount++;
+        };
+        RefCountDisposeWrapper.prototype.release = function () {
+            if (--this.refCount === 0) {
+                this.inner.dispose();
+                this.inner = null;
+            }
+            return this.refCount;
+        };
+        RefCountDisposeWrapper.prototype.dispose = function () {
+            this.release();
+        };
+        return RefCountDisposeWrapper;
+    })();
+    wx.RefCountDisposeWrapper = RefCountDisposeWrapper;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
     var ForEachBinding = (function () {
         function ForEachBinding(domManager) {
             this.priority = 40;
@@ -2043,19 +2068,32 @@ var wx;
             var hooks;
             var exp;
             var setProxyFunc;
+            var animations = {};
             if (typeof compiled === "object" && compiled.hasOwnProperty("data")) {
                 var opt = compiled;
                 exp = opt.data;
+                if (opt.itemEnter) {
+                    animations.itemEnter = this.domManager.evaluateExpression(opt.itemEnter, ctx);
+                    if (typeof animations.itemEnter === "string") {
+                        animations.itemEnter = module.animation(animations.itemEnter);
+                    }
+                }
+                if (opt.itemLeave) {
+                    animations.itemLeave = this.domManager.evaluateExpression(opt.itemLeave, ctx);
+                    if (typeof animations.itemLeave === "string") {
+                        animations.itemLeave = module.animation(animations.itemLeave);
+                    }
+                }
                 if (opt.hooks) {
                     hooks = this.domManager.evaluateExpression(opt.hooks, ctx);
                 }
+                if (typeof hooks === "string")
+                    hooks = wx.injector.get(hooks);
                 if (opt['debug']) {
                     if (opt['debug']['setProxyFunc']) {
                         setProxyFunc = this.domManager.evaluateExpression(opt['debug']['setProxyFunc'], ctx);
                     }
                 }
-                if (typeof hooks === "string")
-                    hooks = wx.injector.get(hooks);
             }
             else {
                 exp = compiled;
@@ -2074,7 +2112,7 @@ var wx;
                         cleanup.dispose();
                     }
                     cleanup = new Rx.CompositeDisposable();
-                    self.applyValue(el, x, hooks, template, ctx, initialApply, cleanup, setProxyFunc);
+                    self.applyValue(el, x, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc);
                     initialApply = false;
                 }
                 catch (e) {
@@ -2106,15 +2144,16 @@ var wx;
                 });
             }).toProperty(startIndex);
         };
-        ForEachBinding.prototype.appendAllRows = function (proxy, list, ctx, template, hooks, indexTrigger, isInitial) {
+        ForEachBinding.prototype.appendAllRows = function (proxy, list, ctx, template, hooks, animations, indexTrigger, isInitial) {
             var length = list.length();
             for (var i = 0; i < length; i++) {
-                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, indexTrigger, isInitial);
+                this.appendRow(proxy, i, list.get(i), ctx, template, hooks, animations, indexTrigger, isInitial);
             }
         };
-        ForEachBinding.prototype.appendRow = function (proxy, index, item, ctx, template, hooks, indexTrigger, isInitial) {
+        ForEachBinding.prototype.appendRow = function (proxy, index, item, ctx, template, hooks, animations, indexTrigger, isInitial) {
             var nodes = wx.cloneNodeArray(template);
             var _index = index;
+            var enterAnimation = animations.itemEnter;
             var cbData = {
                 item: item
             };
@@ -2123,6 +2162,8 @@ var wx;
                 cbData.indexDisp = new wx.RefCountDisposeWrapper(_index, 0);
             }
             cbData.index = _index;
+            if (enterAnimation != null)
+                enterAnimation.prepare(nodes);
             proxy.appendChilds(nodes, cbData);
             if (hooks) {
                 if (hooks.afterRender)
@@ -2130,11 +2171,20 @@ var wx;
                 if (!isInitial && hooks.afterAdd)
                     hooks.afterAdd(nodes, item, index);
             }
+            if (enterAnimation) {
+                var disp = enterAnimation.run(nodes).continueWith(function () { return enterAnimation.complete(nodes); }).subscribe(function (x) {
+                    if (disp != null)
+                        disp.dispose();
+                });
+            }
         };
-        ForEachBinding.prototype.insertRow = function (proxy, index, item, ctx, template, hooks, indexTrigger) {
+        ForEachBinding.prototype.insertRow = function (proxy, index, item, ctx, template, hooks, animations, indexTrigger) {
             var templateLength = template.length;
+            var enterAnimation = animations.itemEnter;
             var nodes = wx.cloneNodeArray(template);
             var _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
+            if (enterAnimation != null)
+                enterAnimation.prepare(nodes);
             proxy.insertChilds(index * templateLength, nodes, {
                 index: _index,
                 item: item,
@@ -2146,40 +2196,91 @@ var wx;
                 if (hooks.afterAdd)
                     hooks.afterAdd(nodes, item, index);
             }
+            if (enterAnimation) {
+                var disp = enterAnimation.run(nodes).continueWith(function () { return enterAnimation.complete(nodes); }).subscribe(function (x) {
+                    if (disp != null)
+                        disp.dispose();
+                });
+            }
         };
-        ForEachBinding.prototype.removeRow = function (proxy, index, item, template, hooks) {
+        ForEachBinding.prototype.removeRow = function (proxy, index, item, template, hooks, animations) {
             var templateLength = template.length;
             var el = proxy.targetNode;
             var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
-            if (hooks && hooks.beforeRemove) {
-                hooks.beforeRemove(nodes, item, index);
-            }
-            else {
+            var leaveAnimation = animations.itemLeave;
+            function removeNodes() {
                 for (var i = 0; i < templateLength; i++) {
                     el.removeChild(nodes[i]);
                 }
             }
+            if (hooks && hooks.beforeRemove) {
+                hooks.beforeRemove(nodes, item, index);
+            }
+            else {
+                if (leaveAnimation != null) {
+                    leaveAnimation.prepare(nodes);
+                    var disp = leaveAnimation.run(nodes).continueWith(function () { return leaveAnimation.complete(nodes); }).continueWith(removeNodes).subscribe(function (x) {
+                        if (disp != null)
+                            disp.dispose();
+                    });
+                }
+                else {
+                    removeNodes();
+                }
+            }
         };
-        ForEachBinding.prototype.moveRow = function (proxy, from, to, item, template, hooks, indexTrigger) {
+        ForEachBinding.prototype.moveRow = function (proxy, from, to, item, template, hooks, animations, indexTrigger) {
             var templateLength = template.length;
             var el = proxy.targetNode;
             var nodes = proxy.removeChilds(from * templateLength, templateLength, true);
+            var leaveAnimation = animations.itemLeave;
+            var enterAnimation = animations.itemEnter;
+            var combined = [];
+            var obs;
+            var self = this;
             if (hooks && hooks.beforeMove) {
                 hooks.beforeMove(nodes, item, from);
             }
-            for (var i = 0; i < templateLength; i++) {
-                el.removeChild(nodes[i]);
+            function removeNodes() {
+                for (var i = 0; i < templateLength; i++) {
+                    el.removeChild(nodes[i]);
+                }
             }
-            nodes = wx.cloneNodeArray(template);
-            var _index = this.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
-            proxy.insertChilds(templateLength * to, nodes, {
-                index: _index,
-                item: item,
-                indexDisp: new wx.RefCountDisposeWrapper(_index, 0)
+            function createRow() {
+                nodes = wx.cloneNodeArray(template);
+                var _index = self.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
+                if (enterAnimation != null)
+                    enterAnimation.prepare(nodes);
+                proxy.insertChilds(templateLength * to, nodes, {
+                    index: _index,
+                    item: item,
+                    indexDisp: new wx.RefCountDisposeWrapper(_index, 0)
+                });
+                if (hooks && hooks.afterMove) {
+                    hooks.afterMove(nodes, item, from);
+                }
+            }
+            if (leaveAnimation) {
+                leaveAnimation.prepare(nodes);
+                obs = leaveAnimation.run(nodes).continueWith(function () { return leaveAnimation.complete(nodes); }).continueWith(removeNodes);
+            }
+            else {
+                obs = Rx.Observable.startDeferred(removeNodes);
+            }
+            combined.push(obs);
+            obs = Rx.Observable.startDeferred(createRow);
+            if (enterAnimation) {
+                obs = obs.continueWith(enterAnimation.run(nodes)).continueWith(function () { return enterAnimation.complete(nodes); });
+            }
+            combined.push(obs);
+            if (combined.length > 1)
+                obs = Rx.Observable.combineLatest(combined, wx.noop).take(1);
+            else if (combined.length === 1)
+                obs = combined[0].take(1);
+            var disp = obs.subscribe(function (x) {
+                if (disp != null)
+                    disp.dispose();
             });
-            if (hooks && hooks.afterMove) {
-                hooks.afterMove(nodes, item, from);
-            }
         };
         ForEachBinding.prototype.rebindRow = function (proxy, index, item, template, indexTrigger) {
             var templateLength = template.length;
@@ -2198,22 +2299,22 @@ var wx;
                 }
             }
         };
-        ForEachBinding.prototype.observeList = function (proxy, ctx, template, cleanup, list, hooks, indexTrigger) {
+        ForEachBinding.prototype.observeList = function (proxy, ctx, template, cleanup, list, hooks, animations, indexTrigger) {
             var _this = this;
             var i;
             var length;
             cleanup.add(indexTrigger);
-            this.appendAllRows(proxy, list, ctx, template, hooks, indexTrigger, true);
+            this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, true);
             cleanup.add(list.itemsAdded.subscribe(function (e) {
                 length = e.items.length;
                 if (e.from === list.length()) {
                     for (i = 0; i < length; i++) {
-                        _this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexTrigger, false);
+                        _this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger, false);
                     }
                 }
                 else {
                     for (i = 0; i < e.items.length; i++) {
-                        _this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, indexTrigger);
+                        _this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger);
                     }
                 }
                 indexTrigger.onNext(true);
@@ -2221,12 +2322,12 @@ var wx;
             cleanup.add(list.itemsRemoved.subscribe(function (e) {
                 length = e.items.length;
                 for (i = 0; i < length; i++) {
-                    _this.removeRow(proxy, i + e.from, e.items[i], template, hooks);
+                    _this.removeRow(proxy, i + e.from, e.items[i], template, hooks, animations);
                 }
                 indexTrigger.onNext(true);
             }));
             cleanup.add(list.itemsMoved.subscribe(function (e) {
-                _this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, indexTrigger);
+                _this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, animations, indexTrigger);
                 indexTrigger.onNext(true);
             }));
             cleanup.add(list.itemReplaced.subscribe(function (e) {
@@ -2235,11 +2336,11 @@ var wx;
             }));
             cleanup.add(list.shouldReset.subscribe(function (e) {
                 proxy.clear();
-                _this.appendAllRows(proxy, list, ctx, template, hooks, indexTrigger, false);
+                _this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, false);
                 indexTrigger.onNext(true);
             }));
         };
-        ForEachBinding.prototype.applyValue = function (el, value, hooks, template, ctx, initialApply, cleanup, setProxyFunc) {
+        ForEachBinding.prototype.applyValue = function (el, value, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc) {
             var i, length;
             if (initialApply) {
                 length = el.childNodes.length;
@@ -2286,13 +2387,13 @@ var wx;
                 var arr = value;
                 length = arr.length;
                 for (i = 0; i < length; i++) {
-                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, undefined, true);
+                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, animations, undefined, true);
                 }
             }
             else if (wx.isList(value)) {
                 var list = value;
                 recalcIndextrigger = new Rx.Subject();
-                this.observeList(proxy, ctx, template, cleanup, list, hooks, recalcIndextrigger);
+                this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
             }
         };
         return ForEachBinding;
@@ -3186,32 +3287,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    "use strict";
-    var RefCountDisposeWrapper = (function () {
-        function RefCountDisposeWrapper(inner, initialRefCount) {
-            if (initialRefCount === void 0) { initialRefCount = 1; }
-            this.inner = inner;
-            this.refCount = initialRefCount;
-        }
-        RefCountDisposeWrapper.prototype.addRef = function () {
-            this.refCount++;
-        };
-        RefCountDisposeWrapper.prototype.release = function () {
-            if (--this.refCount === 0) {
-                this.inner.dispose();
-                this.inner = null;
-            }
-            return this.refCount;
-        };
-        RefCountDisposeWrapper.prototype.dispose = function () {
-            this.release();
-        };
-        return RefCountDisposeWrapper;
-    })();
-    wx.RefCountDisposeWrapper = RefCountDisposeWrapper;
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
     var internal;
     (function (internal) {
         "use strict";
@@ -4074,6 +4149,9 @@ var wx;
                 elements.forEach(function (x) { return prepare(x, params); });
             };
         }
+        else {
+            result.prepare = wx.noop;
+        }
         result.run = function (nodes, params) {
             return Rx.Observable.defer(function () {
                 var elements = toElementList(nodes);
@@ -4085,6 +4163,9 @@ var wx;
                 var elements = toElementList(nodes);
                 elements.forEach(function (x) { return complete(x, params); });
             };
+        }
+        else {
+            result.complete = wx.noop;
         }
         return result;
     }
@@ -5963,7 +6044,6 @@ var wx;
             this.parentPathDirective = "^";
             this.rootStateName = "$";
             this.validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
-            this.titlePropertyName = "__wx_app_title";
             this.domManager = domManager;
             this.reset();
             wx.app.history.onPopState.subscribe(function (e) {
@@ -6000,7 +6080,8 @@ var wx;
         Router.prototype.is = function (state, params, options) {
             var _current = this.current();
             var isActive = _current.name === state;
-            if (isActive && params != null) {
+            params = params || {};
+            if (isActive) {
                 var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
                 if (currentParamsKeys.length === paramsKeys.length) {
@@ -6011,13 +6092,17 @@ var wx;
                         }
                     }
                 }
+                else {
+                    isActive = false;
+                }
             }
             return isActive;
         };
         Router.prototype.includes = function (state, params, options) {
             var _current = this.current();
             var isActive = _current.name.indexOf(state) === 0;
-            if (isActive && params != null) {
+            params = params || {};
+            if (isActive) {
                 var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
                 paramsKeys = paramsKeys.length <= currentParamsKeys.length ? paramsKeys : currentParamsKeys;

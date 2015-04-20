@@ -79,6 +79,8 @@ module wx {
                 var elements = toElementList(nodes);
                 elements.forEach(x => prepare(x, params));
             }
+        } else {
+            result.prepare = noop;
         }
 
         result.run = (nodes, params) => {
@@ -93,6 +95,8 @@ module wx {
                 var elements = toElementList(nodes);
                 elements.forEach(x => complete(x, params));
             }
+        } else {
+            result.complete = noop;
         }
 
         return result;

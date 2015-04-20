@@ -531,7 +531,21 @@ declare module wx.internal {
     }
 }
 declare module wx {
-    interface IForEachBindingOptions {
+    class RefCountDisposeWrapper implements Rx.IDisposable {
+        constructor(inner: Rx.IDisposable, initialRefCount?: number);
+        private inner;
+        private refCount;
+        addRef(): void;
+        release(): number;
+        dispose(): void;
+    }
+}
+declare module wx {
+    interface IForeachAnimationDescriptor {
+        itemEnter?: string | IAnimation;
+        itemLeave?: string | IAnimation;
+    }
+    interface IForEachBindingOptions extends IForeachAnimationDescriptor {
         data: any;
         hooks?: IForEachBindingHooks | string;
     }
@@ -554,6 +568,8 @@ declare module wx {
 declare module wx {
     interface IIfBindingOptions {
         condition: string;
+        enter?: string | IAnimation;
+        leave?: string | IAnimation;
     }
     module internal {
         var ifBindingConstructor: any;
@@ -612,16 +628,6 @@ declare module wx {
         isValueCreated: boolean;
         private createValue;
         private createdValue;
-    }
-}
-declare module wx {
-    class RefCountDisposeWrapper implements Rx.IDisposable {
-        constructor(inner: Rx.IDisposable, initialRefCount?: number);
-        private inner;
-        private refCount;
-        addRef(): void;
-        release(): number;
-        dispose(): void;
     }
 }
 declare module wx.internal {
