@@ -566,10 +566,12 @@ declare module wx {
     }
 }
 declare module wx {
-    interface IIfBindingOptions {
-        condition: string;
+    interface IIfAnimationDescriptor {
         enter?: string | IAnimation;
         leave?: string | IAnimation;
+    }
+    interface IIfBindingOptions extends IIfAnimationDescriptor {
+        condition: string;
     }
     module internal {
         var ifBindingConstructor: any;

@@ -358,8 +358,7 @@ module wx {
             if (_bindings != null && _bindings.length > 0) {
                 // lookup handlers
                 var bindings = _bindings.map(x=> {
-                    // if handler is not registered with current module, fall-back to 'app' module 
-                    var handler = module.binding(x.key) || app.binding(x.key);
+                    var handler = module.binding(x.key);
                     
                     if (!handler)
                         internal.throwError("binding '{0}' has not been registered.", x.key);

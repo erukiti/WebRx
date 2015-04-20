@@ -86,6 +86,10 @@ module wx {
         result.run = (nodes, params) => {
             return Rx.Observable.defer(() => {
                 var elements = toElementList(nodes);
+
+                if (elements.length === 0)
+                    return Rx.Observable.return<any>(undefined);
+
                 return Rx.Observable.combineLatest(elements.map(x => run(x, params)), <any> noop);
             });
         }
@@ -158,6 +162,9 @@ module wx {
         result.run = (nodes, params) => {
             return Rx.Observable.defer(() => {
                 var elements = toElementList(nodes);
+
+                if (elements.length === 0)
+                    return Rx.Observable.return<any>(undefined);
 
                 var obs = Rx.Observable.combineLatest(elements.map(x => {
                     var duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));

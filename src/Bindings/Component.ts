@@ -77,15 +77,8 @@ module wx {
                     cleanup = new Rx.CompositeDisposable();
 
                     // lookup component
-                    var obs: Rx.Observable<IComponent> = undefined;
+                    var obs: Rx.Observable<IComponent> = module.loadComponent(componentName, componentParams);
                     var disp: Rx.IDisposable = undefined;
-
-                    if (module && module.hasComponent(componentName))
-                        obs = module.loadComponent(componentName, componentParams);
-
-                    // fallback to "app" module if not registered with
-                    if (obs == null && app.hasComponent(componentName))
-                        obs = app.loadComponent(componentName, componentParams);
 
                     if (obs == null)
                         internal.throwError("component '{0}' is not registered with current module-context", componentName);

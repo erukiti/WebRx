@@ -54,12 +54,12 @@ module wx {
 
                     if (config != null) {
                         if (!isEqual(currentConfig, config)) {
-                            cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || app).subscribe());
+                            cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || app));
 
                             currentConfig = config;
                         }
                     } else {
-                        cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module || app).subscribe());
+                        cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module || app));
 
                         currentConfig = <any> {};
                     }
@@ -94,14 +94,14 @@ module wx {
         protected router: IRouter;
 
         protected applyTemplate(componentName: string, componentParams: Object,
-            animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.Observable<any> {
+            animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.IDisposable {
             var self = this;
-            var currentComponentElements = nodeChildrenToArray<Node>(el);
+            var oldElements = nodeChildrenToArray<Node>(el);
             var combined: Array<Rx.Observable<any>> = [];
             var obs: Rx.Observable<any>;
 
-            function removeCurrentComponentElements() {
-                currentComponentElements.forEach(x => {
+            function removeOldElements() {
+                oldElements.forEach(x => {
                     self.domManager.cleanNode(x);
                     el.removeChild(x);
                 });
@@ -128,7 +128,7 @@ module wx {
             }
 
             // construct leave-observable
-            if (currentComponentElements.length > 0) {
+            if (oldElements.length > 0) {
                 var leaveAnimation: IAnimation;
 
                 if (animations && animations.leave) {
@@ -140,13 +140,13 @@ module wx {
                 }
 
                 if (leaveAnimation) {
-                    leaveAnimation.prepare(currentComponentElements);
+                    leaveAnimation.prepare(oldElements);
 
-                    obs = leaveAnimation.run(currentComponentElements)
-                        .continueWith(() => leaveAnimation.complete(currentComponentElements))
-                        .continueWith(removeCurrentComponentElements);
+                    obs = leaveAnimation.run(oldElements)
+                        .continueWith(() => leaveAnimation.complete(oldElements))
+                        .continueWith(removeOldElements);
                 } else {
-                    obs = Rx.Observable.startDeferred<any>(removeCurrentComponentElements);
+                    obs = Rx.Observable.startDeferred<any>(removeOldElements);
                 }
 
                 combined.push(obs);
@@ -176,12 +176,14 @@ module wx {
 
             // optimize return
             if (combined.length > 1)
-                return Rx.Observable.combineLatest(combined, <any> noop).take(1);
+                obs = Rx.Observable.combineLatest(combined, <any> noop).take(1);
             else if (combined.length === 1)
-                return combined[0].take(1);
+                obs = combined[0].take(1);
+            else
+                obs = null;
 
             // no-op return
-            return Rx.Observable.return<any>(true);
+            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
         }
     }
 

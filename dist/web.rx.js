@@ -1306,7 +1306,7 @@ var wx;
             }
             if (_bindings != null && _bindings.length > 0) {
                 var bindings = _bindings.map(function (x) {
-                    var handler = module.binding(x.key) || wx.app.binding(x.key);
+                    var handler = module.binding(x.key);
                     if (!handler)
                         internal.throwError("binding '{0}' has not been registered.", x.key);
                     return { handler: handler, value: x.value };
@@ -1793,12 +1793,8 @@ var wx;
                 try {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
-                    var obs = undefined;
+                    var obs = module.loadComponent(componentName, componentParams);
                     var disp = undefined;
-                    if (module && module.hasComponent(componentName))
-                        obs = module.loadComponent(componentName, componentParams);
-                    if (obs == null && wx.app.hasComponent(componentName))
-                        obs = wx.app.loadComponent(componentName, componentParams);
                     if (obs == null)
                         internal.throwError("component '{0}' is not registered with current module-context", componentName);
                     disp = obs.subscribe(function (component) {
@@ -2521,15 +2517,45 @@ var wx;
                 internal.throwError("if-binding only operates on elements!");
             if (options == null)
                 internal.throwError("invalid binding-options!");
+            var compiled = this.domManager.compileBindingOptions(options, module);
             var el = node;
             var self = this;
             var initialApply = true;
-            var exp = this.domManager.compileBindingOptions(options, module);
+            var exp;
+            var animations = {};
+            var cleanup;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
+            if (typeof compiled === "object") {
+                var opt = compiled;
+                exp = opt.condition;
+                if (opt.enter) {
+                    animations.enter = this.domManager.evaluateExpression(opt.enter, ctx);
+                    if (typeof animations.enter === "string") {
+                        animations.enter = module.animation(animations.enter);
+                    }
+                }
+                if (opt.leave) {
+                    animations.leave = this.domManager.evaluateExpression(opt.leave, ctx);
+                    if (typeof animations.leave === "string") {
+                        animations.leave = module.animation(animations.leave);
+                    }
+                }
+            }
+            else {
+                exp = compiled;
+            }
             var obs = this.domManager.expressionToObservable(exp, ctx);
             var template = new Array();
             state.cleanup.add(obs.subscribe(function (x) {
                 try {
-                    self.applyValue(el, wx.unwrapProperty(x), template, ctx, initialApply);
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+                    cleanup.add(self.applyValue(el, wx.unwrapProperty(x), template, ctx, animations, initialApply));
                     initialApply = false;
                 }
                 catch (e) {
@@ -2549,8 +2575,12 @@ var wx;
         };
         IfBinding.prototype.configure = function (options) {
         };
-        IfBinding.prototype.applyValue = function (el, value, template, ctx, initialApply) {
+        IfBinding.prototype.applyValue = function (el, value, template, ctx, animations, initialApply) {
+            var leaveAnimation = animations.leave;
+            var enterAnimation = animations.enter;
             var i;
+            var self = this;
+            var obs = undefined;
             if (initialApply) {
                 for (i = 0; i < el.childNodes.length; i++) {
                     template.push(el.childNodes[i].cloneNode(true));
@@ -2559,20 +2589,38 @@ var wx;
                     el.removeChild(el.firstChild);
                 }
             }
+            var oldElements = wx.nodeChildrenToArray(el);
             value = this.inverse ? !value : value;
+            function removeOldElements() {
+                oldElements.forEach(function (x) {
+                    self.domManager.cleanNode(x);
+                    el.removeChild(x);
+                });
+            }
             if (!value) {
-                this.domManager.cleanDescendants(el);
-                while (el.firstChild) {
-                    el.removeChild(el.firstChild);
+                if (oldElements.length > 0) {
+                    if (leaveAnimation) {
+                        leaveAnimation.prepare(oldElements);
+                        obs = leaveAnimation.run(oldElements).continueWith(function () { return leaveAnimation.complete(oldElements); }).continueWith(removeOldElements);
+                    }
+                    else {
+                        removeOldElements();
+                    }
                 }
             }
             else {
+                var nodes = template.map(function (x) { return x.cloneNode(true); });
+                if (enterAnimation)
+                    enterAnimation.prepare(nodes);
                 for (i = 0; i < template.length; i++) {
-                    var node = template[i].cloneNode(true);
-                    el.appendChild(node);
+                    el.appendChild(nodes[i]);
                 }
                 this.domManager.applyBindingsToDescendants(ctx, el);
+                if (enterAnimation) {
+                    obs = enterAnimation.run(nodes).continueWith(function () { return enterAnimation.complete(nodes); });
+                }
             }
+            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
         };
         return IfBinding;
     })();
@@ -4155,6 +4203,8 @@ var wx;
         result.run = function (nodes, params) {
             return Rx.Observable.defer(function () {
                 var elements = toElementList(nodes);
+                if (elements.length === 0)
+                    return Rx.Observable.return(undefined);
                 return Rx.Observable.combineLatest(elements.map(function (x) { return run(x, params); }), wx.noop);
             });
         };
@@ -4213,6 +4263,8 @@ var wx;
         result.run = function (nodes, params) {
             return Rx.Observable.defer(function () {
                 var elements = toElementList(nodes);
+                if (elements.length === 0)
+                    return Rx.Observable.return(undefined);
                 var obs = Rx.Observable.combineLatest(elements.map(function (x) {
                     var duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
                     return Rx.Observable.timer(duration);
@@ -5837,12 +5889,12 @@ var wx;
                     var config = _this.router.getViewComponent(viewName);
                     if (config != null) {
                         if (!wx.isEqual(currentConfig, config)) {
-                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || wx.app).subscribe());
+                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || wx.app));
                             currentConfig = config;
                         }
                     }
                     else {
-                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module || wx.app).subscribe());
+                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module || wx.app));
                         currentConfig = {};
                     }
                 }
@@ -5861,11 +5913,11 @@ var wx;
         };
         ViewBinding.prototype.applyTemplate = function (componentName, componentParams, animations, el, ctx, module) {
             var self = this;
-            var currentComponentElements = wx.nodeChildrenToArray(el);
+            var oldElements = wx.nodeChildrenToArray(el);
             var combined = [];
             var obs;
-            function removeCurrentComponentElements() {
-                currentComponentElements.forEach(function (x) {
+            function removeOldElements() {
+                oldElements.forEach(function (x) {
                     self.domManager.cleanNode(x);
                     el.removeChild(x);
                 });
@@ -5880,7 +5932,7 @@ var wx;
                 el.appendChild(container);
                 self.domManager.applyBindings(ctx, container);
             }
-            if (currentComponentElements.length > 0) {
+            if (oldElements.length > 0) {
                 var leaveAnimation;
                 if (animations && animations.leave) {
                     if (typeof animations.leave === "string") {
@@ -5891,11 +5943,11 @@ var wx;
                     }
                 }
                 if (leaveAnimation) {
-                    leaveAnimation.prepare(currentComponentElements);
-                    obs = leaveAnimation.run(currentComponentElements).continueWith(function () { return leaveAnimation.complete(currentComponentElements); }).continueWith(removeCurrentComponentElements);
+                    leaveAnimation.prepare(oldElements);
+                    obs = leaveAnimation.run(oldElements).continueWith(function () { return leaveAnimation.complete(oldElements); }).continueWith(removeOldElements);
                 }
                 else {
-                    obs = Rx.Observable.startDeferred(removeCurrentComponentElements);
+                    obs = Rx.Observable.startDeferred(removeOldElements);
                 }
                 combined.push(obs);
             }
@@ -5916,10 +5968,12 @@ var wx;
                 combined.push(obs);
             }
             if (combined.length > 1)
-                return Rx.Observable.combineLatest(combined, wx.noop).take(1);
+                obs = Rx.Observable.combineLatest(combined, wx.noop).take(1);
             else if (combined.length === 1)
-                return combined[0].take(1);
-            return Rx.Observable.return(true);
+                obs = combined[0].take(1);
+            else
+                obs = null;
+            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
         };
         return ViewBinding;
     })();
