@@ -54,12 +54,12 @@ module wx {
 
                     if (config != null) {
                         if (!isEqual(currentConfig, config)) {
-                            cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || app));
+                            cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
 
                             currentConfig = config;
                         }
                     } else {
-                        cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module || app));
+                        cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module));
 
                         currentConfig = <any> {};
                     }

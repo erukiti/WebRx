@@ -5889,12 +5889,12 @@ var wx;
                     var config = _this.router.getViewComponent(viewName);
                     if (config != null) {
                         if (!wx.isEqual(currentConfig, config)) {
-                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || wx.app));
+                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
                             currentConfig = config;
                         }
                     }
                     else {
-                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module || wx.app));
+                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module));
                         currentConfig = {};
                     }
                 }
