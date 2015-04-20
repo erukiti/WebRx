@@ -31,13 +31,15 @@ module wx {
             var el = <HTMLElement> node;
             var compiled = this.domManager.compileBindingOptions(options, module);
             var viewName = this.domManager.evaluateExpression(compiled, ctx);
+            var stateParams: any;
+            var currentStateParams: any;
             var componentName: string = null;
             var componentParams: any;
             var componentAnimations: IViewAnimationDescriptor;
-            var currentComponentName: string = null;
-            var currentComponentParams: any;
             var currentComponentAnimations: IViewAnimationDescriptor;
+            var currentComponentName: string = null;
             var cleanup: Rx.CompositeDisposable;
+            var configuredParamNames: Array<string>;
 
             function doCleanup() {
                 if (cleanup) {
@@ -69,26 +71,34 @@ module wx {
                                 componentAnimations = undefined;
                             }
 
-                            // merge state params into component params
-                            if (newState.params != null)
+                            // build filtered-state params
+                            configuredParamNames = this.router.getConfiguredParameterNamesForView(viewName, componentName);
+                            stateParams = {};
+
+                            if (newState.params != null) {
+                                configuredParamNames.forEach(x => {
+                                    if (newState.params.hasOwnProperty(x)) {
+                                        stateParams[x] = newState.params[x];
+                                    }
+                                });
+
+                                // merge state params into component params
                                 componentParams = extend(newState.params, extend(componentParams, {}));
+                            }
 
                             // only update if changed
-                            if (componentName !== currentComponentName ||
-                                !isEqual(componentParams, currentComponentParams) ||
-                                !isEqual(componentAnimations, currentComponentAnimations)) {
-
+                            if (componentName !== currentComponentName || !isEqual(stateParams, currentStateParams)) {
                                 cleanup.add(this.applyTemplate(componentName, componentParams, componentAnimations, el, ctx, module || app).subscribe());
 
                                 currentComponentName = componentName;
-                                currentComponentParams = componentParams;
+                                currentStateParams = stateParams;
                                 currentComponentAnimations = componentAnimations;
                             }
                         } else {
                             cleanup.add(this.applyTemplate(null, null, currentComponentAnimations, el, ctx, module || app).subscribe());
 
                             currentComponentName = null;
-                            currentComponentParams = {};
+                            currentStateParams = {};
                             currentComponentAnimations = undefined;
                         }
                     }

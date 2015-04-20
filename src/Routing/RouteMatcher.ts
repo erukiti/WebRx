@@ -34,7 +34,7 @@ module wx {
 
             // Object to be returned. The public API.
             // Matched param or splat names, in order
-            var names = [];
+            this.params = [];
             // Route matching RegExp.
             var re = route;
 
@@ -44,7 +44,7 @@ module wx {
                 re = re.replace(reEscape, "\\$&");
                 // Replace any :param or *splat with the appropriate capture group.
                 re = re.replace(reParam, (_, mode, name) => {
-                    names.push(name);
+                    this.params.push(name);
                     // :param should capture until the next / or EOL, while *splat should
                     // capture until the next :param, *splat, or EOL.
                     return mode === ":" ? "([^/]*)" : "(.*)";
@@ -64,10 +64,10 @@ module wx {
                         return null;
                     }
                     // Add all matched :param / *splat values into the params object.
-                    while (i < names.length) {
-                        param = names[i++];
+                    while (i < this.params.length) {
+                        param = this.params[i++];
                         value = matches[i];
-                        // If a rule exists for thie param and it doesn't validate, return null.
+                        // If a rule exists for this param and it doesn't validate, return null.
                         if (rules && param in rules && !this.validateRule(rules[param], value)) {
                             return null;
                         }
@@ -118,6 +118,8 @@ module wx {
         public get isAbsolute() {
             return this.route.indexOf("/") === 0;
         }
+
+        public params: Array<string>;
 
         public concat(route: IRoute): IRoute {
             var other = <RouteMatcher> route;

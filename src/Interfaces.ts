@@ -623,6 +623,7 @@ module wx {
         stringify(params?: Object): string;
         concat(route: IRoute): IRoute;
         isAbsolute: boolean;
+        params: Array<string>;
     }
 
     export interface IViewAnimationDescriptor {
@@ -751,6 +752,11 @@ module wx {
         * Resets internal state configuration to defaults (for unit-testing)
         **/
         reset(): void;
+
+        /**
+        * Returns the parameters configured by the state responsible for activating the component at the specified view
+        **/
+        getConfiguredParameterNamesForView(view: string, component: string): Array<string>;
     }
 
 

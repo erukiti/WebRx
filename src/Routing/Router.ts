@@ -141,6 +141,52 @@ module wx {
             this.go(this.current().name, this.current().params, { force: true, location: false });
         }
 
+        public getConfiguredParameterNamesForView(view: string, component: string): Array<string> {
+            var hierarchy = this.getStateHierarchy(this.current().name);
+            var stateParams = {};
+            var result = [];
+            var config: IRouterStateConfig;
+            var index = -1;
+
+            // walk the hierarchy backward to figure out when the component was introduced at the specified view-slot
+            for (var i = hierarchy.length; i--; i >= 0) {
+                config = hierarchy[i];
+
+                if (config.views && config.views[view]) {
+                    var other = config.views[view];
+                    if (typeof other === "object") {
+                        other = (<any> other).component;
+                    }
+
+                    if (other === component) {
+                        index = i; // found but keep looking
+                    }
+                }
+            }
+
+            if (index !== -1) {
+                config = hierarchy[index];
+
+                // truncate hierarchy and merge params
+                hierarchy = hierarchy.slice(0, index + 1);
+
+                hierarchy.forEach(state => {
+                    // merge params
+                    if (state.params != null) {
+                        extend(state.params, stateParams);
+                    }
+                });
+
+                // extract resulting property names
+                result = Object.keys(stateParams);
+
+                // append any route-params
+                result = result.concat((<IRoute> config.route).params);
+            }
+
+            return result;
+        }
+
         public current = property<IRouterState>();
 
         //////////////////////////////////

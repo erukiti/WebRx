@@ -100,22 +100,58 @@ module wx {
 
     function cssTransitionAnimation(prepare: any, run: any, complete: any): IAnimation {
         var result: IAnimation = <any> {};
+        var prepToAdd: Array<any>;
+        var prepToRemove: Array<any>;
+        var runToAdd: Array<any>;
+        var runToRemove: Array<any>;
+        var completeToAdd: Array<any>;
+        var completeToRemove: Array<any>;
 
         if (prepare) {
-            if (typeof prepare === "string")
-                prepare = prepare.split(/\s+/).map(x=> trimString(x)).filter(x => x);
+            var prepIns: Array<IAnimationCssClassInstruction>; 
+
+            if (typeof prepare === "string") {
+                prepare = prepare.split(/\s+/).map(x => trimString(x)).filter(x => x);
+            } 
+
+            if (typeof prepare[0] === "string") {
+                // convert into IAnimationCssClassInstruction
+                prepIns = prepare.map(x => <IAnimationCssClassInstruction> { css: x, add: true });
+            } else {
+                prepIns = prepare;
+            }
+
+            prepToAdd = prepIns.filter(x => x.add).map(x => x.css);
+            prepToRemove = prepIns.filter(x => !x.add || x.remove).map(x => x.css);
 
             result.prepare = (nodes, params) => {
                 var elements = toElementList(nodes);
 
-                elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(prepare)));
+                if (prepToAdd && prepToAdd.length)
+                    elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(prepToAdd)));
+
+                if (prepToRemove && prepToRemove.length)
+                    elements.forEach(x => toggleCssClass.apply(null, [x, false].concat(prepToRemove)));
             }
         }
 
-        result.run = (nodes, params) => {
-            if (typeof run === "string")
-                run = run.split(/\s+/).map(x=> trimString(x)).filter(x => x);
+        var runIns: Array<IAnimationCssClassInstruction>;
 
+        if (typeof run === "string") {
+            run = run.split(/\s+/).map(x => trimString(x)).filter(x => x);
+        }
+
+        if (typeof run[0] === "string") {
+            // convert into IAnimationCssClassInstruction
+            runIns = run.map(x => <IAnimationCssClassInstruction> { css: x, add: true });
+        } else {
+            runIns = run;
+        }
+
+        runToAdd = runIns.filter(x => x.add).map(x => x.css);
+        runToRemove = runIns.filter(x => !x.add || x.remove).map(x => x.css);
+
+        result.run = (nodes, params) => {
             return Rx.Observable.defer(() => {
                 var elements = toElementList(nodes);
 
@@ -126,28 +162,61 @@ module wx {
 
                 // defer animation-start to avoid problems with transitions on freshly added elements 
                 Rx.Observable.timer(1).subscribe(() => {
-                    elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(run)));
+                    if (runToAdd && runToAdd.length)
+                        elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(runToAdd)));
+
+                    if (runToRemove && runToRemove.length)
+                        elements.forEach(x => toggleCssClass.apply(null, [x, false].concat(runToRemove)));
                 });
 
                 return obs;
             });
         }
 
+        var completeIns: Array<IAnimationCssClassInstruction>; 
+
         if (complete) {
-            if (typeof complete === "string")
-                complete = complete.split(/\s+/).map(x=> trimString(x)).filter(x => x);
+            if (typeof complete === "string") {
+                complete = complete.split(/\s+/).map(x => trimString(x)).filter(x => x);
+            }
+
+            if (typeof complete[0] === "string") {
+                // convert into IAnimationCssClassInstruction
+                completeIns = complete.map(x => <IAnimationCssClassInstruction> { css: x, add: true });
+            } else {
+                completeIns = complete;
+            }
+
+            completeToAdd = completeIns.filter(x => x.add).map(x => x.css);
+            completeToRemove = completeIns.filter(x => !x.add || x.remove).map(x => x.css);
+        } else {
+            // default to remove classes added during prepare & run stages
+            completeToRemove = [];
+
+            if (prepToAdd && prepToAdd.length)
+                completeToRemove = completeToRemove.concat(prepToAdd);
+
+            if (runToAdd && runToAdd.length)
+                completeToRemove = completeToRemove.concat(runToAdd);
         }
 
         result.complete = (nodes, params) => {
             var elements = toElementList(nodes);
 
-            if (complete)
-                elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(complete)));
+            if (completeToAdd && completeToAdd.length)
+                elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(completeToAdd)));
 
-            elements.forEach(x => toggleCssClass.apply(null, [x, false].concat(prepare).concat(run)));
+            if (completeToRemove && completeToRemove.length)
+                elements.forEach(x => toggleCssClass.apply(null, [x, false].concat(completeToRemove)));
         }
 
         return result;
+    }
+
+    export interface IAnimationCssClassInstruction {
+        css: string;
+        add: boolean;
+        remove: boolean;
     }
 
     /**
@@ -160,7 +229,9 @@ module wx {
      * as soon as the animation has ended. 
      * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
      */
-    export function animation(prepareTransitionClass: string, startTransitionClass: string, completeTransitionClass: string): IAnimation;
+    export function animation(prepareTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>,
+        startTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>,
+        completeTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>): IAnimation;
      
     /**
      * Registers a scripted animation
@@ -180,10 +251,8 @@ module wx {
 
         if (typeof val === "function") {
             return scriptedAnimation(val, args.shift(), args.shift());
-        } else if (typeof val === "string") {
-            return cssTransitionAnimation(val, args.shift(), args.shift());
-        } else {
-            internal.throwError("invalid arguments");
         }
+
+        return cssTransitionAnimation(val, args.shift(), args.shift());
     }
 }
