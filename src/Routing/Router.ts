@@ -141,47 +141,37 @@ module wx {
             this.go(this.current().name, this.current().params, { force: true, location: false });
         }
 
-        public getViewParameterNamesFromConfig(view: string, component: string): Array<string> {
-            var hierarchy = this.getStateHierarchy(this.current().name);
-            var stateParams = {};
-            var result = [];
-            var config: IRouterStateConfig;
-            var index = -1;
+        public getViewComponent(viewName: string): IViewConfig {
+            var _current = this.current();
+            var result: IViewConfig = <any> {};
 
-            // walk the hierarchy backward to figure out when the component was introduced at the specified view-slot
-            for (var i = hierarchy.length; i--; i >= 0) {
-                config = hierarchy[i];
+            if (_current.views != null) {
+                var component = _current.views[viewName];
+                var stateParams = {};
 
-                if (config.views && config.views[view]) {
-                    var other = config.views[view];
-                    if (typeof other === "object") {
-                        other = (<any> other).component;
+                if (component != null) {
+                    if (typeof component === "object") {
+                        result.component = component.component;
+                        result.params = component.params || {};
+                        result.animations = component.animations;
+                    } else {
+                        result.component = <string> component;
+                        result.params = {};
+                        result.animations = undefined;
                     }
 
-                    if (other === component) {
-                        index = i; // found but keep looking
-                    }
+                    // ensure that only parameters configured at state level surface at view-level
+                    var parameterNames = this.getViewParameterNamesFromStateConfig(viewName, result.component);
+
+                    parameterNames.forEach(x => {
+                        if (_current.params.hasOwnProperty(x)) {
+                            stateParams[x] = _current.params[x];
+                        }
+                    });
+
+                    // merge state params into component params
+                    result.params = extend(stateParams, result.params);
                 }
-            }
-
-            if (index !== -1) {
-                config = hierarchy[index];
-
-                // truncate hierarchy and merge params
-                hierarchy = hierarchy.slice(0, index + 1);
-
-                hierarchy.forEach(state => {
-                    // merge params
-                    if (state.params != null) {
-                        extend(state.params, stateParams);
-                    }
-                });
-
-                // extract resulting property names
-                result = Object.keys(stateParams);
-
-                // append any route-params
-                result = result.concat((<IRoute> config.route).params);
             }
 
             return result;
@@ -405,6 +395,52 @@ module wx {
                 if (state.onEnter)
                     state.onEnter(this.get(state.name), params);
             }
+        }
+
+        private getViewParameterNamesFromStateConfig(view: string, component: string): Array<string> {
+            var hierarchy = this.getStateHierarchy(this.current().name);
+            var stateParams = {};
+            var result = [];
+            var config: IRouterStateConfig;
+            var index = -1;
+
+            // walk the hierarchy backward to figure out when the component was introduced at the specified view-slot
+            for (var i = hierarchy.length; i--; i >= 0) {
+                config = hierarchy[i];
+
+                if (config.views && config.views[view]) {
+                    var other = config.views[view];
+                    if (typeof other === "object") {
+                        other = (<any> other).component;
+                    }
+
+                    if (other === component) {
+                        index = i; // found but keep looking
+                    }
+                }
+            }
+
+            if (index !== -1) {
+                config = hierarchy[index];
+
+                // truncate hierarchy and merge params
+                hierarchy = hierarchy.slice(0, index + 1);
+
+                hierarchy.forEach(state => {
+                    // merge params
+                    if (state.params != null) {
+                        extend(state.params, stateParams);
+                    }
+                });
+
+                // extract resulting property names
+                result = Object.keys(stateParams);
+
+                // append any route-params
+                result = result.concat((<IRoute> config.route).params);
+            }
+
+            return result;
         }
     }
 

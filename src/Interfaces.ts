@@ -650,6 +650,12 @@ module wx {
         onLeave?: (config: IRouterStateConfig, params?: any) => void;
     }
 
+    export interface IViewConfig {
+        component: string;
+        params?: any;
+        animations?: IViewAnimationDescriptor;
+    }
+
     export const enum RouterLocationChangeMode {
         add = 1,
         replace = 2
@@ -754,9 +760,9 @@ module wx {
         reset(): void;
 
         /**
-        * Returns the parameters configured by the state responsible for activating the component at the specified view
+        * Returns the view-configuration for the specified view at the current state
         **/
-        getViewParameterNamesFromConfig(view: string, component: string): Array<string>;
+        getViewComponent(viewName: string): IViewConfig;
     }
 
 
