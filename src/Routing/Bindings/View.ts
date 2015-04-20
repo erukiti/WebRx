@@ -31,12 +31,7 @@ module wx {
             var el = <HTMLElement> node;
             var compiled = this.domManager.compileBindingOptions(options, module);
             var viewName = this.domManager.evaluateExpression(compiled, ctx);
-            var componentName: string = null;
-            var componentParams: any;
-            var componentAnimations: IViewAnimationDescriptor;
-            var currentComponentName: string = null;
-            var currentComponentParams: any;
-            var currentComponentAnimations: IViewAnimationDescriptor;
+            var currentConfig: IViewConfig;
             var cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
@@ -57,25 +52,16 @@ module wx {
 
                     var config = this.router.getViewComponent(viewName);
 
-                    if (config.component != null) {
-                        componentName = config.component;
-                        componentParams = config.params || {};
-                        componentAnimations = config.animations;
+                    if (config != null) {
+                        if (!isEqual(currentConfig, config)) {
+                            cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || app).subscribe());
 
-                        // only update if changed
-                        if (componentName !== currentComponentName || !isEqual(componentParams, currentComponentParams)) {
-                            cleanup.add(this.applyTemplate(componentName, componentParams, componentAnimations, el, ctx, module || app).subscribe());
-
-                            currentComponentName = componentName;
-                            currentComponentParams = componentParams;
-                            currentComponentAnimations = componentAnimations;
+                            currentConfig = config;
                         }
                     } else {
-                        cleanup.add(this.applyTemplate(null, null, currentComponentAnimations, el, ctx, module || app).subscribe());
+                        cleanup.add(this.applyTemplate(null, null, currentConfig.animations, el, ctx, module || app).subscribe());
 
-                        currentComponentName = null;
-                        currentComponentParams = {};
-                        currentComponentAnimations = undefined;
+                        currentConfig = <any> {};
                     }
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);

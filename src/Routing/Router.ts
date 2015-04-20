@@ -143,13 +143,15 @@ module wx {
 
         public getViewComponent(viewName: string): IViewConfig {
             var _current = this.current();
-            var result: IViewConfig = <any> {};
+            var result: IViewConfig = undefined;
 
             if (_current.views != null) {
                 var component = _current.views[viewName];
                 var stateParams = {};
 
                 if (component != null) {
+                    result = <any> {};
+
                     if (typeof component === "object") {
                         result.component = component.component;
                         result.params = component.params || {};
