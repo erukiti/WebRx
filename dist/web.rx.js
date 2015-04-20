@@ -3306,6 +3306,19 @@ var wx;
         }, function (x) { return accessor.thrownExceptions.onNext(x); });
         return accessor;
     };
+    RxObsConstructor.prototype.continueWith = function () {
+        var args = wx.args2Array(arguments);
+        var val = args.shift();
+        var obs = undefined;
+        if (wx.isRxObservable(val)) {
+            obs = val;
+        }
+        else if (wx.isFunction(val)) {
+            var action = val;
+            obs = Rx.Observable.startDeferred(action);
+        }
+        return this.selectMany(function (_) { return obs; });
+    };
     RxObsConstructor.startDeferred = function (action) {
         return Rx.Observable.defer(function () {
             return Rx.Observable.create(function (observer) {
@@ -4019,18 +4032,39 @@ var wx;
         var elements = nodes.filter(function (x) { return x.nodeType === 1; });
         return elements;
     }
+    function parseTimingValue(x) {
+        if (x.charAt(x.length - 1) === "s") {
+            x = x.substring(0, x.length - 1);
+        }
+        var value = parseFloat(x) || 0;
+        return value;
+    }
     function getMaximumTransitionDuration(el) {
         var str = getComputedStyle(el)["transitionDuration"];
         var maxValue = 0;
         var values = str.split(/\s*,\s*/);
         values.forEach(function (x) {
-            if (x.charAt(x.length - 1) === "s") {
-                x = x.substring(0, x.length - 1);
-            }
-            var value = parseFloat(x) || 0;
+            var value = parseTimingValue(x);
             maxValue = maxValue ? Math.max(value, maxValue) : value;
         });
         return maxValue * 1000;
+    }
+    function getMaximumTransitionDelay(el) {
+        var str = getComputedStyle(el)["transitionDelay"];
+        var maxValue = 0;
+        var values = str.split(/\s*,\s*/);
+        values.forEach(function (x) {
+            var value = Math.max(0, parseTimingValue(x));
+            maxValue = maxValue ? Math.max(value, maxValue) : value;
+        });
+        return maxValue * 1000;
+    }
+    function getKeyframeAnimationDuration(el) {
+        var durationStr = getComputedStyle(el)["animationDuration"] || getComputedStyle(el)["webkitAnimationDuration"] || "0s";
+        var delayStr = getComputedStyle(el)["animationDelay"] || getComputedStyle(el)["webkitAnimationDelay"] || "0s";
+        var duration = parseTimingValue(durationStr);
+        var delay = parseTimingValue(delayStr);
+        return (duration + delay) * 1000;
     }
     function scriptedAnimation(run, prepare, complete) {
         var result = {};
@@ -4054,45 +4088,100 @@ var wx;
         }
         return result;
     }
-    function cssTransitionAnimation(prepare, run) {
+    function cssTransitionAnimation(prepare, run, complete) {
         var result = {};
+        var prepToAdd;
+        var prepToRemove;
+        var runToAdd;
+        var runToRemove;
+        var completeToAdd;
+        var completeToRemove;
         if (prepare) {
+            var prepIns;
+            if (typeof prepare === "string") {
+                prepare = prepare.split(/\s+/).map(function (x) { return wx.trimString(x); }).filter(function (x) { return x; });
+            }
+            if (typeof prepare[0] === "string") {
+                prepIns = prepare.map(function (x) { return { css: x, add: true }; });
+            }
+            else {
+                prepIns = prepare;
+            }
+            prepToAdd = prepIns.filter(function (x) { return x.add; }).map(function (x) { return x.css; });
+            prepToRemove = prepIns.filter(function (x) { return !x.add || x.remove; }).map(function (x) { return x.css; });
             result.prepare = function (nodes, params) {
                 var elements = toElementList(nodes);
-                elements.forEach(function (x) { return wx.toggleCssClass(x, true, prepare); });
+                if (prepToAdd && prepToAdd.length)
+                    elements.forEach(function (x) { return wx.toggleCssClass.apply(null, [x, true].concat(prepToAdd)); });
+                if (prepToRemove && prepToRemove.length)
+                    elements.forEach(function (x) { return wx.toggleCssClass.apply(null, [x, false].concat(prepToRemove)); });
             };
         }
+        var runIns;
+        if (typeof run === "string") {
+            run = run.split(/\s+/).map(function (x) { return wx.trimString(x); }).filter(function (x) { return x; });
+        }
+        if (typeof run[0] === "string") {
+            runIns = run.map(function (x) { return { css: x, add: true }; });
+        }
+        else {
+            runIns = run;
+        }
+        runToAdd = runIns.filter(function (x) { return x.add; }).map(function (x) { return x.css; });
+        runToRemove = runIns.filter(function (x) { return !x.add || x.remove; }).map(function (x) { return x.css; });
         result.run = function (nodes, params) {
             return Rx.Observable.defer(function () {
                 var elements = toElementList(nodes);
                 var obs = Rx.Observable.combineLatest(elements.map(function (x) {
-                    var duration = getMaximumTransitionDuration(x);
+                    var duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
                     return Rx.Observable.timer(duration);
                 }), wx.noop);
                 Rx.Observable.timer(1).subscribe(function () {
-                    elements.forEach(function (x) { return wx.toggleCssClass(x, true, run); });
+                    if (runToAdd && runToAdd.length)
+                        elements.forEach(function (x) { return wx.toggleCssClass.apply(null, [x, true].concat(runToAdd)); });
+                    if (runToRemove && runToRemove.length)
+                        elements.forEach(function (x) { return wx.toggleCssClass.apply(null, [x, false].concat(runToRemove)); });
                 });
                 return obs;
             });
         };
+        var completeIns;
+        if (complete) {
+            if (typeof complete === "string") {
+                complete = complete.split(/\s+/).map(function (x) { return wx.trimString(x); }).filter(function (x) { return x; });
+            }
+            if (typeof complete[0] === "string") {
+                completeIns = complete.map(function (x) { return { css: x, add: true }; });
+            }
+            else {
+                completeIns = complete;
+            }
+            completeToAdd = completeIns.filter(function (x) { return x.add; }).map(function (x) { return x.css; });
+            completeToRemove = completeIns.filter(function (x) { return !x.add || x.remove; }).map(function (x) { return x.css; });
+        }
+        else {
+            completeToRemove = [];
+            if (prepToAdd && prepToAdd.length)
+                completeToRemove = completeToRemove.concat(prepToAdd);
+            if (runToAdd && runToAdd.length)
+                completeToRemove = completeToRemove.concat(runToAdd);
+        }
         result.complete = function (nodes, params) {
             var elements = toElementList(nodes);
-            elements.forEach(function (x) { return wx.toggleCssClass(x, false, prepare, run); });
+            if (completeToAdd && completeToAdd.length)
+                elements.forEach(function (x) { return wx.toggleCssClass.apply(null, [x, true].concat(completeToAdd)); });
+            if (completeToRemove && completeToRemove.length)
+                elements.forEach(function (x) { return wx.toggleCssClass.apply(null, [x, false].concat(completeToRemove)); });
         };
         return result;
     }
     function animation() {
         var args = wx.args2Array(arguments);
-        var run = args.shift();
-        if (typeof run === "function") {
-            return scriptedAnimation(run, args.shift(), args.shift());
+        var val = args.shift();
+        if (typeof val === "function") {
+            return scriptedAnimation(val, args.shift(), args.shift());
         }
-        else if (typeof run === "string") {
-            return cssTransitionAnimation(run, args.shift());
-        }
-        else {
-            wx.internal.throwError("invalid arguments");
-        }
+        return cssTransitionAnimation(val, args.shift(), args.shift());
     }
     wx.animation = animation;
 })(wx || (wx = {}));
@@ -5650,12 +5739,7 @@ var wx;
             var el = node;
             var compiled = this.domManager.compileBindingOptions(options, module);
             var viewName = this.domManager.evaluateExpression(compiled, ctx);
-            var componentName = null;
-            var componentParams;
-            var componentAnimations;
-            var currentComponentName = null;
-            var currentComponentParams;
-            var currentComponentAnimations;
+            var currentConfig;
             var cleanup;
             function doCleanup() {
                 if (cleanup) {
@@ -5669,34 +5753,16 @@ var wx;
                 try {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
-                    if (newState.views != null) {
-                        var component = newState.views[viewName];
-                        if (component != null) {
-                            if (typeof component === "object") {
-                                componentName = component.component;
-                                componentParams = component.params || {};
-                                componentAnimations = component.animations;
-                            }
-                            else {
-                                componentName = component;
-                                componentParams = {};
-                                componentAnimations = undefined;
-                            }
-                            if (newState.params != null)
-                                componentParams = wx.extend(newState.params, wx.extend(componentParams, {}));
-                            if (componentName !== currentComponentName || !wx.isEqual(componentParams, currentComponentParams) || !wx.isEqual(componentAnimations, currentComponentAnimations)) {
-                                cleanup.add(_this.applyTemplate(componentName, componentParams, componentAnimations, el, ctx, module || wx.app).subscribe());
-                                currentComponentName = componentName;
-                                currentComponentParams = componentParams;
-                                currentComponentAnimations = componentAnimations;
-                            }
+                    var config = _this.router.getViewComponent(viewName);
+                    if (config != null) {
+                        if (!wx.isEqual(currentConfig, config)) {
+                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module || wx.app).subscribe());
+                            currentConfig = config;
                         }
-                        else {
-                            cleanup.add(_this.applyTemplate(null, null, currentComponentAnimations, el, ctx, module || wx.app).subscribe());
-                            currentComponentName = null;
-                            currentComponentParams = {};
-                            currentComponentAnimations = undefined;
-                        }
+                    }
+                    else {
+                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module || wx.app).subscribe());
+                        currentConfig = {};
                     }
                 }
                 catch (e) {
@@ -5714,64 +5780,65 @@ var wx;
         };
         ViewBinding.prototype.applyTemplate = function (componentName, componentParams, animations, el, ctx, module) {
             var self = this;
-            var oldTemplateInstance = wx.nodeChildrenToArray(el);
-            var animateEnter = componentName != null;
-            var animateLeave = oldTemplateInstance.length > 0;
-            var hide;
-            var show;
-            if (animations) {
-                if (animations.leave && animateLeave) {
-                    if (typeof animations.leave === "string") {
-                        hide = module.animation(animations.leave);
-                    }
-                    else {
-                        hide = animations.leave;
-                    }
-                }
-                if (animations.enter && animateEnter) {
-                    if (typeof animations.enter === "string") {
-                        show = module.animation(animations.enter);
-                    }
-                    else {
-                        show = animations.enter;
-                    }
-                }
-            }
-            var hideAnimation;
-            if (hide) {
-                hide.prepare(oldTemplateInstance);
-                hideAnimation = hide.run(oldTemplateInstance);
-            }
-            else {
-                hideAnimation = Rx.Observable.return(undefined);
-            }
-            var removeOldTemplate = Rx.Observable.startDeferred(function () {
-                if (hide)
-                    hide.complete(oldTemplateInstance);
-                oldTemplateInstance.forEach(function (x) {
+            var currentComponentElements = wx.nodeChildrenToArray(el);
+            var combined = [];
+            var obs;
+            function removeCurrentComponentElements() {
+                currentComponentElements.forEach(function (x) {
                     self.domManager.cleanNode(x);
                     el.removeChild(x);
                 });
-            });
-            var dataBind = Rx.Observable.startDeferred(function () {
-                if (componentName == null)
-                    return;
+            }
+            function instantiateComponent(animation) {
                 ctx.$componentParams = componentParams;
                 var container = document.createElement("div");
                 var binding = wx.formatString("component: { name: '{0}', params: $componentParams }", componentName);
                 container.setAttribute("data-bind", binding);
-                if (show != null && container.nodeType === 1)
-                    show.prepare(container);
+                if (animation != null)
+                    animation.prepare(container);
                 el.appendChild(container);
                 self.domManager.applyBindings(ctx, container);
-            });
-            var showAnimation = show != null ? show.run(el.childNodes) : Rx.Observable.return(undefined);
-            var cleanupAnimation = Rx.Observable.startDeferred(function () {
-                if (show != null) {
-                    show.complete(el.childNodes);
+            }
+            if (currentComponentElements.length > 0) {
+                var leaveAnimation;
+                if (animations && animations.leave) {
+                    if (typeof animations.leave === "string") {
+                        leaveAnimation = module.animation(animations.leave);
+                    }
+                    else {
+                        leaveAnimation = animations.leave;
+                    }
                 }
-            });
-            return Rx.Observable.combineLatest(hideAnimation.selectMany(function (_) { return removeOldTemplate; }), dataBind.selectMany(function (_) { return showAnimation.selectMany(function (_) { return cleanupAnimation; }); }), wx.noop).take(1);
+                if (leaveAnimation) {
+                    leaveAnimation.prepare(currentComponentElements);
+                    obs = leaveAnimation.run(currentComponentElements).continueWith(function () { return leaveAnimation.complete(currentComponentElements); }).continueWith(removeCurrentComponentElements);
+                }
+                else {
+                    obs = Rx.Observable.startDeferred(removeCurrentComponentElements);
+                }
+                combined.push(obs);
+            }
+            if (componentName != null) {
+                var enterAnimation;
+                if (animations && animations.enter) {
+                    if (typeof animations.enter === "string") {
+                        enterAnimation = module.animation(animations.enter);
+                    }
+                    else {
+                        enterAnimation = animations.enter;
+                    }
+                }
+                obs = Rx.Observable.startDeferred(function () { return instantiateComponent(enterAnimation); });
+                if (enterAnimation) {
+                    obs = obs.continueWith(enterAnimation.run(el.childNodes)).continueWith(function () { return enterAnimation.complete(el.childNodes); });
+                }
+                combined.push(obs);
+            }
+            if (combined.length > 1)
+                return Rx.Observable.combineLatest(combined, wx.noop).take(1);
+            else if (combined.length === 1)
+                return combined[0].take(1);
+            return Rx.Observable.return(true);
         };
         return ViewBinding;
     })();
@@ -5790,12 +5857,12 @@ var wx;
             var _this = this;
             this.route = route;
             this.rules = rules;
-            var names = [];
+            this.params = [];
             var re = route;
             if (typeof route === "string") {
                 re = re.replace(reEscape, "\\$&");
                 re = re.replace(reParam, function (_, mode, name) {
-                    names.push(name);
+                    _this.params.push(name);
                     return mode === ":" ? "([^/]*)" : "(.*)";
                 });
                 re = new RegExp("^" + re + "$");
@@ -5807,8 +5874,8 @@ var wx;
                     if (!matches) {
                         return null;
                     }
-                    while (i < names.length) {
-                        param = names[i++];
+                    while (i < _this.params.length) {
+                        param = _this.params[i++];
                         value = matches[i];
                         if (rules && param in rules && !_this.validateRule(rules[param], value)) {
                             return null;
@@ -5981,6 +6048,35 @@ var wx;
         Router.prototype.reload = function () {
             this.go(this.current().name, this.current().params, { force: true, location: false });
         };
+        Router.prototype.getViewComponent = function (viewName) {
+            var _current = this.current();
+            var result = undefined;
+            if (_current.views != null) {
+                var component = _current.views[viewName];
+                var stateParams = {};
+                if (component != null) {
+                    result = {};
+                    if (typeof component === "object") {
+                        result.component = component.component;
+                        result.params = component.params || {};
+                        result.animations = component.animations;
+                    }
+                    else {
+                        result.component = component;
+                        result.params = {};
+                        result.animations = undefined;
+                    }
+                    var parameterNames = this.getViewParameterNamesFromStateConfig(viewName, result.component);
+                    parameterNames.forEach(function (x) {
+                        if (_current.params.hasOwnProperty(x)) {
+                            stateParams[x] = _current.params[x];
+                        }
+                    });
+                    result.params = wx.extend(stateParams, result.params);
+                }
+            }
+            return result;
+        };
         Router.prototype.registerStateInternal = function (state) {
             var _this = this;
             var parts = state.name.split(this.pathSeparator);
@@ -6126,6 +6222,37 @@ var wx;
                 if (state.onEnter)
                     state.onEnter(this.get(state.name), params);
             }
+        };
+        Router.prototype.getViewParameterNamesFromStateConfig = function (view, component) {
+            var hierarchy = this.getStateHierarchy(this.current().name);
+            var stateParams = {};
+            var result = [];
+            var config;
+            var index = -1;
+            for (var i = hierarchy.length; i--; i >= 0) {
+                config = hierarchy[i];
+                if (config.views && config.views[view]) {
+                    var other = config.views[view];
+                    if (typeof other === "object") {
+                        other = other.component;
+                    }
+                    if (other === component) {
+                        index = i;
+                    }
+                }
+            }
+            if (index !== -1) {
+                config = hierarchy[index];
+                hierarchy = hierarchy.slice(0, index + 1);
+                hierarchy.forEach(function (state) {
+                    if (state.params != null) {
+                        wx.extend(state.params, stateParams);
+                    }
+                });
+                result = Object.keys(stateParams);
+                result = result.concat(config.route.params);
+            }
+            return result;
         };
         return Router;
     })();

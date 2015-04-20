@@ -270,6 +270,7 @@ declare module wx {
         stringify(params?: Object): string;
         concat(route: IRoute): IRoute;
         isAbsolute: boolean;
+        params: Array<string>;
     }
     interface IViewAnimationDescriptor {
         enter?: string | IAnimation;
@@ -303,6 +304,11 @@ declare module wx {
         onEnter?: (config: IRouterStateConfig, params?: any) => void;
         onLeave?: (config: IRouterStateConfig, params?: any) => void;
     }
+    interface IViewConfig {
+        component: string;
+        params?: any;
+        animations?: IViewAnimationDescriptor;
+    }
     const enum RouterLocationChangeMode {
         add = 1,
         replace = 2,
@@ -332,6 +338,7 @@ declare module wx {
         is(state: string, params?: any, options?: any): any;
         includes(state: string, params?: any, options?: any): any;
         reset(): void;
+        getViewComponent(viewName: string): IViewConfig;
     }
     interface IMessageBus {
         registerScheduler(scheduler: Rx.IScheduler, contract: string): void;
@@ -344,6 +351,9 @@ declare module wx {
 declare module Rx {
     interface Observable<T> extends IObservable<T> {
         toProperty(initialValue?: T): wx.IObservableProperty<T>;
+        continueWith(action: () => void): Observable<any>;
+        continueWith<TResult>(action: (T) => TResult): Observable<TResult>;
+        continueWith<TOther>(obs: Rx.Observable<TOther>): Observable<TOther>;
     }
     interface ObservableStatic {
         startDeferred<T>(action: () => T): Rx.Observable<T>;
@@ -660,7 +670,12 @@ declare module wx {
     }
 }
 declare module wx {
-    function animation(prepareTransitionClass: string, startTransitionClass: string): IAnimation;
+    interface IAnimationCssClassInstruction {
+        css: string;
+        add: boolean;
+        remove: boolean;
+    }
+    function animation(prepareTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>, startTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>, completeTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>): IAnimation;
     function animation(run: (element: HTMLElement, params?: any) => Rx.Observable<any>, prepare?: (element: HTMLElement, params?: any) => void, complete?: (element: HTMLElement, params?: any) => void): IAnimation;
 }
 declare module wx {

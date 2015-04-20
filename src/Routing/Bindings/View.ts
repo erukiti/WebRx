@@ -59,7 +59,7 @@ module wx {
                             currentConfig = config;
                         }
                     } else {
-                        cleanup.add(this.applyTemplate(null, null, currentConfig.animations, el, ctx, module || app).subscribe());
+                        cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module || app).subscribe());
 
                         currentConfig = <any> {};
                     }
