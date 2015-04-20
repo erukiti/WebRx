@@ -71,10 +71,11 @@ module wx {
                             }
 
                             // build filtered-state params
-                            var parameterNames = this.router.getViewParameterNamesFromConfig(viewName, componentName);
                             stateParams = {};
 
                             if (newState.params != null) {
+                                var parameterNames = this.router.getViewParameterNamesFromConfig(viewName, componentName);
+
                                 parameterNames.forEach(x => {
                                     if (newState.params.hasOwnProperty(x)) {
                                         stateParams[x] = newState.params[x];
