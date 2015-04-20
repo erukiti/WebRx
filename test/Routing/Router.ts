@@ -470,5 +470,71 @@ describe('Routing',() => {
             wx.router.go("bar");
             expect(fooLeft).toBeTruthy();
         });
+
+        it('getViewComponent() only returns params present at the state that introduced the view into the hierarchy',() => {
+            wx.router.state({
+                name: "foo",
+                route: "foo/:fooId",
+                params: { baz: 3 },
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bar",
+                route: "bar/:barId",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.baz",
+                route: "bar/:barId",
+                views: {
+                    'main': {
+                        component: "foo",
+                        animations: {
+                            leave: "leave",
+                            enter: "enter "
+                        }
+                    }
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bad",
+                route: "bar/:barId",
+                views: {
+                    'details': "bar"
+                }
+            });
+
+
+            wx.router.go("foo", { fooId: 3 }, { location: true });
+            var config = wx.router.getViewComponent("main");
+            expect(config.component).toEqual("foo");
+            expect(Object.keys(config.params)).toEqual(["baz", "fooId"]);
+
+            // test using derived state that uncessearily includes the 'main' view
+            wx.router.go("foo.bar", { fooId: 3, barId: 5 }, { location: true });
+            config = wx.router.getViewComponent("main");
+            expect(config.component).toEqual("foo");
+            expect(Object.keys(config.params)).toEqual(["baz", "fooId"]);
+
+            // test using derived state inherits the 'main' view from state "foo"
+            wx.router.go("foo.bad", { fooId: 3, barId: 5 }, { location: true });
+            config = wx.router.getViewComponent("main");
+            expect(config.component).toEqual("foo");
+            expect(Object.keys(config.params)).toEqual(["baz", "fooId"]);
+
+            // views configured using object rather than string
+            wx.router.go("foo.baz", { fooId: 3, barId: 5 }, { location: true });
+            config = wx.router.getViewComponent("main");
+            expect(config.component).toEqual("foo");
+            expect(Object.keys(config.params)).toEqual(["baz", "fooId"]);
+            expect(config.animations).toBeDefined();
+        });
     });
 });
