@@ -9,7 +9,7 @@ module wx {
     "use strict";
 
     /**
-    * ReactiveUI's awesome ReactiveList ported to Typescript (including tests)
+    * ReactiveUI's awesome ReactiveList ported to Typescript
     * @class
     */
     class ObservableList<T> implements IObservableList<T>, IUnknown, Rx.IDisposable {
