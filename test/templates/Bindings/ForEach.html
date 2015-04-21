@@ -26,3 +26,32 @@
     <span class="part2" data-bind="text: bar">invalid</span>
     <span class="part3" data-bind="text: $index">invalid</span>
 </div>
+
+<div id="foreach-array-animated" data-bind="foreach: { data: src, itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span data-bind="text: $data">invalid</span>
+</div>
+<div id="foreach-array-with-index-animated" data-bind="foreach: { data: src, itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span data-bind="text: $index">invalid</span>
+</div>
+<div id="foreach-array-inline-animated" data-bind="foreach: { data: [1, 5, 7], itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span data-bind="text: $data">invalid</span>
+</div>
+<div id="foreach-list-scalar-animated" data-bind="foreach: { data: src, itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span data-bind="text: $data">invalid</span>
+</div>
+<div id="foreach-list-model-animated" data-bind="foreach: { data: src, itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span class="part1" data-bind="text: foo">invalid</span>
+    <span class="part2" data-bind="text: bar">invalid</span>
+    <span class="part3" data-bind="text: (4 + 6) / 2">invalid</span>
+</div>
+<div id="foreach-list-model-with-index-animated" data-bind="foreach: { data: src, itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span class="part1" data-bind="text: foo">invalid</span>
+    <span class="part2" data-bind="text: bar">invalid</span>
+    <span class="part3" data-bind="text: $index">invalid</span>
+    <span class="part4" data-bind="text: 'foo' + $index">invalid</span>
+</div>
+<div id="foreach-list-model-with-index-and-hooks-animated" data-bind="foreach: { data: src, hooks: hooks, debug: { setProxyFunc: setProxyFunc }, itemEnter: 'dummyEnter', itemLeave: 'dummyLeave' }">
+    <span class="part1" data-bind="text: foo">invalid</span>
+    <span class="part2" data-bind="text: bar">invalid</span>
+    <span class="part3" data-bind="text: $index">invalid</span>
+</div>

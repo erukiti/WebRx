@@ -61,3 +61,4 @@ jasmine.getEnv().addReporter(new jasmine.JSReporter2());
       return !item.passed;
    }
 })();
+

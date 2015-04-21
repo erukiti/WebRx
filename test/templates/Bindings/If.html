@@ -4,3 +4,10 @@
 <div id="if-observable-boolean" data-bind="if: $data"><span>foo</span></div>
 <div id="if-observable-boolean-dynamic" data-bind="if: $data"><span data-bind="text: 'foo'">bar</span></div>
 <div id="if-observable-boolean-command" data-bind="if: show"><button data-bind="command: cmd">Click me</button></div>
+
+<div id="if-constant-boolean-true-animated" data-bind="if: { condition: true, enter: 'dummyEnter', leave: 'dummyLeave' }"><span>foo</span></div>
+<div id="if-constant-boolean-false-animated" data-bind="if: { condition: false, enter: 'dummyEnter', leave: 'dummyLeave' }"><span>foo</span></div>
+<div id="if-observable-boolean-property-animated" data-bind="if: { condition: $data, enter: 'dummyEnter', leave: 'dummyLeave' }"><span>foo</span></div>
+<div id="if-observable-boolean-animated" data-bind="if: { condition: $data, enter: 'dummyEnter', leave: 'dummyLeave' }"><span>foo</span></div>
+<div id="if-observable-boolean-dynamic-animated" data-bind="if: { condition: $data, enter: 'dummyEnter', leave: 'dummyLeave' }"><span data-bind="text: 'foo'">bar</span></div>
+<div id="if-observable-boolean-command-animated" data-bind="if: { condition: show, enter: 'dummyEnter', leave: 'dummyLeave' }"><button data-bind="command: cmd">Click me</button></div>

@@ -254,6 +254,14 @@ module testutils {
             throw new Error("Browser doesn't support triggering events");
         }
     }
+
+    export function ensureDummyAnimations() {
+        // dummy animations
+        if (!wx.app.animation("dummyEnter")) {
+            wx.app.animation("dummyEnter", wx.animation((nodes, params) => Rx.Observable.return<any>(undefined)));
+            wx.app.animation("dummyLeave", wx.animation((nodes, params) => Rx.Observable.return<any>(undefined)));
+        }
+    }
 }
 
 createMockHistory = testutils.createHistory;
