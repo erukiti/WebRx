@@ -5,14 +5,14 @@
 /// <reference path="../Core/RefCountDisposeWrapper.ts" />
 /// <reference path="../RxJsExtensions.ts" />
 
-module wx {
+module wx.internal {
     "use strict";
 
     /**
     * ReactiveUI's awesome ReactiveList ported to Typescript
     * @class
     */
-    class ObservableList<T> implements IObservableList<T>, IUnknown, Rx.IDisposable {
+    export class ObservableList<T> implements IObservableList<T>, IUnknown, Rx.IDisposable {
         constructor(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
             this.setupRx(initialContents, resetChangeThreshold, scheduler);
         }
@@ -390,6 +390,32 @@ module wx {
             return this.inner[index];
         }
 
+        public set(index: number, item: T): void {
+            if (!this.areChangeNotificationsEnabled()) {
+
+                if (this.changeTrackingEnabled) {
+                    this.removeItemFromPropertyTracking(this.inner[index]);
+                    this.addItemToPropertyTracking(item);
+                }
+
+                this.inner[index] = item;
+                return;
+            }
+
+            if (this.beforeItemReplacedSubject.isValueCreated)
+                this.beforeItemReplacedSubject.value.onNext({ from: index, items: [item] });
+
+            if (this.changeTrackingEnabled) {
+                this.removeItemFromPropertyTracking(this.inner[index]);
+                this.addItemToPropertyTracking(item);
+            }
+
+            this.inner[index] = item;
+
+            if (this.itemReplacedSubject.isValueCreated)
+                this.itemReplacedSubject.value.onNext({ from: index, items: [item] });
+        }
+
         public isEmpty: IObservableProperty<boolean>;
 
         public listChanging: Rx.Observable<boolean>;
@@ -431,7 +457,7 @@ module wx {
         ////////////////////
         // Implementation
 
-        private inner: Array<T>;
+        protected inner: Array<T>;
         private beforeItemsAddedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
         private itemsAddedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
         private beforeItemsRemovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
@@ -519,7 +545,7 @@ module wx {
             return this.changeNotificationsSuppressed === 0;
         }
 
-        private insertItem(index: number, item: T): void {
+        protected insertItem(index: number, item: T): void {
             if (!this.areChangeNotificationsEnabled()) {
                 this.inner.splice(index, 0, item);
 
@@ -585,32 +611,6 @@ module wx {
 
             if (this.itemsMovedSubject.isValueCreated)
                 this.itemsMovedSubject.value.onNext(mi);
-        }
-
-        public set(index: number, item: T): void {
-            if (!this.areChangeNotificationsEnabled()) {
-
-                if (this.changeTrackingEnabled) {
-                    this.removeItemFromPropertyTracking(this.inner[index]);
-                    this.addItemToPropertyTracking(item);
-                }
-
-                this.inner[index] = item;
-                return;
-            }
-
-            if (this.beforeItemReplacedSubject.isValueCreated)
-                this.beforeItemReplacedSubject.value.onNext({ from: index, items: [item]});
-
-            if (this.changeTrackingEnabled) {
-                this.removeItemFromPropertyTracking(this.inner[index]);
-                this.addItemToPropertyTracking(item);
-            }
-
-            this.inner[index] = item;
-
-            if (this.itemReplacedSubject.isValueCreated)
-                this.itemReplacedSubject.value.onNext({ from: index, items: [item] });
         }
 
         private clearItems(): void {
@@ -694,9 +694,11 @@ module wx {
         }
     }
 
-    export module internal {
-        export var listConstructor = <any> ObservableList;
-    }
+    export var listConstructor = <any> ObservableList;
+}
+
+module wx {
+    "use strict";
 
     /**
     * Creates a new observable list with optional default contents
@@ -704,6 +706,6 @@ module wx {
     * @param {number = 0.3} resetChangeThreshold
     */
     export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null): IObservableList<T> {
-        return new ObservableList<T>(initialContents, resetChangeThreshold, scheduler);
+        return new internal.ObservableList<T>(initialContents, resetChangeThreshold, scheduler);
     }
 }

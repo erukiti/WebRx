@@ -62,8 +62,7 @@ module wx {
         if (target == null)
             return false;
 
-        return target instanceof internal.listConstructor ||
-            queryInterface(target, IID.IObservableList);    // really??
+        return target instanceof internal.listConstructor;
     }
 
     /**
@@ -227,6 +226,9 @@ module wx {
     * @param {any} o
     */
     export function getOid(o: any): string {
+        if (o == null)
+            return undefined;
+
         if (isPrimitive(o))
             return (typeof o + ":" + o);
 

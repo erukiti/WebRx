@@ -114,75 +114,75 @@ module wx {
         /**
         * This Observable fires before the list is changing, regardless of reason
         **/
-        listChanging: Rx.Observable<boolean>; //  { get; }
+        listChanging: Rx.Observable<boolean>;
 
         /**
         * This Observable fires after list has changed, regardless of reason
         **/
-        listChanged: Rx.Observable<boolean>; //  { get; }
+        listChanged: Rx.Observable<boolean>;
 
         /**
         * Fires when items are added to the list, once per item added.
         * Functions that add multiple items such addRange should fire this
         * multiple times. The object provided is the item that was added.
         **/
-        itemsAdded: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        itemsAdded: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires before an item is going to be added to the list.
         **/
-        beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires once an item has been removed from a list, providing the
         * item that was removed.
         **/
-        itemsRemoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        itemsRemoved: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires before an item will be removed from a list, providing
         * the item that will be removed.
         **/
-        beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires before an items moves from one position in the list to
         * another, providing the item(s) to be moved as well as source and destination
         * indices.
         **/
-        beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires once one or more items moves from one position in the list to
         * another, providing the item(s) that was moved as well as source and destination
         * indices.
         **/
-        itemsMoved: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        itemsMoved: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires before an item is replaced indices.
         **/
-        beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires after an item is replaced
         **/
-        itemReplaced: Rx.Observable<IListChangeInfo<T>>; //  { get; }
+        itemReplaced: Rx.Observable<IListChangeInfo<T>>;
 
         /**
         * Fires when the list length changes, regardless of reason
         **/
-        lengthChanging: Rx.Observable<number>; //  { get; }
+        lengthChanging: Rx.Observable<number>;
 
         /**
         * Fires when the list length changes, regardless of reason
         **/
-        lengthChanged: Rx.Observable<number>; //  { get; }
+        lengthChanged: Rx.Observable<number>;
 
         /**
         * Fires when the empty state changes, regardless of reason
         **/
-        isEmptyChanged: Rx.Observable<boolean>; //  { get; }
+        isEmptyChanged: Rx.Observable<boolean>;
 
         /**
         * This Observable is fired when a shouldReset fires on the list. This
@@ -192,7 +192,7 @@ module wx {
         * This does *not* mean Clear, and if you interpret it as such, you are
         * Doing It Wrong.
         **/
-        shouldReset: Rx.Observable<any>; //  { get; }
+        shouldReset: Rx.Observable<any>;
 
         /**
         * Suppresses change notification from the list until the disposable returned by this method is disposed
@@ -207,6 +207,7 @@ module wx {
     export interface IObservableReadOnlyList<T> extends INotifyListChanged<T>, INotifyListItemChanged {
         length: IObservableProperty<number>;
         get(index: number): T;
+        isReadOnly: boolean;
     }
 
     /**
@@ -218,7 +219,6 @@ module wx {
     export interface IObservableList<T> extends IObservableReadOnlyList<T> {
         isEmpty: IObservableProperty<boolean>;
         set(index: number, item: T);
-        isReadOnly: boolean;
 
         add(item: T): void;
         push(item: T): void;
