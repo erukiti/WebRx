@@ -5,7 +5,7 @@
   "homepage": "http://webrxjs.org",
   "repository": {
     "type": "git",
-    "url": "git://github.com/oliverw/WebRx.git"
+    "url": "git://github.com/WebRxJs/WebRx.git"
   },
   "authors": [
     "Oliver Weichhold <oliver@weichhold.com>"
