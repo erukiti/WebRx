@@ -208,6 +208,7 @@ module wx {
         length: IObservableProperty<number>;
         get(index: number): T;
         isReadOnly: boolean;
+        toArray(): Array<T>;
 
         /**
         * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
@@ -243,7 +244,6 @@ module wx {
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
         reset(): void;
-        toArray(): Array<T>;
 
         sort(comparison: (a: T, b: T) => number): void;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;

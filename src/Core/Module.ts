@@ -42,7 +42,7 @@ module wx {
             return this.components[name] != null;
         }
 
-        public loadComponent(name: string, params?: Object): Rx.Observable<IComponent>{
+        public loadComponent(name: string, params?: Object): Rx.Observable<IComponent> {
             return this.initializeComponent(this.instantiateComponent(name), params);
         }
 
@@ -51,7 +51,6 @@ module wx {
         public binding(names: string[], handler: IBindingHandler): IBindingRegistry;
         public binding(names: string[], handler: string): IBindingRegistry;
         public binding(name: string): IBindingHandler;
-
         public binding() {
             var args = args2Array(arguments);
             var name = args.shift();
@@ -84,7 +83,6 @@ module wx {
 
         public filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
         public filter(name: string): IExpressionFilter;
-
         public filter() {
             var args = args2Array(arguments);
             var name = args.shift();
@@ -116,7 +114,6 @@ module wx {
 
         public animation(name: string, animation: IAnimation): IAnimationRegistry;
         public animation(name: string): IAnimation;
-
         public animation() {
             var args = args2Array(arguments);
             var name = args.shift();
@@ -172,44 +169,44 @@ module wx {
                 result = Rx.Observable.return<IComponentDescriptorEx>(undefined);
             }
 
-            return result.do(x=> this.components[name].instance = x);   // cache instantiated component
+            return result.do(x => this.components[name].instance = x); // cache instantiated component
         }
 
         private initializeComponent(obs: Rx.Observable<IComponentDescriptorEx>, params?: Object): Rx.Observable<IComponent> {
             return obs.take(1).selectMany(component => {
-                if (component == null) {
-                    return Rx.Observable.return<IComponent>(undefined);
-                }
+                    if (component == null) {
+                        return Rx.Observable.return<IComponent>(undefined);
+                    }
 
-                if (component.viewModel) {
-                    // component with view-model & template
-                    return Rx.Observable.combineLatest(
-                        this.loadComponentTemplate(component.template, params),
-                        this.loadComponentViewModel(component.viewModel, params),
-                        (t, vm) => {
-                            // if view-model factory yields a function, use it as constructor
-                            if (isFunction(vm)) {
-                                vm = new vm(params);
-                            }
+                    if (component.viewModel) {
+                        // component with view-model & template
+                        return Rx.Observable.combineLatest(
+                            this.loadComponentTemplate(component.template, params),
+                            this.loadComponentViewModel(component.viewModel, params),
+                            (t, vm) => {
+                                // if view-model factory yields a function, use it as constructor
+                                if (isFunction(vm)) {
+                                    vm = new vm(params);
+                                }
 
-                            return <IComponent> {
-                                template: t,
-                                viewModel: vm,
-                                preBindingInit: component.preBindingInit,
-                                postBindingInit: component.postBindingInit
-                            }
+                                return <IComponent> {
+                                    template: t,
+                                    viewModel: vm,
+                                    preBindingInit: component.preBindingInit,
+                                    postBindingInit: component.postBindingInit
+                                }
+                            });
+                    }
+
+                    // template-only component
+                    return this.loadComponentTemplate(component.template, params)
+                        .select(template => <IComponent> {
+                            template: template,
+                            preBindingInit: component.preBindingInit,
+                            postBindingInit: component.postBindingInit
                         });
-                } 
-
-                // template-only component
-                return this.loadComponentTemplate(component.template, params)
-                    .select(template=> <IComponent> {
-                        template: template,
-                        preBindingInit: component.preBindingInit,
-                        postBindingInit: component.postBindingInit
-                    });
-            })
-            .take(1); 
+                })
+                .take(1);
         }
 
         protected loadComponentTemplate(template: any, params: Object): Rx.Observable<Node[]> {
@@ -239,12 +236,12 @@ module wx {
                     var promise = <Rx.IPromise<Node[]>> <any> options.promise;
                     return Rx.Observable.fromPromise(promise);
                 } else if (options.require) {
-                    return observableRequire<string>(options.require).select(x=> app.templateEngine.parse(x));
+                    return observableRequire<string>(options.require).select(x => app.templateEngine.parse(x));
                 } else if (options.element) {
                     if (typeof options.element === "string") {
                         // try both getElementById & querySelector
                         el = document.getElementById(<string> options.element) ||
-                        document.querySelector(<string> options.element);
+                            document.querySelector(<string> options.element);
 
                         if (el != null) {
                             // only the nodes inside the specified element will be cloned for use as the component’s template
@@ -302,7 +299,7 @@ module wx {
         }
     }
 
-    class App extends Module implements IWebRxApp  {
+    class App extends Module implements IWebRxApp {
         constructor() {
             super("app");
 
@@ -333,7 +330,7 @@ module wx {
         /// </summary>
         public get mainThreadScheduler(): Rx.IScheduler {
             return this._unitTestMainThreadScheduler || this._mainThreadScheduler
-                || Rx.Scheduler.currentThread;  // OW: return a default if schedulers haven't been setup by in
+                || Rx.Scheduler.currentThread; // OW: return a default if schedulers haven't been setup by in
         }
 
         public set mainThreadScheduler(value: Rx.IScheduler) {
@@ -353,7 +350,7 @@ module wx {
             return this._templateEngine;
         }
 
-        public set templateEngine(newVal: ITemplateEngine){
+        public set templateEngine(newVal: ITemplateEngine) {
             this._templateEngine = newVal;
         }
 
@@ -378,19 +375,25 @@ module wx {
             };
 
             Object.defineProperty(result, "length", {
-                get() { return window.history.length; },
+                get() {
+                    return window.history.length;
+                },
                 enumerable: true,
                 configurable: true
             });
 
             Object.defineProperty(result, "state", {
-                get() { return window.history.state; },
+                get() {
+                    return window.history.state;
+                },
                 enumerable: true,
                 configurable: true
             });
 
             Object.defineProperty(result, "location", {
-                get() { return window.location; },
+                get() {
+                    return window.location;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -413,7 +416,7 @@ module wx {
     export var app: IWebRxApp = new App();
 
     var modules: { [name: string]: Array<any>|IModuleDescriptor } = {
-        'app': <IModuleDescriptor> <any> { instance: app }    // auto-register 'app' module
+        'app': <IModuleDescriptor> <any> { instance: app } // auto-register 'app' module
     };
 
     /**
@@ -424,54 +427,54 @@ module wx {
     export function module(name: string, descriptor: Array<any>|IModuleDescriptor) {
         modules[name] = <IModuleDescriptor> descriptor;
         return wx;
-   }
+    }
 
-   /**
+    /**
    * Instantiate a new module instance and configure it using the user supplied configuration
    * @param {string} name The module name
    * @return {IModule} The module handle
    */
-   export function loadModule(name: string): Rx.Observable<IModule> {
-       var md: Array<any>|IModuleDescriptor = modules[name];
-       var result: Rx.Observable<IModule> = undefined;
-       var module: IModule;
+    export function loadModule(name: string): Rx.Observable<IModule> {
+        var md: Array<any>|IModuleDescriptor = modules[name];
+        var result: Rx.Observable<IModule> = undefined;
+        var module: IModule;
 
-       if (md != null) {
-           if (Array.isArray(md)) {
-               // assumed to be inline-annotated-array
-               // resolve the configuration function via DI and invoke it with the module instance as argument
-               module = new Module(name);
-               injector.resolve<IModule>(<Array<any>> md, module);
-               result = Rx.Observable.return(module);
-           } else if (isFunction(md)) {
-               // configuration function
-               module = new Module(name);
-               (<any> md)(module);
-               result = Rx.Observable.return(module);
-           } else {
-               var mdd = <IModuleDescriptor> md;
+        if (md != null) {
+            if (Array.isArray(md)) {
+                // assumed to be inline-annotated-array
+                // resolve the configuration function via DI and invoke it with the module instance as argument
+                module = new Module(name);
+                injector.resolve<IModule>(<Array<any>> md, module);
+                result = Rx.Observable.return(module);
+            } else if (isFunction(md)) {
+                // configuration function
+                module = new Module(name);
+                (<any> md)(module);
+                result = Rx.Observable.return(module);
+            } else {
+                var mdd = <IModuleDescriptor> md;
 
-               if (mdd.instance) {
-                   result = Rx.Observable.return<IModule>(mdd.instance);
-               } else {
-                   module = new Module(name);
+                if (mdd.instance) {
+                    result = Rx.Observable.return<IModule>(mdd.instance);
+                } else {
+                    module = new Module(name);
 
-                   if (mdd.resolve) {
-                       // resolve the configuration function via DI and invoke it with the module instance as argument
-                       injector.get<IModule>(mdd.resolve, module);
-                       result = Rx.Observable.return<IModule>(module);
-                   } else if (mdd.require) {
-                       // load the configuration function from external module and invoke it with the module instance as argument
-                       result = observableRequire<{ (any): any }>(mdd.require)
-                           .do(x=> x(module))  // configure the module
-                           .select(x=> module);
-                   }
-               }
-           }
-       } else {
-           result = Rx.Observable.return<IModule>(undefined);
-       }
+                    if (mdd.resolve) {
+                        // resolve the configuration function via DI and invoke it with the module instance as argument
+                        injector.get<IModule>(mdd.resolve, module);
+                        result = Rx.Observable.return<IModule>(module);
+                    } else if (mdd.require) {
+                        // load the configuration function from external module and invoke it with the module instance as argument
+                        result = observableRequire<{ (any): any }>(mdd.require)
+                            .do(x => x(module)) // configure the module
+                            .select(x => module);
+                    }
+                }
+            }
+        } else {
+            result = Rx.Observable.return<IModule>(undefined);
+        }
 
-       return result.take(1).do(x=> modules[name] = <IModuleDescriptor> <any> { instance: x });   // cache instantiated module
-  }
+        return result.take(1).do(x => modules[name] = <IModuleDescriptor> <any> { instance: x }); // cache instantiated module
+    }
 }

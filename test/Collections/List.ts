@@ -402,4 +402,417 @@ describe("Observable List", () => {
     });
 });
 
+describe("Projected Observable List", () => {
+    var stringOrderer = (a, b) => {
+        if (a.toString() < b.toString()) return -1;
+        if (a.toString() > b.toString()) return 1;
+        return 0;
+    }
 
+    var stringOrdererAsc = (a, b) => {
+        if (a != null && b != null)
+            return b.localeCompare(a);
+
+        return 0;
+    }
+
+    var numberOrderer = (a, b) => {
+        return a - b;
+    }
+
+
+    it("DerivedCollectionsShouldFollowBaseCollection", () => {
+        var input = ["Foo", "Bar", "Baz", "Bamf"];
+        var fixture = wx.list<TestFixture>(input.map(x => {
+            var tf = new TestFixture();
+            tf.IsOnlyOneWord(x);
+            return tf;
+        }));
+
+        var output = fixture.project(undefined, undefined, (x) => x.IsOnlyOneWord());
+
+        expect(input).toEqual(output.toArray());
+
+        var tf = new TestFixture();
+        tf.IsOnlyOneWord("Hello");
+        fixture.add(tf);
+        expect(5).toEqual(output.length());
+        expect("Hello").toEqual(output.get(4));
+
+        fixture.removeAt(4);
+        expect(4).toEqual(output.length());
+
+        tf = new TestFixture();
+        tf.IsOnlyOneWord("Goodbye");
+
+        fixture.set(1, tf);
+        expect(4).toEqual(output.length());
+        expect("Goodbye").toEqual(output.get(1));
+
+        fixture.clear();
+        expect(0).toEqual(output.length());
+    });
+
+
+    it("DerivedCollectionsShouldBeFiltered", () => {
+        var input = ["Foo", "Bar", "Baz", "Bamf"];
+        var fixture = wx.list<TestFixture>(input.map(x => {
+            var tf = new TestFixture();
+            tf.IsOnlyOneWord(x);
+            return tf;
+        }));
+        var itemsAdded = new Array<TestFixture>();
+        var itemsRemoved = new Array<TestFixture>();
+
+        var output = fixture.project<TestFixture>(x => x.IsOnlyOneWord()[0] === 'F', stringOrderer, x => x);
+        output.itemsAdded.subscribe((x) => itemsAdded.push(x.items[0]));
+        output.itemsRemoved.subscribe((x) => itemsRemoved.push(x.items[0]));
+
+        expect(1).toEqual(output.length());
+        expect(0).toEqual(itemsAdded.length);
+        expect(0).toEqual(itemsRemoved.length);
+
+        var tf = new TestFixture();
+        tf.IsOnlyOneWord("Boof");
+        fixture.add(tf);
+        expect(1).toEqual(output.length());
+        expect(0).toEqual(itemsAdded.length);
+        expect(0).toEqual(itemsRemoved.length);
+
+        tf = new TestFixture();
+        tf.IsOnlyOneWord("Far");
+        fixture.add(tf);
+        expect(2).toEqual(output.length());
+        expect(1).toEqual(itemsAdded.length);
+        expect(0).toEqual(itemsRemoved.length);
+
+        fixture.removeAt(1); // Remove "Bar"
+        expect(2).toEqual(output.length());
+        expect(1).toEqual(itemsAdded.length);
+        expect(0).toEqual(itemsRemoved.length);
+
+        fixture.removeAt(0); // Remove "Foo"
+        expect(1).toEqual(output.length());
+        expect(1).toEqual(itemsAdded.length);
+        expect(1).toEqual(itemsRemoved.length);
+    });
+
+    it("DerivedCollectionShouldBeSorted", () => {
+        var input = ["Foo", "Bar", "Baz"];
+        var fixture = wx.list<string>(input);
+
+        var output = fixture.project(undefined, stringOrderer, x => x);
+
+        expect(3).toEqual(output.length());
+        expect(Ix.Enumerable.fromArray(["Bar", "Baz", "Foo"]).zip(Ix.Enumerable.fromArray(
+            output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
+
+        fixture.add("Bamf");
+        expect(4).toEqual(output.length());
+        expect(Ix.Enumerable.fromArray(["Bamf", "Bar", "Baz", "Foo"]).zip(Ix.Enumerable.fromArray(
+            output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
+
+        fixture.add("Eoo");
+        expect(5).toEqual(output.length());
+        expect(Ix.Enumerable.fromArray(["Bamf", "Bar", "Baz", "Eoo", "Foo"]).zip(Ix.Enumerable.fromArray(
+            output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
+
+        fixture.add("Roo");
+        expect(6).toEqual(output.length());
+        expect(Ix.Enumerable.fromArray(["Bamf", "Bar", "Baz", "Eoo", "Foo", "Roo"]).zip(Ix.Enumerable.fromArray(
+            output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
+
+        fixture.add("Bar");
+        expect(7).toEqual(output.length());
+        expect(Ix.Enumerable.fromArray(["Bamf", "Bar", "Bar", "Baz", "Eoo", "Foo", "Roo"]).zip(Ix.Enumerable.fromArray(
+            output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
+    });
+
+    it("DerivedCollectionMoveNotificationSmokeTest", () => {
+        var initial = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        var source = wx.list<number>(initial);
+
+        var derived = source.project(undefined, undefined, x => x);
+        var nestedDerived = derived.project();
+        var derivedSorted = source.project(undefined, numberOrderer);
+
+        for (var i = 0; i < initial.length; i++) {
+            for (var j = 0; j < initial.length; j++) {
+                source.move(i, j);
+
+                expect(derived.toArray()).toEqual(source.toArray());
+                expect(nestedDerived.toArray()).toEqual(source.toArray());
+                expect(derivedSorted.toArray()).toEqual(initial);
+            }
+        }
+    });
+
+    it("DerivedCollectionShouldUnderstandNestedMoveSignals", () => {
+        var source = wx.list(["a", "b", "c", "d", "e", "f"]);
+        var derived = source.project(undefined, undefined, x => x);
+        var nested = derived.project(x => x);
+
+        var reverseNested = nested.project(undefined, stringOrdererAsc, x => x);
+        var sortedNested = reverseNested.project(undefined, stringOrderer, x => x);
+
+        source.move(1, 4);
+
+        expect(source.toArray()).toEqual(derived.toArray());
+        expect(source.toArray()).toEqual(nested.toArray());
+        expect(Ix.Enumerable.fromArray(source.toArray()).orderByDescending(x => x).toArray()).toEqual(reverseNested.toArray());
+        expect(Ix.Enumerable.fromArray(source.toArray()).orderBy(x => x).toArray()).toEqual(sortedNested.toArray());
+    });
+    /*
+    it("DerivedCollectionShouldUnderstandMoveEvenWhenSorted", () => {
+        var sanity = ["a", "b", "c", "d", "e", "f"];
+        var source = wx.list(["a", "b", "c", "d", "e", "f"]);
+
+        var derived = source.project(x => x !== "c", stringOrderer, x => x);
+        var sourceNotifications = [];
+
+        source.listChanged.subscribe(x => sourceNotifications.push(x));
+
+        var derivedNotifications = [];
+        derived.listChanged.subscribe(x => derivedNotifications.push(x));
+
+        expect(5).toEqual(derived.length);
+        expect(derived.toArray()).toEqual(["a", "b", "d", "e", "f"]);
+
+        for (var i = 0; i < 50; i++) {
+            var from = Math.random() * source.length();
+            var to;
+
+            do {
+                to = Math.random() * source.length();
+            } while (to === from);
+
+            source.move(from, to);
+
+            var tmp = sanity[from];
+            sanity.splice(from, 1);
+            sanity.splice(to, 0, tmp);
+
+            expect(source.toArray()).toEqual(sanity);
+            expect(derived.toArray()).toEqual(["a", "b", "d", "e", "f"]);
+
+            expect(1).toEqual(sourceNotifications.length);
+            //expect(NotifyCollectionChangedAction.Move).toEqual(sourceNotifications.First().Action);
+
+            expect(derivedNotifications.length).toEqual(0);
+        }
+    });
+    */
+    it("DerivedCollectionShouldUnderstandDummyMoveSignal", () => {
+        var sanity = ["a", "b", "c", "d", "e", "f"];
+        var source = wx.list(["a", "b", "c", "d", "e", "f"]);
+
+        var derived = source.project(undefined, undefined, x => x);
+
+        var sourceNotifications = [];
+        source.listChanged.subscribe(x => sourceNotifications.push(x));
+
+        var derivedNotifications = [];
+        derived.listChanged.subscribe(x => derivedNotifications.push(x));
+
+        source.move(0, 0);
+
+        expect(1).toEqual(sourceNotifications.length);
+        //expect(NotifyCollectionChangedAction.Move).toEqual(sourceNotifications.First().Action);
+
+        expect(0).toEqual(derivedNotifications.length);
+    });
+
+    it("DerivedCollectionShouldNotSignalRedundantMoveSignals", () => {
+        var source = wx.list(["a", "b", "c", "d", "e", "f"]);
+
+        var derived = source.project(x => x == "d" || x == "e");
+
+        var derivedNotifications = [];
+        derived.listChanged.subscribe(x => derivedNotifications.push(x));
+
+        expect("d").toEqual(source.get(3));
+        source.move(3, 0);
+
+        expect(0).toEqual(derivedNotifications.length);
+    });
+
+    it("DerivedCollectionShouldHandleMovesWhenOnlyContainingOneItem", () => {
+        // This test is here to verify a bug in where newPositionForItem would return an incorrect
+        // index for lists only containing a single item (the item to find a new position for)
+
+        var sanity = ["a", "b", "c", "d", "e", "f"];
+        var source = wx.list(["a", "b", "c", "d", "e", "f"]);
+        var derived = source.project(x => x === "d", undefined, x => x);
+
+        expect("d").toEqual(derived.get(0));
+        expect("d").toEqual(source.get(3));
+
+        source.move(3, 0);
+
+        expect("d").toEqual(source.get(0));
+        expect("d").toEqual(derived.get(0));
+    });
+
+    /// <summary>
+    /// This test is a bit contrived and only exists to verify that a particularly gnarly bug doesn't get 
+    /// reintroduced because it's hard to reason about the removal logic in derived collections and it might
+    /// be tempting to try and reorder the shiftIndices operation in there.
+    /// </summary>
+
+    it("DerivedCollectionRemovalRegressionTest", () => {
+        var input = ['A', 'B', 'C', 'D'];
+        var source = wx.list<string>(input);
+
+        // A derived collection that filters away 'A' and 'B'
+        var derived = source.project(x => x >= 'C', undefined, x => x);
+
+        var changeNotifications = [];
+        derived.listChanged.subscribe(x => changeNotifications.push(x));
+
+        expect(0).toEqual(changeNotifications.length);
+        expect(2).toEqual(derived.length());
+        expect(derived.toArray()).toEqual(['C', 'D']);
+
+        // The tricky part here is that 'B' isn't in the derived collection, only 'C' is and this test
+        // will detect if the dervied collection gets tripped up and removes 'C' instead
+        source.removeAll(['B', 'C']);
+
+        expect(1).toEqual(changeNotifications.length);
+        expect(1).toEqual(derived.length());
+        expect(derived.toArray()).toEqual(['D']);
+    });
+
+    it("DerviedCollectionShouldHandleItemsRemoved", () => {
+        var input = ["Foo", "Bar", "Baz", "Bamf"];
+        var disposed = new Array<TestFixture>();
+
+        var fixture = wx.list<TestFixture>(input.map(x => {
+            var tf = new TestFixture();
+            tf.IsOnlyOneWord(x);
+            return tf;
+        }));
+
+        fixture.itemsRemoved.subscribe(x => disposed.push(x.items[0]));
+
+        var output = fixture.project();
+
+        var tf = new TestFixture();
+        tf.IsOnlyOneWord("Hello");
+        fixture.add(tf);
+        expect(5).toEqual(output.length());
+
+        fixture.removeAt(3);
+        expect(4).toEqual(output.length());
+        expect(1).toEqual(disposed.length);
+        expect("Bamf").toEqual(disposed[0].IsOnlyOneWord());
+
+        tf = new TestFixture();
+        tf.IsOnlyOneWord("Goodbye");
+        fixture.set(1, tf);
+        expect(4).toEqual(output.length());
+        expect(1).toEqual(disposed.length);
+    });
+
+    it("addRangeSmokeTest", () => {
+        var fixture = wx.list<string>();
+        var output = fixture.project(undefined, undefined, x => "Prefix" + x);
+
+        fixture.add("Bamf");
+        expect(1).toEqual(fixture.length());
+        expect(1).toEqual(output.length());
+        expect("Bamf").toEqual(fixture.get(0));
+        expect("PrefixBamf").toEqual(output.get(0));
+
+        fixture.addRange(Ix.Enumerable.repeat("Bar", 4).toArray());
+        expect(5).toEqual(fixture.length());
+        expect(5).toEqual(output.length());
+        expect("Bamf").toEqual(fixture.get(0));
+        expect("PrefixBamf").toEqual(output.get(0));
+
+        expect(Ix.Enumerable.fromArray(fixture.toArray()).skip(1).all(x => x === "Bar")).toBeTruthy();
+        expect(Ix.Enumerable.fromArray(output.toArray()).skip(1).all(x => x === "PrefixBar")).toBeTruthy();
+
+        // Trigger the Reset by.adding a ton of items
+        fixture.addRange(Ix.Enumerable.repeat("Bar", 35).toArray());
+        expect(40).toEqual(fixture.length());
+        expect(40).toEqual(output.length());
+        expect("Bamf").toEqual(fixture.get(0));
+        expect("PrefixBamf").toEqual(output.get(0));
+    });
+
+    it("InsertRangeSmokeTest", () => {
+        var fixture = wx.list<string>();
+        var output = fixture.project(undefined, undefined, x => "Prefix" + x);
+
+        fixture.add("Bamf");
+        expect(1).toEqual(fixture.length());
+        expect(1).toEqual(output.length());
+        expect("Bamf").toEqual(fixture.get(0));
+        expect("PrefixBamf").toEqual(output.get(0));
+
+        fixture.insertRange(0, Ix.Enumerable.repeat("Bar", 4).toArray());
+        expect(5).toEqual(fixture.length());
+        expect(5).toEqual(output.length());
+        expect("Bamf").toEqual(fixture.get(4));
+        expect("PrefixBamf").toEqual(output.get(4));
+
+        expect(Ix.Enumerable.fromArray(fixture.toArray()).take(4).all(x => x === "Bar")).toBeTruthy();
+        expect(Ix.Enumerable.fromArray(output.toArray()).take(4).all(x => x === "PrefixBar")).toBeTruthy();
+
+        // Trigger the Reset by.adding a ton of items
+        fixture.insertRange(0, Ix.Enumerable.repeat("Bar", 35).toArray());
+        expect(40).toEqual(fixture.length());
+        expect(40).toEqual(output.length());
+        expect("Bamf").toEqual(fixture.get(39));
+        expect("PrefixBamf").toEqual(output.get(39));
+    });
+
+    it("DerivedCollectionShouldOrderCorrectly", () => {
+        var collection = wx.list<number>();
+        var orderedCollection = collection.project(undefined, numberOrderer, x => x);
+
+        collection.add(1);
+        collection.add(2);
+
+        expect(2).toEqual(orderedCollection.length());
+        expect(1).toEqual(orderedCollection.get(0));
+        expect(2).toEqual(orderedCollection.get(1));
+    });
+
+    it("DerivedCollectionShouldStopFollowingAfterDisposal", () => {
+        var collection = wx.list<number>();
+        var orderedCollection = collection.project(undefined, numberOrderer, x => x.toString());
+
+        collection.add(1);
+        collection.add(2);
+
+        expect(2).toEqual(orderedCollection.length());
+
+        (<Rx.IDisposable> <any> orderedCollection).dispose();
+
+        collection.add(3);
+        expect(2).toEqual(orderedCollection.length());
+    });
+
+    it("DerivedCollectionFilterTest", () => {
+        var models = wx.list<FakeCollectionModel>(Ix.Enumerable.fromArray([0, 1, 2, 3, 4]).select(x => {
+            var fcm = new FakeCollectionModel();
+            fcm.someNumber(x);
+            return fcm;
+        }).toArray());
+
+        models.changeTrackingEnabled = true;
+
+        var viewModels = models.project(x => !x.isHidden(), undefined, x => new FakeCollectionViewModel(x));
+        expect(5).toEqual(viewModels.length());
+
+        models.get(0).isHidden(true);
+        expect(4).toEqual(viewModels.length());
+
+        models.get(4).isHidden(true);
+        expect(3).toEqual(viewModels.length());
+
+        models.get(0).isHidden(false);
+        expect(4).toEqual(viewModels.length());
+    });
+});
