@@ -208,6 +208,15 @@ module wx {
         length: IObservableProperty<number>;
         get(index: number): T;
         isReadOnly: boolean;
+
+        /**
+        * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+        * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+        * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
+        * @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
+        */
+        project<TNew>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
+            selector?: (T) => TNew, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
     }
 
     /**

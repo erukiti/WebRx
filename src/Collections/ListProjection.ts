@@ -13,7 +13,7 @@ module wx.internal {
     * ReactiveUI's awesome derived ReactiveList ported to Typescript
     * @class
     */
-    export class DerivedObservableList<T, TValue> extends internal.ObservableList<TValue> implements IObservableReadOnlyList<TValue> {
+    export class ObservableListProjection<T, TValue> extends internal.ObservableList<TValue> implements IObservableReadOnlyList<TValue> {
         constructor(source: IObservableList<T>, filter?: (item: T) => boolean,
             orderer?: (a: TValue, b: TValue) => number, selector?: (T) => TValue, scheduler?: Rx.IScheduler) {
             super();
@@ -124,133 +124,111 @@ module wx.internal {
         }
 
         private wireUpChangeNotifications() {
-            var length: number;
-
             this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe((e) => {
-                // TODO
+                this.onItemsAdded(e);
             }));
 
             this.disp.add(this.source.itemsRemoved.observeOn(this.scheduler).subscribe((e) => {
-                // TODO
+                this.onItemsRemoved(e);
             }));
 
             this.disp.add(this.source.itemsMoved.observeOn(this.scheduler).subscribe((e) => {
-                // TODO
+                this.onItemsMoved(e);
             }));
 
             this.disp.add(this.source.itemReplaced.observeOn(this.scheduler).subscribe((e) => {
-                // TODO
+                // TODO: Handle Replace
             }));
 
             this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe((e) => {
-                // TODO
+                this.reset();
             }));
 
-            this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribe(this.onItemChanged));
+            this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribeOnNext(this.onItemChanged, this));
         }
 
-/*
-    private onSourceCollectionChanged(NotifyCollectionChangedEventArgs args): void
-    {
-        if (args.Action == NotifyCollectionChangedAction.Reset) {
-            this.reset();
-            return;
-        }
+        private onItemsMoved(e: IListChangeInfo<T>) {
+            if (e.items.length > 1) {
+                internal.throwError("Derived collections doesn't support multi-item moves");
+            }
 
-            if (args.Action == NotifyCollectionChangedAction.Move) {
-
-                // Debug.Assert(args.OldItems.length == args.NewItems.length);
-
-                if (args.OldItems.length > 1 || args.NewItems.length > 1) {
-                    throw new NotSupportedException("Derived collections doesn't support multi-item moves");
-                }
-
-                // Yeah apparently this can happen. ObservableCollection triggers this notification on Move(0,0)
-                if (args.OldStartingIndex == args.NewStartingIndex) {
-                    return;
-                }
-
-                oldSourceIndex: number = args.OldStartingIndex;
-                newSourceIndex: number = args.NewStartingIndex;
-
-                sourceCopy.RemoveAt(oldSourceIndex);
-                sourceCopy.Insert(newSourceIndex,(T)args.NewItems[0]);
-
-                currentDestinationIndex: number = getIndexFromSourceIndex(oldSourceIndex);
-
-                moveSourceIndexInMap(oldSourceIndex, newSourceIndex);
-
-                if (currentDestinationIndex == -1) {
-                    return;
-                }
-
-                value: TValue = super.currentDestinationIndex];
-
-                if (orderer == null) {
-                    // We mirror the order of the source collection so we'll perform the same move operation
-                    // as the source. As is the case with when we have an orderer we don't test whether or not
-                    // the item should be included or not here. If it has been included at some point it'll
-                    // stay included until onItemChanged picks up a change which filters it.
-                    newDestinationIndex: number = newPositionForExistingItem(
-                        indexToSourceIndexMap, newSourceIndex, currentDestinationIndex);
-
-                    if (newDestinationIndex != currentDestinationIndex) {
-                        this.indexToSourceIndexMap.RemoveAt(currentDestinationIndex);
-                        this.indexToSourceIndexMap.Insert(newDestinationIndex, newSourceIndex);
-
-                        super.internalMove(currentDestinationIndex, newDestinationIndex);
-                    } else {
-                        indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
-                    }
-                } else {
-                    // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we 
-                    // receive a Move notification. If it affects ordering it should be picked up by the
-                    // onItemChange and resorted there instead.
-                    indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
-                }
-
+            if (e.from === e.to) {
                 return;
             }
 
-        if (args.OldItems != null) {
+            var oldSourceIndex = e.from;
+            var newSourceIndex = e.to;
 
-            sourceCopy.RemoveRange(args.OldStartingIndex, args.OldItems.length);
+            this.sourceCopy.splice(oldSourceIndex, 1);
+            this.sourceCopy.splice(newSourceIndex,0, e.items[0]);
 
-            for (var i = 0; i < args.OldItems.length; i++) {
-                destinationIndex: number = getIndexFromSourceIndex(args.OldStartingIndex + i);
-                if (destinationIndex != -1) {
-                    internalRemoveAt(destinationIndex);
-                }
+            var currentDestinationIndex = this.getIndexFromSourceIndex(oldSourceIndex);
+
+            this.moveSourceIndexInMap(oldSourceIndex, newSourceIndex);
+
+            if (currentDestinationIndex === -1) {
+                return;
             }
 
-            removedCount: number = args.OldItems.length;
-            shiftIndicesAtOrOverThreshold(args.OldStartingIndex + removedCount, -removedCount);
+            if (this.orderer == null) {
+                // We mirror the order of the source collection so we'll perform the same move operation
+                // as the source. As is the case with when we have an orderer we don't test whether or not
+                // the item should be included or not here. If it has been included at some point it'll
+                // stay included until onItemChanged picks up a change which filters it.
+                var newDestinationIndex = ObservableListProjection.newPositionForExistingItem2(
+                    this.indexToSourceIndexMap, newSourceIndex, currentDestinationIndex);
+
+                if (newDestinationIndex !== currentDestinationIndex) {
+                    this.indexToSourceIndexMap.splice(currentDestinationIndex, 1);
+                    this.indexToSourceIndexMap.splice(newDestinationIndex, 0, newSourceIndex);
+
+                    super.move(currentDestinationIndex, newDestinationIndex);
+                } else {
+                    this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
+                }
+            } else {
+                // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we 
+                // receive a Move notification. If it affects ordering it should be picked up by the
+                // onItemChange and resorted there instead.
+                this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
+            }
         }
 
-        if (args.NewItems != null) {
+        private onItemsAdded(e: IListChangeInfo<T>) {
+            this.shiftIndicesAtOrOverThreshold(e.to, e.items.length);
 
-            shiftIndicesAtOrOverThreshold(args.NewStartingIndex, args.NewItems.length);
+            for (var i = 0; i < e.items.length; i++) {
+                var sourceItem = e.items[i];
+                this.sourceCopy.splice(e.to + i, 0, sourceItem);
 
-            for (var i = 0; i < args.NewItems.length; i++) {
-                var sourceItem = (T)args.NewItems[i];
-                sourceCopy.Insert(args.NewStartingIndex + i, sourceItem);
-
-                if (!filter(sourceItem)) {
+                if (!this._filter(sourceItem)) {
                     continue;
                 }
 
-                var destinationItem = selector(sourceItem);
-                internalInsertAndMap(args.NewStartingIndex + i, destinationItem);
+                var destinationItem = this.selector(sourceItem);
+                this.internalInsertAndMap(e.to + i, destinationItem);
             }
         }
-    }
-*/
+
+        private onItemsRemoved(e: IListChangeInfo<T>) {
+            this.sourceCopy.splice(e.from, e.items.length);
+
+            for (var i = 0; i < e.items.length; i++) {
+                var destinationIndex = this.getIndexFromSourceIndex(e.from + i);
+                if (destinationIndex !== -1) {
+                    this.internalRemoveAt(destinationIndex);
+                }
+            }
+
+            var removedCount = e.items.length;
+            this.shiftIndicesAtOrOverThreshold(e.from + removedCount, -removedCount);
+        }
+
         private onItemChanged(changedItem: T): void {
             var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
             var shouldBeIncluded = this._filter(changedItem);
 
             sourceIndices.forEach((sourceIndex: number) => {
-
                 var currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
                 var isIncluded = currentDestinationIndex >= 0;
 
@@ -407,7 +385,7 @@ module wx.internal {
         }
 
         private addAllItemsFromSourceCollection(): void {
-            // Debug.Assert(sourceCopy.length == 0, "Expceted source copy to be empty");
+            // Debug.Assert(sourceCopy.length == 0, "Expected source copy to be empty");
             var sourceIndex: number = 0;
 
             this.source.forEach(sourceItem => {
@@ -445,12 +423,12 @@ module wx.internal {
         private positionForNewItem(sourceIndex: number, value: TValue): number {
             // If we haven't got an orderer we'll simply match our items to that of the source collection.
             return this.orderer == null
-                ? DerivedObservableList.positionForNewItemArray(<any> this.indexToSourceIndexMap, <any> sourceIndex, DerivedObservableList.defaultOrderer)
-                : DerivedObservableList.positionForNewItemArray2(this.inner, 0, this.inner.length, value, this.orderer);
+                ? ObservableListProjection.positionForNewItemArray(<any> this.indexToSourceIndexMap, <any> sourceIndex, ObservableListProjection.defaultOrderer)
+                : ObservableListProjection.positionForNewItemArray2(this.inner, 0, this.inner.length, value, this.orderer);
         }
 
         private static positionForNewItemArray<T>(array: Array<T>, item: T, orderer: (a: T, b: T) => number): number {
-            return DerivedObservableList.positionForNewItemArray2(array, 0, array.length, item, orderer);
+            return ObservableListProjection.positionForNewItemArray2(array, 0, array.length, item, orderer);
         }
 
         private static positionForNewItemArray2<T>(array: Array<T>, index: number, count: number,
@@ -469,11 +447,11 @@ module wx.internal {
 
             if (orderer(array[index], item) >= 1) return index;
 
-            var low: number = index, hi = index + count - 1;
-            var mid: number, cmp;
+            var low = index, hi = index + count - 1;
+            var cmp;
 
             while (low <= hi) {
-                mid = low + (hi - low) / 2;
+                var mid = low + (hi - low) / 2;
                 cmp = orderer(array[mid], item);
 
                 if (cmp === 0) {
@@ -496,8 +474,8 @@ module wx.internal {
         private newPositionForExistingItem(sourceIndex: number, currentIndex: number, item: TValue): number {
             // If we haven't got an orderer we'll simply match our items to that of the source collection.
             return this.orderer == null
-                ? DerivedObservableList.newPositionForExistingItem2(<any> this.indexToSourceIndexMap, <any> sourceIndex, currentIndex)
-                : DerivedObservableList.newPositionForExistingItem2(this.inner, item, currentIndex, this.orderer);
+                ? ObservableListProjection.newPositionForExistingItem2(<any> this.indexToSourceIndexMap, <any> sourceIndex, currentIndex)
+                : ObservableListProjection.newPositionForExistingItem2(this.inner, item, currentIndex, this.orderer);
         }
 
         /// <summary>
@@ -515,21 +493,21 @@ module wx.internal {
                 return 0;
             }
 
-            var precedingIndex: number = currentIndex - 1;
-            var succeedingIndex: number = currentIndex + 1;
+            var precedingIndex = currentIndex - 1;
+            var succeedingIndex = currentIndex + 1;
 
             // The item on the preceding or succeeding index relative to currentIndex.
             var comparand = array[precedingIndex >= 0 ? precedingIndex : succeedingIndex];
 
             if (orderer == null) {
-                orderer = DerivedObservableList.defaultOrderer;
+                orderer = ObservableListProjection.defaultOrderer;
             }
 
             // Compare that to the (potentially) new value.
-            var cmp: number = orderer(item, comparand);
+            var cmp = orderer(item, comparand);
 
-            var min: number = 0;
-            var max: number = array.length;
+            var min = 0;
+            var max = array.length;
 
             if (cmp === 0) {
                 // The new value is equal to the preceding or succeeding item, it may stay at the current position
@@ -549,28 +527,11 @@ module wx.internal {
                 return currentIndex;
             }
 
-            var ix: number = DerivedObservableList.positionForNewItemArray2(array, min, max - min, item, orderer);
+            var ix = ObservableListProjection.positionForNewItemArray2(array, min, max - min, item, orderer);
 
             // If the item moves 'forward' in the collection we have to account for the index where
             // the item currently resides getting removed first.
             return ix >= currentIndex ? ix - 1 : ix;
         }
-    }
-}
-
-module wx {
-    "use strict";
-
-    /**
-     * Creates a live-projection over an existing list that can be filtered, re-ordered and mapped. 
-     * @param src {IObservableList<T>|Array<T>} The source collection to follow
-     * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
-     * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
-     * @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
-     */
-    export function derivedList<T, TNew, TDontCare>(src: IObservableList<T>, filter?: (item: T) => boolean,
-        orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, signalReset?: Rx.Observable<TDontCare>,
-        scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew> {
-        return new internal.DerivedObservableList<T, TNew>(src, filter, orderer, selector, scheduler);
     }
 }

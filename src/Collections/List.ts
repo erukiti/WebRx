@@ -368,6 +368,11 @@ module wx.internal {
             this.moveItem(oldIndex, newIndex);
         }
 
+        public project<TNew>(filter?: (item: T) => boolean,
+            orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew> {
+            return new internal.ObservableListProjection<T, TNew>(this, filter, orderer, selector, scheduler);
+        }
+
         public suppressChangeNotifications(): Rx.IDisposable {
             this.changeNotificationsSuppressed++;
 
