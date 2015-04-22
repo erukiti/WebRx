@@ -421,7 +421,7 @@ describe("Projected Observable List", () => {
     }
 
 
-    it("DerivedCollectionsShouldFollowBaseCollection", () => {
+    it("derived collections should follow base collection", () => {
         var input = ["Foo", "Bar", "Baz", "Bamf"];
         var fixture = wx.list<TestFixture>(input.map(x => {
             var tf = new TestFixture();
@@ -454,7 +454,7 @@ describe("Projected Observable List", () => {
     });
 
 
-    it("DerivedCollectionsShouldBeFiltered", () => {
+    it("derived collections should be filtered", () => {
         var input = ["Foo", "Bar", "Baz", "Bamf"];
         var fixture = wx.list<TestFixture>(input.map(x => {
             var tf = new TestFixture();
@@ -497,7 +497,7 @@ describe("Projected Observable List", () => {
         expect(1).toEqual(itemsRemoved.length);
     });
 
-    it("DerivedCollectionShouldBeSorted", () => {
+    it("derived collection should be sorted", () => {
         var input = ["Foo", "Bar", "Baz"];
         var fixture = wx.list<string>(input);
 
@@ -528,7 +528,7 @@ describe("Projected Observable List", () => {
             output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
     });
 
-    it("DerivedCollectionMoveNotificationSmokeTest", () => {
+    it("derived collections move notification smoke-test", () => {
         var initial = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         var source = wx.list<number>(initial);
 
@@ -547,7 +547,7 @@ describe("Projected Observable List", () => {
         }
     });
 
-    it("DerivedCollectionShouldUnderstandNestedMoveSignals", () => {
+    it("derived collection should understand nested move signals", () => {
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
         var derived = source.project(undefined, undefined, x => x);
         var nested = derived.project(x => x);
@@ -562,8 +562,8 @@ describe("Projected Observable List", () => {
         expect(Ix.Enumerable.fromArray(source.toArray()).orderByDescending(x => x).toArray()).toEqual(reverseNested.toArray());
         expect(Ix.Enumerable.fromArray(source.toArray()).orderBy(x => x).toArray()).toEqual(sortedNested.toArray());
     });
-    /*
-    it("DerivedCollectionShouldUnderstandMoveEvenWhenSorted", () => {
+    
+    it("derived collection should understand move even when sorted", () => {
         var sanity = ["a", "b", "c", "d", "e", "f"];
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
 
@@ -575,7 +575,7 @@ describe("Projected Observable List", () => {
         var derivedNotifications = [];
         derived.listChanged.subscribe(x => derivedNotifications.push(x));
 
-        expect(5).toEqual(derived.length);
+        expect(5).toEqual(derived.length());
         expect(derived.toArray()).toEqual(["a", "b", "d", "e", "f"]);
 
         for (var i = 0; i < 50; i++) {
@@ -599,10 +599,12 @@ describe("Projected Observable List", () => {
             //expect(NotifyCollectionChangedAction.Move).toEqual(sourceNotifications.First().Action);
 
             expect(derivedNotifications.length).toEqual(0);
+
+            sourceNotifications = [];
         }
     });
-    */
-    it("DerivedCollectionShouldUnderstandDummyMoveSignal", () => {
+    
+    it("derived collection should understand dummy move signal", () => {
         var sanity = ["a", "b", "c", "d", "e", "f"];
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
 
@@ -622,7 +624,7 @@ describe("Projected Observable List", () => {
         expect(0).toEqual(derivedNotifications.length);
     });
 
-    it("DerivedCollectionShouldNotSignalRedundantMoveSignals", () => {
+    it("derived collection should not signal redundant move signals", () => {
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
 
         var derived = source.project(x => x == "d" || x == "e");
@@ -636,7 +638,7 @@ describe("Projected Observable List", () => {
         expect(0).toEqual(derivedNotifications.length);
     });
 
-    it("DerivedCollectionShouldHandleMovesWhenOnlyContainingOneItem", () => {
+    it("derived collection should handle moves when only containing one item", () => {
         // This test is here to verify a bug in where newPositionForItem would return an incorrect
         // index for lists only containing a single item (the item to find a new position for)
 
@@ -659,7 +661,7 @@ describe("Projected Observable List", () => {
     /// be tempting to try and reorder the shiftIndices operation in there.
     /// </summary>
 
-    it("DerivedCollectionRemovalRegressionTest", () => {
+    it("derived collections removal regression-test", () => {
         var input = ['A', 'B', 'C', 'D'];
         var source = wx.list<string>(input);
 
@@ -682,7 +684,7 @@ describe("Projected Observable List", () => {
         expect(derived.toArray()).toEqual(['D']);
     });
 
-    it("DerviedCollectionShouldHandleItemsRemoved", () => {
+    it("derrived collection should handle items removed", () => {
         var input = ["Foo", "Bar", "Baz", "Bamf"];
         var disposed = new Array<TestFixture>();
 
@@ -713,7 +715,7 @@ describe("Projected Observable List", () => {
         expect(1).toEqual(disposed.length);
     });
 
-    it("addRangeSmokeTest", () => {
+    it("addRange smoke-test", () => {
         var fixture = wx.list<string>();
         var output = fixture.project(undefined, undefined, x => "Prefix" + x);
 
@@ -740,7 +742,7 @@ describe("Projected Observable List", () => {
         expect("PrefixBamf").toEqual(output.get(0));
     });
 
-    it("InsertRangeSmokeTest", () => {
+    it("insertRange smoke-test", () => {
         var fixture = wx.list<string>();
         var output = fixture.project(undefined, undefined, x => "Prefix" + x);
 
@@ -767,7 +769,7 @@ describe("Projected Observable List", () => {
         expect("PrefixBamf").toEqual(output.get(39));
     });
 
-    it("DerivedCollectionShouldOrderCorrectly", () => {
+    it("derived collection should order correctly", () => {
         var collection = wx.list<number>();
         var orderedCollection = collection.project(undefined, numberOrderer, x => x);
 
@@ -779,7 +781,7 @@ describe("Projected Observable List", () => {
         expect(2).toEqual(orderedCollection.get(1));
     });
 
-    it("DerivedCollectionShouldStopFollowingAfterDisposal", () => {
+    it("derived collection should stop following after disposal", () => {
         var collection = wx.list<number>();
         var orderedCollection = collection.project(undefined, numberOrderer, x => x.toString());
 
@@ -794,7 +796,7 @@ describe("Projected Observable List", () => {
         expect(2).toEqual(orderedCollection.length());
     });
 
-    it("DerivedCollectionFilterTest", () => {
+    it("derived collections filter-test", () => {
         var models = wx.list<FakeCollectionModel>(Ix.Enumerable.fromArray([0, 1, 2, 3, 4]).select(x => {
             var fcm = new FakeCollectionModel();
             fcm.someNumber(x);
