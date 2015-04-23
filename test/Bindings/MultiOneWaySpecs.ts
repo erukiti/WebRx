@@ -158,6 +158,12 @@ describe('Bindings', () => {
             model.observableString("foo");
             expect($(el)).toHaveClass('foo');
 
+            // should handle multiple whitespace separated classes
+            model.observableString("test1 test2");
+            expect($(el)).not.toHaveClass('foo');
+            expect($(el)).toHaveClass('test1');
+            expect($(el)).toHaveClass('test2');
+
             // binding should stop updating after getting disposed
             wx.cleanNode(el);
             model.observableString('bar');
@@ -173,6 +179,21 @@ describe('Bindings', () => {
             expect($(el)).not.toHaveClass('voodoo');
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
             expect($(el)).toHaveClass('voodoo');
+        });
+
+        it('binding using dynamic value does not interfere with manually added classes',() => {
+            loadFixtures('templates/Bindings/MultiOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#css-non-observable-model-property-dynamic");
+            var model = createCssModel();
+            model.constantString = 'foo';
+
+            $(el).addClass("bar");
+            expect($(el)).toHaveClass('bar');
+            expect($(el)).not.toHaveClass('foo');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toHaveClass('foo');
+            expect($(el)).toHaveClass('bar');
         });
     });
 

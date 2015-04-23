@@ -101,6 +101,11 @@ module wx {
         }
     }
 
+    // Binding contributions to node-state
+    interface ICssNodeState extends INodeState {
+        cssBindingPreviousDynamicClasses: any;
+    }
+
     class CssBinding extends MultiOneWayChangeBindingBase {
         constructor(domManager: IDomManager) {
             super(domManager, true);
@@ -109,8 +114,26 @@ module wx {
         protected applyValue(el: HTMLElement, value: any, key: string): void {
             if(key !== "")
                 toggleCssClass(el, !!value, key);
-            else
-                toggleCssClass(el, true, value);
+            else {
+                var state = <ICssNodeState> this.domManager.getNodeState(el);
+
+                // if we have previously added classes, remove them
+                if (state.cssBindingPreviousDynamicClasses != null) {
+                    toggleCssClass.apply(null, [el, false].concat(state.cssBindingPreviousDynamicClasses));
+
+                    state.cssBindingPreviousDynamicClasses = null;
+                }
+
+                if (value) {
+                    var classes = value.split(/\s+/).map(x => trimString(x)).filter(x => x);
+
+                    if (classes.length) {
+                        toggleCssClass.apply(null, [el, true].concat(classes));
+
+                        state.cssBindingPreviousDynamicClasses = classes;
+                    }
+                }
+            }
         }
     }
 
