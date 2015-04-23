@@ -353,15 +353,15 @@ module wx {
         }
 
         public project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
-            selector?: (T) => TNew, signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+            selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
 
         public project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
-            signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+            refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
-        public project<TDontCare>(filter?: (item: T) => boolean, signalReset?: Rx.Observable<TDontCare>,
+        public project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
             scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
-        public project<TDontCare>(signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
         public project(): any {
             var args = args2Array(arguments);
@@ -719,14 +719,14 @@ module wx {
     class ObservableListProjection<T, TValue> extends ObservableList<TValue> implements IObservableReadOnlyList<TValue> {
         constructor(source: IObservableList<T>, filter?: (item: T) => boolean,
             orderer?: (a: TValue, b: TValue) => number, selector?: (T) => TValue,
-            signalReset?: Rx.Observable<any>, scheduler?: Rx.IScheduler) {
+            refreshTrigger?: Rx.Observable<any>, scheduler?: Rx.IScheduler) {
             super();
 
             this.source = source;
             this.selector = selector || ((x)=> x);
             this._filter = filter;
             this.orderer = orderer;
-            this.signalReset = signalReset;
+            this.refreshTrigger = refreshTrigger;
             this.scheduler = scheduler || Rx.Scheduler.immediate;
 
             this.addAllItemsFromSourceCollection();
@@ -813,7 +813,7 @@ module wx {
         private selector: (T) => TValue;
         private _filter: (item: T) => boolean;
         private orderer: (a: TValue, b: TValue) => number;
-        private signalReset: Rx.Observable<any>;
+        private refreshTrigger: Rx.Observable<any>;
         private scheduler: Rx.IScheduler;
 
         private static defaultOrderer = (a, b) => {
@@ -840,6 +840,14 @@ module wx {
             return getOid(a) === getOid(b);
         }
 
+        private refresh(): void {
+            var length = this.sourceCopy.length;
+
+            for (var i = 0; i < length; i++) {
+                this.onItemChanged(this.sourceCopy[i]);
+            }
+        }
+
         private wireUpChangeNotifications() {
             this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe((e) => {
                 this.onItemsAdded(e);
@@ -863,8 +871,8 @@ module wx {
 
             this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribe(x => this.onItemChanged(x)));
 
-            if (this.signalReset != null) {
-                this.disp.add(this.signalReset.observeOn(this.scheduler).subscribe(_ => this.reset()));
+            if (this.refreshTrigger != null) {
+                this.disp.add(this.refreshTrigger.observeOn(this.scheduler).subscribe(_ => this.refresh()));
             }
         }
 

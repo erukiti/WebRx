@@ -2644,15 +2644,18 @@ var wx;
 (function (wx) {
     "use strict";
     var MultiOneWayChangeBindingBase = (function () {
-        function MultiOneWayChangeBindingBase(domManager) {
+        function MultiOneWayChangeBindingBase(domManager, supportsDynamicValues) {
+            if (supportsDynamicValues === void 0) { supportsDynamicValues = false; }
             this.priority = 0;
+            this.supportsDynamicValues = false;
             this.domManager = domManager;
+            this.supportsDynamicValues = supportsDynamicValues;
         }
         MultiOneWayChangeBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
             if (node.nodeType !== 1)
                 internal.throwError("binding only operates on elements!");
             var compiled = this.domManager.compileBindingOptions(options, module);
-            if (compiled == null || typeof compiled !== "object")
+            if (compiled == null || (typeof compiled !== "object" && !this.supportsDynamicValues))
                 internal.throwError("invalid binding-options!");
             var el = node;
             var observables = new Array();
@@ -2661,12 +2664,19 @@ var wx;
             var keys = Object.keys(compiled);
             var i;
             var key;
-            for (i = 0; i < keys.length; i++) {
-                key = keys[i];
-                var value = compiled[key];
-                exp = value;
+            if (typeof compiled === "function") {
+                exp = compiled;
                 obs = this.domManager.expressionToObservable(exp, ctx);
-                observables.push([key, obs]);
+                observables.push(["", obs]);
+            }
+            else {
+                for (i = 0; i < keys.length; i++) {
+                    key = keys[i];
+                    var value = compiled[key];
+                    exp = value;
+                    obs = this.domManager.expressionToObservable(exp, ctx);
+                    observables.push([key, obs]);
+                }
             }
             for (i = 0; i < observables.length; i++) {
                 key = observables[i][0];
@@ -2704,10 +2714,30 @@ var wx;
     var CssBinding = (function (_super) {
         __extends(CssBinding, _super);
         function CssBinding(domManager) {
-            _super.call(this, domManager);
+            _super.call(this, domManager, true);
         }
         CssBinding.prototype.applyValue = function (el, value, key) {
-            wx.toggleCssClass(el, !!value, key);
+            var classes;
+            if (key !== "") {
+                classes = key.split(/\s+/).map(function (x) { return wx.trimString(x); }).filter(function (x) { return x; });
+                if (classes.length) {
+                    wx.toggleCssClass.apply(null, [el, !!value].concat(classes));
+                }
+            }
+            else {
+                var state = this.domManager.getNodeState(el);
+                if (state.cssBindingPreviousDynamicClasses != null) {
+                    wx.toggleCssClass.apply(null, [el, false].concat(state.cssBindingPreviousDynamicClasses));
+                    state.cssBindingPreviousDynamicClasses = null;
+                }
+                if (value) {
+                    classes = value.split(/\s+/).map(function (x) { return wx.trimString(x); }).filter(function (x) { return x; });
+                    if (classes.length) {
+                        wx.toggleCssClass.apply(null, [el, true].concat(classes));
+                        state.cssBindingPreviousDynamicClasses = classes;
+                    }
+                }
+            }
         };
         return CssBinding;
     })(MultiOneWayChangeBindingBase);
@@ -3459,6 +3489,63 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
+    var log;
+    (function (_log) {
+        "use strict";
+        function log() {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i - 0] = arguments[_i];
+            }
+            try {
+                console.log.apply(console, arguments);
+            }
+            catch (e) {
+                try {
+                    window['opera'].postError.apply(window['opera'], arguments);
+                }
+                catch (e) {
+                    alert(Array.prototype.join.call(arguments, " "));
+                }
+            }
+        }
+        function critical(fmt) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            if (args.length) {
+                fmt = wx.formatString.apply(null, [fmt].concat(args));
+            }
+            log("**** WebRx Critical: " + fmt);
+        }
+        _log.critical = critical;
+        function error(fmt) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            if (args.length) {
+                fmt = wx.formatString.apply(null, [fmt].concat(args));
+            }
+            log("*** WebRx Error: " + fmt);
+        }
+        _log.error = error;
+        function info(fmt) {
+            var args = [];
+            for (var _i = 1; _i < arguments.length; _i++) {
+                args[_i - 1] = arguments[_i];
+            }
+            if (args.length) {
+                fmt = wx.formatString.apply(null, [fmt].concat(args));
+            }
+            log("* WebRx Info: " + fmt);
+        }
+        _log.info = info;
+    })(log = wx.log || (wx.log = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
     "use strict";
     var ObservableList = (function () {
         function ObservableList(initialContents, resetChangeThreshold, scheduler) {
@@ -3771,8 +3858,21 @@ var wx;
         ObservableList.prototype.move = function (oldIndex, newIndex) {
             this.moveItem(oldIndex, newIndex);
         };
-        ObservableList.prototype.project = function (filter, orderer, selector, scheduler) {
-            return new ObservableListProjection(this, filter, orderer, selector, scheduler);
+        ObservableList.prototype.project = function () {
+            var args = wx.args2Array(arguments);
+            var filter = args.shift();
+            if (filter != null && wx.isRxObservable(filter)) {
+                return new ObservableListProjection(this, undefined, undefined, undefined, filter, args.shift());
+            }
+            var orderer = args.shift();
+            if (orderer != null && wx.isRxObservable(orderer)) {
+                return new ObservableListProjection(this, filter, undefined, undefined, orderer, args.shift());
+            }
+            var selector = args.shift();
+            if (selector != null && wx.isRxObservable(selector)) {
+                return new ObservableListProjection(this, filter, orderer, undefined, selector, args.shift());
+            }
+            return new ObservableListProjection(this, filter, orderer, selector, args.shift(), args.shift());
         };
         ObservableList.prototype.suppressChangeNotifications = function () {
             var _this = this;
@@ -3969,7 +4069,7 @@ var wx;
     })();
     var ObservableListProjection = (function (_super) {
         __extends(ObservableListProjection, _super);
-        function ObservableListProjection(source, filter, orderer, selector, scheduler) {
+        function ObservableListProjection(source, filter, orderer, selector, refreshTrigger, scheduler) {
             _super.call(this);
             this.readonlyExceptionMessage = "Derived collections cannot be modified.";
             this.indexToSourceIndexMap = [];
@@ -3979,6 +4079,7 @@ var wx;
             this.selector = selector || (function (x) { return x; });
             this._filter = filter;
             this.orderer = orderer;
+            this.refreshTrigger = refreshTrigger;
             this.scheduler = scheduler || Rx.Scheduler.immediate;
             this.addAllItemsFromSourceCollection();
             this.wireUpChangeNotifications();
@@ -4041,6 +4142,12 @@ var wx;
         ObservableListProjection.prototype.referenceEquals = function (a, b) {
             return wx.getOid(a) === wx.getOid(b);
         };
+        ObservableListProjection.prototype.refresh = function () {
+            var length = this.sourceCopy.length;
+            for (var i = 0; i < length; i++) {
+                this.onItemChanged(this.sourceCopy[i]);
+            }
+        };
         ObservableListProjection.prototype.wireUpChangeNotifications = function () {
             var _this = this;
             this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe(function (e) {
@@ -4058,7 +4165,10 @@ var wx;
             this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe(function (e) {
                 _this.reset();
             }));
-            this.disp.add(this.source.itemChanged.select(function (x) { return x.sender; }).observeOn(this.scheduler).subscribeOnNext(this.onItemChanged, this));
+            this.disp.add(this.source.itemChanged.select(function (x) { return x.sender; }).observeOn(this.scheduler).subscribe(function (x) { return _this.onItemChanged(x); }));
+            if (this.refreshTrigger != null) {
+                this.disp.add(this.refreshTrigger.observeOn(this.scheduler).subscribe(function (_) { return _this.refresh(); }));
+            }
         };
         ObservableListProjection.prototype.onItemsAdded = function (e) {
             this.shiftIndicesAtOrOverThreshold(e.from, e.items.length);
@@ -5947,63 +6057,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    var log;
-    (function (_log) {
-        "use strict";
-        function log() {
-            var args = [];
-            for (var _i = 0; _i < arguments.length; _i++) {
-                args[_i - 0] = arguments[_i];
-            }
-            try {
-                console.log.apply(console, arguments);
-            }
-            catch (e) {
-                try {
-                    window['opera'].postError.apply(window['opera'], arguments);
-                }
-                catch (e) {
-                    alert(Array.prototype.join.call(arguments, " "));
-                }
-            }
-        }
-        function critical(fmt) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            if (args.length) {
-                fmt = wx.formatString.apply(null, [fmt].concat(args));
-            }
-            log("**** WebRx Critical: " + fmt);
-        }
-        _log.critical = critical;
-        function error(fmt) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            if (args.length) {
-                fmt = wx.formatString.apply(null, [fmt].concat(args));
-            }
-            log("*** WebRx Error: " + fmt);
-        }
-        _log.error = error;
-        function info(fmt) {
-            var args = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                args[_i - 1] = arguments[_i];
-            }
-            if (args.length) {
-                fmt = wx.formatString.apply(null, [fmt].concat(args));
-            }
-            log("* WebRx Info: " + fmt);
-        }
-        _log.info = info;
-    })(log = wx.log || (wx.log = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
     "use strict";
     var MessageBus = (function () {
         function MessageBus() {
@@ -6762,6 +6815,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.64';
+    wx.version = '0.9.65';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

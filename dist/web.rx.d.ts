@@ -80,7 +80,10 @@ declare module wx {
         get(index: number): T;
         isReadOnly: boolean;
         toArray(): Array<T>;
-        project<TNew>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+        project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
     }
     interface IObservableList<T> extends IObservableReadOnlyList<T> {
         isEmpty: IObservableProperty<boolean>;
@@ -638,6 +641,11 @@ declare module wx.internal {
 }
 declare module wx {
 }
+declare module wx.log {
+    function critical(fmt: string, ...args: any[]): void;
+    function error(fmt: string, ...args: any[]): void;
+    function info(fmt: string, ...args: any[]): void;
+}
 declare module wx {
     module internal {
         var listConstructor: any;
@@ -711,11 +719,6 @@ declare module wx {
     module internal {
         var htmlTemplateEngineConstructor: any;
     }
-}
-declare module wx.log {
-    function critical(fmt: string, ...args: any[]): void;
-    function error(fmt: string, ...args: any[]): void;
-    function info(fmt: string, ...args: any[]): void;
 }
 declare module wx {
     var messageBus: IMessageBus;
