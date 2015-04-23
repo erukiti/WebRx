@@ -7,8 +7,9 @@ module wx {
     "use strict";
 
     class MultiOneWayChangeBindingBase implements IBindingHandler {
-        constructor(domManager: IDomManager) {
+        constructor(domManager: IDomManager, supportsDynamicValues: boolean = false) {
             this.domManager = domManager;
+            this.supportsDynamicValues = supportsDynamicValues;
         } 
  
        ////////////////////
@@ -20,7 +21,7 @@ module wx {
 
             var compiled = this.domManager.compileBindingOptions(options, module);
 
-            if (compiled == null || typeof compiled !== "object")
+            if (compiled == null || (typeof compiled !== "object" && !this.supportsDynamicValues))
                 internal.throwError("invalid binding-options!");
 
             var el = <HTMLElement> node;
@@ -31,14 +32,21 @@ module wx {
             var i;
             var key;
 
-            for (i = 0; i < keys.length; i++) {
-                key = keys[i];
-                var value = compiled[key];
+            if (typeof compiled === "function") {
+                exp = <ICompiledExpression> compiled;
 
-                exp = <ICompiledExpression> value;
                 obs = this.domManager.expressionToObservable(exp, ctx);
+                observables.push(["", obs]);
+            } else {
+                for (i = 0; i < keys.length; i++) {
+                    key = keys[i];
+                    var value = compiled[key];
 
-                observables.push([key, obs]);
+                    exp = <ICompiledExpression> value;
+                    obs = this.domManager.expressionToObservable(exp, ctx);
+
+                    observables.push([key, obs]);
+                }
             }
 
             // subscribe
@@ -71,6 +79,7 @@ module wx {
         }
 
         public priority = 0;
+        protected supportsDynamicValues = false;
 
         ////////////////////
         // Implementation
@@ -94,11 +103,14 @@ module wx {
 
     class CssBinding extends MultiOneWayChangeBindingBase {
         constructor(domManager: IDomManager) {
-            super(domManager);
+            super(domManager, true);
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {
-            toggleCssClass(el, !!value, key);
+            if(key !== "")
+                toggleCssClass(el, !!value, key);
+            else
+                toggleCssClass(el, true, value);
         }
     }
 

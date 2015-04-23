@@ -363,7 +363,7 @@ module wx {
 
         public project<TDontCare>(signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
-        public project<TNew, TDontCare>(): any {
+        public project(): any {
             var args = args2Array(arguments);
             var filter = args.shift();
 

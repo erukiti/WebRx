@@ -131,6 +131,49 @@ describe('Bindings', () => {
             expect($(el)).toHaveClass('foo');
             expect($(el)).toHaveClass('bar');
         });
+
+        it('binding to a non-observable model property - dynamic',() => {
+            loadFixtures('templates/Bindings/MultiOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#css-non-observable-model-property-dynamic");
+            var model = createCssModel();
+            model.constantString = 'foo';
+
+            expect($(el)).not.toHaveClass('foo');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toHaveClass('foo');
+        });
+
+        it('binding to a observable model property - dynamic',() => {
+            loadFixtures('templates/Bindings/MultiOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#css-observable-model-property-dynamic");
+            var model = createCssModel();
+
+            expect($(el)).not.toHaveClass('foo');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toHaveClass('voodoo');
+
+            // should reflect property changes
+            model.observableString("foo");
+            expect($(el)).toHaveClass('foo');
+
+            // binding should stop updating after getting disposed
+            wx.cleanNode(el);
+            model.observableString('bar');
+            expect($(el)).not.toHaveClass('bar');
+        });
+
+        it('binding to a observable model @propref - dynamic',() => {
+            loadFixtures('templates/Bindings/MultiOneWay.html');
+
+            var el = <HTMLElement> document.querySelector("#css-observable-model-propref-dynamic");
+            var model = createCssModel();
+
+            expect($(el)).not.toHaveClass('voodoo');
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect($(el)).toHaveClass('voodoo');
+        });
     });
 
     describe('Attr', () => {
