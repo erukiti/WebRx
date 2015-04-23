@@ -861,6 +861,7 @@ module wx {
                 this.reset();
             }));
 
+            this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribe(x => this.onItemChanged(x)));
 
             if (this.signalReset != null) {
                 this.disp.add(this.signalReset.observeOn(this.scheduler).subscribe(_ => this.reset()));
