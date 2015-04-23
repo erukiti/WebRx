@@ -4,6 +4,7 @@
 /// <reference path="../Core/Lazy.ts" />
 /// <reference path="../Core/RefCountDisposeWrapper.ts" />
 /// <reference path="../RxJsExtensions.ts" />
+/// <reference path="../core/Log.ts" />
 
 module wx {
     "use strict";
@@ -351,9 +352,38 @@ module wx {
             this.moveItem(oldIndex, newIndex);
         }
 
-        public project<TNew>(filter?: (item: T) => boolean,
-            orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew> {
-            return new ObservableListProjection<T, TNew>(this, filter, orderer, selector, scheduler);
+        public project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
+            selector?: (T) => TNew, signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+
+        public project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
+            signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+        public project<TDontCare>(filter?: (item: T) => boolean, signalReset?: Rx.Observable<TDontCare>,
+            scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+        public project<TDontCare>(signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+        public project<TNew, TDontCare>(): any {
+            var args = args2Array(arguments);
+            var filter = args.shift();
+
+            if (filter != null && isRxObservable(filter)) {
+                return new ObservableListProjection<any, any>(<any> this, undefined, undefined, undefined, filter, args.shift());
+            }
+
+            var orderer = args.shift();
+
+            if (orderer != null && isRxObservable(orderer)) {
+                return new ObservableListProjection<any, any>(<any> this, filter, undefined, undefined, orderer, args.shift());
+            }
+
+            var selector = args.shift();
+
+            if (selector != null && isRxObservable(selector)) {
+                return new ObservableListProjection<any, any>(<any> this, filter, orderer, undefined, selector, args.shift());
+            }
+
+            return new ObservableListProjection<any, any>(<any> this, filter, orderer, selector, args.shift(), args.shift());
         }
 
         public suppressChangeNotifications(): Rx.IDisposable {
@@ -688,13 +718,15 @@ module wx {
 
     class ObservableListProjection<T, TValue> extends ObservableList<TValue> implements IObservableReadOnlyList<TValue> {
         constructor(source: IObservableList<T>, filter?: (item: T) => boolean,
-            orderer?: (a: TValue, b: TValue) => number, selector?: (T) => TValue, scheduler?: Rx.IScheduler) {
+            orderer?: (a: TValue, b: TValue) => number, selector?: (T) => TValue,
+            signalReset?: Rx.Observable<any>, scheduler?: Rx.IScheduler) {
             super();
 
             this.source = source;
             this.selector = selector || ((x)=> x);
             this._filter = filter;
             this.orderer = orderer;
+            this.signalReset = signalReset;
             this.scheduler = scheduler || Rx.Scheduler.immediate;
 
             this.addAllItemsFromSourceCollection();
@@ -781,6 +813,7 @@ module wx {
         private selector: (T) => TValue;
         private _filter: (item: T) => boolean;
         private orderer: (a: TValue, b: TValue) => number;
+        private signalReset: Rx.Observable<any>;
         private scheduler: Rx.IScheduler;
 
         private static defaultOrderer = (a, b) => {
@@ -828,7 +861,10 @@ module wx {
                 this.reset();
             }));
 
-            this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribeOnNext(this.onItemChanged, this));
+
+            if (this.signalReset != null) {
+                this.disp.add(this.signalReset.observeOn(this.scheduler).subscribe(_ => this.reset()));
+            }
         }
 
         private onItemsAdded(e: IListChangeInfo<T>) {

@@ -108,7 +108,7 @@ var wx;
     function isList(target) {
         if (target == null)
             return false;
-        return target instanceof internal.listConstructor || queryInterface(target, wx.IID.IObservableList);
+        return target instanceof internal.listConstructor;
     }
     wx.isList = isList;
     function isRxScheduler(target) {
@@ -208,6 +208,8 @@ var wx;
     }
     wx.getOwnPropertiesImplementingInterface = getOwnPropertiesImplementingInterface;
     function getOid(o) {
+        if (o == null)
+            return undefined;
         if (isPrimitive(o))
             return (typeof o + ":" + o);
         var result = o[oidPropertyName];
@@ -3640,7 +3642,7 @@ var wx;
                         });
                     }
                 }
-                else if (true) {
+                else {
                     if (_this.beforeItemsAddedSubject.isValueCreated) {
                         _this.beforeItemsAddedSubject.value.onNext({ items: items, from: _this.inner.length });
                     }
@@ -3653,11 +3655,6 @@ var wx;
                             _this.addItemToPropertyTracking(x);
                         });
                     }
-                }
-                else {
-                    items.forEach(function (x) {
-                        _this.add(x);
-                    });
                 }
             });
         };
@@ -3679,7 +3676,7 @@ var wx;
                         });
                     }
                 }
-                else if (true) {
+                else {
                     if (_this.beforeItemsAddedSubject.isValueCreated) {
                         items.forEach(function (x) {
                             _this.beforeItemsAddedSubject.value.onNext({ items: items, from: index });
@@ -3687,20 +3684,13 @@ var wx;
                     }
                     Array.prototype.splice.apply(_this.inner, [index, 0].concat(items));
                     if (_this.itemsAddedSubject.isValueCreated) {
-                        items.forEach(function (x) {
-                            _this.itemsAddedSubject.value.onNext({ items: items, from: index });
-                        });
+                        _this.itemsAddedSubject.value.onNext({ items: items, from: index });
                     }
                     if (_this.changeTrackingEnabled) {
                         items.forEach(function (x) {
                             _this.addItemToPropertyTracking(x);
                         });
                     }
-                }
-                else {
-                    items.forEach(function (x) {
-                        _this.add(x);
-                    });
                 }
             });
         };
@@ -3727,7 +3717,7 @@ var wx;
                         });
                     }
                 }
-                else if (true) {
+                else {
                     if (_this.beforeItemsRemovedSubject.isValueCreated) {
                         items.forEach(function (x) {
                             _this.beforeItemsRemovedSubject.value.onNext({ items: items, from: index });
@@ -3744,11 +3734,6 @@ var wx;
                             _this.itemsRemovedSubject.value.onNext({ items: items, from: index });
                         });
                     }
-                }
-                else {
-                    items.forEach(function (x) {
-                        _this.remove(x);
-                    });
                 }
             });
         };
@@ -3786,6 +3771,9 @@ var wx;
         ObservableList.prototype.move = function (oldIndex, newIndex) {
             this.moveItem(oldIndex, newIndex);
         };
+        ObservableList.prototype.project = function (filter, orderer, selector, scheduler) {
+            return new ObservableListProjection(this, filter, orderer, selector, scheduler);
+        };
         ObservableList.prototype.suppressChangeNotifications = function () {
             var _this = this;
             this.changeNotificationsSuppressed++;
@@ -3803,6 +3791,25 @@ var wx;
         };
         ObservableList.prototype.get = function (index) {
             return this.inner[index];
+        };
+        ObservableList.prototype.set = function (index, item) {
+            if (!this.areChangeNotificationsEnabled()) {
+                if (this.changeTrackingEnabled) {
+                    this.removeItemFromPropertyTracking(this.inner[index]);
+                    this.addItemToPropertyTracking(item);
+                }
+                this.inner[index] = item;
+                return;
+            }
+            if (this.beforeItemReplacedSubject.isValueCreated)
+                this.beforeItemReplacedSubject.value.onNext({ from: index, items: [item] });
+            if (this.changeTrackingEnabled) {
+                this.removeItemFromPropertyTracking(this.inner[index]);
+                this.addItemToPropertyTracking(item);
+            }
+            this.inner[index] = item;
+            if (this.itemReplacedSubject.isValueCreated)
+                this.itemReplacedSubject.value.onNext({ from: index, items: [item] });
         };
         ObservableList.prototype.sort = function (comparison) {
             this.publishBeforeResetNotification();
@@ -3900,25 +3907,6 @@ var wx;
             if (this.itemsMovedSubject.isValueCreated)
                 this.itemsMovedSubject.value.onNext(mi);
         };
-        ObservableList.prototype.set = function (index, item) {
-            if (!this.areChangeNotificationsEnabled()) {
-                if (this.changeTrackingEnabled) {
-                    this.removeItemFromPropertyTracking(this.inner[index]);
-                    this.addItemToPropertyTracking(item);
-                }
-                this.inner[index] = item;
-                return;
-            }
-            if (this.beforeItemReplacedSubject.isValueCreated)
-                this.beforeItemReplacedSubject.value.onNext({ from: index, items: [item] });
-            if (this.changeTrackingEnabled) {
-                this.removeItemFromPropertyTracking(this.inner[index]);
-                this.addItemToPropertyTracking(item);
-            }
-            this.inner[index] = item;
-            if (this.itemReplacedSubject.isValueCreated)
-                this.itemReplacedSubject.value.onNext({ from: index, items: [item] });
-        };
         ObservableList.prototype.clearItems = function () {
             if (!this.areChangeNotificationsEnabled()) {
                 this.inner.length = 0;
@@ -3955,9 +3943,12 @@ var wx;
         };
         ObservableList.prototype.clearAllPropertyChangeWatchers = function () {
             var _this = this;
-            Object.keys(this.propertyChangeWatchers).forEach(function (x) {
-                _this.propertyChangeWatchers[x].release();
-            });
+            if (this.propertyChangeWatchers != null) {
+                Object.keys(this.propertyChangeWatchers).forEach(function (x) {
+                    _this.propertyChangeWatchers[x].release();
+                });
+                this.propertyChangeWatchers = null;
+            }
         };
         ObservableList.prototype.refcountSubscribers = function (input, block) {
             return Rx.Observable.create(function (subj) {
@@ -3976,6 +3967,360 @@ var wx;
         };
         return ObservableList;
     })();
+    var ObservableListProjection = (function (_super) {
+        __extends(ObservableListProjection, _super);
+        function ObservableListProjection(source, filter, orderer, selector, scheduler) {
+            _super.call(this);
+            this.readonlyExceptionMessage = "Derived collections cannot be modified.";
+            this.indexToSourceIndexMap = [];
+            this.sourceCopy = [];
+            this.disp = new Rx.CompositeDisposable();
+            this.source = source;
+            this.selector = selector || (function (x) { return x; });
+            this._filter = filter;
+            this.orderer = orderer;
+            this.scheduler = scheduler || Rx.Scheduler.immediate;
+            this.addAllItemsFromSourceCollection();
+            this.wireUpChangeNotifications();
+        }
+        Object.defineProperty(ObservableListProjection.prototype, "isReadOnly", {
+            get: function () {
+                return true;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ObservableListProjection.prototype.set = function (index, item) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.addRange = function (items) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.insertRange = function (index, items) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.removeAll = function (items) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.removeRange = function (index, count) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.add = function (item) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.clear = function () {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.remove = function (item) {
+            internal.throwError(this.readonlyExceptionMessage);
+            return undefined;
+        };
+        ObservableListProjection.prototype.insert = function (index, item) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.removeAt = function (index) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.move = function (oldIndex, newIndex) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.sort = function (comparison) {
+            internal.throwError(this.readonlyExceptionMessage);
+        };
+        ObservableListProjection.prototype.reset = function () {
+            var _this = this;
+            wx.using(_super.prototype.suppressChangeNotifications.call(this), function () {
+                _super.prototype.clear.call(_this);
+                _this.addAllItemsFromSourceCollection();
+            });
+        };
+        ObservableListProjection.prototype.dispose = function () {
+            this.disp.dispose();
+            _super.prototype.dispose.call(this);
+        };
+        ObservableListProjection.prototype.referenceEquals = function (a, b) {
+            return wx.getOid(a) === wx.getOid(b);
+        };
+        ObservableListProjection.prototype.wireUpChangeNotifications = function () {
+            var _this = this;
+            this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe(function (e) {
+                _this.onItemsAdded(e);
+            }));
+            this.disp.add(this.source.itemsRemoved.observeOn(this.scheduler).subscribe(function (e) {
+                _this.onItemsRemoved(e);
+            }));
+            this.disp.add(this.source.itemsMoved.observeOn(this.scheduler).subscribe(function (e) {
+                _this.onItemsMoved(e);
+            }));
+            this.disp.add(this.source.itemReplaced.observeOn(this.scheduler).subscribe(function (e) {
+                _this.onItemsReplaced(e);
+            }));
+            this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe(function (e) {
+                _this.reset();
+            }));
+            this.disp.add(this.source.itemChanged.select(function (x) { return x.sender; }).observeOn(this.scheduler).subscribeOnNext(this.onItemChanged, this));
+        };
+        ObservableListProjection.prototype.onItemsAdded = function (e) {
+            this.shiftIndicesAtOrOverThreshold(e.from, e.items.length);
+            for (var i = 0; i < e.items.length; i++) {
+                var sourceItem = e.items[i];
+                this.sourceCopy.splice(e.from + i, 0, sourceItem);
+                if (this._filter && !this._filter(sourceItem)) {
+                    continue;
+                }
+                var destinationItem = this.selector(sourceItem);
+                this.internalInsertAndMap(e.from + i, destinationItem);
+            }
+        };
+        ObservableListProjection.prototype.onItemsRemoved = function (e) {
+            this.sourceCopy.splice(e.from, e.items.length);
+            for (var i = 0; i < e.items.length; i++) {
+                var destinationIndex = this.getIndexFromSourceIndex(e.from + i);
+                if (destinationIndex !== -1) {
+                    this.internalRemoveAt(destinationIndex);
+                }
+            }
+            var removedCount = e.items.length;
+            this.shiftIndicesAtOrOverThreshold(e.from + removedCount, -removedCount);
+        };
+        ObservableListProjection.prototype.onItemsMoved = function (e) {
+            if (e.items.length > 1) {
+                internal.throwError("Derived collections doesn't support multi-item moves");
+            }
+            if (e.from === e.to) {
+                return;
+            }
+            var oldSourceIndex = e.from;
+            var newSourceIndex = e.to;
+            this.sourceCopy.splice(oldSourceIndex, 1);
+            this.sourceCopy.splice(newSourceIndex, 0, e.items[0]);
+            var currentDestinationIndex = this.getIndexFromSourceIndex(oldSourceIndex);
+            this.moveSourceIndexInMap(oldSourceIndex, newSourceIndex);
+            if (currentDestinationIndex === -1) {
+                return;
+            }
+            if (this.orderer == null) {
+                var newDestinationIndex = ObservableListProjection.newPositionForExistingItem2(this.indexToSourceIndexMap, newSourceIndex, currentDestinationIndex);
+                if (newDestinationIndex !== currentDestinationIndex) {
+                    this.indexToSourceIndexMap.splice(currentDestinationIndex, 1);
+                    this.indexToSourceIndexMap.splice(newDestinationIndex, 0, newSourceIndex);
+                    _super.prototype.move.call(this, currentDestinationIndex, newDestinationIndex);
+                }
+                else {
+                    this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
+                }
+            }
+            else {
+                this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
+            }
+        };
+        ObservableListProjection.prototype.onItemsReplaced = function (e) {
+            for (var i = 0; i < e.items.length; i++) {
+                var sourceItem = e.items[i];
+                this.sourceCopy[e.from + i] = sourceItem;
+                this.onItemChanged(sourceItem);
+            }
+        };
+        ObservableListProjection.prototype.onItemChanged = function (changedItem) {
+            var _this = this;
+            var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
+            var shouldBeIncluded = !this._filter || this._filter(changedItem);
+            sourceIndices.forEach(function (sourceIndex) {
+                var currentDestinationIndex = _this.getIndexFromSourceIndex(sourceIndex);
+                var isIncluded = currentDestinationIndex >= 0;
+                if (isIncluded && !shouldBeIncluded) {
+                    _this.internalRemoveAt(currentDestinationIndex);
+                }
+                else if (!isIncluded && shouldBeIncluded) {
+                    _this.internalInsertAndMap(sourceIndex, _this.selector(changedItem));
+                }
+                else if (isIncluded && shouldBeIncluded) {
+                    var newItem = _this.selector(changedItem);
+                    if (_this.orderer == null) {
+                        if (!_this.referenceEquals(newItem, _this.get(currentDestinationIndex))) {
+                            _super.prototype.set.call(_this, currentDestinationIndex, newItem);
+                        }
+                    }
+                    else {
+                        if (_this.canItemStayAtPosition(newItem, currentDestinationIndex)) {
+                            if (!_this.referenceEquals(newItem, _this.get(currentDestinationIndex))) {
+                                _super.prototype.set.call(_this, currentDestinationIndex, newItem);
+                            }
+                        }
+                        else {
+                            if (_this.referenceEquals(newItem, _this.get(currentDestinationIndex))) {
+                                var newDestinationIndex = _this.newPositionForExistingItem(sourceIndex, currentDestinationIndex, newItem);
+                                _this.indexToSourceIndexMap.splice(currentDestinationIndex, 1);
+                                _this.indexToSourceIndexMap.splice(newDestinationIndex, 0, sourceIndex);
+                                _super.prototype.move.call(_this, currentDestinationIndex, newDestinationIndex);
+                            }
+                            else {
+                                _this.internalRemoveAt(currentDestinationIndex);
+                                _this.internalInsertAndMap(sourceIndex, newItem);
+                            }
+                        }
+                    }
+                }
+            });
+        };
+        ObservableListProjection.prototype.canItemStayAtPosition = function (item, currentIndex) {
+            var hasPrecedingItem = currentIndex > 0;
+            if (hasPrecedingItem) {
+                var isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this[currentIndex - 1]) >= 0;
+                if (!isGreaterThanOrEqualToPrecedingItem) {
+                    return false;
+                }
+            }
+            var hasSucceedingItem = currentIndex < this.length() - 1;
+            if (hasSucceedingItem) {
+                var isLessThanOrEqualToSucceedingItem = this.orderer(item, this[currentIndex + 1]) <= 0;
+                if (!isLessThanOrEqualToSucceedingItem) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        ObservableListProjection.prototype.getIndexFromSourceIndex = function (sourceIndex) {
+            return this.indexToSourceIndexMap.indexOf(sourceIndex);
+        };
+        ObservableListProjection.prototype.indexOfAll = function (source, item) {
+            var _this = this;
+            var indices = [];
+            var sourceIndex = 0;
+            source.forEach(function (x) {
+                if (_this.referenceEquals(x, item)) {
+                    indices.push(sourceIndex);
+                }
+                sourceIndex++;
+            });
+            return indices;
+        };
+        ObservableListProjection.prototype.moveSourceIndexInMap = function (oldSourceIndex, newSourceIndex) {
+            if (newSourceIndex > oldSourceIndex) {
+                this.shiftSourceIndicesInRange(oldSourceIndex + 1, newSourceIndex + 1, -1);
+            }
+            else {
+                this.shiftSourceIndicesInRange(newSourceIndex, oldSourceIndex, 1);
+            }
+        };
+        ObservableListProjection.prototype.shiftIndicesAtOrOverThreshold = function (threshold, value) {
+            for (var i = 0; i < this.indexToSourceIndexMap.length; i++) {
+                if (this.indexToSourceIndexMap[i] >= threshold) {
+                    this.indexToSourceIndexMap[i] += value;
+                }
+            }
+        };
+        ObservableListProjection.prototype.shiftSourceIndicesInRange = function (rangeStart, rangeStop, value) {
+            for (var i = 0; i < this.indexToSourceIndexMap.length; i++) {
+                var sourceIndex = this.indexToSourceIndexMap[i];
+                if (sourceIndex >= rangeStart && sourceIndex < rangeStop) {
+                    this.indexToSourceIndexMap[i] += value;
+                }
+            }
+        };
+        ObservableListProjection.prototype.addAllItemsFromSourceCollection = function () {
+            var _this = this;
+            var sourceIndex = 0;
+            this.source.forEach(function (sourceItem) {
+                _this.sourceCopy.push(sourceItem);
+                if (!_this._filter || _this._filter(sourceItem)) {
+                    var destinationItem = _this.selector(sourceItem);
+                    _this.internalInsertAndMap(sourceIndex, destinationItem);
+                }
+                sourceIndex++;
+            });
+        };
+        ObservableListProjection.prototype.internalClear = function () {
+            this.indexToSourceIndexMap = [];
+            this.sourceCopy = [];
+            _super.prototype.clear.call(this);
+        };
+        ObservableListProjection.prototype.internalInsertAndMap = function (sourceIndex, value) {
+            var destinationIndex = this.positionForNewItem(sourceIndex, value);
+            this.indexToSourceIndexMap.splice(destinationIndex, 0, sourceIndex);
+            _super.prototype.insert.call(this, destinationIndex, value);
+        };
+        ObservableListProjection.prototype.internalRemoveAt = function (destinationIndex) {
+            this.indexToSourceIndexMap.splice(destinationIndex, 1);
+            _super.prototype.removeAt.call(this, destinationIndex);
+        };
+        ObservableListProjection.prototype.positionForNewItem = function (sourceIndex, value) {
+            return this.orderer == null ? ObservableListProjection.positionForNewItemArray(this.indexToSourceIndexMap, sourceIndex, ObservableListProjection.defaultOrderer) : ObservableListProjection.positionForNewItemArray2(this.inner, 0, this.inner.length, value, this.orderer);
+        };
+        ObservableListProjection.positionForNewItemArray = function (array, item, orderer) {
+            return ObservableListProjection.positionForNewItemArray2(array, 0, array.length, item, orderer);
+        };
+        ObservableListProjection.positionForNewItemArray2 = function (array, index, count, item, orderer) {
+            if (count === 0) {
+                return index;
+            }
+            if (count === 1) {
+                return orderer(array[index], item) >= 0 ? index : index + 1;
+            }
+            if (orderer(array[index], item) >= 1)
+                return index;
+            var low = index, hi = index + count - 1;
+            var cmp;
+            while (low <= hi) {
+                var mid = Math.floor(low + (hi - low) / 2);
+                cmp = orderer(array[mid], item);
+                if (cmp === 0) {
+                    return mid;
+                }
+                if (cmp < 0) {
+                    low = mid + 1;
+                }
+                else {
+                    hi = mid - 1;
+                }
+            }
+            return low;
+        };
+        ObservableListProjection.prototype.newPositionForExistingItem = function (sourceIndex, currentIndex, item) {
+            return this.orderer == null ? ObservableListProjection.newPositionForExistingItem2(this.indexToSourceIndexMap, sourceIndex, currentIndex) : ObservableListProjection.newPositionForExistingItem2(this.inner, item, currentIndex, this.orderer);
+        };
+        ObservableListProjection.newPositionForExistingItem2 = function (array, item, currentIndex, orderer) {
+            if (array.length === 1) {
+                return 0;
+            }
+            var precedingIndex = currentIndex - 1;
+            var succeedingIndex = currentIndex + 1;
+            var comparand = array[precedingIndex >= 0 ? precedingIndex : succeedingIndex];
+            if (orderer == null) {
+                orderer = ObservableListProjection.defaultOrderer;
+            }
+            var cmp = orderer(item, comparand);
+            var min = 0;
+            var max = array.length;
+            if (cmp === 0) {
+                return currentIndex;
+            }
+            else if (cmp > 0) {
+                min = succeedingIndex;
+            }
+            else {
+                max = precedingIndex;
+            }
+            if (min === array.length || max < 0) {
+                return currentIndex;
+            }
+            var ix = ObservableListProjection.positionForNewItemArray2(array, min, max - min, item, orderer);
+            return ix >= currentIndex ? ix - 1 : ix;
+        };
+        ObservableListProjection.defaultOrderer = function (a, b) {
+            var result;
+            if (a == null && b == null)
+                result = 0;
+            else if (a == null)
+                result = -1;
+            else if (b == null)
+                result = 1;
+            else
+                result = a - b;
+            return result;
+        };
+        return ObservableListProjection;
+    })(ObservableList);
     var internal;
     (function (internal) {
         internal.listConstructor = ObservableList;

@@ -215,9 +215,33 @@ module wx {
         * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
         * @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
+        * @param signalReset {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         */
-        project<TNew>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
-            selector?: (T) => TNew, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
+            selector?: (T) => TNew, signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+
+        /**
+        * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+        * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+        * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
+        * @param signalReset {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        */
+        project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
+            signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+        /**
+        * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+        * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+        * @param signalReset {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        */
+        project<TDontCare>(filter?: (item: T) => boolean, signalReset?: Rx.Observable<TDontCare>,
+            scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+        /**
+        * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+        * @param signalReset {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        */
+        project<TDontCare>(signalReset?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
     }
 
     /**

@@ -78,11 +78,13 @@ declare module wx {
     interface IObservableReadOnlyList<T> extends INotifyListChanged<T>, INotifyListItemChanged {
         length: IObservableProperty<number>;
         get(index: number): T;
+        isReadOnly: boolean;
+        toArray(): Array<T>;
+        project<TNew>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
     }
     interface IObservableList<T> extends IObservableReadOnlyList<T> {
         isEmpty: IObservableProperty<boolean>;
         set(index: number, item: T): any;
-        isReadOnly: boolean;
         add(item: T): void;
         push(item: T): void;
         clear(): void;
@@ -97,7 +99,6 @@ declare module wx {
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
         reset(): void;
-        toArray(): Array<T>;
         sort(comparison: (a: T, b: T) => number): void;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];

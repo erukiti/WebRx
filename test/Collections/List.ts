@@ -464,7 +464,7 @@ describe("Derived Observable List", () => {
         var itemsAdded = new Array<TestFixture>();
         var itemsRemoved = new Array<TestFixture>();
 
-        var output = fixture.project<TestFixture>(x => x.IsOnlyOneWord()[0] === 'F', stringOrderer, x => x);
+        var output = fixture.project(x => x.IsOnlyOneWord()[0] === 'F', stringOrderer, x => x);
         output.itemsAdded.subscribe((x) => itemsAdded.push(x.items[0]));
         output.itemsRemoved.subscribe((x) => itemsRemoved.push(x.items[0]));
 
