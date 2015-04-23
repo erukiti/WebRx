@@ -112,9 +112,15 @@ module wx {
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {
-            if(key !== "")
-                toggleCssClass(el, !!value, key);
-            else {
+            var classes: Array<any>;
+
+            if (key !== "") {
+                classes = key.split(/\s+/).map(x => trimString(x)).filter(x => <any> x);
+
+                if (classes.length) {
+                    toggleCssClass.apply(null, [el, !!value].concat(classes));
+                }
+            } else {
                 var state = <ICssNodeState> this.domManager.getNodeState(el);
 
                 // if we have previously added classes, remove them
@@ -125,7 +131,7 @@ module wx {
                 }
 
                 if (value) {
-                    var classes = value.split(/\s+/).map(x => trimString(x)).filter(x => x);
+                    classes = value.split(/\s+/).map(x => trimString(x)).filter(x => x);
 
                     if (classes.length) {
                         toggleCssClass.apply(null, [el, true].concat(classes));
