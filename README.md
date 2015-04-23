@@ -4,7 +4,7 @@
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 <!-- [![Build Status](https://travis-ci.org/WebRxJS/WebRx.png)](https://travis-ci.org/WebRxJS/WebRx) -->
 
-# WebRx
+# <img src="http://webrxjs.org/images/Logo.png" height="32" /> WebRx
 
 WebRx is a Javascript MVVM-Framework built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Observable-driven declarative Data-Binding, Templating and Client-Side Routing.
 
