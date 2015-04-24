@@ -12,7 +12,7 @@
     <language>en-US</language>
     <tags>Rx RxJS Reactive Extensions Observable Data-Binding Web UI SPA</tags>
     <dependencies>
-      <dependency id="RxJS-Lite" version="2.4.7" />
+      <dependency id="RxJS-Lite" version="2.5.2" />
     </dependencies>
   </metadata>
   <files>
