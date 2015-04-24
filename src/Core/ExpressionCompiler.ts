@@ -44,7 +44,7 @@ module wx {
         */
         export function parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken> {
             // Trim leading and trailing spaces from the string
-            var str = trimString(objectLiteralString);
+            var str = objectLiteralString.trim();
 
             // Trim braces '{' surrounding the whole object literal
             if (str.charCodeAt(0) === 123) str = str.slice(1, -1);

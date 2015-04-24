@@ -388,7 +388,6 @@ declare module wx {
     function isInUnitTest(): boolean;
     function args2Array(args: IArguments): Array<any>;
     function formatString(fmt: string, ...args: any[]): string;
-    function trimString(str: string): string;
     function extend(src: Object, dst: Object, inherited?: boolean): Object;
     class PropertyInfo<T> {
         constructor(propertyName: string, property: T);

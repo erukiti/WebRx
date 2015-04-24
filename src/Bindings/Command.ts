@@ -88,7 +88,7 @@ module wx {
                             }));
 
                             // handle input events
-                            var eventArray = eventNames.split(/\s+/).map(x => trimString(x)).filter(x => <any> x);
+                            var eventArray = eventNames.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
                             var eventObservables = eventArray.map(x => Rx.Observable.fromEvent(el, x));
 
                             cleanup.add(Rx.Observable.merge<Event>(eventObservables).subscribe((e: Event) => {

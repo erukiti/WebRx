@@ -119,7 +119,7 @@ module wx {
             var prepIns: Array<IAnimationCssClassInstruction>; 
 
             if (typeof prepare === "string") {
-                prepare = prepare.split(/\s+/).map(x => trimString(x)).filter(x => x);
+                prepare = prepare.split(/\s+/).map(x => x.trim()).filter(x => x);
             } 
 
             if (typeof prepare[0] === "string") {
@@ -146,7 +146,7 @@ module wx {
         var runIns: Array<IAnimationCssClassInstruction>;
 
         if (typeof run === "string") {
-            run = run.split(/\s+/).map(x => trimString(x)).filter(x => x);
+            run = run.split(/\s+/).map(x => x.trim()).filter(x => x);
         }
 
         if (typeof run[0] === "string") {
@@ -188,7 +188,7 @@ module wx {
 
         if (complete) {
             if (typeof complete === "string") {
-                complete = complete.split(/\s+/).map(x => trimString(x)).filter(x => x);
+                complete = complete.split(/\s+/).map(x => x.trim()).filter(x => x);
             }
 
             if (typeof complete[0] === "string") {

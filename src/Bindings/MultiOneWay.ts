@@ -115,7 +115,7 @@ module wx {
             var classes: Array<any>;
 
             if (key !== "") {
-                classes = key.split(/\s+/).map(x => trimString(x)).filter(x => <any> x);
+                classes = key.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
 
                 if (classes.length) {
                     toggleCssClass.apply(null, [el, !!value].concat(classes));
@@ -131,7 +131,7 @@ module wx {
                 }
 
                 if (value) {
-                    classes = value.split(/\s+/).map(x => trimString(x)).filter(x => x);
+                    classes = value.split(/\s+/).map(x => x.trim()).filter(x => x);
 
                     if (classes.length) {
                         toggleCssClass.apply(null, [el, true].concat(classes));

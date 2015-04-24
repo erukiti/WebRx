@@ -72,7 +72,7 @@ module wx {
         }
 
         public getObjectLiteralTokens(value: string): Array<IObjectLiteralToken> {
-            value = trimString(value);
+            value = value.trim();
 
             if (value !== '' && this.isObjectLiteralString(value)) {
                 return this.compiler.parseObjectLiteral(value);
@@ -82,7 +82,7 @@ module wx {
         }
 
         public compileBindingOptions(value: string, module: IModule): Object {
-            value = trimString(value);
+            value = value.trim();
             if (value === '') {
                 return null;
             }
@@ -410,7 +410,7 @@ module wx {
             // transform textual binding-definition into a key-value store where 
             // the key is the binding name and the value is its options
             if (bindingText) {
-                bindingText = trimString(bindingText);
+                bindingText = bindingText.trim();
             }
 
             if (bindingText)

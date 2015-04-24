@@ -54,7 +54,7 @@ module wx {
 
                     // split names
                     if (value) {
-                        value = trimString(value);
+                        value = value.trim();
                         moduleNames = value.split(" ").filter(x => x);
                     }
 

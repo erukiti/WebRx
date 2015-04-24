@@ -142,14 +142,6 @@ module wx {
     }
 
     /**
-    * Removes all leading and trailing white-space characters from a string.
-    * @param {string} The format string
-    */
-    export function trimString(str: string): string {
-        return str.replace(/[ \t]+$/g, "").replace(/^[ \t]+/g, "");
-    }
-
-    /**
     * Copies own properties from src to dst
     */
     export function extend(src: Object, dst: Object, inherited?: boolean): Object {
