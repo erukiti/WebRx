@@ -877,4 +877,9 @@ declare module Rx {
     export interface ObservableStatic {
         startDeferred<T>(action:()=> T): Rx.Observable<T>;
     }
+
+    // TODO: as of RxJs 2.5.2 this is missing in rx.all.d.ts
+    export interface SchedulerStatic {
+        isScheduler(o: any): boolean;
+    }
 }

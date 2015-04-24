@@ -2,6 +2,7 @@
 /// <reference path="../Interfaces.ts" />
 /// <reference path="../RTTI/IUnknown.ts" />
 /// <reference path="Events.ts" />
+/// <reference path="../RTTI/IID.ts" />
 
 /**
 * Global helpers
@@ -73,7 +74,7 @@ module wx {
         if (target == null)
             return false;
 
-        return Rx.helpers.isScheduler(target);
+        return Rx.Scheduler.isScheduler(target);
     }
 
     /**

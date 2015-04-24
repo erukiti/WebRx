@@ -80,6 +80,30 @@ var wx;
 var wx;
 (function (wx) {
     "use strict";
+    var IID = (function () {
+        function IID() {
+        }
+        IID.IUnknown = "IUnknown";
+        IID.IDisposable = "IDisposable";
+        IID.IObservableProperty = "IObservableProperty";
+        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
+        IID.IHandleObservableErrors = "IHandleObservableErrors";
+        IID.IObservableList = "IObservableList";
+        IID.IList = "IList";
+        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
+        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
+        IID.IReactiveDerivedList = "IReactiveDerivedList";
+        IID.IMoveInfo = "IMoveInfo";
+        IID.IObservedChange = "IObservedChange";
+        IID.ICommand = "ICommand";
+        IID.IReadOnlyList = "IReadOnlyList";
+        return IID;
+    })();
+    wx.IID = IID;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
     var cssClassNameRegex = /\S+/g;
     var RxObsConstructor = Rx.Observable;
     wx.noop = function () {
@@ -114,7 +138,7 @@ var wx;
     function isRxScheduler(target) {
         if (target == null)
             return false;
-        return Rx.helpers.isScheduler(target);
+        return Rx.Scheduler.isScheduler(target);
     }
     wx.isRxScheduler = isRxScheduler;
     function isRxObservable(target) {
@@ -639,30 +663,6 @@ var wx;
             };
         }
     })(env = wx.env || (wx.env = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
-    var IID = (function () {
-        function IID() {
-        }
-        IID.IUnknown = "IUnknown";
-        IID.IDisposable = "IDisposable";
-        IID.IObservableProperty = "IObservableProperty";
-        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
-        IID.IHandleObservableErrors = "IHandleObservableErrors";
-        IID.IObservableList = "IObservableList";
-        IID.IList = "IList";
-        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
-        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
-        IID.IReactiveDerivedList = "IReactiveDerivedList";
-        IID.IMoveInfo = "IMoveInfo";
-        IID.IObservedChange = "IObservedChange";
-        IID.ICommand = "ICommand";
-        IID.IReadOnlyList = "IReadOnlyList";
-        return IID;
-    })();
-    wx.IID = IID;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
