@@ -13,7 +13,7 @@ describe('Bindings', () => {
     };
 
     describe('Command',() => {
-        it('binding reacts to changes when bound to observable properties holding command and parameter',() => {
+        it('reacts to changes when bound to observable properties holding command and parameter',() => {
             loadFixtures('templates/Bindings/Command.html');
 
             var el = <HTMLButtonElement> document.querySelector("#command-button-observable");
@@ -49,6 +49,31 @@ describe('Bindings', () => {
             model.param(3);
             testutils.triggerEvent(el, "click");
             expect(barExecuteCount).toEqual(2);
+            expect(executeParam).toEqual(model.param());
+        });
+
+        it('reacts to other events than click',() => {
+            loadFixtures('templates/Bindings/Command.html');
+
+            var el = <HTMLButtonElement> document.querySelector("#command-button-observable-custom-events");
+
+            var fooExecuteCount = 0;
+            var barExecuteCount = 0;
+            var executeParam = undefined;
+
+            var model = {
+                cmd: wx.property(),
+                param: wx.property(),
+                events: "dblclick"
+            };
+
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+            expect(fooExecuteCount).toEqual(0);
+            expect(barExecuteCount).toEqual(0);
+
+            model.cmd(wx.command((x) => { fooExecuteCount++; executeParam = x }));
+            testutils.triggerEvent(el, model.events);
+            expect(fooExecuteCount).toEqual(1);
             expect(executeParam).toEqual(model.param());
         });
 

@@ -8,6 +8,7 @@ module wx {
     export interface ICommandBindingOptions {
         command: ICommand<any>;
         parameter?: any;
+        eventNames?: any;
     }
 
     class CommandBinding implements IBindingHandler {
@@ -33,6 +34,7 @@ module wx {
             var paramObservable: Rx.Observable<any>;
             var cleanup: Rx.CompositeDisposable;
             var isAnchor = el.tagName.toLowerCase() === "a";
+            var eventNames: any = "click";
 
             function doCleanup() {
                 if (cleanup) {
@@ -54,6 +56,11 @@ module wx {
                 if (opt.parameter) {
                     exp = <ICompiledExpression> <any> opt.parameter;
                     paramObservable = this.domManager.expressionToObservable(exp, ctx);
+                }
+
+                if (opt.eventNames) {
+                    exp = <ICompiledExpression> <any> opt.eventNames;
+                    eventNames = this.domManager.evaluateExpression(exp, ctx);
                 }
             }
 
@@ -80,12 +87,15 @@ module wx {
                                 el.disabled = !canExecute;
                             }));
 
-                            // handle click event
-                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
+                            // handle input events
+                            var eventArray = eventNames.split(/\s+/).map(x => trimString(x)).filter(x => <any> x);
+                            var eventObservables = eventArray.map(x => Rx.Observable.fromEvent(el, x));
+
+                            cleanup.add(Rx.Observable.merge<Event>(eventObservables).subscribe((e: Event) => {
                                 x.cmd.execute(x.param);
 
-                                if (isAnchor) {
-                                    // prevent default for anchors
+                                // prevent default for anchors
+                                if (isAnchor && e.type === "click") {
                                     e.preventDefault();
                                 }
                             }));
