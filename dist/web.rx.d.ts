@@ -491,6 +491,7 @@ declare module wx {
     interface ICommandBindingOptions {
         command: ICommand<any>;
         parameter?: any;
+        eventNames?: any;
     }
     module internal {
         var commandBindingConstructor: any;

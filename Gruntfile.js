@@ -166,7 +166,7 @@ module.exports = function (grunt) {
         release: {  
             options: {
                 bump: false,
-                commitMessage: 'Release <%= version %>'
+                tag: false
             }
         },
 
@@ -228,8 +228,8 @@ module.exports = function (grunt) {
     grunt.registerTask("dist", ["gen-ver", "clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
     grunt.registerTask("xtest", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
-    grunt.registerTask('publish:patch', ['bump:patch', 'dist', 'nugetpack', 'nugetpush', "release"]);  
-    grunt.registerTask('publish:minor', ['bump:minor', 'dist', 'nugetpack', 'nugetpush', "release"]);  
-    grunt.registerTask('publish:major', ['bump:major', 'dist', 'nugetpack', 'nugetpush', "release"]);  
+    grunt.registerTask('publish:patch', ['bump:patch', 'dist', "release", 'nugetpack', 'nugetpush']);  
+    grunt.registerTask('publish:minor', ['bump:minor', 'dist', "release", 'nugetpack', 'nugetpush']);  
+    grunt.registerTask('publish:major', ['bump:major', 'dist', "release", 'nugetpack', 'nugetpush']);  
     grunt.registerTask('publish', ['publish:patch']);  
 };

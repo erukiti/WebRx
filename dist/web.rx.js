@@ -1584,6 +1584,7 @@ var wx;
             var paramObservable;
             var cleanup;
             var isAnchor = el.tagName.toLowerCase() === "a";
+            var eventNames = "click";
             function doCleanup() {
                 if (cleanup) {
                     cleanup.dispose();
@@ -1602,6 +1603,10 @@ var wx;
                     exp = opt.parameter;
                     paramObservable = this.domManager.expressionToObservable(exp, ctx);
                 }
+                if (opt.eventNames) {
+                    exp = opt.eventNames;
+                    eventNames = this.domManager.evaluateExpression(exp, ctx);
+                }
             }
             if (paramObservable == null) {
                 paramObservable = Rx.Observable.return(undefined);
@@ -1617,9 +1622,11 @@ var wx;
                         cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
                             el.disabled = !canExecute;
                         }));
-                        cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
+                        var eventArray = eventNames.split(/\s+/).map(function (x) { return wx.trimString(x); }).filter(function (x) { return x; });
+                        var eventObservables = eventArray.map(function (x) { return Rx.Observable.fromEvent(el, x); });
+                        cleanup.add(Rx.Observable.merge(eventObservables).subscribe(function (e) {
                             x.cmd.execute(x.param);
-                            if (isAnchor) {
+                            if (isAnchor && e.type === "click") {
                                 e.preventDefault();
                             }
                         }));
@@ -6815,6 +6822,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.65';
+    wx.version = '0.9.67';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

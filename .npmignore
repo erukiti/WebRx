@@ -12,3 +12,9 @@ tests/
 CHANGELOG.*
 Gruntfile.js
 gruntfile.js
+.tscache
+build
+src
+test
+nuget
+vs
