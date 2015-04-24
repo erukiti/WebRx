@@ -171,12 +171,7 @@ module.exports = function (grunt) {
 
         release: {  
             options: {
-                bump: false,
-                tag: false,
-                add: true,
-                commit: true,
-                push: true,
-                pushTags: true
+                bump: false
             }
         },
 
