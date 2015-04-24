@@ -16,7 +16,7 @@ WebRx is a Javascript MVVM-Framework built on [ReactiveX for Javascript (RxJs)](
 - Supports self-contained, reusable *Components* modelled after the upcoming Web-Components standard
 - Out-of-the box support for *Modules* to facilitate code-reuse and separation of concerns
 - Integrated state-based routing engine inspired by Angular's [UI-Router](https://github.com/angular-ui/ui-router)
-- No dependencies besides RxJS-Lite
+- No dependencies besides [RxJS](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/libraries/rx.complete.md)
 - Compact (~25Kb minified & compressed)
 - First class [TypeScript](http://www.typescriptlang.org/) support
 
@@ -36,7 +36,7 @@ npm install webrx
 ```
 - or download the [latest release as zip](http://webrxjs.org/downloads/web.rx.zip)
 
-Make sure to include script-references to rx.lite.js and rx.lite.extras.js **before** web.rx.js when integrating WebRx into your projects.
+Make sure to include script-references to rx.all.js **before** web.rx.js when integrating WebRx into your projects.
 
 #### Documentation
 
