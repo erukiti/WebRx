@@ -1599,8 +1599,8 @@ var wx;
                     exp = opt.parameter;
                     paramObservable = this.domManager.expressionToObservable(exp, ctx);
                 }
-                if (opt.eventNames) {
-                    exp = opt.eventNames;
+                if (opt.events) {
+                    exp = opt.events;
                     eventNames = this.domManager.evaluateExpression(exp, ctx);
                 }
             }

@@ -8,7 +8,7 @@ module wx {
     export interface ICommandBindingOptions {
         command: ICommand<any>;
         parameter?: any;
-        eventNames?: any;
+        events?: any;
     }
 
     class CommandBinding implements IBindingHandler {
@@ -58,8 +58,8 @@ module wx {
                     paramObservable = this.domManager.expressionToObservable(exp, ctx);
                 }
 
-                if (opt.eventNames) {
-                    exp = <ICompiledExpression> <any> opt.eventNames;
+                if (opt.events) {
+                    exp = <ICompiledExpression> <any> opt.events;
                     eventNames = this.domManager.evaluateExpression(exp, ctx);
                 }
             }
