@@ -22,16 +22,18 @@ WebRx is a Javascript MVVM-Framework built on [ReactiveX for Javascript (RxJs)](
 
 #### Installation
 
-- Installation via NuGet
+- NuGet Installation
 ```bash
 PM> Install-Package WebRx
 ```
-
-- Installation via Bower
+- Bower Installation
 ```bash
 bower install WebRx
 ```
-
+- NPM Installation
+```bash
+npm install webrx
+```
 - or download the [latest release as zip](http://webrxjs.org/downloads/web.rx.zip)
 
 Make sure to include script-references to rx.lite.js and rx.lite.extras.js **before** web.rx.js when integrating WebRx into your projects.
