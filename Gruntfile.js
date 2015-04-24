@@ -163,6 +163,12 @@ module.exports = function (grunt) {
             }
         },
 
+        shell: {
+            gitadd: {
+                command: 'git add .'
+            }
+        },
+
         release: {  
             options: {
                 bump: false,
@@ -217,6 +223,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-typedoc');
     grunt.loadNpmTasks('grunt-saucelabs');
     grunt.loadNpmTasks('grunt-release');  
+    grunt.loadNpmTasks('grunt-shell');
 
     grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
         var template = "module wx {\n\texport var version = '<%= pkg.version %>';\n}";
@@ -230,8 +237,8 @@ module.exports = function (grunt) {
     grunt.registerTask("dist", ["gen-ver", "clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
     grunt.registerTask("xtest", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
-    grunt.registerTask('publish:patch', ['bump:patch', 'dist', "release", 'nugetpack', 'nugetpush']);  
-    grunt.registerTask('publish:minor', ['bump:minor', 'dist', "release", 'nugetpack', 'nugetpush']);  
-    grunt.registerTask('publish:major', ['bump:major', 'dist', "release", 'nugetpack', 'nugetpush']);  
+    grunt.registerTask('publish:patch', ['bump:patch', 'dist', "gitadd", "release", 'nugetpack', 'nugetpush']);  
+    grunt.registerTask('publish:minor', ['bump:minor', 'dist', "gitadd", "release", 'nugetpack', 'nugetpush']);  
+    grunt.registerTask('publish:major', ['bump:major', 'dist', "gitadd", "release", 'nugetpack', 'nugetpush']);  
     grunt.registerTask('publish', ['publish:patch']);  
 };

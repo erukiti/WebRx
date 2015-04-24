@@ -6822,6 +6822,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.67';
+    wx.version = '0.9.71';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
