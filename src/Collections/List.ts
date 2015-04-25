@@ -539,14 +539,18 @@ module wx {
                 this.itemsRemoved.select(x => false),
                 this.itemReplaced.select(x => false),
                 this.itemsMoved.select(x => false),
-                this.resetSubject.select(x => true));
+                this.resetSubject.select(x => true))
+                .publish()
+                .refCount();
 
             this.listChanging = Rx.Observable.merge(
                 this.beforeItemsAdded.select(x => false),
                 this.beforeItemsRemoved.select(x => false),
                 this.beforeItemReplaced.select(x => false),
                 this.beforeItemsMoved.select(x => false),
-                this.beforeResetSubject.select(x => true));
+                this.beforeResetSubject.select(x => true))
+                .publish()
+                .refCount();
 
             if (initialContents) {
                 Array.prototype.splice.apply(this.inner,(<T[]><any>[0, 0]).concat(initialContents));
