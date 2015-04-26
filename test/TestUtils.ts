@@ -11,7 +11,7 @@ declare module wx {
 
 module testutils {
     var knownEvents = {}, knownEventTypesByEventName = {};
-    var keyEventTypeName = (navigator && /Firefox\/2/i.test(navigator.userAgent)) ? 'KeyboardEvent' : 'UIEvents';
+    var keyEventTypeName = 'KeyboardEvent';
     knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress'];
     knownEvents['MouseEvents'] = ['click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave'];
 
@@ -238,12 +238,30 @@ module testutils {
         return nodes.map(x => x.getAttribute(attr)).join(", ");
     }
 
-    export function triggerEvent(element: HTMLElement, eventType: string) {
+    export function triggerEvent(element: HTMLElement, eventType: string, keyCode?: any) {
         if (typeof document.createEvent == "function") {
             if (typeof element.dispatchEvent == "function") {
                 var eventCategory = knownEventTypesByEventName[eventType] || "HTMLEvents";
-                var event = document.createEvent(eventCategory);
-                (<any> event.initEvent)(eventType, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, element);
+                var event: any;
+
+                if (eventCategory !== 'KeyboardEvent') {
+                    event = document.createEvent(eventCategory);
+                    (<any> event.initEvent)(eventType, true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, element);
+                } else {
+                    var keyEvent = <KeyboardEvent> <any> document.createEvent(eventCategory);
+                    keyEvent.initKeyboardEvent(eventType, true, true, null, "", 0, "", false, null);
+
+                    if (keyCode) {
+                        Object.defineProperty(keyEvent, 'keyCode', {
+                            get() {
+                                return keyCode;
+                            }
+                        });
+                    }
+
+                    event = keyEvent;
+                }
+
                 element.dispatchEvent(event);
             }
             else

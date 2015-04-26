@@ -1,0 +1,4 @@
+﻿<div id="keypress-single" data-bind="keypress: { 'enter': clickHandler }">Click me</div>
+<div type="text" id="keypress-multiple" data-bind="keypress: { 'tab': clickHandler, 'enter': inputHandler }"></div>
+<div type="text" id="keypress-multiple-command" data-bind="keypress: { 'tab': clickCommand, 'enter': inputCommand }"></div>
+<div type="text" id="keypress-multiple-command-with-params" data-bind="keypress: { 'tab': { command: clickCommand, parameter: 'foo' } }"></div>
