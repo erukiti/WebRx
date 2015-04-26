@@ -8,6 +8,7 @@
 /// <reference path="Bindings/SimpleOneWay.ts" />
 /// <reference path="Bindings/ForEach.ts" />
 /// <reference path="Bindings/Event.ts" />
+/// <reference path="Bindings/KeyPress.ts" />
 /// <reference path="Bindings/TextInput.ts" />
 /// <reference path="Bindings/SelectedValue.ts" />
 /// <reference path="Bindings/Component.ts" />
@@ -42,6 +43,7 @@ module wx {
         .register("wx.bindings.disabled", [res.domManager, internal.disableBindingConstructor], true)
         .register("wx.bindings.foreach", [res.domManager, internal.forEachBindingConstructor], true)
         .register("wx.bindings.event", [res.domManager, internal.eventBindingConstructor], true)
+        .register("wx.bindings.keyPress", [res.domManager, internal.keyPressBindingConstructor], true)
         .register("wx.bindings.textInput", [res.domManager, internal.textInputBindingConstructor], true)
         .register("wx.bindings.checked", [res.domManager, internal.checkedBindingConstructor], true)
         .register("wx.bindings.selectedValue", [res.domManager, internal.selectedValueBindingConstructor], true)
@@ -71,6 +73,7 @@ module wx {
         .binding("enabled", "wx.bindings.enabled")
         .binding("foreach", "wx.bindings.foreach")
         .binding("event", "wx.bindings.event")
+        .binding(["keyPress", "keypress"], "wx.bindings.keyPress")
         .binding(["textInput", "textinput"], "wx.bindings.textInput")
         .binding("checked", "wx.bindings.checked")
         .binding("selectedValue", "wx.bindings.selectedValue")

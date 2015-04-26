@@ -28,52 +28,10 @@ module wx {
 
             // create an observable for each event handler value
             var tokens = this.domManager.getObjectLiteralTokens(options);
-            var eventDisposables: { [eventName: string]: Rx.Disposable } = {};
-            var eventHandlers = tokens.map(token => {
-                var exp = this.domManager.compileBindingOptions(token.value, module);
-                return this.domManager.expressionToObservable(exp, ctx);
+
+            tokens.forEach(token => {
+                this.wireEvent(el, token.value, token.key, ctx, state, module);
             });
-
-            // subscribe to all events
-            for (var i = 0; i < tokens.length; i++) {
-                ((_i => {
-                    state.cleanup.add(eventHandlers[_i].subscribe(handler => {
-                        try {
-                            var eventName = tokens[_i].key;
-
-                            // unwire previous event subscription
-                            if (eventDisposables[eventName]) {
-                                eventDisposables[eventName].dispose();
-                            }
-
-                            // wire up event observable
-                            handler = unwrapProperty(handler);
-
-                            if (typeof handler === "function") {
-                                eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(e => {
-                                    handler.apply(ctx.$data, [ctx, e]);
-                                });
-                            } else {
-                                // assumed to be an Rx.Observer
-                                var observer = <Rx.Observer<Event>> handler;
-
-                                // subscribe event directly to observer
-                                eventDisposables[eventName] = Rx.Observable.fromEvent<Event>(el, eventName).subscribe(observer);
-                            }
-                        } catch (e) {
-                            wx.app.defaultExceptionHandler.onNext(e);
-                        } 
-                    }));
-                })(i));
-            }
-
-            // release event handlers
-            state.cleanup.add(Rx.Disposable.create(() => {
-                Object.keys(eventDisposables).forEach(x => {
-                    if (eventDisposables[x])
-                        eventDisposables[x].dispose();
-                });
-            }));
 
             // release closure references to GC 
             state.cleanup.add(Rx.Disposable.create(() => {
@@ -87,8 +45,6 @@ module wx {
                 el = null;
 
                 // nullify locals
-                eventDisposables = null;
-                eventHandlers = null;
             }));
         }
 
@@ -102,6 +58,50 @@ module wx {
         // Implementation
 
         protected domManager: IDomManager;
+
+        private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: IDataContext, state: INodeState, module: IModule) {
+            var exp = this.domManager.compileBindingOptions(value, module);
+            var command: ICommand<any>;
+            var commandParameter = undefined;
+            var obs = Rx.Observable.fromEvent<Event>(el, eventName);
+
+            if (typeof exp === "function") {
+                var handler = this.domManager.evaluateExpression(exp, ctx);
+                handler = unwrapProperty(handler);
+
+                if (isFunction(handler)) {
+                    state.cleanup.add(obs.subscribe(e => {
+                        handler.apply(ctx.$data, [ctx, e]);
+                    }));
+                } else {
+                    if (isCommand(handler)) {
+                        command = <ICommand<any>> <any> handler;
+
+                        state.cleanup.add(obs.subscribe(_ => {
+                            command.execute(undefined);
+                        }));
+                    } else {
+                        // assumed to be an Rx.Observer
+                        var observer = <Rx.Observer<Event>> handler;
+
+                        // subscribe event directly to observer
+                        state.cleanup.add(obs.subscribe(observer));
+                    }
+                }
+            } else if (typeof exp === "object") {
+                command = <ICommand<any>> <any> this.domManager.evaluateExpression(exp.command, ctx);
+                command = unwrapProperty(command);
+
+                if (exp.hasOwnProperty("parameter"))
+                    commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
+
+                state.cleanup.add(obs.subscribe(_ => {
+                    command.execute(commandParameter);
+                }));
+            } else {
+                internal.throwError("invalid binding options");
+            }
+        }
     }
 
     export module internal {

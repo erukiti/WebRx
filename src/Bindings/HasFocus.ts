@@ -4,6 +4,11 @@
 module wx {
     "use strict";
 
+    export interface IHasFocusBindingOptions {
+        property: any;
+        delay: number;
+    }
+
     class HasFocusBinding implements IBindingHandler {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
@@ -22,7 +27,23 @@ module wx {
             var el = <HTMLInputElement> node;
             var prop: IObservableProperty<any>;
             var cleanup: Rx.CompositeDisposable;
-            var exp = this.domManager.compileBindingOptions(options, module);
+            var compiled = this.domManager.compileBindingOptions(options, module);
+            var exp: ICompiledExpression;
+            var delay = 0;
+
+            if (typeof compiled === "object" && compiled.hasOwnProperty("property")) {
+                var opt = <IHasFocusBindingOptions> compiled;
+                exp = opt.property;
+
+                delay = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.delay, ctx);
+
+                // convert boolean to number
+                if (typeof delay === "boolean")
+                    delay = delay ? 1 : 0;
+
+            } else {
+                exp = compiled;
+            }
 
             function doCleanup() {
                 if (cleanup) {
@@ -57,10 +78,10 @@ module wx {
                     // that we make tricky assumption about the presence of a "visible" binding 
                     // on the same element who's subscribe handler runs after us 
 
-                    if (el.style.display !== 'none') {
+                    if (delay === 0 && el.style.display !== 'none') {
                         el.focus();
                     } else {
-                        Rx.Scheduler.currentThread.schedule(() => {
+                        Rx.Observable.timer(delay).subscribe(() => {
                             el.focus();
                         });
                     }
@@ -69,7 +90,7 @@ module wx {
                 }
             }
 
-            // options is supposed to be a field-access path
+            // options is supposed to be a @propref
             state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
                 try {
                     if (!isProperty(model)) {

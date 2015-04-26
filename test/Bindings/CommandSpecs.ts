@@ -52,31 +52,6 @@ describe('Bindings', () => {
             expect(executeParam).toEqual(model.param());
         });
 
-        it('reacts to other events than click',() => {
-            loadFixtures('templates/Bindings/Command.html');
-
-            var el = <HTMLButtonElement> document.querySelector("#command-button-observable-custom-events");
-
-            var fooExecuteCount = 0;
-            var barExecuteCount = 0;
-            var executeParam = undefined;
-
-            var model = {
-                cmd: wx.property(),
-                param: wx.property(),
-                events: "dblclick"
-            };
-
-            expect(() => wx.applyBindings(model, el)).not.toThrowError();
-            expect(fooExecuteCount).toEqual(0);
-            expect(barExecuteCount).toEqual(0);
-
-            model.cmd(wx.command((x) => { fooExecuteCount++; executeParam = x }));
-            testutils.triggerEvent(el, model.events);
-            expect(fooExecuteCount).toEqual(1);
-            expect(executeParam).toEqual(model.param());
-        });
-
         function commandBindingSmokeTestImpl(sel: string) {
             var executed = false;
             var el = <HTMLElement> document.querySelector(sel);

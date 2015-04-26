@@ -8,7 +8,6 @@ module wx {
     export interface ICommandBindingOptions {
         command: ICommand<any>;
         parameter?: any;
-        events?: any;
     }
 
     class CommandBinding implements IBindingHandler {
@@ -34,7 +33,7 @@ module wx {
             var paramObservable: Rx.Observable<any>;
             var cleanup: Rx.CompositeDisposable;
             var isAnchor = el.tagName.toLowerCase() === "a";
-            var eventNames: any = "click";
+            var event: any = "click";
 
             function doCleanup() {
                 if (cleanup) {
@@ -56,11 +55,6 @@ module wx {
                 if (opt.parameter) {
                     exp = <ICompiledExpression> <any> opt.parameter;
                     paramObservable = this.domManager.expressionToObservable(exp, ctx);
-                }
-
-                if (opt.events) {
-                    exp = <ICompiledExpression> <any> opt.events;
-                    eventNames = this.domManager.evaluateExpression(exp, ctx);
                 }
             }
 
@@ -88,10 +82,7 @@ module wx {
                             }));
 
                             // handle input events
-                            var eventArray = eventNames.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
-                            var eventObservables = eventArray.map(x => Rx.Observable.fromEvent(el, x));
-
-                            cleanup.add(Rx.Observable.merge<Event>(eventObservables).subscribe((e: Event) => {
+                            cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
                                 x.cmd.execute(x.param);
 
                                 // prevent default for anchors
