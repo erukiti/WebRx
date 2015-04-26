@@ -6,7 +6,7 @@ module wx {
     "use strict";
 
     export interface IEventBindingOptions {
-        [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>;
+        [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>|{ command: ICommand<any>; parameter: any };
     }
 
     class EventBinding implements IBindingHandler {
@@ -89,11 +89,13 @@ module wx {
                     }
                 }
             } else if (typeof exp === "object") {
-                command = <ICommand<any>> <any> this.domManager.evaluateExpression(exp.command, ctx);
+                var opt = <{ command: ICommand<any>; parameter: any }> exp;
+
+                command = <ICommand<any>> <any> this.domManager.evaluateExpression(<any> opt.command, ctx);
                 command = unwrapProperty(command);
 
                 if (exp.hasOwnProperty("parameter"))
-                    commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
+                    commandParameter = this.domManager.evaluateExpression(opt.parameter, ctx);
 
                 state.cleanup.add(obs.subscribe(_ => {
                     command.execute(commandParameter);

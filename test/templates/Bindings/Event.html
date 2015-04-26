@@ -1,3 +1,5 @@
 ﻿<button id="event-single" data-bind="event: { click: clickHandler }">Click me</button>
 <input type="text" id="event-multiple" data-bind="event: { click: clickHandler, input: inputHandler }" />
 <input type="text" id="event-multiple-observer" data-bind="event: { click: clickObserver, input: inputObserver }" />
+<input type="text" id="event-multiple-command" data-bind="event: { click: clickCommand, input: inputCommand }" />
+<input type="text" id="event-multiple-command-with-params" data-bind="event: { click: { command: clickCommand, parameter: 'foo' } }" />

@@ -137,5 +137,76 @@ describe('Bindings', () => {
             testutils.triggerEvent(el, "input");
             expect(inputCallCount).toEqual(0);
         });
+
+        it('binds multiple events to commands',() => {
+            loadFixtures('templates/Bindings/Event.html');
+
+            var el = <HTMLInputElement> document.querySelector("#event-multiple-command");
+
+            var clickCallCount = 0;
+            var inputCallCount = 0;
+
+            var clickSubject = new Rx.Subject<Event>();
+            var inputSubject = new Rx.Subject<Event>();
+
+            var model = {
+                clickCommand: wx.command((x) => { clickSubject.onNext(x) }),
+                inputCommand: wx.command((x) => { inputSubject.onNext(x) })
+            };
+
+            clickSubject.subscribe(x => clickCallCount++);
+            inputSubject.subscribe(x => inputCallCount++);
+
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+
+            expect(clickCallCount).toEqual(0);
+            expect(inputCallCount).toEqual(0);
+
+            testutils.triggerEvent(el, "click");
+            expect(clickCallCount).toEqual(1);
+
+            el.value = "new";
+            testutils.triggerEvent(el, "input");
+            expect(inputCallCount).toEqual(1);
+
+            wx.cleanNode(el);
+            clickCallCount = 0;
+            inputCallCount = 0;
+
+            // should no longer fire
+            testutils.triggerEvent(el, "click");
+            expect(clickCallCount).toEqual(0);
+
+            el.value = "old";
+            testutils.triggerEvent(el, "input");
+            expect(inputCallCount).toEqual(0);
+        });
+
+        it('binds multiple events to commands with params',() => {
+            loadFixtures('templates/Bindings/Event.html');
+
+            var el = <HTMLInputElement> document.querySelector("#event-multiple-command-with-params");
+
+            var clicks = [];
+
+            var model = {
+                clickCommand: wx.command((x) => { clicks.push(x); })
+            };
+
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+
+            expect(clicks.length).toEqual(0);
+
+            testutils.triggerEvent(el, "click");
+            expect(clicks.length).toEqual(1);
+            expect(clicks[0]).toEqual('foo');
+
+            wx.cleanNode(el);
+            clicks = [];
+
+            // should no longer fire
+            testutils.triggerEvent(el, "click");
+            expect(clicks.length).toEqual(0);
+        });
     });
 });

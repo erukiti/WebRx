@@ -52,6 +52,23 @@ describe('Routing',() => {
                 expect(el).toHaveClass("active");
             });
 
+            it('binds using custom css classes',() => {
+                loadFixtures('templates/Routing/Bindings/StateActive.html');
+
+                router.state({
+                    name: "foo"
+                });
+
+                var el = <HTMLAnchorElement> document.querySelector("#fixture4");
+                expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+                expect(el).not.toHaveClass("selected");
+                expect(el).not.toHaveClass("selected2");
+
+                router.go("foo");
+                expect(el).toHaveClass("selected");
+                expect(el).toHaveClass("selected2");
+            });
+
             it('does not use strict equality when comparing params',() => {
                 loadFixtures('templates/Routing/Bindings/StateActive.html');
 
