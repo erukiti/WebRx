@@ -223,7 +223,7 @@ module wx {
                 if(state.name !== this.rootStateName) 
                     state.route = route(parts[parts.length - 1]);
                 else
-                    state.route = "/";
+                    state.route = route("/");
             }
 
             // detect root-state override

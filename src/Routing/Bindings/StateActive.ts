@@ -8,6 +8,7 @@ module wx {
     export interface IStateActiveBindingOptions {
         name: string;
         params?: Object;
+        cssClass?: string;
     }
 
     class StateActiveBinding implements IBindingHandler {
@@ -34,6 +35,7 @@ module wx {
             var paramsKeys: Array<string> = [];
             var stateName;
             var stateParams: Object;
+            var cssClass = "active";
 
             observables.push(router.current.changed.startWith(router.current()));
 
@@ -53,6 +55,10 @@ module wx {
                         observables.push(this.domManager.expressionToObservable(opt.params[x], ctx));
                     });
                 }
+
+                if (opt.cssClass) {
+                    cssClass = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.cssClass, ctx);
+                }
             }
 
             // subscribe to any input changes
@@ -71,7 +77,12 @@ module wx {
                         stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                     }
 
-                    toggleCssClass(el, this.router.includes(stateName, stateParams), "active");
+                    var active = this.router.includes(stateName, stateParams);
+                    var classes = cssClass.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
+
+                    if (classes.length) {
+                        toggleCssClass.apply(null, [el, active].concat(classes));
+                    }
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
                 } 
