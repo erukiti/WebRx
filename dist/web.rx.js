@@ -1911,10 +1911,11 @@ var wx;
                 }
             }
             else if (typeof exp === "object") {
-                command = this.domManager.evaluateExpression(exp.command, ctx);
+                var opt = exp;
+                command = this.domManager.evaluateExpression(opt.command, ctx);
                 command = wx.unwrapProperty(command);
                 if (exp.hasOwnProperty("parameter"))
-                    commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
+                    commandParameter = this.domManager.evaluateExpression(opt.parameter, ctx);
                 state.cleanup.add(obs.subscribe(function (_) {
                     command.execute(commandParameter);
                 }));
@@ -6258,6 +6259,7 @@ var wx;
             var paramsKeys = [];
             var stateName;
             var stateParams;
+            var cssClass = "active";
             observables.push(wx.router.current.changed.startWith(wx.router.current()));
             if (typeof compiled === "function") {
                 exp = compiled;
@@ -6271,6 +6273,9 @@ var wx;
                         observables.push(_this.domManager.expressionToObservable(opt.params[x], ctx));
                     });
                 }
+                if (opt.cssClass) {
+                    cssClass = this.domManager.evaluateExpression(opt.cssClass, ctx);
+                }
             }
             state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
                 try {
@@ -6280,7 +6285,11 @@ var wx;
                     for (var i = 0; i < paramsKeys.length; i++) {
                         stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
                     }
-                    wx.toggleCssClass(el, _this.router.includes(stateName, stateParams), "active");
+                    var active = _this.router.includes(stateName, stateParams);
+                    var classes = cssClass.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+                    if (classes.length) {
+                        wx.toggleCssClass.apply(null, [el, active].concat(classes));
+                    }
                 }
                 catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
@@ -6765,7 +6774,10 @@ var wx;
                 }
             }
             else {
-                state.route = wx.route(parts[parts.length - 1]);
+                if (state.name !== this.rootStateName)
+                    state.route = wx.route(parts[parts.length - 1]);
+                else
+                    state.route = wx.route("/");
             }
             if (state.name === this.rootStateName)
                 this.root = state;
@@ -6947,6 +6959,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.73';
+    wx.version = '0.9.75';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

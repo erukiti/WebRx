@@ -517,7 +517,10 @@ declare module wx {
 }
 declare module wx {
     interface IEventBindingOptions {
-        [eventName: string]: (ctx: IDataContext, event: Event) => any | Rx.Observer<Event>;
+        [eventName: string]: (ctx: IDataContext, event: Event) => any | Rx.Observer<Event> | {
+            command: ICommand<any>;
+            parameter: any;
+        };
     }
     module internal {
         var eventBindingConstructor: any;
@@ -747,6 +750,7 @@ declare module wx {
     interface IStateActiveBindingOptions {
         name: string;
         params?: Object;
+        cssClass?: string;
     }
     module internal {
         var stateActiveBindingConstructor: any;
