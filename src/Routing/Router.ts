@@ -220,7 +220,10 @@ module wx {
                 }
             } else {
                 // derive relative route from name
-                state.route = route(parts[parts.length - 1]);
+                if(state.name !== this.rootStateName) 
+                    state.route = route(parts[parts.length - 1]);
+                else
+                    state.route = "/";
             }
 
             // detect root-state override
