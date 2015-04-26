@@ -1,5 +1,6 @@
 ﻿///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="typings/URI.d.ts" />
+/// <reference path="../build/web.rx.d.ts" />
 
 declare module wx {
     export interface IHistory {
