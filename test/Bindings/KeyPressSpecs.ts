@@ -3,7 +3,7 @@
 /// <reference path="../../build/web.rx.d.ts" />
 
 describe('Bindings',() => {
-    if (wx.env.firefox || (wx.env.ie && wx.env.ie.version < 10))
+    if (window["_phantom"] || wx.env.firefox || (wx.env.ie && wx.env.ie.version < 10))
         return;
 
     describe('KeyPress',() => {
