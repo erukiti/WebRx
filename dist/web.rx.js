@@ -2697,7 +2697,7 @@ var wx;
                         keys: {}
                     };
                     variation.split('-').forEach(function (value) {
-                        combination.keys[value] = true;
+                        combination.keys[value.trim()] = true;
                     });
                     combinations.push(combination);
                 });
@@ -2719,11 +2719,13 @@ var wx;
             var ctrlPressed = !!event.ctrlKey;
             var shiftPressed = !!event.shiftKey;
             var keyCode = event.keyCode;
-            var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()];
             var metaRequired = !!combination.keys.meta;
             var altRequired = !!combination.keys.alt;
             var ctrlRequired = !!combination.keys.ctrl;
             var shiftRequired = !!combination.keys.shift;
+            if ((!shiftPressed || shiftRequired) && keyCode >= 65 && keyCode <= 90)
+                keyCode = keyCode + 32;
+            var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()] || combination.keys[String.fromCharCode(keyCode)];
             return (mainKeyPressed && (metaRequired === metaPressed) && (altRequired === altPressed) && (ctrlRequired === ctrlPressed) && (shiftRequired === shiftPressed));
         };
         KeyPressBinding.prototype.testCombinations = function (combinations, event) {
@@ -2742,14 +2744,16 @@ var wx;
                 var handler = this.domManager.evaluateExpression(exp, ctx);
                 handler = wx.unwrapProperty(handler);
                 if (!wx.isCommand(handler)) {
-                    state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (_) {
+                    state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (e) {
                         handler.apply(ctx.$data, [ctx]);
+                        e.preventDefault();
                     }));
                 }
                 else {
                     command = handler;
-                    state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (_) {
+                    state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (e) {
                         command.execute(undefined);
+                        e.preventDefault();
                     }));
                 }
             }
@@ -2758,8 +2762,9 @@ var wx;
                 command = wx.unwrapProperty(command);
                 if (exp.hasOwnProperty("parameter"))
                     commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
-                state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (_) {
+                state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (e) {
                     command.execute(commandParameter);
+                    e.preventDefault();
                 }));
             }
             else {
@@ -6959,6 +6964,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.75';
+    wx.version = '0.9.76';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
