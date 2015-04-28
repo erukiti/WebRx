@@ -132,7 +132,7 @@ module wx {
         public reset(): void {
             this.states = {};
 
-            // Implicit root state that is always active
+            // Implicit root state that is always present
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
                 route: route("/")
