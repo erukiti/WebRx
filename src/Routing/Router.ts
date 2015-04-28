@@ -138,7 +138,7 @@ module wx {
                 route: route("/")
             });
 
-            this.go(this.rootStateName);
+            this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
         }
 
         public reload(): void {
