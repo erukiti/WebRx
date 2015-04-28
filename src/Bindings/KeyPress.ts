@@ -63,7 +63,7 @@ module wx {
                     };
 
                     variation.split('-').forEach(value => {
-                        combination.keys[value] = true;
+                        combination.keys[value.trim()] = true;
                     });
 
                     combinations.push(combination);
@@ -105,12 +105,16 @@ module wx {
             var shiftPressed = !!event.shiftKey;
             var keyCode = event.keyCode;
 
-            var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()];
-
             var metaRequired = !!combination.keys.meta;
             var altRequired = !!combination.keys.alt;
             var ctrlRequired = !!combination.keys.ctrl;
             var shiftRequired = !!combination.keys.shift;
+
+            // normalize keycodes
+            if ((!shiftPressed || shiftRequired) && keyCode >= 65 && keyCode <= 90)
+                keyCode = keyCode + 32;
+
+            var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()] || combination.keys[String.fromCharCode(keyCode)];
 
             return (
                 mainKeyPressed &&
@@ -140,14 +144,18 @@ module wx {
                 handler = unwrapProperty(handler);
 
                 if (!isCommand(handler)) {
-                    state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(_ => {
+                    state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(e => {
                         handler.apply(ctx.$data, [ctx]);
+
+                        e.preventDefault();
                     }));
                 } else {
                     command = <ICommand<any>> <any> handler;
 
-                    state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(_ => {
+                    state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(e => {
                         command.execute(undefined);
+
+                        e.preventDefault();
                     }));
                 }
             } else if (typeof exp === "object") {
@@ -157,8 +165,10 @@ module wx {
                 if (exp.hasOwnProperty("parameter"))
                     commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
 
-                state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(_ => {
+                state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(e => {
                     command.execute(commandParameter);
+
+                    e.preventDefault();
                 }));
             } else {
                 internal.throwError("invalid binding options");
