@@ -720,6 +720,12 @@ module wx {
 
     export interface IRouter {
         /**
+        * Transitions to the state inferred from the browser's current location
+        * This method should be invoked once after registering application states.
+        **/
+        sync(): void;
+
+        /**
         * Registers a state configuration under a given state name.
         * @param {IRouterStateConfig} config State configuration to register
         **/
@@ -737,10 +743,7 @@ module wx {
         updateCurrentStateParams(withParamsAction: (params: any)=> void): void;
 
         /**
-        * Convenience method for transitioning to a new state. IRouter.go calls IRouter.transitionTo internally 
-        * but automatically sets options to { location: true, inherit: true, relative: IRouter.current, notify: true }. 
-        * This allows you to easily use an absolute or relative to path and specify only the parameters you'd like 
-        * to update (while letting unspecified parameters inherit from the currently active ancestor states).
+        * Method for transitioning to a new state.
         * @param {string} to Absolute or relative destination state path. 'contact.detail' - will go to the 
         * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
         * '.child.grandchild' will go to grandchild state

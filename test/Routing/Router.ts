@@ -471,6 +471,54 @@ describe('Routing',() => {
             expect(fooLeft).toBeTruthy();
         });
 
+        it('sync() correctly inferes the state from the browsers current location',() => {
+            wx.router.state({
+                name: "foo",
+                route: "foo/:fooId",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            wx.router.state({
+                name: "bar",
+                views: {
+                    'main': "foo"
+                }
+            });
+
+            wx.router.state({
+                name: "foo.bar",
+                route: "bar/:barId",
+                views: {
+                    'main': "bar"
+                }
+            });
+
+            wx.router.go("$", { }, { location: 2 });
+            expect(wx.router.is("$")).toBeTruthy();
+
+            wx.app.history.location.pathname = "/foo";
+            wx.router.sync();
+            expect(wx.router.is("foo", { fooId: 3 })).toBeFalsy();
+
+            wx.app.history.location.pathname = "/foo/3";
+            wx.router.sync();
+            expect(wx.router.is("foo", { fooId: 3 })).toBeTruthy();
+
+            wx.app.history.location.pathname = "/bar";
+            wx.router.sync();
+            expect(wx.router.is("bar", { })).toBeTruthy();
+
+            wx.app.history.location.pathname = "/foo/3/bar/5";
+            wx.router.sync();
+            expect(wx.router.is("foo.bar", { fooId: 3, barId: 5 })).toBeTruthy();
+
+            wx.app.history.location.pathname = "/";
+            wx.router.sync();
+            expect(wx.router.is("$")).toBeTruthy();
+        });
+
         it('getViewComponent() only returns params present at the state that introduced the view into the hierarchy',() => {
             wx.router.state({
                 name: "foo",

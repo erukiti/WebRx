@@ -141,6 +141,26 @@ module wx {
             this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
         }
 
+        public sync(): void {
+            // infer initial state from browser-location
+            var uri = app.history.location.pathname;// + app.history.location.search;
+
+            // iterate over registered states to find matching uri
+            var keys = Object.keys(this.states);
+            var length = keys.length;
+            var params;
+
+            for (var i = 0; i < length; i++) {
+                var state = this.states[keys[i]];
+                var route = this.getAbsoluteRouteForState(state.name);
+
+                if ((params = route.parse(uri)) != null) {
+                    this.go(state.name, params, { location: RouterLocationChangeMode.replace });
+                    break;
+                }
+            }
+        }
+
         public reload(): void {
             this.go(this.current().name, this.current().params, { force: true, location: false });
         }
@@ -253,7 +273,7 @@ module wx {
             app.history.replaceState(hs, "", state.uri);
         }
 
-        private mapPath(path: string) {
+        private mapPath(path: string): string {
             // child-relative
             if (path.indexOf(this.pathSeparator) === 0) {
                 return this.current().name + path;
