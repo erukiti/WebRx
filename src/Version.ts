@@ -1,3 +1,3 @@
 module wx {
-	export var version = '0.9.76';
+	export var version = '0.9.78';
 }

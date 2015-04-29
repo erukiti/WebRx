@@ -332,6 +332,7 @@ declare module wx {
         pushState(statedata: any, title: string, url?: string): void;
     }
     interface IRouter {
+        sync(): void;
         state(config: IRouterStateConfig): IRouter;
         current: IObservableProperty<IRouterState>;
         updateCurrentStateParams(withParamsAction: (params: any) => void): void;

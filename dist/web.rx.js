@@ -6726,7 +6726,21 @@ var wx;
                 name: this.rootStateName,
                 route: wx.route("/")
             });
-            this.go(this.rootStateName);
+            this.go(this.rootStateName, {}, { location: 2 /* replace */ });
+        };
+        Router.prototype.sync = function () {
+            var uri = wx.app.history.location.pathname;
+            var keys = Object.keys(this.states);
+            var length = keys.length;
+            var params;
+            for (var i = 0; i < length; i++) {
+                var state = this.states[keys[i]];
+                var route = this.getAbsoluteRouteForState(state.name);
+                if ((params = route.parse(uri)) != null) {
+                    this.go(state.name, params, { location: 2 /* replace */ });
+                    break;
+                }
+            }
         };
         Router.prototype.reload = function () {
             this.go(this.current().name, this.current().params, { force: true, location: false });
@@ -6964,6 +6978,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.76';
+    wx.version = '0.9.78';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
