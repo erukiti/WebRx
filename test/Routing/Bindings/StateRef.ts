@@ -2,6 +2,7 @@
 /// <reference path="../../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../../build/web.rx.d.ts" />
 /// <reference path="../../typings/URI.d.ts" />
+/// <reference path="../../TestUtils.ts" />
 
 describe('Routing',() => {
     var router = wx.injector.get<wx.IRouter>(wx.res.router);
@@ -73,7 +74,7 @@ describe('Routing',() => {
                 expect(new URI(el.href).pathname()).toEqual("/bar");
             });
 
-            it('clicking the anchor element should change the current router state',() => {
+            it('clicking an anchor element should trigger a state-transition',() => {
                 loadFixtures('templates/Routing/Bindings/StateRef.html');
 
                 router.state({
@@ -81,6 +82,23 @@ describe('Routing',() => {
                 });
 
                 var el = <HTMLAnchorElement> document.querySelector("#fixture1");
+                var model = {};
+                expect(() => wx.applyBindings(model, el)).not.toThrow();
+
+                expect(router.current().name).toEqual("$");
+
+                testutils.triggerEvent(el, "click");
+                expect(router.current().name).toEqual("foo");
+            });
+
+            it('clicking a button element should trigger a state-transition',() => {
+                loadFixtures('templates/Routing/Bindings/StateRef.html');
+
+                router.state({
+                    name: "foo"
+                });
+
+                var el = <HTMLElement> document.querySelector("#fixture4");
                 var model = {};
                 expect(() => wx.applyBindings(model, el)).not.toThrow();
 

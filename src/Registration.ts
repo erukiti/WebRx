@@ -81,8 +81,8 @@ module wx {
         .binding("value", "wx.bindings.value")
         .binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus")
         .binding("view", "wx.bindings.view")
-        .binding("sref", "wx.bindings.sref")
-        .binding(["sactive", "state-active"], "wx.bindings.sactive");
+        .binding(["sref", "stateRef", "stateref"], "wx.bindings.sref")
+        .binding(["sactive", "stateActive", "stateactive"], "wx.bindings.sactive");
 
     app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" })
         .component("wx-select", { resolve: "wx.components.select" });

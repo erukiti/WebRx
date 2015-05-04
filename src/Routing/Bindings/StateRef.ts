@@ -20,13 +20,15 @@ module wx {
         // IBinding
 
         public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
-            if (node.nodeType !== 1 || (<HTMLElement> node).tagName.toLowerCase() !== 'a')
-                internal.throwError("stateRef-binding only operates on anchor-elements!");
+            if (node.nodeType !== 1)
+                internal.throwError("stateRef-binding only operates on elements!");
 
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLAnchorElement> node;
+            var el = <HTMLElement> node;
+            var isAnchor = el.tagName.toLowerCase() === "a";
+            var anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
             var compiled = this.domManager.compileBindingOptions(options, module);
             var exp: ICompiledExpression;
             var observables: Array<Rx.Observable<any>> = [];
@@ -54,7 +56,7 @@ module wx {
             }
 
             // subscribe to any input changes
-            state.cleanup.add(Rx.Observable.combineLatest(observables, (_) => args2Array(arguments)).subscribe(latest => {
+            state.cleanup.add(Rx.Observable.combineLatest(observables, function(_) { return args2Array(arguments) }).subscribe(latest => {
                 try {
                     // first element is always the state-name
                     stateName = unwrapProperty(latest.shift());
@@ -66,7 +68,9 @@ module wx {
                         stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                     }
 
-                    el.href = this.router.uri(stateName, stateParams);
+                    if(anchor != null) {
+                        anchor.href = this.router.uri(stateName, stateParams);
+                    }
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
                 } 
