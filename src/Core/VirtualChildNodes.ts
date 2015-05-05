@@ -24,7 +24,6 @@ module wx.internal {
 
         public appendChilds(nodes: Node[], callbackData?: any) {
             let length = nodes.length;
-            let i;
 
             // append to proxy array
             if (nodes.length > 1)
@@ -33,13 +32,13 @@ module wx.internal {
                 this.childNodes.push(nodes[0]);
 
             // append to DOM
-            for (i = 0; i < length; i++) {
+            for(let i= 0; i < length; i++) {
                 this.targetNode.appendChild(nodes[i]);
             }
 
             // callback
             if (this.insertCB) {
-                for (i = 0; i < length; i++) {
+                for(let i= 0; i < length; i++) {
                     this.insertCB(nodes[i], callbackData);
                 }
             }
@@ -51,19 +50,18 @@ module wx.internal {
             } else {
                 let refNode = this.childNodes[index];
                 let length = nodes.length;
-                let i;
 
                 // insert into proxy array
                 Array.prototype.splice.apply(this.childNodes, [index, 0].concat(<any> nodes));
 
                 // insert into DOM
-                for (i = 0; i < length; i++) {
+                for(let i= 0; i < length; i++) {
                     this.targetNode.insertBefore(nodes[i], refNode);
                 }
 
                 // callback
                 if (this.insertCB) {
-                    for (i = 0; i < length; i++) {
+                    for(let i= 0; i < length; i++) {
                         this.insertCB(nodes[i], callbackData);
                     }
                 }

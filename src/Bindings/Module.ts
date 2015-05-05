@@ -111,11 +111,9 @@ module wx {
         protected domManager: IDomManager;
 
         protected applyValue(el: HTMLElement, module: IModule, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
-            let i;
-
             if (initialApply) {
                 // clone to template
-                for (i = 0; i < el.childNodes.length; i++) {
+                for(let i= 0; i < el.childNodes.length; i++) {
                     template.push(el.childNodes[i].cloneNode(true));
                 }
             }
@@ -131,7 +129,7 @@ module wx {
             }
 
             // clone nodes and inject
-            for (i = 0; i < template.length; i++) {
+            for(let i= 0; i < template.length; i++) {
                 let node = template[i].cloneNode(true);
                 el.appendChild(node);
             }

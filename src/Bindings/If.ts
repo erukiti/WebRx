@@ -124,13 +124,12 @@ module wx {
             animations: IIfAnimationDescriptor, initialApply: boolean): Rx.IDisposable {
             let leaveAnimation: IAnimation = <IAnimation> animations.leave;
             let enterAnimation: IAnimation = <IAnimation> animations.enter;
-            let i;
             let self = this;
             let obs: Rx.Observable<any> = undefined;
 
             if (initialApply) {
                 // clone to template
-                for (i = 0; i < el.childNodes.length; i++) {
+                for(let i= 0; i < el.childNodes.length; i++) {
                     template.push(el.childNodes[i].cloneNode(true));
                 }
 
@@ -168,7 +167,7 @@ module wx {
                 if (enterAnimation)
                     enterAnimation.prepare(nodes);
 
-                for (i = 0; i < template.length; i++) {
+                for(let i= 0; i < template.length; i++) {
                     el.appendChild(nodes[i]);
                 }
 

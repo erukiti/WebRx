@@ -449,11 +449,11 @@ module wx {
                 length = e.items.length;
 
                 if (e.from === list.length()) {
-                    for (i = 0; i < length; i++) {
+                    for(let i= 0; i < length; i++) {
                         this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger, false);
                     }
                 } else {
-                    for (i = 0; i < e.items.length; i++) {
+                    for(let i= 0; i < e.items.length; i++) {
                         this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger);
                     }
                 }
@@ -464,7 +464,7 @@ module wx {
             cleanup.add(list.itemsRemoved.subscribe((e) => {
                 length = e.items.length;
 
-                for (i = 0; i < length; i++) {
+                for(let i= 0; i < length; i++) {
                     this.removeRow(proxy, i + e.from, e.items[i], template, hooks, animations);
                 }
 
@@ -500,7 +500,7 @@ module wx {
                 // clone to template
                 length = el.childNodes.length;
 
-                for (i = 0; i < length; i++) {
+                for(let i= 0; i < length; i++) {
                     template.push(el.childNodes[i].cloneNode(true));
                 }
             }
@@ -559,7 +559,7 @@ module wx {
                 // iterate once and be done with it
                 length = arr.length;
 
-                for (i = 0; i < length; i++) {
+                for(let i= 0; i < length; i++) {
                     this.appendRow(proxy, i, arr[i], ctx, template, hooks, animations, undefined, true);
                 }
             } else if(isList(value)) {

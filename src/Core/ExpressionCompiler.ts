@@ -992,7 +992,7 @@ module wx {
             let hooks = getRuntimeHooks(locals);
 
             if (hooks) {
-                for (i = 0; element.length > 1; i++) {
+                for(let i= 0; element.length > 1; i++) {
                     key = ensureSafeMemberName(element.shift(), fullExp);
 
                     propertyObj = hooks.readFieldHook ?
@@ -1010,7 +1010,7 @@ module wx {
                     obj = propertyObj;
                 }
             } else {
-                for (i = 0; element.length > 1; i++) {
+                for(let i= 0; element.length > 1; i++) {
                     key = ensureSafeMemberName(element.shift(), fullExp);
                     propertyObj = obj[key];
                     if (!propertyObj) {

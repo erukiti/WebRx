@@ -29,7 +29,6 @@ module wx {
             let obs: Rx.Observable<any>;
             let exp: ICompiledExpression;
             let keys = Object.keys(compiled);
-            let i;
             let key;
 
             if (typeof compiled === "function") {
@@ -38,7 +37,7 @@ module wx {
                 obs = this.domManager.expressionToObservable(exp, ctx);
                 observables.push(["", obs]);
             } else {
-                for (i = 0; i < keys.length; i++) {
+                for(let i= 0; i < keys.length; i++) {
                     key = keys[i];
                     let value = compiled[key];
 
@@ -50,7 +49,7 @@ module wx {
             }
 
             // subscribe
-            for (i = 0; i < observables.length; i++) {
+            for(let i= 0; i < observables.length; i++) {
                 key = observables[i][0];
                 obs = observables[i][1];
 

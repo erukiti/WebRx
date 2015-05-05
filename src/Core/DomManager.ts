@@ -336,7 +336,6 @@ module wx {
 
             let _bindings: Array<{ key: string; value: string; fromTag?: boolean }>;
             let tagName = el.tagName.toLowerCase();
-            let i;
 
             // check if tag represents a component
             if (module.hasComponent(tagName) || app.hasComponent(tagName)) {
@@ -378,7 +377,7 @@ module wx {
                 result = hd.length > 0;
 
                 // apply all bindings
-                for (i = 0; i < bindings.length; i++) {
+                for(let i= 0; i < bindings.length; i++) {
                     let binding = bindings[i];
                     let handler = binding.handler;
 

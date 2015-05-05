@@ -245,11 +245,10 @@ module wx {
         if (classNames) {
             let currentClassNames = node.className.match(cssClassNameRegex) || [];
             let index: number;
-            let i;
             let className;
 
             if (shouldHaveClass) {
-                for (i = 0; i < classNames.length; i++) {
+                for(let i= 0; i < classNames.length; i++) {
                     className = classNames[i];
 
                     index = currentClassNames.indexOf(className);
@@ -257,7 +256,7 @@ module wx {
                         currentClassNames.push(className);
                 }
             } else {
-                for (i = 0; i < classNames.length; i++) {
+                for(let i= 0; i < classNames.length; i++) {
                     className = classNames[i];
                     index = currentClassNames.indexOf(className);
                     if (index !== -1)
