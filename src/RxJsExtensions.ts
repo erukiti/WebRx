@@ -1,5 +1,6 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="Core/ScheduledSubject.ts" />
+/// <reference path="Core/Module.ts" />
 /// <reference path="RTTI/IID.ts" />
 
 module wx {
