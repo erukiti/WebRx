@@ -1,6 +1,7 @@
 ﻿///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../../Core/DomManager.ts" />
 /// <reference path="../../Interfaces.ts" />
+/// <reference path="../Router.ts" />
 
 module wx {
     "use strict";
@@ -62,7 +63,7 @@ module wx {
             }
 
             // subscribe to any input changes
-            state.cleanup.add(Rx.Observable.combineLatest(observables, (_) => args2Array(arguments)).subscribe(latest => {
+            state.cleanup.add(Rx.Observable.combineLatest(observables, function(_) { return args2Array(arguments); }).subscribe(latest => {
                 try {
                     // first element is the current state
                     var currentState = latest.shift();

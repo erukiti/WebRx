@@ -73,20 +73,27 @@ module wx {
                             if (!isCommand(x.cmd))
                                 internal.throwError("Command-Binding only supports binding to a command!");
 
-                            // initial update
-                            el.disabled = !x.cmd.canExecute(x.param);
-
-                            // listen to changes
-                            cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
-                                el.disabled = !canExecute;
-                            }));
+                            // disabled handling if supported by element
+                            if(el.hasOwnProperty("disabled")) {
+                                // initial update
+                                el["disabled"] = !x.cmd.canExecute(x.param);
+    
+                                // listen to changes
+                                cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
+                                    el["disabled"] = !canExecute;
+                                }));
+                            }
 
                             // handle input events
                             cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
-                                x.cmd.execute(x.param);
+                                // verify that the command can actually execute since we cannot disable 
+                                // all elements - only form elements such as buttons 
+                                if(x.cmd.canExecute(x.param)) {
+                                    x.cmd.execute(x.param);
+                                }                                
 
                                 // prevent default for anchors
-                                if (isAnchor && e.type === "click") {
+                                if (isAnchor) {
                                     e.preventDefault();
                                 }
                             }));

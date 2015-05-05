@@ -1,4 +1,5 @@
-﻿
+﻿declare var WeakMap: any;
+
 module wx {
     "use strict";
 

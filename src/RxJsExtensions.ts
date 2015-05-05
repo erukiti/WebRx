@@ -16,7 +16,7 @@ module wx {
         scheduler = scheduler || Rx.Scheduler.currentThread;
 
         // initialize accessor function (read-only)
-        var accessor: any = (newVal?: any): any => {
+        var accessor: any = function(newVal?: any): any {
             if (arguments.length > 0) {
                 internal.throwError("attempt to write to a read-only observable property");
             }

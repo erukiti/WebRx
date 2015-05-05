@@ -62,7 +62,7 @@ module wx {
                         var observables = moduleNames.map(x => loadModule(x));
 
                         disp = Rx.Observable.combineLatest(observables,
-                            (_) => <IModule[]> args2Array(arguments)).subscribe(modules => {
+                            function(_) { return <IModule[]> args2Array(arguments) }).subscribe(modules => {
                             // create intermediate module
                             var moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
                             var merged: IModule = new internal.moduleConstructor(moduleName);

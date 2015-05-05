@@ -1,4 +1,6 @@
-﻿module wx {
+﻿declare var Set: any;
+
+module wx {
     "use strict";
 
     /**

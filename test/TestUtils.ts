@@ -268,8 +268,8 @@ module testutils {
                 throw new Error("The supplied element doesn't support dispatchEvent");
         } else if (element.click) {
             element.click();
-        } else if (typeof element.fireEvent != "undefined") {
-            element.fireEvent("on" + eventType);
+        } else if (typeof element["fireEvent"] != "undefined") {
+            element["fireEvent"]("on" + eventType);
         } else {
             throw new Error("Browser doesn't support triggering events");
         }

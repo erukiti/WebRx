@@ -1,6 +1,7 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
+/// <reference path="../TestUtils.ts" />
 
 describe('Bindings', () => {
     function createCommandModel(commandAction: (any) => void) {
@@ -59,9 +60,11 @@ describe('Bindings', () => {
 
             // canExecute tests
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
-            expect(el.disabled).toBeTruthy();
+            if(el.hasOwnProperty("disabled"))
+                expect(el["disabled"]).toBeTruthy();
             model.canExecute(true);
-            expect(el.disabled).toBeFalsy();
+            if(el.hasOwnProperty("disabled"))
+                expect(el["disabled"]).toBeFalsy();
 
             // execute test
             testutils.triggerEvent(el, "click");
@@ -71,7 +74,8 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             executed = false;
             model.canExecute(false);
-            expect(el.disabled).toBeFalsy();
+            if(el.hasOwnProperty("disabled"))
+                expect(el["disabled"]).toBeFalsy();
             testutils.triggerEvent(el, "click");
             expect(executed).toBeFalsy();
         }
