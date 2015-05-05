@@ -2,13 +2,13 @@
 module wx.res {
     "use strict";
 
-    export var injector = "wx.injector";
-    export var domManager = "wx.domservice";
-    export var router = "wx.router";
-    export var messageBus = "wx.messageBus";
-    export var expressionCompiler = "wx.expressioncompiler";
-    export var htmlTemplateEngine = "wx.htmlTemplateEngine";
+    export const injector = "wx.injector";
+    export const domManager = "wx.domservice";
+    export const router = "wx.router";
+    export const messageBus = "wx.messageBus";
+    export const expressionCompiler = "wx.expressioncompiler";
+    export const htmlTemplateEngine = "wx.htmlTemplateEngine";
 
-    export var hasValueBindingValue = "has.wx.bindings.value";
-    export var valueBindingValue = "wx.bindings.value";
+    export const hasValueBindingValue = "has.wx.bindings.value";
+    export const valueBindingValue = "wx.bindings.value";
 }

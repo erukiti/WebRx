@@ -11,7 +11,7 @@ declare module wx {
 
 module testutils {
     var knownEvents = {}, knownEventTypesByEventName = {};
-    var keyEventTypeName = 'KeyboardEvent';
+    const keyEventTypeName = 'KeyboardEvent';
     knownEvents[keyEventTypeName] = ['keyup', 'keydown', 'keypress'];
     knownEvents['MouseEvents'] = ['click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'mouseover', 'mouseout', 'mouseenter', 'mouseleave'];
 

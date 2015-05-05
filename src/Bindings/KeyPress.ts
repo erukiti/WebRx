@@ -9,7 +9,7 @@ module wx {
         [key: string]: (ctx: IDataContext, event: Event) => any|ICommand<any>|{ command: ICommand<any>; parameter: any };
     }
 
-    let keysByCode = {
+    const keysByCode = {
         8: 'backspace',
         9: 'tab',
         13: 'enter',

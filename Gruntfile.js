@@ -223,7 +223,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-shell');
 
     grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
-        var template = "module wx {\n\texport var version = '<%= pkg.version %>';\n}";
+        var template = "module wx {\n\texport const version = '<%= pkg.version %>';\n}";
 
         grunt.file.write('src/Version.ts', grunt.template.process(template));
     });

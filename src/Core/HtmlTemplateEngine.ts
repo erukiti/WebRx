@@ -10,7 +10,7 @@ module wx {
     * NOTE: This version does not support scripts in templates!
     */
 
-    var
+    const
         rsingleTag = /^<([\w-]+)\s*\/?>(?:<\/\1>|)$/,
         rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:-]+)[^>]*)\/>/gi,
         rtagName = /<([\w:-]+)/,

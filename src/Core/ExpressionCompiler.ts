@@ -13,29 +13,29 @@ module wx {
 
         // The following regular expressions will be used to split an object-literal string into tokens
         // These two match strings, either with double quotes or single quotes
-        let stringDouble = '"(?:[^"\\\\]|\\\\.)*"';
-        let stringSingle = "'(?:[^'\\\\]|\\\\.)*'";
+        const stringDouble = '"(?:[^"\\\\]|\\\\.)*"';
+        const stringSingle = "'(?:[^'\\\\]|\\\\.)*'";
         // Matches a regular expression (text enclosed by slashes), but will also match sets of divisions
         // as a regular expression (this is handled by the parsing loop below).
-        let stringRegexp = '/(?:[^/\\\\]|\\\\.)*/\w*';
+        const stringRegexp = '/(?:[^/\\\\]|\\\\.)*/\w*';
         // These characters have special meaning to the parser and must not appear in the middle of a
         // token, except as part of a string.
-        let specials = ',"\'{}()/:[\\]';
+        const specials = ',"\'{}()/:[\\]';
         // Match text (at least two characters) that does not contain any of the above special characters,
         // although some of the special characters are allowed to start it (all but the colon and comma).
         // The text can contain spaces, but leading or trailing spaces are skipped.
-        let everyThingElse = '[^\\s:,/][^' + specials + ']*[^\\s' + specials + ']';
+        const everyThingElse = '[^\\s:,/][^' + specials + ']*[^\\s' + specials + ']';
         // Match any non-space character not matched already. This will match colons and commas, since they're
         // not matched by "everyThingElse", but will also match any other single character that wasn't already
         // matched (for example: in "a: 1, b: 2", each of the non-space characters will be matched by oneNotSpace).
-        let oneNotSpace = '[^\\s]';
+        const oneNotSpace = '[^\\s]';
 
         // Create the actual regular expression by or-ing the above strings. The order is important.
-        let bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRegexp + '|' + everyThingElse + '|' + oneNotSpace, 'g');
+        const bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRegexp + '|' + everyThingElse + '|' + oneNotSpace, 'g');
 
         // Match end of previous token to determine whether a slash is a division or regex.
-        let divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/;
-        let keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 };
+        const divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/;
+        const keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 };
 
         /**
         * Split an object-literal string into tokens (borrowed from the KnockoutJS project)
@@ -107,7 +107,7 @@ module wx {
         * Angular's expression compiler ported to Typescript
         */
 
-        let hookField = "___runtimeHooks";
+        const hookField = "___runtimeHooks";
 
         function noop() {}
 
@@ -201,7 +201,7 @@ module wx {
             return obj;
         }
 
-        let OPERATORS = {
+        const OPERATORS = {
             /* jshint bitwise : false */
             'null': () => { return null; },
             'true': () => { return true; },
@@ -244,7 +244,7 @@ module wx {
             '!': (self, locals, a) => { return !a(self, locals); }
         };
         /* jshint bitwise: true */
-        let ESCAPE = { "n": "\n", "f": "\f", "r": "\r", "t": "\t", "v": "\v", "'": "'", '"': "\"" };
+        const ESCAPE = { "n": "\n", "f": "\f", "r": "\r", "t": "\t", "v": "\v", "'": "'", '"': "\"" };
 
         /**
      * @constructor
