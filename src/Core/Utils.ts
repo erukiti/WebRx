@@ -277,6 +277,22 @@ module wx {
     }
 
     /**
+     * Returns true if the specified element may be disabled
+     * @param {HTMLElement} el
+     */
+    export function elementCanBeDisabled(el: HTMLElement): boolean {
+        return el instanceof HTMLButtonElement ||
+        	el instanceof HTMLAnchorElement ||
+            el instanceof HTMLInputElement ||
+            el instanceof HTMLFieldSetElement ||
+            el instanceof HTMLLinkElement ||
+            el instanceof HTMLOptGroupElement ||
+            el instanceof HTMLOptionElement ||
+            el instanceof HTMLSelectElement ||
+            el instanceof HTMLTextAreaElement;
+    }
+    
+    /**
      * Returns true if object is a Function.
      * @param obj
      */

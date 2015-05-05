@@ -60,11 +60,9 @@ describe('Bindings', () => {
 
             // canExecute tests
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
-            if(el.hasOwnProperty("disabled"))
-                expect(el["disabled"]).toBeTruthy();
+            expect((<any> el).disabled).toBeTruthy();
             model.canExecute(true);
-            if(el.hasOwnProperty("disabled"))
-                expect(el["disabled"]).toBeFalsy();
+            expect((<any> el).disabled).toBeFalsy();
 
             // execute test
             testutils.triggerEvent(el, "click");
@@ -74,8 +72,7 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             executed = false;
             model.canExecute(false);
-            if(el.hasOwnProperty("disabled"))
-                expect(el["disabled"]).toBeFalsy();
+            expect((<any> el).disabled).toBeFalsy();
             testutils.triggerEvent(el, "click");
             expect(executed).toBeFalsy();
         }

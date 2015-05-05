@@ -158,8 +158,8 @@ module wx {
         protected applyValue(el: HTMLElement, value: any): void {
             value = this.inverse ? !value : value;
 
-            if(el.hasOwnProperty("disabled")) {
-                el["disabled"] = value;
+            if(elementCanBeDisabled(el)) {
+                (<any> el).disabled = value;
             }
         }
 

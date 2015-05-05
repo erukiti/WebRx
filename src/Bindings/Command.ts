@@ -74,13 +74,13 @@ module wx {
                                 internal.throwError("Command-Binding only supports binding to a command!");
 
                             // disabled handling if supported by element
-                            if(el.hasOwnProperty("disabled")) {
+                            if(elementCanBeDisabled(el)) {
                                 // initial update
-                                el["disabled"] = !x.cmd.canExecute(x.param);
+                                (<any> el).disabled = !x.cmd.canExecute(x.param);
     
                                 // listen to changes
                                 cleanup.add(x.cmd.canExecuteObservable.subscribe(canExecute => {
-                                    el["disabled"] = !canExecute;
+                                    (<any> el).disabled = !canExecute;
                                 }));
                             }
 

@@ -13,11 +13,11 @@ module wx {
     * (Note: This is the equivalent to Knockout's ko.computed)
     * @param {T} initialValue? Optional initial value, valid until the observable produces a value
     */
-    RxObsConstructor.prototype.toProperty = function(initialValue?: any, scheduler?: Rx.IScheduler) {
+    function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
         scheduler = scheduler || Rx.Scheduler.currentThread;
 
         // initialize accessor function (read-only)
-        let accessor: any = function(newVal?: any): any {
+        let accessor: any = function propertyAccessor(newVal?: any): any {
             if (arguments.length > 0) {
                 internal.throwError("attempt to write to a read-only observable property");
             }
@@ -93,6 +93,8 @@ module wx {
 
         return accessor;
     }
+    
+    RxObsConstructor.prototype.toProperty = toProperty;
 
     RxObsConstructor.prototype.continueWith = function() {
         let args = args2Array(arguments);
