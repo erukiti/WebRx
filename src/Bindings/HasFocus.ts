@@ -24,15 +24,15 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLInputElement> node;
-            var prop: IObservableProperty<any>;
-            var cleanup: Rx.CompositeDisposable;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var exp: ICompiledExpression;
-            var delay = 0;
+            let el = <HTMLInputElement> node;
+            let prop: IObservableProperty<any>;
+            let cleanup: Rx.CompositeDisposable;
+            let compiled = this.domManager.compileBindingOptions(options, module);
+            let exp: ICompiledExpression;
+            let delay = 0;
 
             if (typeof compiled === "object" && compiled.hasOwnProperty("property")) {
-                var opt = <IHasFocusBindingOptions> compiled;
+                let opt = <IHasFocusBindingOptions> compiled;
                 exp = opt.property;
 
                 delay = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.delay, ctx);
@@ -55,10 +55,10 @@ module wx {
             function handleElementFocusChange(isFocused: boolean) {
                 // If possible, ignore which event was raised and determine focus state using activeElement,
                 // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
-                var ownerDoc = el.ownerDocument;
+                let ownerDoc = el.ownerDocument;
 
                 if ("activeElement" in ownerDoc) {
-                    var active;
+                    let active;
                     try {
                         active = ownerDoc.activeElement;
                     } catch (e) {
@@ -150,7 +150,7 @@ module wx {
         protected domManager: IDomManager;
 
         protected getFocusEventObservables(el: HTMLInputElement): Array<Rx.Observable<boolean>> {
-            var result: Array<Rx.Observable<boolean>> = [];
+            let result: Array<Rx.Observable<boolean>> = [];
 
             result.push(Rx.Observable.fromEvent(el, 'focus').select(x=> true));
             result.push(Rx.Observable.fromEvent(el, 'focusin').select(x=> true));

@@ -11,8 +11,8 @@
 module wx {
     "use strict";
 
-    var cssClassNameRegex = /\S+/g;
-    var RxObsConstructor = (<new <T>() => Rx.Observable<T>> <any> Rx.Observable); // the cast is neccessary because the rx.js.d.ts declares Observable as an interface
+    let cssClassNameRegex = /\S+/g;
+    let RxObsConstructor = (<new <T>() => Rx.Observable<T>> <any> Rx.Observable); // the cast is neccessary because the rx.js.d.ts declares Observable as an interface
 
     export var noop = () => {};
 
@@ -27,7 +27,7 @@ module wx {
     * Returns true if target is a javascript primitive
     */
     export function isPrimitive(target: any): boolean {
-        var t = typeof target;
+        let t = typeof target;
 
         return t === "boolean" || t === "number" || t === "string";
     }
@@ -120,9 +120,9 @@ module wx {
     * Transforms the current method's arguments into an array
     */
     export function args2Array(args: IArguments): Array<any> {
-        var result = [];
+        let result = [];
 
-        for (var i = 0, len = args.length; i < len; i++) {
+        for(let i = 0, len = args.length; i < len; i++) {
             result.push(args[i]);
         }
 
@@ -135,7 +135,7 @@ module wx {
     * @param {any[]} ...args Format arguments
     */
     export function formatString(fmt: string, ...args: any[]): string {
-        var pattern = /\{\d+\}/g;
+        let pattern = /\{\d+\}/g;
 
         return (<any> fmt).replace(pattern, (capture) => {
             return args[capture.match(/\d+/)];
@@ -146,11 +146,11 @@ module wx {
     * Copies own properties from src to dst
     */
     export function extend(src: Object, dst: Object, inherited?: boolean): Object {
-        var prop: string;
+        let prop: string;
 
         if (!inherited) {
-            var ownProps = Object.getOwnPropertyNames(src);
-            for (var i = 0; i < ownProps.length; i++) {
+            let ownProps = Object.getOwnPropertyNames(src);
+            for(let i = 0; i < ownProps.length; i++) {
                 prop = ownProps[i];
                 dst[prop] = src[prop];
             }
@@ -163,8 +163,8 @@ module wx {
         return dst;
     }
 
-    var oid = 1;
-    var oidPropertyName = "__rxui_oid__" + (new Date).getTime();
+    let oid = 1;
+    let oidPropertyName = "__rxui_oid__" + (new Date).getTime();
 
     export class PropertyInfo<T> {
         constructor(propertyName: string, property: T) {
@@ -207,7 +207,7 @@ module wx {
     export function getOwnPropertiesImplementingInterface<T>(target: any, iid: string): PropertyInfo<T>[] {
         return Object.keys(target).filter(propertyName => {
             // lookup object for name
-            var o = target[propertyName];
+            let o = target[propertyName];
 
             // is it an ObservableProperty?
             return queryInterface(o, iid);
@@ -225,7 +225,7 @@ module wx {
         if (isPrimitive(o))
             return (typeof o + ":" + o);
 
-        var result = o[oidPropertyName];
+        let result = o[oidPropertyName];
 
         if (result === undefined) {
             result = (++oid).toString();
@@ -243,10 +243,10 @@ module wx {
     */
     export function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...classNames: string[]): void {
         if (classNames) {
-            var currentClassNames = node.className.match(cssClassNameRegex) || [];
-            var index: number;
-            var i;
-            var className;
+            let currentClassNames = node.className.match(cssClassNameRegex) || [];
+            let index: number;
+            let i;
+            let className;
 
             if (shouldHaveClass) {
                 for (i = 0; i < classNames.length; i++) {
@@ -299,7 +299,7 @@ module wx {
      * @param b Object to compare to
      */
     export function isEqual(a, b, aStack?, bStack?) {
-        var toString = ({}).toString;
+        let toString = ({}).toString;
 
         // Identical objects are equal. `0 === -0`, but they aren't identical.
         // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
@@ -312,7 +312,7 @@ module wx {
         //if (b instanceof _) b = b._wrapped;
 
         // Compare `[[Class]]` names.
-        var className = toString.call(a);
+        let className = toString.call(a);
         if (className !== toString.call(b))
             return false;
 
@@ -339,14 +339,14 @@ module wx {
                 return +a === +b;
         }
 
-        var areArrays = className === '[object Array]';
+        let areArrays = className === '[object Array]';
         if (!areArrays) {
             if (typeof a != 'object' || typeof b != 'object')
                 return false;
 
             // Objects with different constructors are not equivalent, but `Object`s or `Array`s
             // from different frames are.
-            var aCtor = a.constructor, bCtor = b.constructor;
+            let aCtor = a.constructor, bCtor = b.constructor;
             if (aCtor !== bCtor && !(isFunction(aCtor) && aCtor instanceof aCtor &&
                     isFunction(bCtor) && bCtor instanceof bCtor)
                 && ('constructor' in a && 'constructor' in b)) {
@@ -360,7 +360,7 @@ module wx {
         // It's done here since we only need them for objects and arrays comparison.
         aStack = aStack || [];
         bStack = bStack || [];
-        var length = aStack.length;
+        let length = aStack.length;
         while (length--) {
             // Linear search. Performance is inversely proportional to the number of
             // unique nested structures.
@@ -385,7 +385,7 @@ module wx {
             }
         } else {
             // Deep compare objects.
-            var keys = Object.keys(a), key;
+            let keys = Object.keys(a), key;
             length = keys.length;
             // Ensure that both objects contain the same number of properties before comparing deep equality.
             if (Object.keys(b).length !== length)
@@ -408,10 +408,10 @@ module wx {
     * Returns an array of clones of the nodes in the source array
     */
     export function cloneNodeArray(nodes: Array<Node>): Array<Node> {
-        var length = nodes.length;
-        var result = new Array<Node>(length);
+        let length = nodes.length;
+        let result = new Array<Node>(length);
 
-        for (var i = 0; i < length; i++) {
+        for(let i = 0; i < length; i++) {
             result[i] = nodes[i].cloneNode(true);
         }
 
@@ -486,20 +486,20 @@ module wx {
     * @return {Rx.Observable<T>} An observable
     */
     export function observeObject(target: any, onChanging: boolean = false): Rx.Observable<IPropertyChangedEventArgs> {
-        var thrownExceptionsSubject = queryInterface(target, IID.IHandleObservableErrors) ?
+        let thrownExceptionsSubject = queryInterface(target, IID.IHandleObservableErrors) ?
             <Rx.Observer<Error>> <any> (<IHandleObservableErrors> target).thrownExceptions : app.defaultExceptionHandler;
 
         return Rx.Observable.create<IPropertyChangedEventArgs>(
             (observer: Rx.Observer<IPropertyChangedEventArgs>): Rx.IDisposable => {
-                var result = new Rx.CompositeDisposable();
-                var observableProperties = getOwnPropertiesImplementingInterface<IObservableProperty<any>>(target, IID.IObservableProperty);
+                let result = new Rx.CompositeDisposable();
+                let observableProperties = getOwnPropertiesImplementingInterface<IObservableProperty<any>>(target, IID.IObservableProperty);
 
                 observableProperties.forEach(x => {
-                    var prop = x.property;
-                    var obs = onChanging ? prop.changing : prop.changed;
+                    let prop = x.property;
+                    let obs = onChanging ? prop.changing : prop.changed;
 
                     result.add(obs.subscribe(_=> {
-                        var e = new internal.PropertyChangedEventArgs(self, x.propertyName);
+                        let e = new internal.PropertyChangedEventArgs(self, x.propertyName);
 
                         try {
                             observer.onNext(e);
@@ -569,10 +569,10 @@ module wx {
             return arguments[0].changed.startWith(arguments[0]()).select(arguments[1]);
         }
 
-        var args = args2Array(arguments);
+        let args = args2Array(arguments);
 
         // extract selector
-        var selector = args.pop();
+        let selector = args.pop();
 
         // prepend sequence with current values to satisfy combineLatest
         args = args.map(x => x.changed.startWith(x()));
@@ -589,7 +589,7 @@ module wx {
         * Throw an error containing the specified description
         */
         export function throwError(fmt: string, ...args: any[]): void {
-            var msg = "WebRx: " + formatString(fmt, args);
+            let msg = "WebRx: " + formatString(fmt, args);
             throw new Error(msg);
         }
 
@@ -598,7 +598,7 @@ module wx {
         * Throw an error containing the specified description
         */
         export function emitError(fmt: string, ...args: any[]): void {
-            var msg = "WebRx: " + formatString(fmt, args);
+            let msg = "WebRx: " + formatString(fmt, args);
             app.defaultExceptionHandler.onNext(Error(msg));
         }
     }

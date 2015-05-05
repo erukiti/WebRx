@@ -55,7 +55,7 @@ module wx {
         // IDisposable implementation
 
         public dispose(): void {
-            var disp = this.canExecuteDisp;
+            let disp = this.canExecuteDisp;
 
             if (disp != null)
                 disp.dispose();
@@ -66,13 +66,13 @@ module wx {
 
         public get canExecuteObservable(): Rx.Observable<boolean> {
             // setup canExecuteObservable
-            var ret = this.canExecuteObs.startWith(this.canExecuteLatest).distinctUntilChanged();
+            let ret = this.canExecuteObs.startWith(this.canExecuteLatest).distinctUntilChanged();
 
             if (this.canExecuteDisp != null)
                 return ret;
 
             return Rx.Observable.create<boolean>(subj => {
-                var disp = ret.subscribe(subj);
+                let disp = ret.subscribe(subj);
 
                 // NB: We intentionally leak the CanExecute disconnect, it's
                 // cleaned up by the global Dispose. This is kind of a
@@ -106,21 +106,21 @@ module wx {
         }
 
         public executeAsync(parameter?: any): Rx.Observable<T> {
-            var self = this;
+            let self = this;
 
-            var ret = Rx.Observable.create<T>(subj => {
+            let ret = Rx.Observable.create<T>(subj => {
                 if (++self.inflightCount === 1) {
                     self.isExecutingSubject.onNext(true);
                 }
 
-                var decrement = new Rx.SerialDisposable();
+                let decrement = new Rx.SerialDisposable();
                 decrement.setDisposable(Rx.Disposable.create(() => {
                     if (--self.inflightCount === 0) {
                         self.isExecutingSubject.onNext(false);
                     }
                 }));
 
-                var disp = self.func(parameter)
+                let disp = self.func(parameter)
                     .observeOn(self.scheduler)
                     .do(
                     _ => { },
@@ -194,11 +194,11 @@ module wx {
 
     // factory method implementation
     export function command(): ICommand<any> {
-        var args = args2Array(arguments);
-        var canExecute: Rx.Observable<boolean>;
-        var execute: (any) => void;
-        var scheduler: Rx.IScheduler;
-        var thisArg: any;
+        let args = args2Array(arguments);
+        let canExecute: Rx.Observable<boolean>;
+        let execute: (any) => void;
+        let scheduler: Rx.IScheduler;
+        let thisArg: any;
 
         if (isFunction(args[0])) {
             // first overload
@@ -270,11 +270,11 @@ module wx {
 
     // factory method implementation
     export function asyncCommand<T>(): ICommand<T> {
-        var args = args2Array(arguments);
-        var canExecute: Rx.Observable<boolean>;
-        var executeAsync: (any) => Rx.Observable<T>;
-        var scheduler: Rx.IScheduler;
-        var thisArg: any;
+        let args = args2Array(arguments);
+        let canExecute: Rx.Observable<boolean>;
+        let executeAsync: (any) => Rx.Observable<T>;
+        let scheduler: Rx.IScheduler;
+        let thisArg: any;
 
         if (isFunction(args[0])) {
             // second overload
@@ -313,27 +313,27 @@ module wx {
 
     // factory method implementation
     export function combinedCommand<T>(): ICommand<any> {
-        var args = args2Array(arguments);
+        let args = args2Array(arguments);
 
-        var commands: ICommand<any>[] = args
+        let commands: ICommand<any>[] = args
             .filter(x=> isCommand(x));
 
-        var canExecute: Rx.Observable<boolean> = args
+        let canExecute: Rx.Observable<boolean> = args
             .filter(x => isRxObservable(x))
             .pop();
 
         if (!canExecute)
             canExecute = Rx.Observable.return(true);
 
-        var childrenCanExecute = Rx.Observable.combineLatest(commands.map(x => x.canExecuteObservable),
+        let childrenCanExecute = Rx.Observable.combineLatest(commands.map(x => x.canExecuteObservable),
             (...latestCanExecute:boolean[]) => latestCanExecute.every(x => x));
 
-        var canExecuteSum = Rx.Observable.combineLatest(
+        let canExecuteSum = Rx.Observable.combineLatest(
             canExecute.startWith(true),
             childrenCanExecute,
             (parent, child) => parent && child);
 
-        var ret = command(canExecuteSum);
+        let ret = command(canExecuteSum);
         ret.results.subscribe(x => commands.forEach(cmd => {
             cmd.execute(x);
         }));

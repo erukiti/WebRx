@@ -23,7 +23,7 @@ module wx {
                 internal.throwError("an element must not be bound multiple times!");
 
             // create or update node state for root node
-            var state = this.getNodeState(rootNode);
+            let state = this.getNodeState(rootNode);
             if (state) {
                 state.model = model;
             } else {
@@ -32,14 +32,14 @@ module wx {
             }
 
             // calculate resulting data-context and apply bindings
-            var ctx = this.getDataContext(rootNode);
+            let ctx = this.getDataContext(rootNode);
             this.applyBindingsRecursive(ctx, <HTMLElement> rootNode);
         }
 
         public applyBindingsToDescendants(ctx: IDataContext, node: Node): void {
             if (node.hasChildNodes()) {
-                for (var i = 0; i < node.childNodes.length; i++) {
-                    var child = node.childNodes[i];
+                for(let i = 0; i < node.childNodes.length; i++) {
+                    let child = node.childNodes[i];
 
                     // only elements
                     if (child.nodeType !== 1)
@@ -59,8 +59,8 @@ module wx {
 
         public cleanDescendants(node: Node): void {
             if (node.hasChildNodes()) {
-                for (var i = 0; i < node.childNodes.length; i++) {
-                    var child = node.childNodes[i];
+                for(let i = 0; i < node.childNodes.length; i++) {
+                    let child = node.childNodes[i];
 
                     // only elements
                     if (node.nodeType !== 1)
@@ -88,11 +88,11 @@ module wx {
             }
 
             if (this.isObjectLiteralString(value)) {
-                var result = {};
-                var tokens = this.compiler.parseObjectLiteral(value);
-                var token: IObjectLiteralToken;
+                let result = {};
+                let tokens = this.compiler.parseObjectLiteral(value);
+                let token: IObjectLiteralToken;
 
-                for (var i = 0; i < tokens.length; i++) {
+                for(let i = 0; i < tokens.length; i++) {
                     token = tokens[i];
                     result[token.key] = this.compileBindingOptions(token.value, module);
                 }
@@ -100,7 +100,7 @@ module wx {
                 return result;
             } else {
                 // build compiler options
-                var options = <IExpressionCompilerOptions> extend(this.parserOptions, {});
+                let options = <IExpressionCompilerOptions> extend(this.parserOptions, {});
                 options.filters = {};
 
                 // enrich with app filters
@@ -116,7 +116,7 @@ module wx {
         }
 
         public getModuleContext(node: Node): IModule {
-            var state: INodeState;
+            let state: INodeState;
 
             // collect model hierarchy
             while (node) {
@@ -140,11 +140,11 @@ module wx {
         }
 
         public getDataContext(node: Node): IDataContext {
-            var models = [];
-            var state = this.getNodeState(node);
+            let models = [];
+            let state = this.getNodeState(node);
 
             // collect model hierarchy
-            var _node = node;
+            let _node = node;
             while (_node) {
                 state = state != null ? state : this.getNodeState(_node);
                 if (state != null) {
@@ -157,7 +157,7 @@ module wx {
                 _node = _node.parentNode;
             }
 
-            var ctx: IDataContext;
+            let ctx: IDataContext;
             
             if (models.length > 0) {
                 ctx = {
@@ -191,7 +191,7 @@ module wx {
         }
 
         public isNodeBound(node: Node): boolean {
-            var state = this.nodeState.get(node);
+            let state = this.nodeState.get(node);
             return state && state.isBound;
         }
 
@@ -204,7 +204,7 @@ module wx {
         }
 
         public clearNodeState(node: Node) {
-            var state = this.nodeState.get(node);
+            let state = this.nodeState.get(node);
 
             if (state) {
                 if (state.cleanup != null) {
@@ -228,15 +228,15 @@ module wx {
         }
 
         public evaluateExpression(exp: ICompiledExpression, ctx: IDataContext): any {
-            var locals = this.createLocals(undefined, ctx);
-            var result = exp(ctx.$data, locals);
+            let locals = this.createLocals(undefined, ctx);
+            let result = exp(ctx.$data, locals);
             return result;
         }
 
         public expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
-            var captured = createSet<Rx.Observable<any>>();
-            var locals;
-            var result: any;
+            let captured = createSet<Rx.Observable<any>>();
+            let locals;
+            let result: any;
 
             // initial evaluation
             try {
@@ -262,8 +262,8 @@ module wx {
                 return Rx.Observable.return(result);
             }
 
-            var obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
-                var innerDisp = Rx.Observable.defer(() => {
+            let obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
+                let innerDisp = Rx.Observable.defer(() => {
                     // construct observable that represents the first change of any of the expression's dependencies
                     return Rx.Observable.merge(setToArray(captured)).take(1);
                 })
@@ -296,7 +296,7 @@ module wx {
             });
 
             // prefix with initial result
-            var startValue = isRxObservable(result) ?
+            let startValue = isRxObservable(result) ?
                 result :
                 Rx.Observable.return(result);
 
@@ -321,10 +321,10 @@ module wx {
         };
 
         private applyBindingsInternal(ctx: IDataContext, el: HTMLElement, module: IModule): boolean {
-            var result = false;
+            let result = false;
 
             // get or create elment-state
-            var state = this.getNodeState(el);
+            let state = this.getNodeState(el);
 
             // create and set if necessary
             if (!state) {
@@ -334,15 +334,15 @@ module wx {
                 internal.throwError("an element must not be bound multiple times!");
             }
 
-            var _bindings: Array<{ key: string; value: string; fromTag?: boolean }>;
-            var tagName = el.tagName.toLowerCase();
-            var i;
+            let _bindings: Array<{ key: string; value: string; fromTag?: boolean }>;
+            let tagName = el.tagName.toLowerCase();
+            let i;
 
             // check if tag represents a component
             if (module.hasComponent(tagName) || app.hasComponent(tagName)) {
                 // when a component is referenced by element, we just apply a virtual 'component' binding
-                var params = el.getAttribute(DomManager.paramsAttributename);
-                var componentReference: any;
+                let params = el.getAttribute(DomManager.paramsAttributename);
+                let componentReference: any;
 
                 if (params)
                     componentReference = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomManager.paramsAttributename) + "} }";
@@ -357,8 +357,8 @@ module wx {
 
             if (_bindings != null && _bindings.length > 0) {
                 // lookup handlers
-                var bindings = _bindings.map(x=> {
-                    var handler = module.binding(x.key);
+                let bindings = _bindings.map(x=> {
+                    let handler = module.binding(x.key);
                     
                     if (!handler)
                         internal.throwError("binding '{0}' has not been registered.", x.key);
@@ -370,7 +370,7 @@ module wx {
                 bindings.sort((a, b) => (b.handler.priority || 0) - (a.handler.priority || 0));
 
                 // check if there's binding-handler competition for descendants (which is illegal)
-                var hd = bindings.filter(x => x.handler.controlsDescendants).map(x => "'" + x.value + "'");
+                let hd = bindings.filter(x => x.handler.controlsDescendants).map(x => "'" + x.value + "'");
                 if (hd.length > 1) {
                     internal.throwError("bindings {0} are competing for descendants of target element!", hd.join(", "));
                 } 
@@ -379,8 +379,8 @@ module wx {
 
                 // apply all bindings
                 for (i = 0; i < bindings.length; i++) {
-                    var binding = bindings[i];
-                    var handler = binding.handler;
+                    let binding = bindings[i];
+                    let handler = binding.handler;
 
                     handler.applyBinding(el, binding.value, ctx, state, module);
                 }
@@ -397,11 +397,11 @@ module wx {
         }
 
         public getBindingDefinitions(node: Node): Array<{ key: string; value: string }> {
-            var bindingText = null;
+            let bindingText = null;
 
             if (node.nodeType === 1) {  // element
                 // attempt to get definition from attribute
-                var attr = (<Element> node).getAttribute(DomManager.bindingAttributeName);
+                let attr = (<Element> node).getAttribute(DomManager.bindingAttributeName);
                 if (attr) {
                     bindingText = attr;
                 }
@@ -425,13 +425,13 @@ module wx {
 
             if (!this.applyBindingsInternal(ctx, el, module) && el.hasChildNodes()) {
                 // module binding might have updated state.module
-                var state = this.getNodeState(el);
+                let state = this.getNodeState(el);
                 if (state && state.module)
                     module = state.module;
 
                 // iterate over descendants
-                for (var i = 0; i < el.childNodes.length; i++) {
-                    var child = el.childNodes[i];
+                for(let i = 0; i < el.childNodes.length; i++) {
+                    let child = el.childNodes[i];
 
                     // only elements
                     if (child.nodeType !== 1)
@@ -444,10 +444,10 @@ module wx {
 
         private cleanNodeRecursive(node: Node): void {
             if (node.hasChildNodes()) {
-                var length = node.childNodes.length;
+                let length = node.childNodes.length;
 
-                for (var i = 0; i < length; i++) {
-                    var child = node.childNodes[i];
+                for(let i = 0; i < length; i++) {
+                    let child = node.childNodes[i];
 
                     // only elements
                     if (node.nodeType !== 1)
@@ -462,15 +462,15 @@ module wx {
         }
 
         private createLocals(captured: ISet<Rx.Observable<any>>, ctx: IDataContext) {
-            var locals = {};
-            var list: IObservableList<any>;
-            var prop: IObservableProperty<any>;
-            var result, target;
+            let locals = {};
+            let list: IObservableList<any>;
+            let prop: IObservableProperty<any>;
+            let result, target;
 
-            var hooks: ICompiledExpressionRuntimeHooks = {
+            let hooks: ICompiledExpressionRuntimeHooks = {
                 readFieldHook: (o: any, field: any): any => {
                     // handle "@propref" access-modifier
-                    var noUnwrap = false;
+                    let noUnwrap = false;
 
                     if (field[0] === '@') {
                         noUnwrap = true;
@@ -481,7 +481,7 @@ module wx {
                     
                     // intercept access to observable properties
                     if (!noUnwrap && isProperty(result)) {
-                        var prop = <IObservableProperty<any>> result;
+                        let prop = <IObservableProperty<any>> result;
 
                         // register observable
                         if (captured)
@@ -504,7 +504,7 @@ module wx {
 
                     // intercept access to observable properties
                     if (isProperty(target)) {
-                        var prop = <IObservableProperty<any>> target;
+                        let prop = <IObservableProperty<any>> target;
 
                         // register observable
                         if (captured)
@@ -535,7 +535,7 @@ module wx {
                     
                     // intercept access to observable properties
                     if (queryInterface(result, IID.IObservableProperty)) {
-                        var prop = <IObservableProperty<any>> result;
+                        let prop = <IObservableProperty<any>> result;
 
                         // register observable
                         if (captured)
@@ -597,10 +597,10 @@ module wx {
             this.compiler.setRuntimeHooks(locals, hooks);
 
             // injected context members into locals
-            var keys = Object.keys(ctx);
-            var length = keys.length;
-            for (var i = 0; i < length; i++) {
-                var key = keys[i];
+            let keys = Object.keys(ctx);
+            let length = keys.length;
+            for(let i = 0; i < length; i++) {
+                let key = keys[i];
                 locals[key] = ctx[key];
             }
 

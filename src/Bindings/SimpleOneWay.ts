@@ -21,10 +21,10 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var self = this;
-            var exp = this.domManager.compileBindingOptions(options, module);
-            var obs = this.domManager.expressionToObservable(exp, ctx);
+            let el = <HTMLElement> node;
+            let self = this;
+            let exp = this.domManager.compileBindingOptions(options, module);
+            let obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -96,7 +96,7 @@ module wx {
         }
 
         public configure(_options): void {
-            var options = <IVisibleBindingOptions> _options;
+            let options = <IVisibleBindingOptions> _options;
 
             VisibleBinding.useCssClass = options.useCssClass;
             VisibleBinding.hiddenClass = options.hiddenClass;

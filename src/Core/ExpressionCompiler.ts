@@ -13,29 +13,29 @@ module wx {
 
         // The following regular expressions will be used to split an object-literal string into tokens
         // These two match strings, either with double quotes or single quotes
-        var stringDouble = '"(?:[^"\\\\]|\\\\.)*"';
-        var stringSingle = "'(?:[^'\\\\]|\\\\.)*'";
+        let stringDouble = '"(?:[^"\\\\]|\\\\.)*"';
+        let stringSingle = "'(?:[^'\\\\]|\\\\.)*'";
         // Matches a regular expression (text enclosed by slashes), but will also match sets of divisions
         // as a regular expression (this is handled by the parsing loop below).
-        var stringRegexp = '/(?:[^/\\\\]|\\\\.)*/\w*';
+        let stringRegexp = '/(?:[^/\\\\]|\\\\.)*/\w*';
         // These characters have special meaning to the parser and must not appear in the middle of a
         // token, except as part of a string.
-        var specials = ',"\'{}()/:[\\]';
+        let specials = ',"\'{}()/:[\\]';
         // Match text (at least two characters) that does not contain any of the above special characters,
         // although some of the special characters are allowed to start it (all but the colon and comma).
         // The text can contain spaces, but leading or trailing spaces are skipped.
-        var everyThingElse = '[^\\s:,/][^' + specials + ']*[^\\s' + specials + ']';
+        let everyThingElse = '[^\\s:,/][^' + specials + ']*[^\\s' + specials + ']';
         // Match any non-space character not matched already. This will match colons and commas, since they're
         // not matched by "everyThingElse", but will also match any other single character that wasn't already
         // matched (for example: in "a: 1, b: 2", each of the non-space characters will be matched by oneNotSpace).
-        var oneNotSpace = '[^\\s]';
+        let oneNotSpace = '[^\\s]';
 
         // Create the actual regular expression by or-ing the above strings. The order is important.
-        var bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRegexp + '|' + everyThingElse + '|' + oneNotSpace, 'g');
+        let bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRegexp + '|' + everyThingElse + '|' + oneNotSpace, 'g');
 
         // Match end of previous token to determine whether a slash is a division or regex.
-        var divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/;
-        var keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 };
+        let divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/;
+        let keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 };
 
         /**
         * Split an object-literal string into tokens (borrowed from the KnockoutJS project)
@@ -44,20 +44,20 @@ module wx {
         */
         export function parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken> {
             // Trim leading and trailing spaces from the string
-            var str = objectLiteralString.trim();
+            let str = objectLiteralString.trim();
 
             // Trim braces '{' surrounding the whole object literal
             if (str.charCodeAt(0) === 123) str = str.slice(1, -1);
 
             // Split into tokens
-            var result = new Array<IObjectLiteralToken>(), toks = str.match(bindingToken), key, values, depth = 0;
+            let result = new Array<IObjectLiteralToken>(), toks = str.match(bindingToken), key, values, depth = 0;
 
             if (toks) {
                 // Append a comma so that we don't need a separate code block to deal with the last item
                 toks.push(',');
 
-                for (var i = 0, tok; tok = toks[i]; ++i) {
-                    var c = tok.charCodeAt(0);
+                for(let i = 0, tok; tok = toks[i]; ++i) {
+                    let c = tok.charCodeAt(0);
                     // A comma signals the end of a key/value pair if depth is zero
                     if (c === 44) { // ","
                         if (depth <= 0) {
@@ -73,7 +73,7 @@ module wx {
                         // A set of slashes is initially matched as a regular expression, but could be division
                     } else if (c === 47 && i && tok.length > 1) { // "/"
                         // Look at the end of the previous token to determine if the slash is actually division
-                        var match = toks[i - 1].match(divisionLookBehind);
+                        let match = toks[i - 1].match(divisionLookBehind);
                         if (match && !keywordRegexLookBehind[match[0]]) {
                             // The slash is actually a division punctuator; re-parse the remainder of the string (not including the slash)
                             str = str.substr(str.indexOf(tok) + 1);
@@ -107,13 +107,13 @@ module wx {
         * Angular's expression compiler ported to Typescript
         */
 
-        var hookField = "___runtimeHooks";
+        let hookField = "___runtimeHooks";
 
         function noop() {}
 
         // Simplified extend() for our use-case
         function extend(dst, obj) {
-            var key;
+            let key;
 
             for (key in obj) {
                 if (obj.hasOwnProperty(key)) {
@@ -129,7 +129,7 @@ module wx {
         //function valueFn(value) { return () => value; }
 
         function $parseMinErr(module, message, arg1?, arg2?, arg3?, arg4?, arg5?) {
-            var args = arguments;
+            let args = arguments;
 
             message = message.replace(/{(\d)}/g, (match) => {
                 return args[2 + parseInt(match[1])];
@@ -201,7 +201,7 @@ module wx {
             return obj;
         }
 
-        var OPERATORS = {
+        let OPERATORS = {
             /* jshint bitwise : false */
             'null': () => { return null; },
             'true': () => { return true; },
@@ -244,7 +244,7 @@ module wx {
             '!': (self, locals, a) => { return !a(self, locals); }
         };
         /* jshint bitwise: true */
-        var ESCAPE = { "n": "\n", "f": "\f", "r": "\r", "t": "\t", "v": "\v", "'": "'", '"': "\"" };
+        let ESCAPE = { "n": "\n", "f": "\f", "r": "\r", "t": "\t", "v": "\v", "'": "'", '"': "\"" };
 
         /**
      * @constructor
@@ -270,8 +270,8 @@ module wx {
 
                 this.tokens = [];
 
-                var token: any;
-                var json = [];
+                let token: any;
+                let json = [];
 
                 while (this.index < this.text.length) {
                     this.ch = this.text.charAt(this.index);
@@ -299,11 +299,11 @@ module wx {
                         this.index++;
                         continue;
                     } else {
-                        var ch2 = this.ch + this.peek();
-                        var ch3 = ch2 + this.peek(2);
-                        var fn = OPERATORS[this.ch];
-                        var fn2 = OPERATORS[ch2];
-                        var fn3 = OPERATORS[ch3];
+                        let ch2 = this.ch + this.peek();
+                        let ch3 = ch2 + this.peek(2);
+                        let fn = OPERATORS[this.ch];
+                        let fn2 = OPERATORS[ch2];
+                        let fn3 = OPERATORS[ch3];
                         if (fn3) {
                             this.tokens.push({ index: this.index, text: ch3, fn: fn3 });
                             this.index += 3;
@@ -336,7 +336,7 @@ module wx {
             }
 
             private peek(i?): any {
-                var num = i || 1;
+                let num = i || 1;
                 return (this.index + num < this.text.length) ? this.text.charAt(this.index + num) : false;
             }
 
@@ -362,7 +362,7 @@ module wx {
 
             private throwError(error?, start?, end?): void {
                 end = end || this.index;
-                var colStr = (isDefined(start)
+                let colStr = (isDefined(start)
                     ? "s " + start + "-" + this.index + " [" + this.text.substring(start, end) + "]"
                     : " " + end);
                 throw $parseMinErr("lexerr", "Lexer Error: {0} at column{1} in expression [{2}].",
@@ -370,14 +370,14 @@ module wx {
             }
 
             private readNumber(): void {
-                var n: any = "";
-                var start = this.index;
+                let n: any = "";
+                let start = this.index;
                 while (this.index < this.text.length) {
-                    var ch = lowercase(this.text.charAt(this.index));
+                    let ch = lowercase(this.text.charAt(this.index));
                     if (ch === "." || this.isNumber(ch)) {
                         n += ch;
                     } else {
-                        var peekCh = this.peek();
+                        let peekCh = this.peek();
                         if (ch === "e" && this.isExpOperator(peekCh)) {
                             n += ch;
                         } else if (this.isExpOperator(ch) &&
@@ -406,12 +406,12 @@ module wx {
             }
 
             private readIdent(): void {
-                var parser = this;
+                let parser = this;
 
-                var ident = "";
-                var start = this.index;
+                let ident = "";
+                let start = this.index;
 
-                var lastDot: number, peekIndex: number, methodName: string, ch: string;
+                let lastDot: number, peekIndex: number, methodName: string, ch: string;
 
                 while (this.index < this.text.length) {
                     ch = this.text.charAt(this.index);
@@ -443,7 +443,7 @@ module wx {
                     }
                 }
 
-                var token: any = {
+                let token: any = {
                     index: start,
                     text: ident
                 };
@@ -453,7 +453,7 @@ module wx {
                     token.fn = OPERATORS[ident];
                     token.json = OPERATORS[ident];
                 } else {
-                    var getter = getterFn(ident, this.options, this.text);
+                    let getter = getterFn(ident, this.options, this.text);
                     token.fn = extend((self: any, locals: any) => {
                         return (getter(self, locals));
                     }, {
@@ -480,23 +480,23 @@ module wx {
             }
 
             private readString(quote): void {
-                var start = this.index;
+                let start = this.index;
                 this.index++;
-                var value = "";
-                var rawString = quote;
-                var escape = false;
+                let value = "";
+                let rawString = quote;
+                let escape = false;
                 while (this.index < this.text.length) {
-                    var ch = this.text.charAt(this.index);
+                    let ch = this.text.charAt(this.index);
                     rawString += ch;
                     if (escape) {
                         if (ch === "u") {
-                            var hex = this.text.substring(this.index + 1, this.index + 5);
+                            let hex = this.text.substring(this.index + 1, this.index + 5);
                             if (!hex.match(/[\da-f]{4}/i))
                                 this.throwError("Invalid unicode escape [\\u" + hex + "]");
                             this.index += 4;
                             value += String.fromCharCode(parseInt(hex, 16));
                         } else {
-                            var rep = ESCAPE[ch];
+                            let rep = ESCAPE[ch];
                             if (rep) {
                                 value += rep;
                             } else {
@@ -546,7 +546,7 @@ module wx {
 
                 this.tokens = this.lexer.lex(text);
 
-                var value = this.statements();
+                let value = this.statements();
 
                 if (this.tokens.length !== 0) {
                     this.throwError("is an unexpected token", this.tokens[0]);
@@ -559,7 +559,7 @@ module wx {
             }
 
             private primary(): ICompiledExpression {
-                var primary;
+                let primary;
                 if (this.expect("(")) {
                     primary = this.filterChain();
                     this.consume(")");
@@ -568,7 +568,7 @@ module wx {
                 } else if (this.expect("{")) {
                     primary = this.object();
                 } else {
-                    var token = this.expect();
+                    let token = this.expect();
                     primary = token.fn;
                     if (!primary) {
                         this.throwError("not a primary expression", token);
@@ -579,7 +579,7 @@ module wx {
                     }
                 }
 
-                var next, context;
+                let next, context;
                 while ((next = this.expect("(", "[", "."))) {
                     if (next.text === "(") {
                         primary = this.functionCall(primary, context);
@@ -611,8 +611,8 @@ module wx {
 
             private peek(e1?, e2?, e3?, e4?): any {
                 if (this.tokens.length > 0) {
-                    var token = this.tokens[0];
-                    var t = token.text;
+                    let token = this.tokens[0];
+                    let t = token.text;
                     if (t === e1 || t === e2 || t === e3 || t === e4 ||
                     (!e1 && !e2 && !e3 && !e4)) {
                         return token;
@@ -622,7 +622,7 @@ module wx {
             }
 
             private expect(e1?, e2?, e3?, e4?): any {
-                var token = this.peek(e1, e2, e3, e4);
+                let token = this.peek(e1, e2, e3, e4);
                 if (token) {
                     this.tokens.shift();
                     return token;
@@ -661,7 +661,7 @@ module wx {
             }
 
             private statements(): ICompiledExpression {
-                var statements = [];
+                let statements = [];
                 while (true) {
                     if (this.tokens.length > 0 && !this.peek("}", ")", ";", "]"))
                         statements.push(this.filterChain());
@@ -671,9 +671,9 @@ module wx {
                         return (statements.length === 1)
                             ? statements[0] :
                             (self: any, locals: any) => {
-                                var value;
-                                for (var i = 0; i < statements.length; i++) {
-                                    var statement = statements[i];
+                                let value;
+                                for(let i = 0; i < statements.length; i++) {
+                                    let statement = statements[i];
                                     if (statement) {
                                         value = statement(self, locals);
                                     }
@@ -685,8 +685,8 @@ module wx {
             }
 
             private filterChain(): ICompiledExpression {
-                var left = this.expression();
-                var token;
+                let left = this.expression();
+                let token;
                 while (true) {
                     if ((token = this.expect("|"))) {
                         left = this.binaryFn(left, token.fn, this.filter());
@@ -697,16 +697,16 @@ module wx {
             }
 
             private filter(): ICompiledExpression {
-                var token = this.expect();
-                var fn = this.options.filters[token.text];
-                var argsFn = [];
+                let token = this.expect();
+                let fn = this.options.filters[token.text];
+                let argsFn = [];
                 while (true) {
                     if ((token = this.expect(":"))) {
                         argsFn.push(this.expression());
                     } else {
                         var fnInvoke = (self, locals, input) => {
-                            var args = [input];
-                            for (var i = 0; i < argsFn.length; i++) {
+                            let args = [input];
+                            for(let i = 0; i < argsFn.length; i++) {
                                 args.push(argsFn[i](self, locals));
                             }
                             return fn.apply(self, args);
@@ -723,9 +723,9 @@ module wx {
             }
 
             private assignment(): ICompiledExpression {
-                var left = this.ternary();
-                var right;
-                var token;
+                let left = this.ternary();
+                let right;
+                let token;
                 if ((token = this.expect("="))) {
                     if (!(<any> left).assign) {
                         this.throwError("implies assignment but [" +
@@ -740,9 +740,9 @@ module wx {
             }
 
             private ternary(): ICompiledExpression {
-                var left = this.logicalOR();
-                var middle;
-                var token;
+                let left = this.logicalOR();
+                let middle;
+                let token;
                 if ((token = this.expect("?"))) {
                     middle = this.ternary();
                     if ((token = this.expect(":"))) {
@@ -756,8 +756,8 @@ module wx {
             }
 
             private logicalOR(): ICompiledExpression {
-                var left = this.logicalAND();
-                var token;
+                let left = this.logicalAND();
+                let token;
                 while (true) {
                     if ((token = this.expect("||"))) {
                         left = this.binaryFn(left, token.fn, this.logicalAND());
@@ -768,8 +768,8 @@ module wx {
             }
 
             private logicalAND(): ICompiledExpression {
-                var left = this.equality();
-                var token;
+                let left = this.equality();
+                let token;
                 if ((token = this.expect("&&"))) {
                     left = this.binaryFn(left, token.fn, this.logicalAND());
                 }
@@ -777,8 +777,8 @@ module wx {
             }
 
             private equality(): ICompiledExpression {
-                var left = this.relational();
-                var token;
+                let left = this.relational();
+                let token;
                 if ((token = this.expect("==", "!=", "===", "!=="))) {
                     left = this.binaryFn(left, token.fn, this.equality());
                 }
@@ -786,8 +786,8 @@ module wx {
             }
 
             private relational(): ICompiledExpression {
-                var left = this.additive();
-                var token;
+                let left = this.additive();
+                let token;
                 if ((token = this.expect("<", ">", "<=", ">="))) {
                     left = this.binaryFn(left, token.fn, this.relational());
                 }
@@ -795,8 +795,8 @@ module wx {
             }
 
             private additive(): ICompiledExpression {
-                var left = this.multiplicative();
-                var token;
+                let left = this.multiplicative();
+                let token;
                 while ((token = this.expect("+", "-"))) {
                     left = this.binaryFn(left, token.fn, this.multiplicative());
                 }
@@ -804,8 +804,8 @@ module wx {
             }
 
             private multiplicative(): ICompiledExpression {
-                var left = this.unary();
-                var token;
+                let left = this.unary();
+                let token;
                 while ((token = this.expect("*", "/", "%"))) {
                     left = this.binaryFn(left, token.fn, this.unary());
                 }
@@ -813,7 +813,7 @@ module wx {
             }
 
             private unary(): ICompiledExpression {
-                var token;
+                let token;
                 if (this.expect("+")) {
                     return this.primary();
                 } else if ((token = this.expect("-"))) {
@@ -826,9 +826,9 @@ module wx {
             }
 
             private fieldAccess(object): (scope: any, locals?: any) => ICompiledExpression {
-                var parser = this;
-                var field = this.expect().text;
-                var getter = getterFn(field, this.options, this.text);
+                let parser = this;
+                let field = this.expect().text;
+                let getter = getterFn(field, this.options, this.text);
 
                 return extend((scope: any, locals?: any, self?) => {
                     return getter(self || object(scope, locals));
@@ -840,20 +840,20 @@ module wx {
             }
 
             private objectIndex(obj): ICompiledExpression {
-                var parser = this;
+                let parser = this;
 
-                var indexFn = this.expression();
+                let indexFn = this.expression();
                 this.consume("]");
 
                 return extend((self: any, locals: any) => {
-                    var o = obj(self, locals),
+                    let o = obj(self, locals),
                         i = indexFn(self, locals),
                         v,
                         p;
 
                     if (!o) return undefined;
 
-                    var hooks = getRuntimeHooks(locals);
+                    let hooks = getRuntimeHooks(locals);
                     if (hooks && hooks.readIndexHook)
                         v = hooks.readIndexHook(o, i);
                     else
@@ -863,11 +863,11 @@ module wx {
                     return v;
                 }, {
                     assign(self, value, locals) {
-                        var key = indexFn(self, locals);
+                        let key = indexFn(self, locals);
                         // prevent overwriting of Function.constructor which would break ensureSafeObject check
-                        var safe = ensureSafeObject(obj(self, locals), parser.text);
+                        let safe = ensureSafeObject(obj(self, locals), parser.text);
 
-                        var hooks = getRuntimeHooks(locals);
+                        let hooks = getRuntimeHooks(locals);
                         if (hooks && hooks.writeIndexHook)
                             return hooks.writeIndexHook(safe, key, value);
 
@@ -880,7 +880,7 @@ module wx {
                 if (this.options.disallowFunctionCalls)
                     this.throwError("Function calls are not allowed");
 
-                var argsFn = [];
+                let argsFn = [];
                 if (this.peekToken().text !== ")") {
                     do {
                         argsFn.push(this.expression());
@@ -888,22 +888,22 @@ module wx {
                 }
                 this.consume(")");
 
-                var parser = this;
+                let parser = this;
 
                 return (scope: any, locals: any) => {
-                    var args = [];
-                    var context = contextGetter ? contextGetter(scope, locals) : scope;
+                    let args = [];
+                    let context = contextGetter ? contextGetter(scope, locals) : scope;
 
-                    for (var i = 0; i < argsFn.length; i++) {
+                    for(let i = 0; i < argsFn.length; i++) {
                         args.push(argsFn[i](scope, locals));
                     }
-                    var fnPtr = fn(scope, locals, context) || noop;
+                    let fnPtr = fn(scope, locals, context) || noop;
 
                     ensureSafeObject(context, parser.text);
                     ensureSafeObject(fnPtr, parser.text);
 
                     // IE stupidity! (IE doesn't have apply for some native functions)
-                    var v = fnPtr.apply
+                    let v = fnPtr.apply
                         ? fnPtr.apply(context, args)
                         : fnPtr(args[0], args[1], args[2], args[3], args[4]);
 
@@ -913,15 +913,15 @@ module wx {
 
             // This is used with json array declaration
             private arrayDeclaration(): ICompiledExpression {
-                var elementFns = [];
-                var allConstant = true;
+                let elementFns = [];
+                let allConstant = true;
                 if (this.peekToken().text !== "]") {
                     do {
                         if (this.peek("]")) {
                             // Support trailing commas per ES5.1.
                             break;
                         }
-                        var elementFn = this.expression();
+                        let elementFn = this.expression();
                         elementFns.push(elementFn);
                         if (!(<any> elementFn).constant) {
                             allConstant = false;
@@ -931,8 +931,8 @@ module wx {
                 this.consume("]");
 
                 return extend((self: any, locals: any) => {
-                    var array = [];
-                    for (var i = 0; i < elementFns.length; i++) {
+                    let array = [];
+                    for(let i = 0; i < elementFns.length; i++) {
                         array.push(elementFns[i](self, locals));
                     }
                     return array;
@@ -943,18 +943,18 @@ module wx {
             }
 
             private object(): ICompiledExpression {
-                var keyValues = [];
-                var allConstant = true;
+                let keyValues = [];
+                let allConstant = true;
                 if (this.peekToken().text !== "}") {
                     do {
                         if (this.peek("}")) {
                             // Support trailing commas per ES5.1.
                             break;
                         }
-                        var token = this.expect(),
+                        let token = this.expect(),
                             key = token.string || token.text;
                         this.consume(":");
-                        var value = this.expression();
+                        let value = this.expression();
                         keyValues.push({ key: key, value: value });
                         if (!(<any> value).constant) {
                             allConstant = false;
@@ -964,9 +964,9 @@ module wx {
                 this.consume("}");
 
                 return extend((self: any, locals: any) => {
-                    var object = {};
-                    for (var i = 0; i < keyValues.length; i++) {
-                        var keyValue = keyValues[i];
+                    let object = {};
+                    for(let i = 0; i < keyValues.length; i++) {
+                        let keyValue = keyValues[i];
                         object[keyValue.key] = keyValue.value(self, locals);
                     }
                     return object;
@@ -985,11 +985,11 @@ module wx {
         //////////////////////////////////////////////////
 
         function setter(obj, path, setValue, fullExp, options, locals) {
-            var element = path.split("."), key;
-            var i: number;
-            var propertyObj;
+            let element = path.split("."), key;
+            let i: number;
+            let propertyObj;
 
-            var hooks = getRuntimeHooks(locals);
+            let hooks = getRuntimeHooks(locals);
 
             if (hooks) {
                 for (i = 0; element.length > 1; i++) {
@@ -1031,7 +1031,7 @@ module wx {
             return setValue;
         }
 
-        var getterFnCache = {};
+        let getterFnCache = {};
 
         /**
      * Implementation of the "Black Hole" variant from:
@@ -1046,8 +1046,8 @@ module wx {
             ensureSafeMemberName(key4, fullExp);
 
             return (scope: any, locals: any) => {
-                var pathVal = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
-                var hooks = getRuntimeHooks(locals);
+                let pathVal = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
+                let hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook) {
                     if (pathVal == null) return pathVal;
                     pathVal = hooks.readFieldHook(pathVal, key0);
@@ -1101,7 +1101,7 @@ module wx {
                 scope = ((locals && locals.hasOwnProperty(key0)) ? locals : scope);
                 if (scope == null) return undefined;
 
-                var hooks = getRuntimeHooks(locals);
+                let hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook)
                     return hooks.readFieldHook(scope, key0);
 
@@ -1114,7 +1114,7 @@ module wx {
             ensureSafeMemberName(key1, fullExp);
 
             return (scope: any, locals: any) => {
-                var hooks = getRuntimeHooks(locals);
+                let hooks = getRuntimeHooks(locals);
                 if (hooks && hooks.readFieldHook) {
                     scope = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
                     if (scope == null) return undefined;
@@ -1136,7 +1136,7 @@ module wx {
                 return getterFnCache[path];
             }
 
-            var pathKeys = path.split("."),
+            let pathKeys = path.split("."),
                 pathKeysLength = pathKeys.length,
                 fn: (scope: any, locals?: any, self?: any) => any;
 
@@ -1152,10 +1152,10 @@ module wx {
                 } else {
                     fn = (scope: any, locals: any) => {
                         // backup locals
-                        var _locals = {};
+                        let _locals = {};
                         Object.keys(locals).forEach(x => _locals[x] = locals[x]);
 
-                        var i = 0, val;
+                        let i = 0, val;
                         do {
                             val = cspSafeGetterFn(pathKeys[i++], pathKeys[i++], pathKeys[i++], pathKeys[i++],
                                 pathKeys[i++], fullExp, options)(scope, locals);
@@ -1170,7 +1170,7 @@ module wx {
                     };
                 }
             } /* else {
-            var code = "var p;\n";
+            let code = "var p;\n";
             forEach(pathKeys, (key, index) => {
                 ensureSafeMemberName(key, fullExp);
                 code += "if(s == null) return undefined;\n" +
@@ -1183,7 +1183,7 @@ module wx {
             code += "return s;";
 
             // jshint -W054 
-            var evaledFnGetter = new Function("s", "k", "pw", code); // s=scope, k=locals, pw=promiseWarning
+            let evaledFnGetter = new Function("s", "k", "pw", code); // s=scope, k=locals, pw=promiseWarning
             // jshint +W054 /
             evaledFnGetter.toString = valueFn(code);
             fn = <(scope: any, locals?: any, self?: any) => any> evaledFnGetter;
@@ -1219,14 +1219,14 @@ module wx {
                 throw new TypeError("src must be a string, instead saw '" + typeof src + "'");
             }
 
-            var lexer = new Lexer({});
-            var parser = new Parser(lexer, options);
+            let lexer = new Lexer({});
+            let parser = new Parser(lexer, options);
 
             if (!cache) {
                 return parser.parse(src);
             }
 
-            var cached = cache[src];
+            let cached = cache[src];
             if (!cached) {
                 cached = cache[src] = parser.parse(src);
             }
@@ -1236,7 +1236,7 @@ module wx {
     }
 
     export module internal {
-        var exports: IExpressionCompiler = compiler; 
+        let exports: IExpressionCompiler = compiler; 
         export var expressionCompilerConstructor = <any> exports;
     }
 };

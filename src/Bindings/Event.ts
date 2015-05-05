@@ -24,10 +24,10 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
+            let el = <HTMLElement> node;
 
             // create an observable for each event handler value
-            var tokens = this.domManager.getObjectLiteralTokens(options);
+            let tokens = this.domManager.getObjectLiteralTokens(options);
 
             tokens.forEach(token => {
                 this.wireEvent(el, token.value, token.key, ctx, state, module);
@@ -60,13 +60,13 @@ module wx {
         protected domManager: IDomManager;
 
         private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: IDataContext, state: INodeState, module: IModule) {
-            var exp = this.domManager.compileBindingOptions(value, module);
-            var command: ICommand<any>;
-            var commandParameter = undefined;
-            var obs = Rx.Observable.fromEvent<Event>(el, eventName);
+            let exp = this.domManager.compileBindingOptions(value, module);
+            let command: ICommand<any>;
+            let commandParameter = undefined;
+            let obs = Rx.Observable.fromEvent<Event>(el, eventName);
 
             if (typeof exp === "function") {
-                var handler = this.domManager.evaluateExpression(exp, ctx);
+                let handler = this.domManager.evaluateExpression(exp, ctx);
                 handler = unwrapProperty(handler);
 
                 if (isFunction(handler)) {
@@ -82,14 +82,14 @@ module wx {
                         }));
                     } else {
                         // assumed to be an Rx.Observer
-                        var observer = <Rx.Observer<Event>> handler;
+                        let observer = <Rx.Observer<Event>> handler;
 
                         // subscribe event directly to observer
                         state.cleanup.add(obs.subscribe(observer));
                     }
                 }
             } else if (typeof exp === "object") {
-                var opt = <{ command: ICommand<any>; parameter: any }> exp;
+                let opt = <{ command: ICommand<any>; parameter: any }> exp;
 
                 command = <ICommand<any>> <any> this.domManager.evaluateExpression(<any> opt.command, ctx);
                 command = unwrapProperty(command);

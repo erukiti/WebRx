@@ -62,8 +62,8 @@ module wx.internal {
     }
     
     export function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>): Rx.Subject<T> {
-        var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
-        var result = extend(scheduled, new Rx.Subject<T>(), true);
+        let scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
+        let result = extend(scheduled, new Rx.Subject<T>(), true);
 
         return <any> result;
     }

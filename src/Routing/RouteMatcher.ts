@@ -20,9 +20,9 @@ module wx {
 
     // Characters to be escaped with \. RegExp borrowed from the Backbone router
     // but escaped (note: unnecessarily) to keep JSHint from complaining.
-    var reEscape = /[\-\[\]{}()+?.,\\\^$|#\s]/g;
+    let reEscape = /[\-\[\]{}()+?.,\\\^$|#\s]/g;
     // Match named :param or *splat placeholders.
-    var reParam = /([:*])(\w+)/g;
+    let reParam = /([:*])(\w+)/g;
 
     class RouteMatcher implements IRoute {
         // Pass in a route string (or RegExp) plus an optional map of rules, and get
@@ -36,7 +36,7 @@ module wx {
             // Matched param or splat names, in order
             this.params = [];
             // Route matching RegExp.
-            var re = route;
+            let re = route;
 
             // Build route RegExp from passed string.
             if (typeof route === "string") {
@@ -55,10 +55,10 @@ module wx {
                 // Match the passed url against the route, returning an object of params
                 // and values.
                 this.parse = (url)=> {
-                    var i = 0;
-                    var param, value;
-                    var params = {};
-                    var matches = url.match(re);
+                    let i = 0;
+                    let param, value;
+                    let params = {};
+                    let matches = url.match(re);
                     // If no matches, return null.
                     if (!matches) {
                         return null;
@@ -80,8 +80,8 @@ module wx {
                 this.stringify = (params) => {
                     params = params || {};
 
-                    var param, re;
-                    var result = route;
+                    let param, re;
+                    let result = route;
                     // Insert each passed param into the route string. Note that this loop
                     // doesn't check .hasOwnProperty because this script doesn't support
                     // modifications to Object.prototype.
@@ -96,7 +96,7 @@ module wx {
             } else {
                 // RegExp route was passed. This is super-simple.
                 this.parse = url => {
-                    var matches = url.match(re);
+                    let matches = url.match(re);
                     return matches && { captures: matches.slice(1) };
                 };
                 // There's no meaningful way to stringify based on a RegExp route, so
@@ -122,10 +122,10 @@ module wx {
         public params: Array<string>;
 
         public concat(route: IRoute): IRoute {
-            var other = <RouteMatcher> route;
-            var a = this.stripTrailingSlash(this.route);
-            var b = this.stripTrailingSlash(other.route);
-            var rules = null;
+            let other = <RouteMatcher> route;
+            let a = this.stripTrailingSlash(this.route);
+            let b = this.stripTrailingSlash(other.route);
+            let rules = null;
 
             // check for conflicting rules
             if (other.rules) {
@@ -161,7 +161,7 @@ module wx {
             // getting .toString from a new object {} or Object.prototype, I'm assuming
             // that exports will always be an object, and using its .toString method.
             // Bad idea? Let me know by filing an issue
-            var type = this.toString.call(rule).charAt(8);
+            let type = this.toString.call(rule).charAt(8);
             // If regexp, match. If function, invoke. Otherwise, compare. Note that ==
             // is used because type coercion is needed, as `value` will always be a
             // string, but `rule` might not.

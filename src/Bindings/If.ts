@@ -31,13 +31,13 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var el = <HTMLElement> node;
-            var self = this;
-            var initialApply = true;
-            var exp: ICompiledExpression;
-            var animations: IIfAnimationDescriptor = <IForeachAnimationDescriptor> {};
-            var cleanup: Rx.CompositeDisposable;
+            let compiled = this.domManager.compileBindingOptions(options, module);
+            let el = <HTMLElement> node;
+            let self = this;
+            let initialApply = true;
+            let exp: ICompiledExpression;
+            let animations: IIfAnimationDescriptor = <IForeachAnimationDescriptor> {};
+            let cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
                 if (cleanup) {
@@ -47,7 +47,7 @@ module wx {
             }
 
             if (typeof compiled === "object") {
-                var opt = <IIfBindingOptions> compiled;
+                let opt = <IIfBindingOptions> compiled;
                 exp = <ICompiledExpression> <any> opt.condition;
 
                 // extract animations
@@ -70,10 +70,10 @@ module wx {
                 exp = compiled;
             }
 
-            var obs = this.domManager.expressionToObservable(exp, ctx);
+            let obs = this.domManager.expressionToObservable(exp, ctx);
 
             // backup inner HTML
-            var template = new Array<Node>();
+            let template = new Array<Node>();
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -122,11 +122,11 @@ module wx {
 
         protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext,
             animations: IIfAnimationDescriptor, initialApply: boolean): Rx.IDisposable {
-            var leaveAnimation: IAnimation = <IAnimation> animations.leave;
-            var enterAnimation: IAnimation = <IAnimation> animations.enter;
-            var i;
-            var self = this;
-            var obs: Rx.Observable<any> = undefined;
+            let leaveAnimation: IAnimation = <IAnimation> animations.leave;
+            let enterAnimation: IAnimation = <IAnimation> animations.enter;
+            let i;
+            let self = this;
+            let obs: Rx.Observable<any> = undefined;
 
             if (initialApply) {
                 // clone to template
@@ -140,7 +140,7 @@ module wx {
                 }
             }
 
-            var oldElements = nodeChildrenToArray<Node>(el);
+            let oldElements = nodeChildrenToArray<Node>(el);
             value = this.inverse ? !value : value;
 
             function removeOldElements() {
@@ -163,7 +163,7 @@ module wx {
                     }
                 }
             } else {
-                var nodes = template.map(x => x.cloneNode(true));
+                let nodes = template.map(x => x.cloneNode(true));
 
                 if (enterAnimation)
                     enterAnimation.prepare(nodes);

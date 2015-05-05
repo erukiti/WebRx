@@ -21,7 +21,7 @@ module wx {
         noCache?: boolean;
     }
 
-    var templateCache: { [key: string]: any } = {};
+    let templateCache: { [key: string]: any } = {};
 
     class SelectComponent implements IComponentDescriptor {
         constructor(htmlTemplateEngine: ITemplateEngine) {
@@ -33,7 +33,7 @@ module wx {
         }
 
         public viewModel = (params: any): any => {
-            var opt = <ISelectComponentParams> params;
+            let opt = <ISelectComponentParams> params;
 
             return {
                 items: params.items,
@@ -48,9 +48,9 @@ module wx {
         htmlTemplateEngine: ITemplateEngine;
 
         protected buildTemplate(params: ISelectComponentParams): Node[] {
-            var result: string;
-            var key: string = undefined;
-            var nodes: Node[];
+            let result: string;
+            let key: string = undefined;
+            let nodes: Node[];
 
             // check cache
             if (!params.noCache) {
@@ -74,10 +74,10 @@ module wx {
 
             // base-template
             result = '<select class="wx-select" data-bind="{0}"><option data-bind="{1}"></option></select>';
-            var bindings: Array<{ key: string; value: string }> = [];
-            var attrs: Array<{ key: string; value: string }> = [];
-            var itemBindings: Array<{ key: string; value: string }> = [];
-            var itemAttrs: Array<{ key: string; value: string }> = [];
+            let bindings: Array<{ key: string; value: string }> = [];
+            let attrs: Array<{ key: string; value: string }> = [];
+            let itemBindings: Array<{ key: string; value: string }> = [];
+            let itemAttrs: Array<{ key: string; value: string }> = [];
 
             bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
 
@@ -130,8 +130,8 @@ module wx {
                 itemBindings.push({ key: "attr", value: "{ " + itemAttrs.map(x => x.key + ": " + x.value).join(", ") + " }" });
 
             // assemble all bindings
-            var bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
-            var itemBindingString = itemBindings.map(x => x.key + ": " + x.value).join(", ");
+            let bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
+            let itemBindingString = itemBindings.map(x => x.key + ": " + x.value).join(", ");
 
             // assemble template
             result = formatString(result, bindingString, itemBindingString);

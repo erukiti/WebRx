@@ -8,7 +8,7 @@ module wx {
     "use strict";
 
     function toElementList(element: Node|Array<Node>|HTMLElement|Array<HTMLElement>|NodeList): Array<HTMLElement> {
-        var nodes: Array<Node>;
+        let nodes: Array<Node>;
 
         if (element instanceof Node || element instanceof HTMLElement)
             nodes = [<Node> element];
@@ -19,7 +19,7 @@ module wx {
         else
             internal.throwError("invalid argument: element");
 
-        var elements = <Array<HTMLElement>> nodes.filter(x => x.nodeType === 1);
+        let elements = <Array<HTMLElement>> nodes.filter(x => x.nodeType === 1);
         return elements;
     }
 
@@ -30,17 +30,17 @@ module wx {
             x = x.substring(0, x.length - 1);
         }
 
-        var value = parseFloat(x) || 0;
+        let value = parseFloat(x) || 0;
         return value;
     }
 
     function getMaximumTransitionDuration(el: HTMLElement) {
-        var str = getComputedStyle(el)["transitionDuration"];
-        var maxValue = 0;
-        var values = str.split(/\s*,\s*/);
+        let str = getComputedStyle(el)["transitionDuration"];
+        let maxValue = 0;
+        let values = str.split(/\s*,\s*/);
 
         values.forEach(x => {
-            var value = parseTimingValue(x);
+            let value = parseTimingValue(x);
             maxValue = maxValue ? Math.max(value, maxValue) : value;
         });
 
@@ -48,12 +48,12 @@ module wx {
     }
 
     function getMaximumTransitionDelay(el: HTMLElement) {
-        var str = getComputedStyle(el)["transitionDelay"];
-        var maxValue = 0;
-        var values = str.split(/\s*,\s*/);
+        let str = getComputedStyle(el)["transitionDelay"];
+        let maxValue = 0;
+        let values = str.split(/\s*,\s*/);
 
         values.forEach(x => {
-            var value = Math.max(0, parseTimingValue(x));
+            let value = Math.max(0, parseTimingValue(x));
             maxValue = maxValue ? Math.max(value, maxValue) : value;
         });
 
@@ -61,22 +61,22 @@ module wx {
     }
 
     function getKeyframeAnimationDuration(el: HTMLElement) {
-        var durationStr = getComputedStyle(el)["animationDuration"] || getComputedStyle(el)["webkitAnimationDuration"] || "0s";
-        var delayStr = getComputedStyle(el)["animationDelay"] || getComputedStyle(el)["webkitAnimationDelay"] || "0s";
+        let durationStr = getComputedStyle(el)["animationDuration"] || getComputedStyle(el)["webkitAnimationDuration"] || "0s";
+        let delayStr = getComputedStyle(el)["animationDelay"] || getComputedStyle(el)["webkitAnimationDelay"] || "0s";
 
-        var duration = parseTimingValue(durationStr);
-        var delay = parseTimingValue(delayStr);
+        let duration = parseTimingValue(durationStr);
+        let delay = parseTimingValue(delayStr);
         return (duration + delay) * 1000;
     }
 
     function scriptedAnimation(run: (element: HTMLElement, params?: any) => Rx.Observable<any>,
         prepare?: (element: HTMLElement, params?: any) => void,
         complete?: (element: HTMLElement, params?: any) => void): IAnimation {
-        var result: IAnimation = <any> {};
+        let result: IAnimation = <any> {};
 
         if (prepare) {
             result.prepare = (nodes, params) => {
-                var elements = toElementList(nodes);
+                let elements = toElementList(nodes);
                 elements.forEach(x => prepare(x, params));
             }
         } else {
@@ -85,7 +85,7 @@ module wx {
 
         result.run = (nodes, params) => {
             return Rx.Observable.defer(() => {
-                var elements = toElementList(nodes);
+                let elements = toElementList(nodes);
 
                 if (elements.length === 0)
                     return Rx.Observable.return<any>(undefined);
@@ -96,7 +96,7 @@ module wx {
 
         if (complete) {
             result.complete = (nodes, params) => {
-                var elements = toElementList(nodes);
+                let elements = toElementList(nodes);
                 elements.forEach(x => complete(x, params));
             }
         } else {
@@ -107,16 +107,16 @@ module wx {
     }
 
     function cssTransitionAnimation(prepare: any, run: any, complete: any): IAnimation {
-        var result: IAnimation = <any> {};
-        var prepToAdd: Array<any>;
-        var prepToRemove: Array<any>;
-        var runToAdd: Array<any>;
-        var runToRemove: Array<any>;
-        var completeToAdd: Array<any>;
-        var completeToRemove: Array<any>;
+        let result: IAnimation = <any> {};
+        let prepToAdd: Array<any>;
+        let prepToRemove: Array<any>;
+        let runToAdd: Array<any>;
+        let runToRemove: Array<any>;
+        let completeToAdd: Array<any>;
+        let completeToRemove: Array<any>;
 
         if (prepare) {
-            var prepIns: Array<IAnimationCssClassInstruction>; 
+            let prepIns: Array<IAnimationCssClassInstruction>; 
 
             if (typeof prepare === "string") {
                 prepare = prepare.split(/\s+/).map(x => x.trim()).filter(x => x);
@@ -133,7 +133,7 @@ module wx {
             prepToRemove = prepIns.filter(x => !x.add || x.remove).map(x => x.css);
 
             result.prepare = (nodes, params) => {
-                var elements = toElementList(nodes);
+                let elements = toElementList(nodes);
 
                 if (prepToAdd && prepToAdd.length)
                     elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(prepToAdd)));
@@ -143,7 +143,7 @@ module wx {
             }
         }
 
-        var runIns: Array<IAnimationCssClassInstruction>;
+        let runIns: Array<IAnimationCssClassInstruction>;
 
         if (typeof run === "string") {
             run = run.split(/\s+/).map(x => x.trim()).filter(x => x);
@@ -161,13 +161,13 @@ module wx {
 
         result.run = (nodes, params) => {
             return Rx.Observable.defer(() => {
-                var elements = toElementList(nodes);
+                let elements = toElementList(nodes);
 
                 if (elements.length === 0)
                     return Rx.Observable.return<any>(undefined);
 
-                var obs = Rx.Observable.combineLatest(elements.map(x => {
-                    var duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
+                let obs = Rx.Observable.combineLatest(elements.map(x => {
+                    let duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
                     return Rx.Observable.timer(duration);
                 }), <any> noop);
 
@@ -184,7 +184,7 @@ module wx {
             });
         }
 
-        var completeIns: Array<IAnimationCssClassInstruction>; 
+        let completeIns: Array<IAnimationCssClassInstruction>; 
 
         if (complete) {
             if (typeof complete === "string") {
@@ -212,7 +212,7 @@ module wx {
         }
 
         result.complete = (nodes, params) => {
-            var elements = toElementList(nodes);
+            let elements = toElementList(nodes);
 
             if (completeToAdd && completeToAdd.length)
                 elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(completeToAdd)));
@@ -257,8 +257,8 @@ module wx {
         complete?: (element: HTMLElement, params?: any) => void): IAnimation;
 
     export function animation() {
-        var args = args2Array(arguments);
-        var val = args.shift();
+        let args = args2Array(arguments);
+        let val = args.shift();
 
         if (typeof val === "function") {
             return scriptedAnimation(val, args.shift(), args.shift());

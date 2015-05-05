@@ -5,8 +5,8 @@
 module wx.env {
     "use strict";
 
-    var _window = <any> window;
-    var userAgent = _window.navigator.userAgent;
+    let _window = <any> window;
+    let userAgent = _window.navigator.userAgent;
 
     export interface IBrowserProperties {
         version: number;
@@ -21,7 +21,7 @@ module wx.env {
     export var safari: IBrowserProperties;
     export var firefox: IBrowserProperties;
 
-    var parseVersion = matches => {
+    let parseVersion = matches => {
         if (matches) {
             return parseFloat(matches[1]);
         }
@@ -37,8 +37,8 @@ module wx.env {
     // Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
     // Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
     // Currently this is by design, since IE 10+ behaves correctly when treated as a standard browser.
-    var version = document && (function () {
-        var version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
+    let version = document && (function () {
+        let version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
 
         // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
         while (
@@ -54,11 +54,11 @@ module wx.env {
         if (version < 10) {
             // for IE9 and lower, provide an accessor for document scoped
             // observables which allow monitoring the selectionchange event
-            var map = wx.createWeakMap<Document, Rx.Observable<Document>>();
+            let map = wx.createWeakMap<Document, Rx.Observable<Document>>();
 
             ie.getSelectionChangeObservable = (el: HTMLElement) => {
-                var doc = el.ownerDocument;
-                var result = map.get(doc);
+                let doc = el.ownerDocument;
+                let result = map.get(doc);
 
                 if (result)
                     return result;
@@ -88,7 +88,7 @@ module wx.env {
         firefox = { version: version };
     }
 
-    var hasES5 = typeof Array.isArray === "function" &&
+    let hasES5 = typeof Array.isArray === "function" &&
         typeof [].forEach === "function" &&
         typeof [].map === "function" &&
         typeof [].some === "function" &&

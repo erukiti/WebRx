@@ -25,15 +25,15 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var compiled = this.domManager.compileBindingOptions(options, module);
+            let compiled = this.domManager.compileBindingOptions(options, module);
 
-            var el = <HTMLElement> node;
-            var exp: ICompiledExpression;
-            var cmdObservable: Rx.Observable<ICommand<any>>;
-            var paramObservable: Rx.Observable<any>;
-            var cleanup: Rx.CompositeDisposable;
-            var isAnchor = el.tagName.toLowerCase() === "a";
-            var event: any = "click";
+            let el = <HTMLElement> node;
+            let exp: ICompiledExpression;
+            let cmdObservable: Rx.Observable<ICommand<any>>;
+            let paramObservable: Rx.Observable<any>;
+            let cleanup: Rx.CompositeDisposable;
+            let isAnchor = el.tagName.toLowerCase() === "a";
+            let event: any = "click";
 
             function doCleanup() {
                 if (cleanup) {
@@ -47,7 +47,7 @@ module wx {
 
                 cmdObservable = <any> this.domManager.expressionToObservable(exp, ctx);
             } else {
-                var opt = <ICommandBindingOptions> compiled;
+                let opt = <ICommandBindingOptions> compiled;
 
                 exp = <ICompiledExpression> <any> opt.command;
                 cmdObservable = <any> this.domManager.expressionToObservable(exp, ctx);

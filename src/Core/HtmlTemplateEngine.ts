@@ -48,8 +48,8 @@ module wx {
     wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
     wrapMap.th = wrapMap.td;
 
-    var supportsCreateHTMLDocument = (() => {
-        var doc = document.implementation.createHTMLDocument("");
+    let supportsCreateHTMLDocument = (() => {
+        let doc = document.implementation.createHTMLDocument("");
         // Support: Node with jsdom<=1.5.0+
         // jsdom's document created via the above method doesn't contain the body
         if (!doc.body) {
@@ -60,7 +60,7 @@ module wx {
     })();
    
     function merge(first, second) {
-        var len = +second.length,
+        let len = +second.length,
             j = 0,
             i = first.length;
 
@@ -74,7 +74,7 @@ module wx {
     }
 
     function buildFragment(elems, context) {
-        var elem,
+        let elem,
             tmp,
             tag,
             wrap,
@@ -144,8 +144,8 @@ module wx {
     class HtmlTemplateEngine implements ITemplateEngine {
         public parse(data: string): Node[] {
             // document.implementation stops scripts or inline event handlers from being executed immediately
-            var context = supportsCreateHTMLDocument ? document.implementation.createHTMLDocument("") : document;
-            var parsed: any = rsingleTag.exec(data);
+            let context = supportsCreateHTMLDocument ? document.implementation.createHTMLDocument("") : document;
+            let parsed: any = rsingleTag.exec(data);
 
             // Single tag
             if (parsed) {
@@ -154,7 +154,7 @@ module wx {
 
             parsed = buildFragment([data], context);
 
-            var result = merge([], parsed.childNodes);
+            let result = merge([], parsed.childNodes);
             return result;
         }
     }

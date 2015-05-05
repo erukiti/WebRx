@@ -19,18 +19,18 @@ module wx {
             if (node.nodeType !== 1)
                 internal.throwError("binding only operates on elements!");
 
-            var compiled = this.domManager.compileBindingOptions(options, module);
+            let compiled = this.domManager.compileBindingOptions(options, module);
 
             if (compiled == null || (typeof compiled !== "object" && !this.supportsDynamicValues))
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var observables = new Array<[string, Rx.Observable<any>]>();
-            var obs: Rx.Observable<any>;
-            var exp: ICompiledExpression;
-            var keys = Object.keys(compiled);
-            var i;
-            var key;
+            let el = <HTMLElement> node;
+            let observables = new Array<[string, Rx.Observable<any>]>();
+            let obs: Rx.Observable<any>;
+            let exp: ICompiledExpression;
+            let keys = Object.keys(compiled);
+            let i;
+            let key;
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
@@ -40,7 +40,7 @@ module wx {
             } else {
                 for (i = 0; i < keys.length; i++) {
                     key = keys[i];
-                    var value = compiled[key];
+                    let value = compiled[key];
 
                     exp = <ICompiledExpression> value;
                     obs = this.domManager.expressionToObservable(exp, ctx);
@@ -112,7 +112,7 @@ module wx {
         }
 
         protected applyValue(el: HTMLElement, value: any, key: string): void {
-            var classes: Array<any>;
+            let classes: Array<any>;
 
             if (key !== "") {
                 classes = key.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
@@ -121,7 +121,7 @@ module wx {
                     toggleCssClass.apply(null, [el, !!value].concat(classes));
                 }
             } else {
-                var state = <ICssNodeState> this.domManager.getNodeState(el);
+                let state = <ICssNodeState> this.domManager.getNodeState(el);
 
                 // if we have previously added classes, remove them
                 if (state.cssBindingPreviousDynamicClasses != null) {
@@ -154,7 +154,7 @@ module wx {
             // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
             // when someProp is a "no value"-like value (strictly null, false, or undefined)
             // (because the absence of the "checked" attr is how to mark an element as not checked, etc.)
-            var toRemove = (value === false) || (value === null) || (value === undefined);
+            let toRemove = (value === false) || (value === null) || (value === undefined);
             if (toRemove)
                 el.removeAttribute(key);
             else {

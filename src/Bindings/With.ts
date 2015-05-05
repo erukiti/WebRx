@@ -22,10 +22,10 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var self = this;
-            var exp = this.domManager.compileBindingOptions(options, module);
-            var obs = this.domManager.expressionToObservable(exp, ctx);
+            let el = <HTMLElement> node;
+            let self = this;
+            let exp = this.domManager.compileBindingOptions(options, module);
+            let obs = this.domManager.expressionToObservable(exp, ctx);
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -67,7 +67,7 @@ module wx {
 
         protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
             state.model = value;
-            var ctx = this.domManager.getDataContext(el);
+            let ctx = this.domManager.getDataContext(el);
 
             this.domManager.cleanDescendants(el);
             this.domManager.applyBindingsToDescendants(ctx, el);

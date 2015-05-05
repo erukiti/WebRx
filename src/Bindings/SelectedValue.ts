@@ -12,7 +12,7 @@ module wx {
         updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any);
     }
 
-    var impls = new Array<ISelectedValueBindingImpl>();
+    let impls = new Array<ISelectedValueBindingImpl>();
 
     class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
         constructor(domManager: IDomManager) {
@@ -35,7 +35,7 @@ module wx {
 
         public observeModel(model: any): Rx.Observable<any> {
             if (isProperty(model)) {
-                var prop = <IObservableProperty<any>> model;
+                let prop = <IObservableProperty<any>> model;
                 return prop.changed;
             }
 
@@ -43,13 +43,13 @@ module wx {
         }
 
         public updateElement(el: HTMLElement, model: any) {
-            var input = <HTMLInputElement> el;
+            let input = <HTMLInputElement> el;
 
             input.checked = internal.getNodeValue(input, this.domManager) == unwrapProperty(model);
         }
 
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
-            var input = <HTMLInputElement> el;
+            let input = <HTMLInputElement> el;
 
             if (input.checked) {
                 model(internal.getNodeValue(input, this.domManager));
@@ -75,7 +75,7 @@ module wx {
 
         public observeModel(model: any): Rx.Observable<any> {
             if (isProperty(model)) {
-                var prop = <IObservableProperty<any>> model;
+                let prop = <IObservableProperty<any>> model;
                 return prop.changed;
             }
 
@@ -83,15 +83,15 @@ module wx {
         }
 
         public updateElement(el: HTMLElement, model: any) {
-            var select = <HTMLSelectElement> el;
-            var value = unwrapProperty(model);
-            var length = select.options.length;
+            let select = <HTMLSelectElement> el;
+            let value = unwrapProperty(model);
+            let length = select.options.length;
 
             if (value == null) {
                 select.selectedIndex = -1;
             } else {
-                for (var i = 0; i < length; i++) {
-                    var option = select.options[i];
+                for(let i = 0; i < length; i++) {
+                    let option = select.options[i];
                     if (internal.getNodeValue(option, this.domManager) == value) {
                         select.selectedIndex = i;
                         break;
@@ -101,10 +101,10 @@ module wx {
         }
 
         public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
-            var select = <HTMLSelectElement> el;
+            let select = <HTMLSelectElement> el;
 
             // selected-value comes from the option at selectedIndex
-            var value = select.selectedIndex !== -1 ?
+            let value = select.selectedIndex !== -1 ?
                 internal.getNodeValue(select.options[select.selectedIndex], this.domManager) :
                 undefined;
 
@@ -130,10 +130,10 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLInputElement> node;
-            var impl: ISelectedValueBindingImpl;
-            var implCleanup: Rx.CompositeDisposable;
-            var exp = this.domManager.compileBindingOptions(options, module);
+            let el = <HTMLInputElement> node;
+            let impl: ISelectedValueBindingImpl;
+            let implCleanup: Rx.CompositeDisposable;
+            let exp = this.domManager.compileBindingOptions(options, module);
             
             function cleanupImpl() {
                 if (implCleanup) {
@@ -149,7 +149,7 @@ module wx {
 
                     // lookup implementation
                     impl = undefined;
-                    for (var i = 0; i < impls.length; i++) {
+                    for(let i = 0; i < impls.length; i++) {
                         if (impls[i].supports(el, model)) {
                             impl = impls[i];
                             break;

@@ -38,7 +38,7 @@ module wx {
         private schedulerMappings: { [topic: string]: Rx.IScheduler } = {};
 
         private setupSubjectIfNecessary<T>(contract: string): Rx.Subject<T> {
-            var ret: Rx.Subject<T> = this.messageBus[contract];
+            let ret: Rx.Subject<T> = this.messageBus[contract];
 
             if(ret == null) {
                 ret = internal.createScheduledSubject<T>(this.getScheduler(contract), null, new Rx.BehaviorSubject<T>(undefined));
@@ -49,7 +49,7 @@ module wx {
         }
 
         private getScheduler(contract: string): Rx.IScheduler {
-            var scheduler = this.schedulerMappings[contract];
+            let scheduler = this.schedulerMappings[contract];
             return scheduler || Rx.Scheduler.currentThread;
        }
     }

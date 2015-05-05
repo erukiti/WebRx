@@ -26,13 +26,13 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var opt = <IComponentBindingOptions> compiled;
-            var exp: ICompiledExpression;
-            var componentNameObservable: Rx.Observable<string>;
-            var componentParams = {};
-            var cleanup: Rx.CompositeDisposable;
+            let el = <HTMLElement> node;
+            let compiled = this.domManager.compileBindingOptions(options, module);
+            let opt = <IComponentBindingOptions> compiled;
+            let exp: ICompiledExpression;
+            let componentNameObservable: Rx.Observable<string>;
+            let componentParams = {};
+            let cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
                 if (cleanup) {
@@ -65,7 +65,7 @@ module wx {
             }
 
             // clear children
-            var oldContents = new Array<Node>();
+            let oldContents = new Array<Node>();
             while (el.firstChild) {
                  oldContents.push(el.removeChild(el.firstChild));
             }
@@ -77,8 +77,8 @@ module wx {
                     cleanup = new Rx.CompositeDisposable();
 
                     // lookup component
-                    var obs: Rx.Observable<IComponent> = module.loadComponent(componentName, componentParams);
-                    var disp: Rx.IDisposable = undefined;
+                    let obs: Rx.Observable<IComponent> = module.loadComponent(componentName, componentParams);
+                    let disp: Rx.IDisposable = undefined;
 
                     if (obs == null)
                         internal.throwError("component '{0}' is not registered with current module-context", componentName);
@@ -144,8 +144,8 @@ module wx {
             }
 
             // clone template and inject
-            for (var i = 0; i < template.length; i++) {
-                var node = template[i].cloneNode(true);
+            for(let i = 0; i < template.length; i++) {
+                let node = template[i].cloneNode(true);
                 el.appendChild(node);
             }
 

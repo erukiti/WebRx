@@ -12,7 +12,7 @@ module wx {
         /// ISet
 
         public add(value: T): ISet<T> {
-            var key = getOid(value);
+            let key = getOid(value);
 
             if (!this.keys[key]) {
                 this.values.push(value);
@@ -23,10 +23,10 @@ module wx {
         }
 
         public delete(value: T): boolean {
-            var key = getOid(value);
+            let key = getOid(value);
 
             if (this.keys[key]) {
-                var index = this.values.indexOf(value);
+                let index = this.values.indexOf(value);
                 this.values.splice(index, 1);
 
                 delete this.keys[key];
@@ -37,7 +37,7 @@ module wx {
         }
 
         public has(value: T): boolean {
-            var key = getOid(value);
+            let key = getOid(value);
             return this.keys.hasOwnProperty(key);
         }
 
@@ -65,7 +65,7 @@ module wx {
         private keys: { [key: string]: boolean } = {};
     }
 
-    var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
+    let hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
         && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
         && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
 
@@ -86,7 +86,7 @@ module wx {
     * Extracts the values of a Set by invoking its forEach method and capturing the output
     */
     export function setToArray<T>(src: ISet<T>): Array<T> {
-        var result = new Array<T>();
+        let result = new Array<T>();
         src.forEach(x => result.push(x));
         return result;
     }

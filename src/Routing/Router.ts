@@ -25,8 +25,8 @@ module wx {
 
             // monitor navigation history
             app.history.onPopState.subscribe((e) => {
-                var state = <IHistoryState> e.state;
-                var stateName = state.stateName;
+                let state = <IHistoryState> e.state;
+                let stateName = state.stateName;
 
                 if (stateName != null) {
                     // enter state using extracted params
@@ -54,7 +54,7 @@ module wx {
         }
 
         public updateCurrentStateParams(withParamsAction: (params: any) => void): void {
-            var _current = this.current();
+            let _current = this.current();
             withParamsAction(_current.params);
             this.replaceHistoryState(_current, app.title());
         }
@@ -73,16 +73,16 @@ module wx {
         }
 
         public is(state: string, params?: any, options?: any) {
-            var _current = this.current();
-            var isActive = _current.name === state;
+            let _current = this.current();
+            let isActive = _current.name === state;
             params = params || {};
 
             if (isActive) {
-                var currentParamsKeys = Object.keys(_current.params);
-                var paramsKeys = Object.keys(params);
+                let currentParamsKeys = Object.keys(_current.params);
+                let paramsKeys = Object.keys(params);
 
                 if (currentParamsKeys.length === paramsKeys.length) {
-                    for (var i = 0; i < paramsKeys.length; i++) {
+                    for(let i = 0; i < paramsKeys.length; i++) {
                         if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
                             isActive = false;
                             break;
@@ -97,18 +97,18 @@ module wx {
         }
 
         public includes(state: string, params?: any, options?: any) {
-            var _current = this.current();
-            var isActive = _current.name.indexOf(state) === 0;
+            let _current = this.current();
+            let isActive = _current.name.indexOf(state) === 0;
             params = params || {};
 
             if (isActive) {
-                var currentParamsKeys = Object.keys(_current.params);
-                var paramsKeys = Object.keys(params);
+                let currentParamsKeys = Object.keys(_current.params);
+                let paramsKeys = Object.keys(params);
 
                 paramsKeys = paramsKeys.length <= currentParamsKeys.length ?
                     paramsKeys : currentParamsKeys;
 
-                for (var i = 0; i < paramsKeys.length; i++) {
+                for(let i = 0; i < paramsKeys.length; i++) {
                     if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
                         isActive = false;
                         break;
@@ -122,7 +122,7 @@ module wx {
         public uri(state: string, params?: {}): string {
             state = this.mapPath(state);
 
-            var route = this.getAbsoluteRouteForState(state);
+            let route = this.getAbsoluteRouteForState(state);
             if (route != null)
                 return route.stringify(params);
 
@@ -143,16 +143,16 @@ module wx {
 
         public sync(): void {
             // infer initial state from browser-location
-            var uri = app.history.location.pathname;// + app.history.location.search;
+            let uri = app.history.location.pathname;// + app.history.location.search;
 
             // iterate over registered states to find matching uri
-            var keys = Object.keys(this.states);
-            var length = keys.length;
-            var params;
+            let keys = Object.keys(this.states);
+            let length = keys.length;
+            let params;
 
-            for (var i = 0; i < length; i++) {
-                var state = this.states[keys[i]];
-                var route = this.getAbsoluteRouteForState(state.name);
+            for(let i = 0; i < length; i++) {
+                let state = this.states[keys[i]];
+                let route = this.getAbsoluteRouteForState(state.name);
 
                 if ((params = route.parse(uri)) != null) {
                     this.go(state.name, params, { location: RouterLocationChangeMode.replace });
@@ -166,12 +166,12 @@ module wx {
         }
 
         public getViewComponent(viewName: string): IViewConfig {
-            var _current = this.current();
-            var result: IViewConfig = undefined;
+            let _current = this.current();
+            let result: IViewConfig = undefined;
 
             if (_current.views != null) {
-                var component = _current.views[viewName];
-                var stateParams = {};
+                let component = _current.views[viewName];
+                let stateParams = {};
 
                 if (component != null) {
                     result = <any> {};
@@ -187,7 +187,7 @@ module wx {
                     }
 
                     // ensure that only parameters configured at state level surface at view-level
-                    var parameterNames = this.getViewParameterNamesFromStateConfig(viewName, result.component);
+                    let parameterNames = this.getViewParameterNamesFromStateConfig(viewName, result.component);
 
                     parameterNames.forEach(x => {
                         if (_current.params.hasOwnProperty(x)) {
@@ -218,7 +218,7 @@ module wx {
         private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
 
         private registerStateInternal(state: IRouterStateConfig) {
-            var parts = state.name.split(this.pathSeparator);
+            let parts = state.name.split(this.pathSeparator);
 
             if (state.name !== this.rootStateName) {
                 // validate name
@@ -254,7 +254,7 @@ module wx {
         }
 
         private pushHistoryState(state: IRouterState, title?: string): void {
-            var hs = <IHistoryState> {
+            let hs = <IHistoryState> {
                 stateName: state.name,
                 params: state.params,
                 title: title != null ? title : document.title
@@ -264,7 +264,7 @@ module wx {
         }
 
         private replaceHistoryState(state: IRouterState, title?: string): void {
-            var hs = <IHistoryState> {
+            let hs = <IHistoryState> {
                 stateName: state.name,
                 params: state.params,
                 title: title != null ? title : document.title
@@ -279,17 +279,17 @@ module wx {
                 return this.current().name + path;
             } else if (path.indexOf(this.parentPathDirective) === 0) {
                 // parent-relative                
-                var parent = this.current().name;
+                let parent = this.current().name;
 
                 // can't go further up than root
                 if (parent === this.rootStateName)
                     return parent;
 
                 // test parents and siblings until one is found that is registered
-                var parts = parent.split(this.pathSeparator);
+                let parts = parent.split(this.pathSeparator);
 
-                for (var i = parts.length - 1; i > 0; i--) {
-                    var tmp = parts.slice(0, i).join(this.pathSeparator);
+                for(let i = parts.length - 1; i > 0; i--) {
+                    let tmp = parts.slice(0, i).join(this.pathSeparator);
 
                     // check if parent or sibling relative to current parent exists 
                     if (this.get(tmp) || this.get(tmp + path.substr(1))) {
@@ -307,15 +307,15 @@ module wx {
         }
 
         private getStateHierarchy(name: string): IRouterStateConfig[] {
-            var parts = name.split(this.pathSeparator);
-            var stateName: string = "";
-            var result = [];
-            var state: IRouterStateConfig;
+            let parts = name.split(this.pathSeparator);
+            let stateName: string = "";
+            let result = [];
+            let state: IRouterStateConfig;
 
             if (name !== this.rootStateName)
                 result.push(this.root);
 
-            for (var i = 0; i < parts.length; i++) {
+            for(let i = 0; i < parts.length; i++) {
                 if (i > 0)
                     stateName += this.pathSeparator + parts[i];
                 else
@@ -339,12 +339,12 @@ module wx {
 
         private getAbsoluteRouteForState(name: string, hierarchy?: IRouterStateConfig[]): IRoute {
             hierarchy = hierarchy != null ? hierarchy : this.getStateHierarchy(name);
-            var result: IRoute = null;
+            let result: IRoute = null;
 
             hierarchy.forEach(state => {
                 // concat urls
                 if (result != null) {
-                    var route = <IRoute> state.route;
+                    let route = <IRoute> state.route;
 
                     // individual states may use absolute urls as well
                     if (!route.isAbsolute)
@@ -360,9 +360,9 @@ module wx {
         }
 
         private activateState(to: string, params?: Object, options?: IStateChangeOptions): void {
-            var hierarchy = this.getStateHierarchy(to);
-            var stateViews: { [view: string]: string|{ component: string; params?: any } } = {};
-            var stateParams = {};
+            let hierarchy = this.getStateHierarchy(to);
+            let stateViews: { [view: string]: string|{ component: string; params?: any } } = {};
+            let stateParams = {};
 
             hierarchy.forEach(state => {
                 // merge views
@@ -382,14 +382,14 @@ module wx {
             }
 
             // construct resulting state
-            var route = this.getAbsoluteRouteForState(to, hierarchy);
-            var state = <IRouterState> extend(this.states[to], {});
+            let route = this.getAbsoluteRouteForState(to, hierarchy);
+            let state = <IRouterState> extend(this.states[to], {});
             state.uri = route.stringify(params);
             state.views = stateViews;
             state.params = stateParams;
 
             // perform deep equal against current state
-            var _current = this.current();
+            let _current = this.current();
 
             if ((options && options.force) || _current == null ||
                 _current.name !== to ||
@@ -426,18 +426,18 @@ module wx {
         }
 
         private getViewParameterNamesFromStateConfig(view: string, component: string): Array<string> {
-            var hierarchy = this.getStateHierarchy(this.current().name);
-            var stateParams = {};
-            var result = [];
-            var config: IRouterStateConfig;
-            var index = -1;
+            let hierarchy = this.getStateHierarchy(this.current().name);
+            let stateParams = {};
+            let result = [];
+            let config: IRouterStateConfig;
+            let index = -1;
 
             // walk the hierarchy backward to figure out when the component was introduced at the specified view-slot
-            for (var i = hierarchy.length; i--; i >= 0) {
+            for(let i = hierarchy.length; i--; i >= 0) {
                 config = hierarchy[i];
 
                 if (config.views && config.views[view]) {
-                    var other = config.views[view];
+                    let other = config.views[view];
                     if (typeof other === "object") {
                         other = (<any> other).component;
                     }

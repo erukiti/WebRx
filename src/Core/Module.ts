@@ -23,7 +23,7 @@ module wx {
         // IModule
 
         public merge(other: IModule): IModule {
-            var _other = <Module> other;
+            let _other = <Module> other;
 
             extend(_other.components, this.components);
             extend(_other.bindings, this.bindings);
@@ -52,9 +52,9 @@ module wx {
         public binding(names: string[], handler: string): IBindingRegistry;
         public binding(name: string): IBindingHandler;
         public binding() {
-            var args = args2Array(arguments);
-            var name = args.shift();
-            var handler: IBindingHandler;
+            let args = args2Array(arguments);
+            let name = args.shift();
+            let handler: IBindingHandler;
 
             // lookup?
             if (args.length === 0) {
@@ -84,9 +84,9 @@ module wx {
         public filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
         public filter(name: string): IExpressionFilter;
         public filter() {
-            var args = args2Array(arguments);
-            var name = args.shift();
-            var filter: IExpressionFilter;
+            let args = args2Array(arguments);
+            let name = args.shift();
+            let filter: IExpressionFilter;
 
             // lookup?
             if (args.length === 0) {
@@ -115,9 +115,9 @@ module wx {
         public animation(name: string, animation: IAnimation): IAnimationRegistry;
         public animation(name: string): IAnimation;
         public animation() {
-            var args = args2Array(arguments);
-            var name = args.shift();
-            var animation: IAnimation;
+            let args = args2Array(arguments);
+            let name = args.shift();
+            let animation: IAnimation;
 
             // lookup?
             if (args.length === 0) {
@@ -150,8 +150,8 @@ module wx {
         private animations: { [index: string]: IAnimation; } = {};
 
         private instantiateComponent(name: string): Rx.Observable<IComponentDescriptorEx> {
-            var cd = this.components[name];
-            var result: Rx.Observable<IComponentDescriptorEx> = undefined;
+            let cd = this.components[name];
+            let result: Rx.Observable<IComponentDescriptorEx> = undefined;
 
             if (cd != null) {
                 // if the component has been registered as resource, resolve it now and update registry
@@ -160,7 +160,7 @@ module wx {
                 } else if (cd.template) {
                     result = Rx.Observable.return<IComponentDescriptorEx>(cd);
                 } else if (cd.resolve) {
-                    var resolved = injector.get<IComponentDescriptorEx>(cd.resolve);
+                    let resolved = injector.get<IComponentDescriptorEx>(cd.resolve);
                     result = Rx.Observable.return<IComponentDescriptorEx>(resolved);
                 } else if (cd.require) {
                     result = observableRequire<IComponentDescriptorEx>(cd.require);
@@ -210,8 +210,8 @@ module wx {
         }
 
         protected loadComponentTemplate(template: any, params: Object): Rx.Observable<Node[]> {
-            var syncResult: Node[];
-            var el: Element;
+            let syncResult: Node[];
+            let el: Element;
 
             if (isFunction(template)) {
                 syncResult = template(params);
@@ -227,13 +227,13 @@ module wx {
             } else if (Array.isArray(template)) {
                 return Rx.Observable.return(<Node[]> template);
             } else if (typeof template === "object") {
-                var options = <IComponentTemplateDescriptor> template;
+                let options = <IComponentTemplateDescriptor> template;
 
                 if (options.resolve) {
                     syncResult = injector.get<Node[]>(options.resolve);
                     return Rx.Observable.return(syncResult);
                 } else if (options.promise) {
-                    var promise = <Rx.IPromise<Node[]>> <any> options.promise;
+                    let promise = <Rx.IPromise<Node[]>> <any> options.promise;
                     return Rx.Observable.fromPromise(promise);
                 } else if (options.require) {
                     return observableRequire<string>(options.require).select(x => app.templateEngine.parse(x));
@@ -271,7 +271,7 @@ module wx {
         }
 
         protected loadComponentViewModel(vm: any, componentParams: Object): Rx.Observable<any> {
-            var syncResult: any;
+            let syncResult: any;
 
             if (isFunction(vm)) {
                 return Rx.Observable.return(vm);
@@ -280,13 +280,13 @@ module wx {
                 syncResult = injector.resolve<any>(vm, componentParams);
                 return Rx.Observable.return(syncResult);
             } else if (typeof vm === "object") {
-                var options = <IComponentViewModelDescriptor> vm;
+                let options = <IComponentViewModelDescriptor> vm;
 
                 if (options.resolve) {
                     syncResult = injector.get<any>(options.resolve, componentParams);
                     return Rx.Observable.return(syncResult);
                 } else if (options.promise) {
-                    var promise = <Rx.IPromise<any>> <any> options.promise;
+                    let promise = <Rx.IPromise<any>> <any> options.promise;
                     return Rx.Observable.fromPromise(promise);
                 } else if (options.require) {
                     return observableRequire(options.require);
@@ -366,7 +366,7 @@ module wx {
 
         private createHistory(): IHistory {
             // inherit default implementation
-            var result = <IHistory> {
+            let result = <IHistory> {
                 back: window.history.back.bind(window.history),
                 forward: window.history.forward.bind(window.history),
                 //go: window.history.go,
@@ -435,9 +435,9 @@ module wx {
    * @return {IModule} The module handle
    */
     export function loadModule(name: string): Rx.Observable<IModule> {
-        var md: Array<any>|IModuleDescriptor = modules[name];
-        var result: Rx.Observable<IModule> = undefined;
-        var module: IModule;
+        let md: Array<any>|IModuleDescriptor = modules[name];
+        let result: Rx.Observable<IModule> = undefined;
+        let module: IModule;
 
         if (md != null) {
             if (Array.isArray(md)) {
@@ -452,7 +452,7 @@ module wx {
                 (<any> md)(module);
                 result = Rx.Observable.return(module);
             } else {
-                var mdd = <IModuleDescriptor> md;
+                let mdd = <IModuleDescriptor> md;
 
                 if (mdd.instance) {
                     result = Rx.Observable.return<IModule>(mdd.instance);

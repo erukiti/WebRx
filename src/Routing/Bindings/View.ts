@@ -28,11 +28,11 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var viewName = this.domManager.evaluateExpression(compiled, ctx);
-            var currentConfig: IViewConfig;
-            var cleanup: Rx.CompositeDisposable;
+            let el = <HTMLElement> node;
+            let compiled = this.domManager.compileBindingOptions(options, module);
+            let viewName = this.domManager.evaluateExpression(compiled, ctx);
+            let currentConfig: IViewConfig;
+            let cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
                 if (cleanup) {
@@ -50,7 +50,7 @@ module wx {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
 
-                    var config = this.router.getViewComponent(viewName);
+                    let config = this.router.getViewComponent(viewName);
 
                     if (config != null) {
                         if (!isEqual(currentConfig, config)) {
@@ -95,10 +95,10 @@ module wx {
 
         protected applyTemplate(componentName: string, componentParams: Object,
             animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.IDisposable {
-            var self = this;
-            var oldElements = nodeChildrenToArray<Node>(el);
-            var combined: Array<Rx.Observable<any>> = [];
-            var obs: Rx.Observable<any>;
+            let self = this;
+            let oldElements = nodeChildrenToArray<Node>(el);
+            let combined: Array<Rx.Observable<any>> = [];
+            let obs: Rx.Observable<any>;
 
             function removeOldElements() {
                 oldElements.forEach(x => {
@@ -112,8 +112,8 @@ module wx {
                 (<IViewDataContext> ctx).$componentParams = componentParams;
 
                 // create component container element
-                var container = <HTMLElement> document.createElement("div");
-                var binding = formatString("component: { name: '{0}', params: $componentParams }", componentName);
+                let container = <HTMLElement> document.createElement("div");
+                let binding = formatString("component: { name: '{0}', params: $componentParams }", componentName);
                 container.setAttribute("data-bind", binding);
 
                 // prepare container for animation
@@ -129,7 +129,7 @@ module wx {
 
             // construct leave-observable
             if (oldElements.length > 0) {
-                var leaveAnimation: IAnimation;
+                let leaveAnimation: IAnimation;
 
                 if (animations && animations.leave) {
                     if (typeof animations.leave === "string") {
@@ -154,7 +154,7 @@ module wx {
 
             // construct enter-observable
             if (componentName != null) {
-                var enterAnimation: IAnimation;
+                let enterAnimation: IAnimation;
 
                 if (animations && animations.enter) {
                     if (typeof animations.enter === "string") {

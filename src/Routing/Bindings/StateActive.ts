@@ -28,15 +28,15 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLAnchorElement> node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var exp: ICompiledExpression;
-            var observables = [];
-            var opt = <IStateActiveBindingOptions> compiled;
-            var paramsKeys: Array<string> = [];
-            var stateName;
-            var stateParams: Object;
-            var cssClass = "active";
+            let el = <HTMLAnchorElement> node;
+            let compiled = this.domManager.compileBindingOptions(options, module);
+            let exp: ICompiledExpression;
+            let observables = [];
+            let opt = <IStateActiveBindingOptions> compiled;
+            let paramsKeys: Array<string> = [];
+            let stateName;
+            let stateParams: Object;
+            let cssClass = "active";
 
             observables.push(router.current.changed.startWith(router.current()));
 
@@ -66,7 +66,7 @@ module wx {
             state.cleanup.add(Rx.Observable.combineLatest(observables, function(_) { return args2Array(arguments); }).subscribe(latest => {
                 try {
                     // first element is the current state
-                    var currentState = latest.shift();
+                    let currentState = latest.shift();
 
                     // second element is the state-name
                     stateName = unwrapProperty(latest.shift());
@@ -74,12 +74,12 @@ module wx {
                     // subsequent entries are latest param values
                     stateParams = {};
 
-                    for (var i = 0; i < paramsKeys.length; i++) {
+                    for(let i = 0; i < paramsKeys.length; i++) {
                         stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                     }
 
-                    var active = this.router.includes(stateName, stateParams);
-                    var classes = cssClass.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
+                    let active = this.router.includes(stateName, stateParams);
+                    let classes = cssClass.split(/\s+/).map(x => x.trim()).filter(x => <any> x);
 
                     if (classes.length) {
                         toggleCssClass.apply(null, [el, active].concat(classes));

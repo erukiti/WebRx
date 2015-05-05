@@ -17,10 +17,10 @@ module wx {
         public register(key: string, instance: any): IInjector;
 
         public register(): IInjector {
-            var key = arguments[0];
-            var val = arguments[1];
-            var isSingleton: boolean = arguments[2];
-            var factory: (deps: any, args: any) => any;
+            let key = arguments[0];
+            let val = arguments[1];
+            let isSingleton: boolean = arguments[2];
+            let factory: (deps: any, args: any) => any;
 
             if (this.registrations.hasOwnProperty(key))
                 internal.throwError("'{0}' is already registered", key);
@@ -32,13 +32,13 @@ module wx {
             } else if(Array.isArray(val)) {
                 // first overload
                 // array assumed to be inline array notation with constructor
-                var self = this;
-                var ctor = val.pop();
-                var dependencies = val;
+                let self = this;
+                let ctor = val.pop();
+                let dependencies = val;
 
                 factory = (args: any, deps) => {
                     // resolve dependencies
-                    var resolved = dependencies.map(x => {
+                    let resolved = dependencies.map(x => {
                         try {
                             return self.get(x, undefined, deps);
                         } catch (e) {
@@ -47,8 +47,8 @@ module wx {
                     });
                     
                     // invoke constructor
-                    var _args = [null].concat(resolved).concat(args);
-                    var ctorFunc = ctor.bind.apply(ctor, _args);
+                    let _args = [null].concat(resolved).concat(args);
+                    let ctorFunc = ctor.bind.apply(ctor, _args);
                     return new ctorFunc();
                 };
             } else {
@@ -68,7 +68,7 @@ module wx {
                 internal.throwError("Detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
 
             // registered?
-            var registration = this.registrations[key];
+            let registration = this.registrations[key];
             if (registration === undefined)
                 internal.throwError("'{0}' is not registered", key);
 
@@ -77,12 +77,12 @@ module wx {
                 return registration.value;
 
             // append current key
-            var newDeps = {};
+            let newDeps = {};
             newDeps[key] = true;
             extend(deps, newDeps);
 
             // create it
-            var result = registration.factory(args, newDeps);
+            let result = registration.factory(args, newDeps);
 
             // cache if singleton
             if (registration.isSingleton)
@@ -92,14 +92,14 @@ module wx {
         }
 
         public resolve<T>(iaa: Array<any>, args?: any): T {
-            var ctor = iaa.pop();
+            let ctor = iaa.pop();
             if (!isFunction(ctor))
                 internal.throwError("Error resolving inline-annotated-array. Constructor must be of type 'function' but is '{0}", typeof ctor);
 
-            var self = this;
+            let self = this;
 
             // resolve dependencies
-            var resolved = iaa.map(x => {
+            let resolved = iaa.map(x => {
                 try {
                     return self.get(x, undefined, iaa);
                 } catch (e) {
@@ -108,8 +108,8 @@ module wx {
             });
                     
             // invoke constructor
-            var _args = [null].concat(resolved).concat(args);
-            var ctorFunc = ctor.bind.apply(ctor, _args);
+            let _args = [null].concat(resolved).concat(args);
+            let ctorFunc = ctor.bind.apply(ctor, _args);
             return new ctorFunc();
         }
 

@@ -5,6 +5,7 @@
 /// <reference path="../Core/RefCountDisposeWrapper.ts" />
 /// <reference path="../RxJsExtensions.ts" />
 /// <reference path="../core/Log.ts" />
+/// <reference path="../core/Module.ts" />
 
 module wx {
     "use strict";
@@ -166,7 +167,7 @@ module wx {
                 internal.throwError("items");
             }
 
-            var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
+            let disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
 
             using(disp, () => {
                 // reset notification
@@ -211,7 +212,7 @@ module wx {
                 internal.throwError("index");
             }
 
-            var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
+            let disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
 
             using(disp, () => {
                 // reset notification
@@ -254,7 +255,7 @@ module wx {
                 internal.throwError("items");
             }
 
-            var disp = this.isLengthAboveResetThreshold(items.length) ?
+            let disp = this.isLengthAboveResetThreshold(items.length) ?
                 this.suppressChangeNotifications() : Rx.Disposable.empty;
 
             using(disp, () => {
@@ -265,11 +266,11 @@ module wx {
         }
 
         public removeRange(index: number, count: number): void {
-            var disp = this.isLengthAboveResetThreshold(count) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
+            let disp = this.isLengthAboveResetThreshold(count) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
 
             using(disp, () => {
                 // construct items
-                var items: T[] = this.inner.slice(index, index + count);
+                let items: T[] = this.inner.slice(index, index + count);
 
                 // reset notification
                 if (!this.areChangeNotificationsEnabled()) {
@@ -328,7 +329,7 @@ module wx {
         }
 
         public remove(item: T): boolean {
-            var index = this.inner.indexOf(item);
+            let index = this.inner.indexOf(item);
             if (index === -1)
                 return false;
 
@@ -364,20 +365,20 @@ module wx {
         public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
         public project(): any {
-            var args = args2Array(arguments);
-            var filter = args.shift();
+            let args = args2Array(arguments);
+            let filter = args.shift();
 
             if (filter != null && isRxObservable(filter)) {
                 return new ObservableListProjection<any, any>(<any> this, undefined, undefined, undefined, filter, args.shift());
             }
 
-            var orderer = args.shift();
+            let orderer = args.shift();
 
             if (orderer != null && isRxObservable(orderer)) {
                 return new ObservableListProjection<any, any>(<any> this, filter, undefined, undefined, orderer, args.shift());
             }
 
-            var selector = args.shift();
+            let selector = args.shift();
 
             if (selector != null && isRxObservable(selector)) {
                 return new ObservableListProjection<any, any>(<any> this, filter, orderer, undefined, selector, args.shift());
@@ -590,7 +591,7 @@ module wx {
         }
 
         private removeItem(index: number): void {
-            var item = this.inner[index];
+            let item = this.inner[index];
 
             if (!this.areChangeNotificationsEnabled()) {
                 this.inner.splice(index, 1);
@@ -614,7 +615,7 @@ module wx {
         }
 
         private moveItem(oldIndex: number, newIndex: number): void {
-            var item = this.inner[oldIndex];
+            let item = this.inner[oldIndex];
 
             if (!this.areChangeNotificationsEnabled()) {
                 this.inner.splice(oldIndex, 1);
@@ -623,7 +624,7 @@ module wx {
                 return;
             }
 
-            var mi = { items: [item], from: oldIndex, to: newIndex};
+            let mi = { items: [item], from: oldIndex, to: newIndex};
 
             if (this.beforeItemsMovedSubject.isValueCreated)
                 this.beforeItemsMovedSubject.value.onNext(mi);
@@ -654,21 +655,21 @@ module wx {
         }
 
         private addItemToPropertyTracking(toTrack: T): void {
-            var rcd = this.propertyChangeWatchers[getOid(toTrack)];
-            var self = this;
+            let rcd = this.propertyChangeWatchers[getOid(toTrack)];
+            let self = this;
 
             if (rcd) {
                 rcd.addRef();
                 return;
             }
 
-            var changing = observeObject(toTrack, true)
+            let changing = observeObject(toTrack, true)
                 .select(i => new internal.PropertyChangedEventArgs(toTrack, i.propertyName));
 
-            var changed = observeObject(toTrack, false)
+            let changed = observeObject(toTrack, false)
                 .select(i => new internal.PropertyChangedEventArgs(toTrack, i.propertyName));
 
-            var disp = new Rx.CompositeDisposable(
+            let disp = new Rx.CompositeDisposable(
                 changing.where(_ => self.areChangeNotificationsEnabled()).subscribe(x=> self.itemChangingSubject.value.onNext(x)),
                 changed.where(_ => self.areChangeNotificationsEnabled()).subscribe(x=> self.itemChangedSubject.value.onNext(x)));
 
@@ -680,7 +681,7 @@ module wx {
         }
 
         private removeItemFromPropertyTracking(toUntrack: T): void {
-            var rcd = this.propertyChangeWatchers[getOid(toUntrack)];
+            let rcd = this.propertyChangeWatchers[getOid(toUntrack)];
 
             if (rcd) {
                 rcd.release();
@@ -821,7 +822,7 @@ module wx {
         private scheduler: Rx.IScheduler;
 
         private static defaultOrderer = (a, b) => {
-            var result: number;
+            let result: number;
 
             if (a == null && b == null)
                 result = 0;
@@ -845,9 +846,9 @@ module wx {
         }
 
         private refresh(): void {
-            var length = this.sourceCopy.length;
+            let length = this.sourceCopy.length;
 
-            for (var i = 0; i < length; i++) {
+            for(let i = 0; i < length; i++) {
                 this.onItemChanged(this.sourceCopy[i]);
             }
         }
@@ -883,15 +884,15 @@ module wx {
         private onItemsAdded(e: IListChangeInfo<T>) {
             this.shiftIndicesAtOrOverThreshold(e.from, e.items.length);
 
-            for (var i = 0; i < e.items.length; i++) {
-                var sourceItem = e.items[i];
+            for(let i = 0; i < e.items.length; i++) {
+                let sourceItem = e.items[i];
                 this.sourceCopy.splice(e.from + i, 0, sourceItem);
 
                 if (this._filter && !this._filter(sourceItem)) {
                     continue;
                 }
 
-                var destinationItem = this.selector(sourceItem);
+                let destinationItem = this.selector(sourceItem);
                 this.internalInsertAndMap(e.from + i, destinationItem);
             }
         }
@@ -899,14 +900,14 @@ module wx {
         private onItemsRemoved(e: IListChangeInfo<T>) {
             this.sourceCopy.splice(e.from, e.items.length);
 
-            for (var i = 0; i < e.items.length; i++) {
-                var destinationIndex = this.getIndexFromSourceIndex(e.from + i);
+            for(let i = 0; i < e.items.length; i++) {
+                let destinationIndex = this.getIndexFromSourceIndex(e.from + i);
                 if (destinationIndex !== -1) {
                     this.internalRemoveAt(destinationIndex);
                 }
             }
 
-            var removedCount = e.items.length;
+            let removedCount = e.items.length;
             this.shiftIndicesAtOrOverThreshold(e.from + removedCount, -removedCount);
         }
 
@@ -919,13 +920,13 @@ module wx {
                 return;
             }
 
-            var oldSourceIndex = e.from;
-            var newSourceIndex = e.to;
+            let oldSourceIndex = e.from;
+            let newSourceIndex = e.to;
 
             this.sourceCopy.splice(oldSourceIndex, 1);
             this.sourceCopy.splice(newSourceIndex, 0, e.items[0]);
 
-            var currentDestinationIndex = this.getIndexFromSourceIndex(oldSourceIndex);
+            let currentDestinationIndex = this.getIndexFromSourceIndex(oldSourceIndex);
 
             this.moveSourceIndexInMap(oldSourceIndex, newSourceIndex);
 
@@ -938,7 +939,7 @@ module wx {
                 // as the source. As is the case with when we have an orderer we don't test whether or not
                 // the item should be included or not here. If it has been included at some point it'll
                 // stay included until onItemChanged picks up a change which filters it.
-                var newDestinationIndex = ObservableListProjection.newPositionForExistingItem2(
+                let newDestinationIndex = ObservableListProjection.newPositionForExistingItem2(
                     this.indexToSourceIndexMap, newSourceIndex, currentDestinationIndex);
 
                 if (newDestinationIndex !== currentDestinationIndex) {
@@ -958,8 +959,8 @@ module wx {
         }
 
         private onItemsReplaced(e: IListChangeInfo<T>) {
-            for (var i = 0; i < e.items.length; i++) {
-                var sourceItem = e.items[i];
+            for(let i = 0; i < e.items.length; i++) {
+                let sourceItem = e.items[i];
                 this.sourceCopy[e.from + i] = sourceItem;
 
                 this.onItemChanged(sourceItem);
@@ -967,12 +968,12 @@ module wx {
         }
 
         private onItemChanged(changedItem: T): void {
-            var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
-            var shouldBeIncluded = !this._filter || this._filter(changedItem);
+            let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
+            let shouldBeIncluded = !this._filter || this._filter(changedItem);
 
             sourceIndices.forEach((sourceIndex: number) => {
-                var currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
-                var isIncluded = currentDestinationIndex >= 0;
+                let currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
+                let isIncluded = currentDestinationIndex >= 0;
 
                 if (isIncluded && !shouldBeIncluded) {
                     this.internalRemoveAt(currentDestinationIndex);
@@ -982,7 +983,7 @@ module wx {
                     // The item is already included and it should stay there but it's possible that the change that
                     // caused this event affects the ordering. This gets a little tricky so let's be verbose.
 
-                    var newItem = this.selector(changedItem);
+                    let newItem = this.selector(changedItem);
 
                     if (this.orderer == null) {
                         // We don't have an orderer so we're currently using the source collection index for sorting 
@@ -1008,7 +1009,7 @@ module wx {
                             // object has changed (ie the selector is not an identity function).
                             if (this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
 
-                                var newDestinationIndex = this.newPositionForExistingItem(
+                                let newDestinationIndex = this.newPositionForExistingItem(
                                     sourceIndex, currentDestinationIndex, newItem);
 
                                 // Debug.Assert(newDestinationIndex != currentDestinationIndex, "This can't be, canItemStayAtPosition said it this couldn't happen");
@@ -1034,19 +1035,19 @@ module wx {
         /// it's less than or equal to the succeeding item.
         /// </summary>
         private canItemStayAtPosition(item: TValue, currentIndex: number): boolean {
-            var hasPrecedingItem = currentIndex > 0;
+            let hasPrecedingItem = currentIndex > 0;
 
             if (hasPrecedingItem) {
-                var isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this[currentIndex - 1]) >= 0;
+                let isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this[currentIndex - 1]) >= 0;
                 if (!isGreaterThanOrEqualToPrecedingItem) {
                     return false;
                 }
             }
 
-            var hasSucceedingItem = currentIndex < this.length() - 1;
+            let hasSucceedingItem = currentIndex < this.length() - 1;
 
             if (hasSucceedingItem) {
-                var isLessThanOrEqualToSucceedingItem = this.orderer(item, this[currentIndex + 1]) <= 0;
+                let isLessThanOrEqualToSucceedingItem = this.orderer(item, this[currentIndex + 1]) <= 0;
                 if (!isLessThanOrEqualToSucceedingItem) {
                     return false;
                 }
@@ -1067,8 +1068,8 @@ module wx {
         /// provided equality comparer.
         /// </summary>
         private indexOfAll(source, item: T): Array<number> {
-            var indices = [];
-            var sourceIndex = 0;
+            let indices = [];
+            let sourceIndex = 0;
 
             source.forEach((x) => {
                 if (this.referenceEquals(x, item)) {
@@ -1103,7 +1104,7 @@ module wx {
         /// up or down.
         /// </summary>
         private shiftIndicesAtOrOverThreshold(threshold: number, value: number): void {
-            for (var i = 0; i < this.indexToSourceIndexMap.length; i++) {
+            for(let i = 0; i < this.indexToSourceIndexMap.length; i++) {
                 if (this.indexToSourceIndexMap[i] >= threshold) {
                     this.indexToSourceIndexMap[i] += value;
                 }
@@ -1114,8 +1115,8 @@ module wx {
         /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive). 
         /// </summary>
         private shiftSourceIndicesInRange(rangeStart: number, rangeStop: number, value: number): void {
-            for (var i = 0; i < this.indexToSourceIndexMap.length; i++) {
-                var sourceIndex = this.indexToSourceIndexMap[i];
+            for(let i = 0; i < this.indexToSourceIndexMap.length; i++) {
+                let sourceIndex = this.indexToSourceIndexMap[i];
                 if (sourceIndex >= rangeStart && sourceIndex < rangeStop) {
                     this.indexToSourceIndexMap[i] += value;
                 }
@@ -1124,13 +1125,13 @@ module wx {
 
         private addAllItemsFromSourceCollection(): void {
             // Debug.Assert(sourceCopy.length == 0, "Expected source copy to be empty");
-            var sourceIndex = 0;
+            let sourceIndex = 0;
 
             this.source.forEach(sourceItem => {
                 this.sourceCopy.push(sourceItem);
 
                 if (!this._filter || this._filter(sourceItem)) {
-                    var destinationItem = this.selector(sourceItem);
+                    let destinationItem = this.selector(sourceItem);
                     this.internalInsertAndMap(sourceIndex, destinationItem);
                 }
 
@@ -1146,7 +1147,7 @@ module wx {
         }
 
         private internalInsertAndMap(sourceIndex: number, value: TValue): void {
-            var destinationIndex = this.positionForNewItem(sourceIndex, value);
+            let destinationIndex = this.positionForNewItem(sourceIndex, value);
 
             this.indexToSourceIndexMap.splice(destinationIndex, 0, sourceIndex);
             super.insert(destinationIndex, value);
@@ -1184,11 +1185,11 @@ module wx {
 
             if (orderer(array[index], item) >= 1) return index;
 
-            var low = index, hi = index + count - 1;
-            var cmp;
+            let low = index, hi = index + count - 1;
+            let cmp;
 
             while (low <= hi) {
-                var mid = Math.floor(low + (hi - low) / 2);
+                let mid = Math.floor(low + (hi - low) / 2);
                 cmp = orderer(array[mid], item);
 
                 if (cmp === 0) {
@@ -1230,21 +1231,21 @@ module wx {
                 return 0;
             }
 
-            var precedingIndex = currentIndex - 1;
-            var succeedingIndex = currentIndex + 1;
+            let precedingIndex = currentIndex - 1;
+            let succeedingIndex = currentIndex + 1;
 
             // The item on the preceding or succeeding index relative to currentIndex.
-            var comparand = array[precedingIndex >= 0 ? precedingIndex : succeedingIndex];
+            let comparand = array[precedingIndex >= 0 ? precedingIndex : succeedingIndex];
 
             if (orderer == null) {
                 orderer = ObservableListProjection.defaultOrderer;
             }
 
             // Compare that to the (potentially) new value.
-            var cmp = orderer(item, comparand);
+            let cmp = orderer(item, comparand);
 
-            var min = 0;
-            var max = array.length;
+            let min = 0;
+            let max = array.length;
 
             if (cmp === 0) {
                 // The new value is equal to the preceding or succeeding item, it may stay at the current position
@@ -1264,7 +1265,7 @@ module wx {
                 return currentIndex;
             }
 
-            var ix = ObservableListProjection.positionForNewItemArray2(array, min, max - min, item, orderer);
+            let ix = ObservableListProjection.positionForNewItemArray2(array, min, max - min, item, orderer);
 
             // If the item moves 'forward' in the collection we have to account for the index where
             // the item currently resides getting removed first.

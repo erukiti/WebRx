@@ -20,18 +20,18 @@ module wx {
              if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLInputElement> node;
-            var tag = el.tagName.toLowerCase();
-            var isTextArea = tag === "textarea";
+            let el = <HTMLInputElement> node;
+            let tag = el.tagName.toLowerCase();
+            let isTextArea = tag === "textarea";
 
             if (tag !== 'input' && tag !== 'textarea')
                 internal.throwError("textInput-binding can only be applied to input or textarea elements");
 
-            var exp = this.domManager.compileBindingOptions(options, module);
-            var prop: IObservableProperty<any>;
-            var propertySubscription: Rx.Disposable;
-            var eventSubscription: Rx.Disposable;
-            var previousElementValue;
+            let exp = this.domManager.compileBindingOptions(options, module);
+            let prop: IObservableProperty<any>;
+            let propertySubscription: Rx.Disposable;
+            let eventSubscription: Rx.Disposable;
+            let previousElementValue;
 
             function updateElement(value: any) {
                 if (value === null || value === undefined) {
@@ -79,7 +79,7 @@ module wx {
                         // don't attempt to updated computed properties
                         if (!prop.source) {
                             // wire change-events depending on browser and version
-                            var events = this.getTextInputEventObservables(el, isTextArea);
+                            let events = this.getTextInputEventObservables(el, isTextArea);
                             eventSubscription = Rx.Observable.merge(events).subscribe(e => {
                                 prop(el.value);
                             });
@@ -118,7 +118,7 @@ module wx {
         protected domManager: IDomManager;
 
         protected getTextInputEventObservables(el: HTMLInputElement, isTextArea: boolean): Array<Rx.Observable<Object>> {
-            var result: Array<Rx.Observable<Object>> = [];
+            let result: Array<Rx.Observable<Object>> = [];
 
             if (env.ie && env.ie.version < 10) {
                 if (env.ie.version <= 9) {

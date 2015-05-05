@@ -5,7 +5,7 @@
 module wx {
     "use strict";
 
-    var RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
+    let RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 
     /**
     * Creates an read-only observable property with an optional default value from the current (this) observable
@@ -16,7 +16,7 @@ module wx {
         scheduler = scheduler || Rx.Scheduler.currentThread;
 
         // initialize accessor function (read-only)
-        var accessor: any = function(newVal?: any): any {
+        let accessor: any = function(newVal?: any): any {
             if (arguments.length > 0) {
                 internal.throwError("attempt to write to a read-only observable property");
             }
@@ -72,7 +72,7 @@ module wx {
         //////////////////////////////////
         // implementation
 
-        var firedInitial = false;
+        let firedInitial = false;
 
         accessor.sub = this
             .distinctUntilChanged()
@@ -94,14 +94,14 @@ module wx {
     }
 
     RxObsConstructor.prototype.continueWith = function() {
-        var args = args2Array(arguments);
-        var val = args.shift();
-        var obs: Rx.Observable<any> = undefined;
+        let args = args2Array(arguments);
+        let val = args.shift();
+        let obs: Rx.Observable<any> = undefined;
 
         if (isRxObservable(val)) {
             obs = <Rx.Observable<any>> val;
         } else if(isFunction(val)) {
-            var action = <() => any> val;
+            let action = <() => any> val;
             obs = Rx.Observable.startDeferred(action);
         }
 
@@ -111,7 +111,7 @@ module wx {
     RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
         return Rx.Observable.defer(() => {
             return Rx.Observable.create<T>(observer => {
-                var cancelled = false;
+                let cancelled = false;
 
                 if(!cancelled)
                     action();

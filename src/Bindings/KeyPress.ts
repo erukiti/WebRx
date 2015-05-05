@@ -9,7 +9,7 @@ module wx {
         [key: string]: (ctx: IDataContext, event: Event) => any|ICommand<any>|{ command: ICommand<any>; parameter: any };
     }
 
-    var keysByCode = {
+    let keysByCode = {
         8: 'backspace',
         9: 'tab',
         13: 'enter',
@@ -42,18 +42,18 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
+            let el = <HTMLElement> node;
 
             // create an observable for key combination
-            var tokens = this.domManager.getObjectLiteralTokens(options);
-            var obs = Rx.Observable.fromEvent<KeyboardEvent>(el, "keydown")
+            let tokens = this.domManager.getObjectLiteralTokens(options);
+            let obs = Rx.Observable.fromEvent<KeyboardEvent>(el, "keydown")
                 .where(x=> !x.repeat)
                 .publish()
                 .refCount();
 
             tokens.forEach(token => {
-                var keyDesc = token.key;
-                var combination, combinations = [];
+                let keyDesc = token.key;
+                let combination, combinations = [];
 
                 // parse key combinations
                 keyDesc.split(' ').forEach(variation => {
@@ -99,22 +99,22 @@ module wx {
         protected domManager: IDomManager;
 
         private testCombination(combination, event: KeyboardEvent): boolean {
-            var metaPressed = !!(event.metaKey && !event.ctrlKey);
-            var altPressed = !!event.altKey;
-            var ctrlPressed = !!event.ctrlKey;
-            var shiftPressed = !!event.shiftKey;
-            var keyCode = event.keyCode;
+            let metaPressed = !!(event.metaKey && !event.ctrlKey);
+            let altPressed = !!event.altKey;
+            let ctrlPressed = !!event.ctrlKey;
+            let shiftPressed = !!event.shiftKey;
+            let keyCode = event.keyCode;
 
-            var metaRequired = !!combination.keys.meta;
-            var altRequired = !!combination.keys.alt;
-            var ctrlRequired = !!combination.keys.ctrl;
-            var shiftRequired = !!combination.keys.shift;
+            let metaRequired = !!combination.keys.meta;
+            let altRequired = !!combination.keys.alt;
+            let ctrlRequired = !!combination.keys.ctrl;
+            let shiftRequired = !!combination.keys.shift;
 
             // normalize keycodes
             if ((!shiftPressed || shiftRequired) && keyCode >= 65 && keyCode <= 90)
                 keyCode = keyCode + 32;
 
-            var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()] || combination.keys[String.fromCharCode(keyCode)];
+            let mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()] || combination.keys[String.fromCharCode(keyCode)];
 
             return (
                 mainKeyPressed &&
@@ -126,7 +126,7 @@ module wx {
         }
 
         private testCombinations(combinations, event: KeyboardEvent): boolean {
-            for (var i = 0; i < combinations.length; i++) {
+            for(let i = 0; i < combinations.length; i++) {
                 if (this.testCombination(combinations[i], event))
                     return true;
             }
@@ -135,12 +135,12 @@ module wx {
         }
 
         private wireKey(value: any, obs: Rx.Observable<KeyboardEvent>, combinations, ctx: IDataContext, state: INodeState, module: IModule) {
-            var exp = this.domManager.compileBindingOptions(value, module);
-            var command: ICommand<any>;
-            var commandParameter = undefined;
+            let exp = this.domManager.compileBindingOptions(value, module);
+            let command: ICommand<any>;
+            let commandParameter = undefined;
 
             if (typeof exp === "function") {
-                var handler = this.domManager.evaluateExpression(exp, ctx);
+                let handler = this.domManager.evaluateExpression(exp, ctx);
                 handler = unwrapProperty(handler);
 
                 if (!isCommand(handler)) {

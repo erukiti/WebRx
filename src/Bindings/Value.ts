@@ -19,16 +19,16 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLInputElement> node;
-            var tag = el.tagName.toLowerCase();
+            let el = <HTMLInputElement> node;
+            let tag = el.tagName.toLowerCase();
 
             if (tag !== 'input' && tag !== 'option' && tag !== 'select' && tag !== 'textarea')
                 internal.throwError("value-binding only operates on checkboxes and radio-buttons");
 
-            var useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
-            var prop: IObservableProperty<any>;
-            var cleanup: Rx.CompositeDisposable;
-            var exp = this.domManager.compileBindingOptions(options, module);
+            let useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
+            let prop: IObservableProperty<any>;
+            let cleanup: Rx.CompositeDisposable;
+            let exp = this.domManager.compileBindingOptions(options, module);
 
             function doCleanup() {
                 if (cleanup) {
@@ -120,7 +120,7 @@ module wx {
          * @param {IDomManager} domManager
          */
         export function getNodeValue(node: Node, domManager: IDomManager): any {
-            var state = <any> domManager.getNodeState(node);
+            let state = <any> domManager.getNodeState(node);
             if (state != null && state[res.hasValueBindingValue]) {
                 return state[res.valueBindingValue];
             }
@@ -139,7 +139,7 @@ module wx {
             if ((value === null) || (value === undefined))
                 value = "";
 
-            var state = <any> domManager.getNodeState(node);
+            let state = <any> domManager.getNodeState(node);
 
             if (typeof value === "string") {
                 // Update the element only if the element and model are different. On some browsers, updating the value

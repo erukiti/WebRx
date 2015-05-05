@@ -26,16 +26,16 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var isAnchor = el.tagName.toLowerCase() === "a";
-            var anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var exp: ICompiledExpression;
-            var observables: Array<Rx.Observable<any>> = [];
-            var opt = <IStateRefBindingOptions> compiled;
-            var paramsKeys: Array<string> = [];
-            var stateName;
-            var stateParams: Object;
+            let el = <HTMLElement> node;
+            let isAnchor = el.tagName.toLowerCase() === "a";
+            let anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
+            let compiled = this.domManager.compileBindingOptions(options, module);
+            let exp: ICompiledExpression;
+            let observables: Array<Rx.Observable<any>> = [];
+            let opt = <IStateRefBindingOptions> compiled;
+            let paramsKeys: Array<string> = [];
+            let stateName;
+            let stateParams: Object;
 
             if (typeof compiled === "function") {
                 exp = <ICompiledExpression> compiled;
@@ -64,7 +64,7 @@ module wx {
                     // subsequent entries are latest param values
                     stateParams = {};
 
-                    for (var i = 0; i < paramsKeys.length; i++) {
+                    for(let i = 0; i < paramsKeys.length; i++) {
                         stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
                     }
 

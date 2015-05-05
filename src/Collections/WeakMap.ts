@@ -14,22 +14,22 @@ module wx {
         /// IWeakMap
 
         public set(key: TKey, value: T) {
-            var oid = getOid(key);
+            let oid = getOid(key);
             this.inner[oid] = value;
         }
 
         public get(key: TKey): T {
-            var oid = getOid(key);
+            let oid = getOid(key);
             return this.inner[oid];
         }
 
         public has(key: TKey): boolean {
-            var oid = getOid(key);
+            let oid = getOid(key);
             return this.inner.hasOwnProperty(oid);
         }
 
         public delete(key: TKey): boolean {
-            var oid = getOid(key);
+            let oid = getOid(key);
             return delete this.inner[oid];
         }
 
@@ -43,7 +43,7 @@ module wx {
         private inner: { [key: string]: T } = {};
     }
 
-    var hasNativeSupport = typeof WeakMap === "function";
+    let hasNativeSupport = typeof WeakMap === "function";
 
     /**
     * Creates a new WeakMap instance

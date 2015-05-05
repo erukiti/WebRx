@@ -25,12 +25,12 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLElement> node;
-            var self = this;
-            var exp = this.domManager.compileBindingOptions(options, module);
-            var obs = this.domManager.expressionToObservable(exp, ctx);
-            var initialApply = true;
-            var cleanup: Rx.CompositeDisposable;
+            let el = <HTMLElement> node;
+            let self = this;
+            let exp = this.domManager.compileBindingOptions(options, module);
+            let obs = this.domManager.expressionToObservable(exp, ctx);
+            let initialApply = true;
+            let cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
                 if (cleanup) {
@@ -40,7 +40,7 @@ module wx {
             }
 
             // backup inner HTML
-            var template = new Array<Node>();
+            let template = new Array<Node>();
 
             // subscribe
             state.cleanup.add(obs.subscribe(x => {
@@ -48,9 +48,9 @@ module wx {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
 
-                    var value = unwrapProperty(x);
-                    var moduleNames: Array<string>;
-                    var disp: Rx.IDisposable = undefined;
+                    let value = unwrapProperty(x);
+                    let moduleNames: Array<string>;
+                    let disp: Rx.IDisposable = undefined;
 
                     // split names
                     if (value) {
@@ -59,13 +59,13 @@ module wx {
                     }
 
                     if (moduleNames.length > 0) {
-                        var observables = moduleNames.map(x => loadModule(x));
+                        let observables = moduleNames.map(x => loadModule(x));
 
                         disp = Rx.Observable.combineLatest(observables,
                             function(_) { return <IModule[]> args2Array(arguments) }).subscribe(modules => {
                             // create intermediate module
-                            var moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
-                            var merged: IModule = new internal.moduleConstructor(moduleName);
+                            let moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
+                            let merged: IModule = new internal.moduleConstructor(moduleName);
 
                             // merge modules into intermediate
                             merged.merge(module || wx.app);
@@ -111,7 +111,7 @@ module wx {
         protected domManager: IDomManager;
 
         protected applyValue(el: HTMLElement, module: IModule, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
-            var i;
+            let i;
 
             if (initialApply) {
                 // clone to template
@@ -132,7 +132,7 @@ module wx {
 
             // clone nodes and inject
             for (i = 0; i < template.length; i++) {
-                var node = template[i].cloneNode(true);
+                let node = template[i].cloneNode(true);
                 el.appendChild(node);
             }
 

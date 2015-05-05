@@ -19,17 +19,17 @@ module wx {
             if (options == null)
                 internal.throwError("invalid binding-options!");
 
-            var el = <HTMLInputElement> node;
-            var tag = el.tagName.toLowerCase();
-            var isCheckBox = el.type === 'checkbox';
-            var isRadioButton = el.type === 'radio';
+            let el = <HTMLInputElement> node;
+            let tag = el.tagName.toLowerCase();
+            let isCheckBox = el.type === 'checkbox';
+            let isRadioButton = el.type === 'radio';
 
             if (tag !== 'input' || (!isCheckBox && !isRadioButton))
                 internal.throwError("checked-binding only operates on checkboxes and radio-buttons");
 
-            var exp = this.domManager.compileBindingOptions(options, module);
-            var prop: IObservableProperty<any>;
-            var cleanup: Rx.CompositeDisposable;
+            let exp = this.domManager.compileBindingOptions(options, module);
+            let prop: IObservableProperty<any>;
+            let cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
                 if (cleanup) {
@@ -64,7 +64,7 @@ module wx {
                         // don't attempt to updated computed properties
                         if (!prop.source) {
                             // wire change-events depending on browser and version
-                            var events = this.getCheckedEventObservables(el);
+                            let events = this.getCheckedEventObservables(el);
                             cleanup.add(Rx.Observable.merge(events).subscribe(e => {
                                 prop(el.checked);
                             }));
@@ -103,7 +103,7 @@ module wx {
         protected domManager: IDomManager;
 
         protected getCheckedEventObservables(el: HTMLInputElement): Array<Rx.Observable<Object>> {
-            var result: Array<Rx.Observable<Object>> = [];
+            let result: Array<Rx.Observable<Object>> = [];
 
             result.push(Rx.Observable.fromEvent(el, 'click'));
             result.push(Rx.Observable.fromEvent(el, 'change'));

@@ -16,15 +16,15 @@ module wx.internal {
             this.removeCB = removeCB;
 
             if (initialSyncToTarget) {
-                for (var i = 0; i < targetNode.childNodes.length; i++) {
+                for(let i = 0; i < targetNode.childNodes.length; i++) {
                     this.childNodes.push(targetNode.childNodes[i]);
                 }
             }
         }
 
         public appendChilds(nodes: Node[], callbackData?: any) {
-            var length = nodes.length;
-            var i;
+            let length = nodes.length;
+            let i;
 
             // append to proxy array
             if (nodes.length > 1)
@@ -49,9 +49,9 @@ module wx.internal {
             if (index === this.childNodes.length) {
                 this.appendChilds(nodes, callbackData);
             } else {
-                var refNode = this.childNodes[index];
-                var length = nodes.length;
-                var i;
+                let refNode = this.childNodes[index];
+                let length = nodes.length;
+                let i;
 
                 // insert into proxy array
                 Array.prototype.splice.apply(this.childNodes, [index, 0].concat(<any> nodes));
@@ -71,21 +71,21 @@ module wx.internal {
         }
 
         public removeChilds(index: number, count: number, keepDom: boolean): Node[] {
-            var node: Node;
+            let node: Node;
             if (count === 0)
                 return [];
 
             // extract removed nodes
-            var nodes = this.childNodes.slice(index, index + count);
+            let nodes = this.childNodes.slice(index, index + count);
 
             // remove from proxy array
             this.childNodes.splice(index, count);
 
             if (!keepDom) {
                 // remove from DOM
-                var length = nodes.length;
+                let length = nodes.length;
 
-                for (var i = 0; i < length; i++) {
+                for(let i = 0; i < length; i++) {
                     node = nodes[i];
 
                     if (this.removeCB)
@@ -100,10 +100,10 @@ module wx.internal {
 
         public clear(): void {
             // remove from DOM
-            var length = this.childNodes.length;
-            var node: Node;
+            let length = this.childNodes.length;
+            let node: Node;
 
-            for (var i = 0; i < length; i++) {
+            for(let i = 0; i < length; i++) {
                 node = this.childNodes[i];
 
                 if (this.removeCB)
