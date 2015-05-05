@@ -36,7 +36,7 @@ module wx {
             let self = this;
             let initialApply = true;
             let exp: ICompiledExpression;
-            let animations: IIfAnimationDescriptor = <IForeachAnimationDescriptor> {};
+            let animations: IIfAnimationDescriptor = <IIfAnimationDescriptor> {};
             let cleanup: Rx.CompositeDisposable;
 
             function doCleanup() {
