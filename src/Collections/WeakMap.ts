@@ -1,4 +1,6 @@
-﻿declare var WeakMap: any;
+﻿/// <reference path="../Core/Utils.ts" />
+
+declare var WeakMap: any;
 
 module wx {
     "use strict";

@@ -1,4 +1,6 @@
-﻿declare var Set: any;
+﻿/// <reference path="../Core/Utils.ts" />
+
+declare var Set: any;
 
 module wx {
     "use strict";
