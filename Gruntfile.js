@@ -40,7 +40,6 @@ module.exports = function (grunt) {
                 mapRoot: "",                   // where to locate .map.js files. [(default) '' == generated js location.]
                 declaration: false,            // generate a declaration .d.ts file for every output js file. [true | false (default)]
                 noImplicitAny: false,          // set to true to pass --noImplicitAny to the compiler. [true | false (default)]
-                emitDecoratorMetadata: true,
                 fast: "watch"                  // see https://github.com/TypeStrong/grunt-ts/blob/master/docs/fast.md ["watch" (default) | "always" | "never"]
             },
         },
