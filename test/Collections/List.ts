@@ -5,11 +5,6 @@
 /// <reference path="../TestModels.ts" />
 
 describe("Observable List", () => {
-    it("implements IUnknown", () => {
-        var o = wx.list<TestViewModel>();
-        expect(wx.supportsQueryInterface(o)).toBeTruthy();
-    });
-
     it("is correctly initialized from default value",() => {
         var obsList = wx.list<number>([3, 2, 1]);
         expect(obsList.toArray()).toEqual([3, 2, 1]);

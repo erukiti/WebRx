@@ -1,11 +1,14 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../RTTI/IID.ts" />
+/// <reference path="../IID.ts" />
 /// <reference path="Utils.ts" />
 /// <reference path="../Core/Module.ts" />
+/// <reference path="../Core/Lazy.ts" />
 
 module wx {
     "use strict";
 
+    @Implements(IID.ICommand)
+    @Implements(IID.IDisposable)
     class Command<T> implements ICommand<T> {
         /// <summary>
         /// Don't use this directly, use wx.commandXYZ instead
@@ -36,19 +39,6 @@ module wx {
             this.exceptionsSubject
                 .observeOn(this.scheduler)
                 .subscribe(app.defaultExceptionHandler);
-        }
-
-        ////////////////////
-        /// IUnknown
-
-        public queryInterface(iid: string) {
-            if (iid === IID.IUnknown ||
-                iid === IID.ICommand ||
-                iid === IID.IHandleObservableErrors ||
-                iid === IID.IDisposable)
-                return true;
-
-            return false;
         }
 
         //////////////////////////////////

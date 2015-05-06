@@ -4,11 +4,6 @@
 /// <reference path="../TestUtils.ts" />
 
 describe("Command", () => {
-    it("implements IUnknown", () => {
-        var cmd = wx.command();
-        expect(wx.supportsQueryInterface(cmd)).toBeTruthy();
-    });
-
     it("implements ICommand", () => {
         var cmd = wx.command();
         expect(wx.queryInterface(cmd, wx.IID.ICommand)).toBeTruthy();

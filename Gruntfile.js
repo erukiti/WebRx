@@ -55,6 +55,7 @@ module.exports = function (grunt) {
                         "node_modules/rx/dist/rx.testing.js",
                         "node_modules/browser-jquery/jquery.js",
                         "node_modules/jasmine-jquery/lib/jasmine-jquery.js",
+                        "node_modules/reflect-metadata/Reflect.js",
                         "node_modules/ix/l2o.js",
                         "node_modules/ix/ix.js",
                         "node_modules/URIjs/src/URI.js",
@@ -135,13 +136,9 @@ module.exports = function (grunt) {
             options: {
               separator: '\n\n',
             },
-            build: {
-              src: ['build/web.rx.js', 'node_modules/reflect-metadata/Reflect.js'],
-              dest: 'build/web.rx.js',
-            },
             
             dist: {
-              src: ['dist/web.rx.js', 'node_modules/reflect-metadata/Reflect.js'],
+              src: ['node_modules/reflect-metadata/Reflect.js', 'dist/web.rx.js'],
               dest: 'dist/web.rx.js',
             }
           },
@@ -245,11 +242,11 @@ module.exports = function (grunt) {
         grunt.file.write('src/Version.ts', grunt.template.process(template));
     });
 
-    grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default", "concat:build" ]);
-    grunt.registerTask("test", ["gen-ver", "ts:src", "concat:build", "ts:specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["gen-ver", "ts:src", "concat:build", "ts:specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default" ]);
+    grunt.registerTask("test", ["gen-ver", "ts:src", "ts:specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
     grunt.registerTask("dist", ["gen-ver", "clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "concat:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
-    grunt.registerTask("xtest", ["gen-ver", "ts:src", "concat:build" , "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
+    grunt.registerTask("xtest", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  
     grunt.registerTask('publish:minor', ['bump:minor', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  

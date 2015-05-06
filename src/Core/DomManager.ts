@@ -4,7 +4,7 @@
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Collections/Set.ts" />
 /// <reference path="../Core/Environment.ts" />
-/// <reference path="../Core/Module.ts" />
+/// <reference path="../Bindings/Module.ts" />
 
 module wx {
     "use strict";

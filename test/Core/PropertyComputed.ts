@@ -7,11 +7,6 @@ describe("Output Properties", () => {
         expect(prop).toBeDefined();
     });
 
-    it("implements IUnknown",() => {
-        var prop = Rx.Observable.never().toProperty();
-        expect(wx.supportsQueryInterface(prop)).toBeTruthy();
-    });
-
     it("implements IObservableProperty",() => {
         var prop = Rx.Observable.never().toProperty();
         expect(wx.queryInterface(prop, wx.IID.IObservableProperty)).toBeTruthy();

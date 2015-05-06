@@ -1,10 +1,10 @@
-﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts" />
 /// <reference path="../Interfaces.ts" />
-/// <reference path="../RTTI/IUnknown.ts" />
 /// <reference path="Events.ts" />
-/// <reference path="../RTTI/IID.ts" />
+/// <reference path="../IID.ts" />
 
-/**
+/*
 * Global helpers
 */
 
@@ -175,6 +175,26 @@ module wx {
         propertyName: string;
         property: T;
     }
+    
+    const implementsMetaDataKey = "wx:interfaceImpl";
+
+    /**
+    * Interface decorator
+    * @param {string} interfaceName Name of an interface
+    */
+    export function Implements(value: string|Array<string>) {
+        return function (target: Function|Object) {
+            let interfaces = Reflect.getMetadata(implementsMetaDataKey, target) || {};
+
+            if(typeof(value) === "string")
+                value = (<string> value).split(/\s+/).map(x => x.trim()).filter(x => <any> x);
+
+            for(let i=0;i<value.length;i++)            
+                interfaces[value[i]] = true;
+
+            Reflect.defineMetadata(implementsMetaDataKey, interfaces, target);
+        }
+    }
 
     /**
     * Tests if the target supports the interface
@@ -182,23 +202,16 @@ module wx {
     * @param {string} iid
     */
     export function queryInterface(target: any, iid: string): boolean {
-        // test for IUnknown first
-        if (supportsQueryInterface(target)) {
-            return (<IUnknown> target).queryInterface(iid);
-        }
-
-        return false;
+        if(target == null || isPrimitive(target))
+            return false;
+        
+        if(typeof target === "object")
+            target = target.constructor;
+            
+        let interfaces = Reflect.getMetadata(implementsMetaDataKey, target);
+        return interfaces != null && interfaces[iid];
     }
-
-    /**
-    * Checks if the target supports queryInterface
-    * @param {any} target
-    */
-    export function supportsQueryInterface(target: any): boolean {
-        return target !== undefined && target !== null &&
-            typeof target.queryInterface === "function";
-    }
-
+    
     /**
     * Returns all own properties of target implementing interface iid
     * @param {any} target
@@ -305,7 +318,7 @@ module wx {
      * @param obj
      */
     export function isDisposable(obj) {
-        return isFunction(obj["dispose"]);
+        return queryInterface(obj, IID.IDisposable) || isFunction(obj["dispose"]);
     }
 
     /**

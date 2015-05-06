@@ -1,5 +1,5 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../RTTI/IID.ts" />
+/// <reference path="../IID.ts" />
 /// <reference path="../Core/Module.ts" />
 
 // NOTE: The factory method approach is necessary because it is  
@@ -28,18 +28,9 @@ module wx {
                 return accessor.value;
             }
         };
-
-        //////////////////////////////////
-        // IUnknown implementation
-
-        accessor.queryInterface = (iid: string) => {
-            if (iid === IID.IUnknown ||
-                iid === IID.IObservableProperty ||
-                iid === IID.IDisposable)
-                return true;
-
-            return false;
-        };
+        
+        Implements(IID.IObservableProperty)(accessor);
+        Implements(IID.IDisposable)(accessor);
 
         //////////////////////////////////
         // IDisposable implementation

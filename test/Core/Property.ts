@@ -23,11 +23,6 @@ describe("Observable Properties", () => {
         expect(prop3()).toEqual(null);
     });
 
-    it("implements IUnknown",() => {
-        var prop = wx.property<number>();
-        expect(wx.supportsQueryInterface(prop)).toBeTruthy();
-    });
-
     it("implements IObservableProperty",() => {
         var prop = wx.property<number>();
         expect(wx.queryInterface(prop, wx.IID.IObservableProperty)).toBeTruthy();

@@ -1,6 +1,6 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Core/Utils.ts" />
-/// <reference path="../RTTI/IID.ts" />
+/// <reference path="../IID.ts" />
 /// <reference path="../Core/Lazy.ts" />
 /// <reference path="../Core/RefCountDisposeWrapper.ts" />
 /// <reference path="../RxJsExtensions.ts" />
@@ -14,23 +14,11 @@ module wx {
     * ReactiveUI's awesome ReactiveList ported to Typescript
     * @class
     */
-    class ObservableList<T> implements IObservableList<T>, IUnknown, Rx.IDisposable {
+    @Implements(IID.IObservableList)
+    @Implements(IID.IDisposable)
+    class ObservableList<T> implements IObservableList<T>, Rx.IDisposable {
         constructor(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
             this.setupRx(initialContents, resetChangeThreshold, scheduler);
-        }
-
-        ////////////////////
-        /// IUnknown
-
-        public queryInterface(iid: string) {
-            if (iid === IID.IUnknown ||
-                iid === IID.IDisposable ||
-                iid === IID.IObservableList ||
-                iid === IID.IReadOnlyList ||
-                iid === IID.IList)
-                return true;
-
-            return false;
         }
 
         //////////////////////////////////

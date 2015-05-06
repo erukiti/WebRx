@@ -634,6 +634,8 @@ module wx {
         name: string;
         merge(other: IModule): IModule;
     }
+    
+    export var app: IWebRxApp;
 
     /**
     * Represents an engine responsible for converting arbitrary text fragements into a collection of Dom Nodes
