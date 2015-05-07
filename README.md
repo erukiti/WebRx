@@ -6,19 +6,21 @@
 
 # <img src="http://webrxjs.org/images/Logo.png" height="32" /> WebRx
 
-WebRx is a Javascript MVVM-Framework built on [ReactiveX for Javascript (RxJs)](http://reactivex.io) that combines functional-reactive programming with Observable-driven declarative Data-Binding, Templating and Client-Side Routing.
+WebRx is a Client-Side MVVM-Framework that combines functional-reactive programming with declarative Data-Binding, Templating and Client-Side Routing.
+
+The framework is written in [Typescript](http://www.typescriptlang.org/) and built on top of [ReactiveX for Javascript (RxJs)](http://reactivex.io) which is a powerful set of libraries for processing and querying asynchronous data-streams that can originate from diverse sources such as Http-Requests, Input-Events, Timers and much more.
 
 #### Features
 
 - Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
 - [Documentation](http://webrxjs.org/docs)
+- Developed in [TypeScript](http://www.typescriptlang.org/) (just like Angular 2.0)
 - Declarative One-way and Two-way data-binding with many built-in operators
 - Supports self-contained, reusable *Components* modelled after the upcoming Web-Components standard
 - Out-of-the box support for *Modules* to facilitate code-reuse and separation of concerns
 - Integrated state-based routing engine inspired by Angular's [UI-Router](https://github.com/angular-ui/ui-router)
 - No dependencies besides [RxJS](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/libraries/rx.complete.md)
 - Compact (~25Kb minified & compressed)
-- First class [TypeScript](http://www.typescriptlang.org/) support
 
 #### Installation
 
