@@ -6,7 +6,7 @@
 
 # <img src="http://webrxjs.org/images/Logo.png" height="32" /> WebRx
 
-WebRx is a Client-Side MVVM-Framework that combines functional-reactive programming with declarative Data-Binding, Templating and Client-Side Routing.
+WebRx is a browser-based MVVM-Framework that combines functional-reactive programming with declarative Data-Binding, Templating and Client-Side Routing.
 
 The framework is written in [Typescript](http://www.typescriptlang.org/) and built on top of [ReactiveX for Javascript (RxJs)](http://reactivex.io) which is a powerful set of libraries for processing and querying asynchronous data-streams that can originate from diverse sources such as Http-Requests, Input-Events, Timers and much more.
 
