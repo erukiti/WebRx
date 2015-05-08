@@ -57,6 +57,7 @@ module wx {
     injector.register("wx.components.radiogroup", [res.htmlTemplateEngine, internal.radioGroupComponentConstructor])
         .register("wx.components.select", [res.htmlTemplateEngine, internal.selectComponentConstructor]);
 
+    // initialize app module
     app.binding("module", "wx.bindings.module")
         .binding("css", "wx.bindings.css")
         .binding("attr", "wx.bindings.attr")
