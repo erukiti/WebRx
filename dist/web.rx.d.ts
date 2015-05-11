@@ -1,18 +1,6 @@
 /// <reference path="../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts" />
 /// <reference path="../test/typings/jquery.d.ts" />
-declare module wx {
-    function createWeakMap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T>;
-}
-declare module wx.res {
-    var injector: string;
-    var domManager: string;
-    var router: string;
-    var messageBus: string;
-    var expressionCompiler: string;
-    var htmlTemplateEngine: string;
-    var hasValueBindingValue: string;
-    var valueBindingValue: string;
-}
 declare module wx {
     interface IInjector {
         register(key: string, factory: Array<any>, singleton?: boolean): IInjector;
@@ -259,6 +247,7 @@ declare module wx {
         name: string;
         merge(other: IModule): IModule;
     }
+    var app: IWebRxApp;
     interface ITemplateEngine {
         parse(templateSource: string): Node[];
     }
@@ -296,7 +285,7 @@ declare module wx {
     }
     interface IRouterState {
         name: string;
-        uri: string;
+        url: string;
         params: any;
         views: {
             [view: string]: string | {
@@ -332,12 +321,13 @@ declare module wx {
         pushState(statedata: any, title: string, url?: string): void;
     }
     interface IRouter {
+        baseUrl: string;
         sync(): void;
         state(config: IRouterStateConfig): IRouter;
         current: IObservableProperty<IRouterState>;
         updateCurrentStateParams(withParamsAction: (params: any) => void): void;
         go(to: string, params?: Object, options?: IStateChangeOptions): void;
-        uri(state: string, params?: {}): string;
+        url(state: string, params?: {}): string;
         reload(): void;
         get(state: string): IRouterStateConfig;
         is(state: string, params?: any, options?: any): any;
@@ -367,11 +357,6 @@ declare module Rx {
         isScheduler(o: any): boolean;
     }
 }
-declare module wx {
-    interface IUnknown {
-        queryInterface(iid: string): boolean;
-    }
-}
 declare module wx.internal {
     class PropertyChangedEventArgs implements IPropertyChangedEventArgs {
         constructor(sender: any, propertyName: string);
@@ -381,20 +366,11 @@ declare module wx.internal {
 }
 declare module wx {
     class IID {
-        static IUnknown: string;
         static IDisposable: string;
         static IObservableProperty: string;
-        static IReactiveNotifyPropertyChanged: string;
-        static IHandleObservableErrors: string;
         static IObservableList: string;
-        static IList: string;
-        static IReactiveNotifyCollectionChanged: string;
-        static IReactiveNotifyCollectionItemChanged: string;
-        static IReactiveDerivedList: string;
-        static IMoveInfo: string;
-        static IObservedChange: string;
         static ICommand: string;
-        static IReadOnlyList: string;
+        static IHandleObservableErrors: string;
     }
 }
 declare module wx {
@@ -416,12 +392,13 @@ declare module wx {
         propertyName: string;
         property: T;
     }
+    function Implements(value: string | Array<string>): (target: Object | Function) => void;
     function queryInterface(target: any, iid: string): boolean;
-    function supportsQueryInterface(target: any): boolean;
     function getOwnPropertiesImplementingInterface<T>(target: any, iid: string): PropertyInfo<T>[];
     function getOid(o: any): string;
     function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...classNames: string[]): void;
     function triggerReflow(el: HTMLElement): void;
+    function elementCanBeDisabled(el: HTMLElement): boolean;
     function isFunction(obj: any): boolean;
     function isDisposable(obj: any): boolean;
     function isEqual(a: any, b: any, aStack?: any, bStack?: any): boolean;
@@ -444,9 +421,24 @@ declare module wx {
         function emitError(fmt: string, ...args: any[]): void;
     }
 }
+declare var WeakMap: any;
+declare module wx {
+    function createWeakMap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T>;
+}
+declare module wx.res {
+    const injector: string;
+    const domManager: string;
+    const router: string;
+    const messageBus: string;
+    const expressionCompiler: string;
+    const htmlTemplateEngine: string;
+    const hasValueBindingValue: string;
+    const valueBindingValue: string;
+}
 declare module wx {
     var injector: IInjector;
 }
+declare var Set: any;
 declare module wx {
     function createSet<T>(disableNativeSupport?: boolean): ISet<T>;
     function setToArray<T>(src: ISet<T>): Array<T>;
@@ -467,16 +459,12 @@ declare module wx.env {
     function cleanExternalData(node: Node): any;
 }
 declare module wx {
-    function property<T>(initialValue?: T): IObservableProperty<T>;
-}
-declare var createMockHistory: () => wx.IHistory;
-declare module wx {
-    module internal {
-        var moduleConstructor: any;
+    interface INodeState {
+        module?: IModule;
     }
-    var app: IWebRxApp;
-    function module(name: string, descriptor: Array<any> | IModuleDescriptor): typeof wx;
-    function loadModule(name: string): Rx.Observable<IModule>;
+    module internal {
+        var moduleBindingConstructor: any;
+    }
 }
 declare module wx {
     module internal {
@@ -500,12 +488,16 @@ declare module wx {
     }
 }
 declare module wx {
-    interface INodeState {
-        module?: IModule;
-    }
+    function property<T>(initialValue?: T): IObservableProperty<T>;
+}
+declare var createMockHistory: () => wx.IHistory;
+declare module wx {
     module internal {
-        var moduleBindingConstructor: any;
+        var moduleConstructor: any;
     }
+    var app: IWebRxApp;
+    function module(name: string, descriptor: Array<any> | IModuleDescriptor): typeof wx;
+    function loadModule(name: string): Rx.Observable<IModule>;
 }
 declare module wx {
     interface IComponentBindingOptions {
@@ -748,6 +740,15 @@ declare module wx {
     }
 }
 declare module wx {
+    function route(route: any, rules?: any): IRoute;
+}
+declare module wx {
+    var router: IRouter;
+    module internal {
+        var routerConstructor: any;
+    }
+}
+declare module wx {
     interface IStateActiveBindingOptions {
         name: string;
         params?: Object;
@@ -772,16 +773,7 @@ declare module wx {
     }
 }
 declare module wx {
-    function route(route: any, rules?: any): IRoute;
 }
 declare module wx {
-    var router: IRouter;
-    module internal {
-        var routerConstructor: any;
-    }
-}
-declare module wx {
-}
-declare module wx {
-    var version: string;
+    const version: string;
 }

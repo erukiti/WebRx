@@ -1,67 +1,10 @@
+///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 var wx;
 (function (wx) {
     "use strict";
-    var WeakMapEmulated = (function () {
-        function WeakMapEmulated() {
-            this.inner = {};
-        }
-        WeakMapEmulated.prototype.set = function (key, value) {
-            var oid = wx.getOid(key);
-            this.inner[oid] = value;
-        };
-        WeakMapEmulated.prototype.get = function (key) {
-            var oid = wx.getOid(key);
-            return this.inner[oid];
-        };
-        WeakMapEmulated.prototype.has = function (key) {
-            var oid = wx.getOid(key);
-            return this.inner.hasOwnProperty(oid);
-        };
-        WeakMapEmulated.prototype.delete = function (key) {
-            var oid = wx.getOid(key);
-            return delete this.inner[oid];
-        };
-        Object.defineProperty(WeakMapEmulated.prototype, "isEmulated", {
-            get: function () {
-                return true;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return WeakMapEmulated;
-    })();
-    var hasNativeSupport = typeof WeakMap === "function";
-    function createWeakMap(disableNativeSupport) {
-        if (disableNativeSupport || !hasNativeSupport) {
-            return new WeakMapEmulated();
-        }
-        return new WeakMap();
-    }
-    wx.createWeakMap = createWeakMap;
+    wx.app;
 })(wx || (wx = {}));
-var wx;
-(function (wx) {
-    var res;
-    (function (res) {
-        "use strict";
-        res.injector = "wx.injector";
-        res.domManager = "wx.domservice";
-        res.router = "wx.router";
-        res.messageBus = "wx.messageBus";
-        res.expressionCompiler = "wx.expressioncompiler";
-        res.htmlTemplateEngine = "wx.htmlTemplateEngine";
-        res.hasValueBindingValue = "has.wx.bindings.value";
-        res.valueBindingValue = "wx.bindings.value";
-    })(res = wx.res || (wx.res = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
-})(wx || (wx = {}));
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     var internal;
@@ -83,31 +26,26 @@ var wx;
     var IID = (function () {
         function IID() {
         }
-        IID.IUnknown = "IUnknown";
         IID.IDisposable = "IDisposable";
         IID.IObservableProperty = "IObservableProperty";
-        IID.IReactiveNotifyPropertyChanged = "IReactiveNotifyPropertyChanged";
-        IID.IHandleObservableErrors = "IHandleObservableErrors";
         IID.IObservableList = "IObservableList";
-        IID.IList = "IList";
-        IID.IReactiveNotifyCollectionChanged = "IReactiveNotifyCollectionChanged";
-        IID.IReactiveNotifyCollectionItemChanged = "IReactiveNotifyCollectionItemChanged";
-        IID.IReactiveDerivedList = "IReactiveDerivedList";
-        IID.IMoveInfo = "IMoveInfo";
-        IID.IObservedChange = "IObservedChange";
         IID.ICommand = "ICommand";
-        IID.IReadOnlyList = "IReadOnlyList";
+        IID.IHandleObservableErrors = "IHandleObservableErrors";
         return IID;
     })();
     wx.IID = IID;
 })(wx || (wx = {}));
+/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts" />
+/// <reference path="../Interfaces.ts" />
+/// <reference path="Events.ts" />
+/// <reference path="../IID.ts" />
 var wx;
 (function (wx) {
     "use strict";
     var cssClassNameRegex = /\S+/g;
     var RxObsConstructor = Rx.Observable;
-    wx.noop = function () {
-    };
+    wx.noop = function () { };
     function isStrictMode() {
         return typeof this === "undefined";
     }
@@ -126,7 +64,8 @@ var wx;
     function isCommand(target) {
         if (target == null)
             return false;
-        return target instanceof internal.commandConstructor || queryInterface(target, wx.IID.ICommand);
+        return target instanceof internal.commandConstructor ||
+            queryInterface(target, wx.IID.ICommand);
     }
     wx.isCommand = isCommand;
     function isList(target) {
@@ -209,17 +148,27 @@ var wx;
         return PropertyInfo;
     })();
     wx.PropertyInfo = PropertyInfo;
+    var implementsMetaDataKey = "wx:interfaceImpl";
+    function Implements(value) {
+        return function (target) {
+            var interfaces = Reflect.getMetadata(implementsMetaDataKey, target) || {};
+            if (typeof (value) === "string")
+                value = value.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+            for (var i = 0; i < value.length; i++)
+                interfaces[value[i]] = true;
+            Reflect.defineMetadata(implementsMetaDataKey, interfaces, target);
+        };
+    }
+    wx.Implements = Implements;
     function queryInterface(target, iid) {
-        if (supportsQueryInterface(target)) {
-            return target.queryInterface(iid);
-        }
-        return false;
+        if (target == null || isPrimitive(target))
+            return false;
+        if (typeof target === "object")
+            target = target.constructor;
+        var interfaces = Reflect.getMetadata(implementsMetaDataKey, target);
+        return interfaces != null && interfaces[iid];
     }
     wx.queryInterface = queryInterface;
-    function supportsQueryInterface(target) {
-        return target !== undefined && target !== null && typeof target.queryInterface === "function";
-    }
-    wx.supportsQueryInterface = supportsQueryInterface;
     function getOwnPropertiesImplementingInterface(target, iid) {
         return Object.keys(target).filter(function (propertyName) {
             var o = target[propertyName];
@@ -248,10 +197,9 @@ var wx;
         if (classNames) {
             var currentClassNames = node.className.match(cssClassNameRegex) || [];
             var index;
-            var i;
             var className;
             if (shouldHaveClass) {
-                for (i = 0; i < classNames.length; i++) {
+                for (var i = 0; i < classNames.length; i++) {
                     className = classNames[i];
                     index = currentClassNames.indexOf(className);
                     if (index === -1)
@@ -259,7 +207,7 @@ var wx;
                 }
             }
             else {
-                for (i = 0; i < classNames.length; i++) {
+                for (var i = 0; i < classNames.length; i++) {
                     className = classNames[i];
                     index = currentClassNames.indexOf(className);
                     if (index !== -1)
@@ -274,12 +222,24 @@ var wx;
         el.getBoundingClientRect();
     }
     wx.triggerReflow = triggerReflow;
+    function elementCanBeDisabled(el) {
+        return el instanceof HTMLButtonElement ||
+            el instanceof HTMLAnchorElement ||
+            el instanceof HTMLInputElement ||
+            el instanceof HTMLFieldSetElement ||
+            el instanceof HTMLLinkElement ||
+            el instanceof HTMLOptGroupElement ||
+            el instanceof HTMLOptionElement ||
+            el instanceof HTMLSelectElement ||
+            el instanceof HTMLTextAreaElement;
+    }
+    wx.elementCanBeDisabled = elementCanBeDisabled;
     function isFunction(obj) {
         return typeof obj == 'function' || false;
     }
     wx.isFunction = isFunction;
     function isDisposable(obj) {
-        return isFunction(obj["dispose"]);
+        return queryInterface(obj, wx.IID.IDisposable) || isFunction(obj["dispose"]);
     }
     wx.isDisposable = isDisposable;
     function isEqual(a, b, aStack, bStack) {
@@ -308,7 +268,9 @@ var wx;
             if (typeof a != 'object' || typeof b != 'object')
                 return false;
             var aCtor = a.constructor, bCtor = b.constructor;
-            if (aCtor !== bCtor && !(isFunction(aCtor) && aCtor instanceof aCtor && isFunction(bCtor) && bCtor instanceof bCtor) && ('constructor' in a && 'constructor' in b)) {
+            if (aCtor !== bCtor && !(isFunction(aCtor) && aCtor instanceof aCtor &&
+                isFunction(bCtor) && bCtor instanceof bCtor)
+                && ('constructor' in a && 'constructor' in b)) {
                 return false;
             }
         }
@@ -397,7 +359,8 @@ var wx;
     wx.observableRequire = observableRequire;
     function observeObject(target, onChanging) {
         if (onChanging === void 0) { onChanging = false; }
-        var thrownExceptionsSubject = queryInterface(target, wx.IID.IHandleObservableErrors) ? target.thrownExceptions : wx.app.defaultExceptionHandler;
+        var thrownExceptionsSubject = queryInterface(target, wx.IID.IHandleObservableErrors) ?
+            target.thrownExceptions : wx.app.defaultExceptionHandler;
         return Rx.Observable.create(function (observer) {
             var result = new Rx.CompositeDisposable();
             var observableProperties = getOwnPropertiesImplementingInterface(target, wx.IID.IObservableProperty);
@@ -415,7 +378,9 @@ var wx;
                 }));
             });
             return result;
-        }).publish().refCount();
+        })
+            .publish()
+            .refCount();
     }
     wx.observeObject = observeObject;
     function whenAny() {
@@ -451,6 +416,66 @@ var wx;
         internal.emitError = emitError;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+/// <reference path="../Core/Utils.ts" />
+var wx;
+(function (wx) {
+    "use strict";
+    var WeakMapEmulated = (function () {
+        function WeakMapEmulated() {
+            this.inner = {};
+        }
+        WeakMapEmulated.prototype.set = function (key, value) {
+            var oid = wx.getOid(key);
+            this.inner[oid] = value;
+        };
+        WeakMapEmulated.prototype.get = function (key) {
+            var oid = wx.getOid(key);
+            return this.inner[oid];
+        };
+        WeakMapEmulated.prototype.has = function (key) {
+            var oid = wx.getOid(key);
+            return this.inner.hasOwnProperty(oid);
+        };
+        WeakMapEmulated.prototype.delete = function (key) {
+            var oid = wx.getOid(key);
+            return delete this.inner[oid];
+        };
+        Object.defineProperty(WeakMapEmulated.prototype, "isEmulated", {
+            get: function () {
+                return true;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return WeakMapEmulated;
+    })();
+    var hasNativeSupport = typeof WeakMap === "function";
+    function createWeakMap(disableNativeSupport) {
+        if (disableNativeSupport || !hasNativeSupport) {
+            return new WeakMapEmulated();
+        }
+        return new WeakMap();
+    }
+    wx.createWeakMap = createWeakMap;
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    var res;
+    (function (res) {
+        "use strict";
+        res.injector = "wx.injector";
+        res.domManager = "wx.domservice";
+        res.router = "wx.router";
+        res.messageBus = "wx.messageBus";
+        res.expressionCompiler = "wx.expressioncompiler";
+        res.htmlTemplateEngine = "wx.htmlTemplateEngine";
+        res.hasValueBindingValue = "has.wx.bindings.value";
+        res.valueBindingValue = "wx.bindings.value";
+    })(res = wx.res || (wx.res = {}));
+})(wx || (wx = {}));
+/// <reference path="Utils.ts" />
+/// <reference path="Resources.ts" />
+/// <reference path="Utils.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -469,13 +494,13 @@ var wx;
                 factory = function (args, deps) { return val.apply(null, args); };
             }
             else if (Array.isArray(val)) {
-                var self = this;
+                var self_1 = this;
                 var ctor = val.pop();
                 var dependencies = val;
                 factory = function (args, deps) {
                     var resolved = dependencies.map(function (x) {
                         try {
-                            return self.get(x, undefined, deps);
+                            return self_1.get(x, undefined, deps);
                         }
                         catch (e) {
                             wx.internal.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, key, e);
@@ -531,6 +556,7 @@ var wx;
     wx.injector = new Injector();
     wx.injector.register(wx.res.injector, function () { return new Injector(); });
 })(wx || (wx = {}));
+/// <reference path="../Core/Utils.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -584,7 +610,9 @@ var wx;
         });
         return SetEmulated;
     })();
-    var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach") && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear") && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
+    var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
+        && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
+        && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
     function createSet(disableNativeSupport) {
         if (disableNativeSupport || !hasNativeSupport) {
             return new SetEmulated();
@@ -599,6 +627,9 @@ var wx;
     }
     wx.setToArray = setToArray;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="Utils.ts" />
+/// <reference path="../Collections/WeakMap.ts" />
 var wx;
 (function (wx) {
     var env;
@@ -621,8 +652,8 @@ var wx;
         }
         var version = document && (function () {
             var version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
-            while (div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->', iElems[0]) {
-            }
+            while (div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
+                iElems[0]) { }
             return version > 4 ? version : undefined;
         }());
         if (version) {
@@ -636,7 +667,10 @@ var wx;
                         return result;
                     result = Rx.Observable.defer(function () {
                         return Rx.Observable.fromEvent(doc, 'selectionchange');
-                    }).select(function (x) { return doc; }).publish().refCount();
+                    })
+                        .select(function (x) { return doc; })
+                        .publish()
+                        .refCount();
                     map.set(doc, result);
                     return result;
                 };
@@ -650,8 +684,17 @@ var wx;
         if (version) {
             env.firefox = { version: version };
         }
-        var hasES5 = typeof Array.isArray === "function" && typeof [].forEach === "function" && typeof [].map === "function" && typeof [].some === "function" && typeof [].indexOf === "function" && typeof Object.keys === "function" && typeof Object.defineProperty === "function";
-        env.isSupported = (!env.ie || env.ie.version >= 9) || (!env.safari || env.safari.version >= 5) || (!env.firefox || env.firefox.version >= 5) && hasES5;
+        var hasES5 = typeof Array.isArray === "function" &&
+            typeof [].forEach === "function" &&
+            typeof [].map === "function" &&
+            typeof [].some === "function" &&
+            typeof [].indexOf === "function" &&
+            typeof Object.keys === "function" &&
+            typeof Object.defineProperty === "function";
+        env.isSupported = (!env.ie || env.ie.version >= 9) ||
+            (!env.safari || env.safari.version >= 5) ||
+            (!env.firefox || env.firefox.version >= 5) &&
+                hasES5;
         env.jQueryInstance = window["jQuery"];
         if (env.jQueryInstance && (typeof env.jQueryInstance['cleanData'] === "function")) {
             env.cleanExternalData = function (node) {
@@ -659,402 +702,111 @@ var wx;
             };
         }
         else {
-            env.cleanExternalData = function (node) {
-            };
+            env.cleanExternalData = function (node) { };
         }
     })(env = wx.env || (wx.env = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     "use strict";
-    function property(initialValue) {
-        var accessor = function (newVal) {
-            if (arguments.length > 0) {
-                if (newVal !== accessor.value) {
-                    accessor.changingSubject.onNext(newVal);
-                    accessor.value = newVal;
-                    accessor.changedSubject.onNext(newVal);
-                }
-            }
-            else {
-                return accessor.value;
-            }
-        };
-        accessor.queryInterface = function (iid) {
-            if (iid === wx.IID.IUnknown || iid === wx.IID.IObservableProperty || iid === wx.IID.IDisposable)
-                return true;
-            return false;
-        };
-        accessor.dispose = function () {
-        };
-        if (initialValue !== undefined)
-            accessor.value = initialValue;
-        accessor.changedSubject = new Rx.Subject();
-        accessor.changed = accessor.changedSubject.publish().refCount();
-        accessor.changingSubject = new Rx.Subject();
-        accessor.changing = accessor.changingSubject.publish().refCount();
-        return accessor;
-    }
-    wx.property = property;
-})(wx || (wx = {}));
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var wx;
-(function (wx) {
-    "use strict";
-    var Module = (function () {
-        function Module(name) {
-            this.bindings = {};
-            this.components = {};
-            this.expressionFilters = {};
-            this.animations = {};
-            this.name = name;
+    var ModuleBinding = (function () {
+        function ModuleBinding(domManager) {
+            this.priority = 100;
+            this.controlsDescendants = true;
+            this.domManager = domManager;
         }
-        Module.prototype.merge = function (other) {
-            var _other = other;
-            wx.extend(_other.components, this.components);
-            wx.extend(_other.bindings, this.bindings);
-            wx.extend(_other.expressionFilters, this.expressionFilters);
-            wx.extend(_other.animations, this.animations);
-            return this;
-        };
-        Module.prototype.component = function (name, component) {
-            this.components[name] = component;
-            return this;
-        };
-        Module.prototype.hasComponent = function (name) {
-            return this.components[name] != null;
-        };
-        Module.prototype.loadComponent = function (name, params) {
-            return this.initializeComponent(this.instantiateComponent(name), params);
-        };
-        Module.prototype.binding = function () {
-            var _this = this;
-            var args = wx.args2Array(arguments);
-            var name = args.shift();
-            var handler;
-            if (args.length === 0) {
-                handler = this.bindings[name];
-                if (typeof handler === "string") {
-                    handler = wx.injector.get(handler);
-                    this.bindings[name] = handler;
-                }
-                return handler;
-            }
-            handler = args.shift();
-            if (Array.isArray(name)) {
-                name.forEach(function (x) { return _this.bindings[x] = handler; });
-            }
-            else {
-                this.bindings[name] = handler;
-            }
-            return this;
-        };
-        Module.prototype.filter = function () {
-            var args = wx.args2Array(arguments);
-            var name = args.shift();
-            var filter;
-            if (args.length === 0) {
-                filter = this.expressionFilters[name];
-                if (typeof filter === "string") {
-                    filter = wx.injector.get(filter);
-                    this.bindings[name] = filter;
-                }
-                return filter;
-            }
-            filter = args.shift();
-            this.expressionFilters[name] = filter;
-            return this;
-        };
-        Module.prototype.filters = function () {
-            return this.expressionFilters;
-        };
-        Module.prototype.animation = function () {
-            var args = wx.args2Array(arguments);
-            var name = args.shift();
-            var animation;
-            if (args.length === 0) {
-                animation = this.animations[name];
-                if (typeof animation === "string") {
-                    animation = wx.injector.get(animation);
-                    this.bindings[name] = animation;
-                }
-                return animation;
-            }
-            animation = args.shift();
-            this.animations[name] = animation;
-            return this;
-        };
-        Module.prototype.instantiateComponent = function (name) {
-            var _this = this;
-            var cd = this.components[name];
-            var result = undefined;
-            if (cd != null) {
-                if (cd.instance) {
-                    result = Rx.Observable.return(cd.instance);
-                }
-                else if (cd.template) {
-                    result = Rx.Observable.return(cd);
-                }
-                else if (cd.resolve) {
-                    var resolved = wx.injector.get(cd.resolve);
-                    result = Rx.Observable.return(resolved);
-                }
-                else if (cd.require) {
-                    result = wx.observableRequire(cd.require);
+        ModuleBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+            if (node.nodeType !== 1)
+                internal.throwError("module-binding only operates on elements!");
+            if (options == null)
+                internal.throwError("invalid binding-options!");
+            var el = node;
+            var self = this;
+            var exp = this.domManager.compileBindingOptions(options, module);
+            var obs = this.domManager.expressionToObservable(exp, ctx);
+            var initialApply = true;
+            var cleanup;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
                 }
             }
-            else {
-                result = Rx.Observable.return(undefined);
-            }
-            return result.do(function (x) { return _this.components[name].instance = x; });
-        };
-        Module.prototype.initializeComponent = function (obs, params) {
-            var _this = this;
-            return obs.take(1).selectMany(function (component) {
-                if (component == null) {
-                    return Rx.Observable.return(undefined);
-                }
-                if (component.viewModel) {
-                    return Rx.Observable.combineLatest(_this.loadComponentTemplate(component.template, params), _this.loadComponentViewModel(component.viewModel, params), function (t, vm) {
-                        if (wx.isFunction(vm)) {
-                            vm = new vm(params);
-                        }
-                        return {
-                            template: t,
-                            viewModel: vm,
-                            preBindingInit: component.preBindingInit,
-                            postBindingInit: component.postBindingInit
-                        };
-                    });
-                }
-                return _this.loadComponentTemplate(component.template, params).select(function (template) { return {
-                    template: template,
-                    preBindingInit: component.preBindingInit,
-                    postBindingInit: component.postBindingInit
-                }; });
-            }).take(1);
-        };
-        Module.prototype.loadComponentTemplate = function (template, params) {
-            var syncResult;
-            var el;
-            if (wx.isFunction(template)) {
-                syncResult = template(params);
-                if (typeof syncResult === "string") {
-                    syncResult = wx.app.templateEngine.parse(template(params));
-                }
-                return Rx.Observable.return(syncResult);
-            }
-            else if (typeof template === "string") {
-                syncResult = wx.app.templateEngine.parse(template);
-                return Rx.Observable.return(syncResult);
-            }
-            else if (Array.isArray(template)) {
-                return Rx.Observable.return(template);
-            }
-            else if (typeof template === "object") {
-                var options = template;
-                if (options.resolve) {
-                    syncResult = wx.injector.get(options.resolve);
-                    return Rx.Observable.return(syncResult);
-                }
-                else if (options.promise) {
-                    var promise = options.promise;
-                    return Rx.Observable.fromPromise(promise);
-                }
-                else if (options.require) {
-                    return wx.observableRequire(options.require).select(function (x) { return wx.app.templateEngine.parse(x); });
-                }
-                else if (options.element) {
-                    if (typeof options.element === "string") {
-                        el = document.getElementById(options.element) || document.querySelector(options.element);
-                        if (el != null) {
-                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
-                        }
-                        else {
-                            syncResult = [];
-                        }
-                        return Rx.Observable.return(syncResult);
+            var template = new Array();
+            state.cleanup.add(obs.subscribe(function (x) {
+                try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+                    var value = wx.unwrapProperty(x);
+                    var moduleNames;
+                    var disp = undefined;
+                    if (value) {
+                        value = value.trim();
+                        moduleNames = value.split(" ").filter(function (x) { return x; });
                     }
-                    else {
-                        el = options.element;
-                        if (el != null) {
-                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
-                        }
-                        else {
-                            syncResult = [];
-                        }
-                        return Rx.Observable.return(syncResult);
+                    if (moduleNames.length > 0) {
+                        var observables = moduleNames.map(function (x) { return wx.loadModule(x); });
+                        disp = Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (modules) {
+                            var moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
+                            var merged = new internal.moduleConstructor(moduleName);
+                            merged.merge(module || wx.app);
+                            modules.forEach(function (x) { return merged.merge(x); });
+                            self.applyValue(el, merged, template, ctx, state, initialApply);
+                            initialApply = false;
+                        });
+                        if (disp != null)
+                            cleanup.add(disp);
                     }
                 }
-            }
-            internal.throwError("invalid template descriptor");
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
+            }));
+            state.cleanup.add(Rx.Disposable.create(function () {
+                node = null;
+                options = null;
+                ctx = null;
+                state = null;
+                obs = null;
+                self = null;
+            }));
         };
-        Module.prototype.loadComponentViewModel = function (vm, componentParams) {
-            var syncResult;
-            if (wx.isFunction(vm)) {
-                return Rx.Observable.return(vm);
-            }
-            else if (Array.isArray(vm)) {
-                syncResult = wx.injector.resolve(vm, componentParams);
-                return Rx.Observable.return(syncResult);
-            }
-            else if (typeof vm === "object") {
-                var options = vm;
-                if (options.resolve) {
-                    syncResult = wx.injector.get(options.resolve, componentParams);
-                    return Rx.Observable.return(syncResult);
-                }
-                else if (options.promise) {
-                    var promise = options.promise;
-                    return Rx.Observable.fromPromise(promise);
-                }
-                else if (options.require) {
-                    return wx.observableRequire(options.require);
-                }
-                else if (options.instance) {
-                    return Rx.Observable.return(options.instance);
-                }
-            }
-            internal.throwError("invalid view-model descriptor");
+        ModuleBinding.prototype.configure = function (options) {
         };
-        return Module;
+        ModuleBinding.prototype.applyValue = function (el, module, template, ctx, state, initialApply) {
+            if (initialApply) {
+                for (var i = 0; i < el.childNodes.length; i++) {
+                    template.push(el.childNodes[i].cloneNode(true));
+                }
+            }
+            state.module = module;
+            this.domManager.cleanDescendants(el);
+            while (el.firstChild) {
+                el.removeChild(el.firstChild);
+            }
+            for (var i = 0; i < template.length; i++) {
+                var node = template[i].cloneNode(true);
+                el.appendChild(node);
+            }
+            this.domManager.applyBindingsToDescendants(ctx, el);
+        };
+        return ModuleBinding;
     })();
-    var App = (function (_super) {
-        __extends(App, _super);
-        function App() {
-            _super.call(this, "app");
-            this.defaultExceptionHandler = Rx.Observer.create(function (ex) {
-                if (!wx.isInUnitTest()) {
-                    wx.log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
-                }
-            });
-            this.title = wx.property();
-            if (!wx.isInUnitTest()) {
-                this.history = this.createHistory();
-            }
-            else {
-                this.history = createMockHistory();
-            }
-        }
-        Object.defineProperty(App.prototype, "mainThreadScheduler", {
-            get: function () {
-                return this._unitTestMainThreadScheduler || this._mainThreadScheduler || Rx.Scheduler.currentThread;
-            },
-            set: function (value) {
-                if (wx.isInUnitTest()) {
-                    this._unitTestMainThreadScheduler = value;
-                    this._mainThreadScheduler = this._mainThreadScheduler || value;
-                }
-                else {
-                    this._mainThreadScheduler = value;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(App.prototype, "templateEngine", {
-            get: function () {
-                if (!this._templateEngine) {
-                    this._templateEngine = wx.injector.get(wx.res.htmlTemplateEngine);
-                }
-                return this._templateEngine;
-            },
-            set: function (newVal) {
-                this._templateEngine = newVal;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        App.prototype.createHistory = function () {
-            var result = {
-                back: window.history.back.bind(window.history),
-                forward: window.history.forward.bind(window.history),
-                pushState: window.history.pushState.bind(window.history),
-                replaceState: window.history.replaceState.bind(window.history)
-            };
-            Object.defineProperty(result, "length", {
-                get: function () {
-                    return window.history.length;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(result, "state", {
-                get: function () {
-                    return window.history.state;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(result, "location", {
-                get: function () {
-                    return window.location;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            result.onPopState = Rx.Observable.fromEventPattern(function (h) { return window.addEventListener("popstate", h); }, function (h) { return window.removeEventListener("popstate", h); }).publish().refCount();
-            return result;
-        };
-        return App;
-    })(Module);
     var internal;
     (function (internal) {
-        internal.moduleConstructor = Module;
+        internal.moduleBindingConstructor = ModuleBinding;
     })(internal = wx.internal || (wx.internal = {}));
-    wx.app = new App();
-    var modules = {
-        'app': { instance: wx.app }
-    };
-    function module(name, descriptor) {
-        modules[name] = descriptor;
-        return wx;
-    }
-    wx.module = module;
-    function loadModule(name) {
-        var md = modules[name];
-        var result = undefined;
-        var module;
-        if (md != null) {
-            if (Array.isArray(md)) {
-                module = new Module(name);
-                wx.injector.resolve(md, module);
-                result = Rx.Observable.return(module);
-            }
-            else if (wx.isFunction(md)) {
-                module = new Module(name);
-                md(module);
-                result = Rx.Observable.return(module);
-            }
-            else {
-                var mdd = md;
-                if (mdd.instance) {
-                    result = Rx.Observable.return(mdd.instance);
-                }
-                else {
-                    module = new Module(name);
-                    if (mdd.resolve) {
-                        wx.injector.get(mdd.resolve, module);
-                        result = Rx.Observable.return(module);
-                    }
-                    else if (mdd.require) {
-                        result = wx.observableRequire(mdd.require).do(function (x) { return x(module); }).select(function (x) { return module; });
-                    }
-                }
-            }
-        }
-        else {
-            result = Rx.Observable.return(undefined);
-        }
-        return result.take(1).do(function (x) { return modules[name] = { instance: x }; });
-    }
-    wx.loadModule = loadModule;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Collections/WeakMap.ts" />
+/// <reference path="../Core/Resources.ts" />
+/// <reference path="../Core/Injector.ts" />
+/// <reference path="../Collections/Set.ts" />
+/// <reference path="../Core/Environment.ts" />
+/// <reference path="../Bindings/Module.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -1254,7 +1006,9 @@ var wx;
             var obs = Rx.Observable.create(function (observer) {
                 var innerDisp = Rx.Observable.defer(function () {
                     return Rx.Observable.merge(wx.setToArray(captured)).take(1);
-                }).repeat().subscribe(function (trigger) {
+                })
+                    .repeat()
+                    .subscribe(function (trigger) {
                     try {
                         captured.clear();
                         locals = _this.createLocals(captured, ctx);
@@ -1274,8 +1028,13 @@ var wx;
                 });
                 return innerDisp;
             });
-            var startValue = wx.isRxObservable(result) ? result : Rx.Observable.return(result);
-            return obs.startWith(startValue).concatAll().publish().refCount();
+            var startValue = wx.isRxObservable(result) ?
+                result :
+                Rx.Observable.return(result);
+            return obs.startWith(startValue)
+                .concatAll()
+                .publish()
+                .refCount();
         };
         DomManager.prototype.applyBindingsInternal = function (ctx, el, module) {
             var result = false;
@@ -1289,7 +1048,6 @@ var wx;
             }
             var _bindings;
             var tagName = el.tagName.toLowerCase();
-            var i;
             if (module.hasComponent(tagName) || wx.app.hasComponent(tagName)) {
                 var params = el.getAttribute(DomManager.paramsAttributename);
                 var componentReference;
@@ -1315,7 +1073,7 @@ var wx;
                     internal.throwError("bindings {0} are competing for descendants of target element!", hd.join(", "));
                 }
                 result = hd.length > 0;
-                for (i = 0; i < bindings.length; i++) {
+                for (var i = 0; i < bindings.length; i++) {
                     var binding = bindings[i];
                     var handler = binding.handler;
                     handler.applyBinding(el, binding.value, ctx, state, module);
@@ -1358,8 +1116,8 @@ var wx;
         };
         DomManager.prototype.cleanNodeRecursive = function (node) {
             if (node.hasChildNodes()) {
-                var length = node.childNodes.length;
-                for (var i = 0; i < length; i++) {
+                var length_1 = node.childNodes.length;
+                for (var i = 0; i < length_1; i++) {
                     var child = node.childNodes[i];
                     if (node.nodeType !== 1)
                         continue;
@@ -1382,10 +1140,10 @@ var wx;
                     }
                     result = o[field];
                     if (!noUnwrap && wx.isProperty(result)) {
-                        var prop = result;
+                        var prop_1 = result;
                         if (captured)
-                            captured.add(prop.changed);
-                        result = prop();
+                            captured.add(prop_1.changed);
+                        result = prop_1();
                     }
                     return result;
                 },
@@ -1395,10 +1153,10 @@ var wx;
                     }
                     target = o[field];
                     if (wx.isProperty(target)) {
-                        var prop = target;
+                        var prop_2 = target;
                         if (captured)
-                            captured.add(prop.changed);
-                        prop(newValue);
+                            captured.add(prop_2.changed);
+                        prop_2(newValue);
                     }
                     else {
                         o[field] = newValue;
@@ -1416,10 +1174,10 @@ var wx;
                         result = o[index];
                     }
                     if (wx.queryInterface(result, wx.IID.IObservableProperty)) {
-                        var prop = result;
+                        var prop_3 = result;
                         if (captured)
-                            captured.add(prop.changed);
-                        result = prop();
+                            captured.add(prop_3.changed);
+                        result = prop_3();
                     }
                     return result;
                 },
@@ -1479,6 +1237,8 @@ var wx;
     }
     wx.cleanNode = cleanNode;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -1560,6 +1320,9 @@ var wx;
         internal.checkedBindingConstructor = CheckedBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -1603,20 +1366,26 @@ var wx;
             if (paramObservable == null) {
                 paramObservable = Rx.Observable.return(undefined);
             }
-            state.cleanup.add(Rx.Observable.combineLatest(cmdObservable, paramObservable, function (cmd, param) { return ({ cmd: cmd, param: param }); }).subscribe(function (x) {
+            state.cleanup.add(Rx.Observable
+                .combineLatest(cmdObservable, paramObservable, function (cmd, param) { return ({ cmd: cmd, param: param }); })
+                .subscribe(function (x) {
                 try {
                     doCleanup();
                     cleanup = new Rx.CompositeDisposable();
                     if (x.cmd != null) {
                         if (!wx.isCommand(x.cmd))
                             internal.throwError("Command-Binding only supports binding to a command!");
-                        el.disabled = !x.cmd.canExecute(x.param);
-                        cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
-                            el.disabled = !canExecute;
-                        }));
+                        if (wx.elementCanBeDisabled(el)) {
+                            el.disabled = !x.cmd.canExecute(x.param);
+                            cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
+                                el.disabled = !canExecute;
+                            }));
+                        }
                         cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
-                            x.cmd.execute(x.param);
-                            if (isAnchor && e.type === "click") {
+                            if (x.cmd.canExecute(x.param)) {
+                                x.cmd.execute(x.param);
+                            }
+                            if (isAnchor) {
                                 e.preventDefault();
                             }
                         }));
@@ -1644,98 +1413,418 @@ var wx;
         internal.commandBindingConstructor = CommandBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../IID.ts" />
+/// <reference path="../Core/Module.ts" />
 var wx;
 (function (wx) {
     "use strict";
-    var ModuleBinding = (function () {
-        function ModuleBinding(domManager) {
-            this.priority = 100;
-            this.controlsDescendants = true;
-            this.domManager = domManager;
+    function property(initialValue) {
+        var accessor = function (newVal) {
+            if (arguments.length > 0) {
+                if (newVal !== accessor.value) {
+                    accessor.changingSubject.onNext(newVal);
+                    accessor.value = newVal;
+                    accessor.changedSubject.onNext(newVal);
+                }
+            }
+            else {
+                return accessor.value;
+            }
+        };
+        wx.Implements(wx.IID.IObservableProperty)(accessor);
+        wx.Implements(wx.IID.IDisposable)(accessor);
+        accessor.dispose = function () {
+        };
+        if (initialValue !== undefined)
+            accessor.value = initialValue;
+        accessor.changedSubject = new Rx.Subject();
+        accessor.changed = accessor.changedSubject
+            .publish()
+            .refCount();
+        accessor.changingSubject = new Rx.Subject();
+        accessor.changing = accessor.changingSubject
+            .publish()
+            .refCount();
+        return accessor;
+    }
+    wx.property = property;
+})(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="Utils.ts" />
+/// <reference path="Injector.ts" />
+/// <reference path="Resources.ts" />
+/// <reference path="Property.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var wx;
+(function (wx) {
+    "use strict";
+    var Module = (function () {
+        function Module(name) {
+            this.bindings = {};
+            this.components = {};
+            this.expressionFilters = {};
+            this.animations = {};
+            this.name = name;
         }
-        ModuleBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-            if (node.nodeType !== 1)
-                internal.throwError("module-binding only operates on elements!");
-            if (options == null)
-                internal.throwError("invalid binding-options!");
-            var el = node;
-            var self = this;
-            var exp = this.domManager.compileBindingOptions(options, module);
-            var obs = this.domManager.expressionToObservable(exp, ctx);
-            var initialApply = true;
-            var cleanup;
-            function doCleanup() {
-                if (cleanup) {
-                    cleanup.dispose();
-                    cleanup = null;
+        Module.prototype.merge = function (other) {
+            var _other = other;
+            wx.extend(_other.components, this.components);
+            wx.extend(_other.bindings, this.bindings);
+            wx.extend(_other.expressionFilters, this.expressionFilters);
+            wx.extend(_other.animations, this.animations);
+            return this;
+        };
+        Module.prototype.component = function (name, component) {
+            this.components[name] = component;
+            return this;
+        };
+        Module.prototype.hasComponent = function (name) {
+            return this.components[name] != null;
+        };
+        Module.prototype.loadComponent = function (name, params) {
+            return this.initializeComponent(this.instantiateComponent(name), params);
+        };
+        Module.prototype.binding = function () {
+            var _this = this;
+            var args = wx.args2Array(arguments);
+            var name = args.shift();
+            var handler;
+            if (args.length === 0) {
+                handler = this.bindings[name];
+                if (typeof handler === "string") {
+                    handler = wx.injector.get(handler);
+                    this.bindings[name] = handler;
+                }
+                return handler;
+            }
+            handler = args.shift();
+            if (Array.isArray(name)) {
+                name.forEach(function (x) { return _this.bindings[x] = handler; });
+            }
+            else {
+                this.bindings[name] = handler;
+            }
+            return this;
+        };
+        Module.prototype.filter = function () {
+            var args = wx.args2Array(arguments);
+            var name = args.shift();
+            var filter;
+            if (args.length === 0) {
+                filter = this.expressionFilters[name];
+                if (typeof filter === "string") {
+                    filter = wx.injector.get(filter);
+                    this.bindings[name] = filter;
+                }
+                return filter;
+            }
+            filter = args.shift();
+            this.expressionFilters[name] = filter;
+            return this;
+        };
+        Module.prototype.filters = function () {
+            return this.expressionFilters;
+        };
+        Module.prototype.animation = function () {
+            var args = wx.args2Array(arguments);
+            var name = args.shift();
+            var animation;
+            if (args.length === 0) {
+                animation = this.animations[name];
+                if (typeof animation === "string") {
+                    animation = wx.injector.get(animation);
+                    this.bindings[name] = animation;
+                }
+                return animation;
+            }
+            animation = args.shift();
+            this.animations[name] = animation;
+            return this;
+        };
+        Module.prototype.instantiateComponent = function (name) {
+            var _this = this;
+            var cd = this.components[name];
+            var result = undefined;
+            if (cd != null) {
+                if (cd.instance) {
+                    result = Rx.Observable.return(cd.instance);
+                }
+                else if (cd.template) {
+                    result = Rx.Observable.return(cd);
+                }
+                else if (cd.resolve) {
+                    var resolved = wx.injector.get(cd.resolve);
+                    result = Rx.Observable.return(resolved);
+                }
+                else if (cd.require) {
+                    result = wx.observableRequire(cd.require);
                 }
             }
-            var template = new Array();
-            state.cleanup.add(obs.subscribe(function (x) {
-                try {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-                    var value = wx.unwrapProperty(x);
-                    var moduleNames;
-                    var disp = undefined;
-                    if (value) {
-                        value = value.trim();
-                        moduleNames = value.split(" ").filter(function (x) { return x; });
+            else {
+                result = Rx.Observable.return(undefined);
+            }
+            return result.do(function (x) { return _this.components[name].instance = x; });
+        };
+        Module.prototype.initializeComponent = function (obs, params) {
+            var _this = this;
+            return obs.take(1).selectMany(function (component) {
+                if (component == null) {
+                    return Rx.Observable.return(undefined);
+                }
+                if (component.viewModel) {
+                    return Rx.Observable.combineLatest(_this.loadComponentTemplate(component.template, params), _this.loadComponentViewModel(component.viewModel, params), function (t, vm) {
+                        if (wx.isFunction(vm)) {
+                            vm = new vm(params);
+                        }
+                        return {
+                            template: t,
+                            viewModel: vm,
+                            preBindingInit: component.preBindingInit,
+                            postBindingInit: component.postBindingInit
+                        };
+                    });
+                }
+                return _this.loadComponentTemplate(component.template, params)
+                    .select(function (template) { return {
+                    template: template,
+                    preBindingInit: component.preBindingInit,
+                    postBindingInit: component.postBindingInit
+                }; });
+            })
+                .take(1);
+        };
+        Module.prototype.loadComponentTemplate = function (template, params) {
+            var syncResult;
+            var el;
+            if (wx.isFunction(template)) {
+                syncResult = template(params);
+                if (typeof syncResult === "string") {
+                    syncResult = wx.app.templateEngine.parse(template(params));
+                }
+                return Rx.Observable.return(syncResult);
+            }
+            else if (typeof template === "string") {
+                syncResult = wx.app.templateEngine.parse(template);
+                return Rx.Observable.return(syncResult);
+            }
+            else if (Array.isArray(template)) {
+                return Rx.Observable.return(template);
+            }
+            else if (typeof template === "object") {
+                var options = template;
+                if (options.resolve) {
+                    syncResult = wx.injector.get(options.resolve);
+                    return Rx.Observable.return(syncResult);
+                }
+                else if (options.promise) {
+                    var promise = options.promise;
+                    return Rx.Observable.fromPromise(promise);
+                }
+                else if (options.require) {
+                    return wx.observableRequire(options.require).select(function (x) { return wx.app.templateEngine.parse(x); });
+                }
+                else if (options.element) {
+                    if (typeof options.element === "string") {
+                        el = document.getElementById(options.element) ||
+                            document.querySelector(options.element);
+                        if (el != null) {
+                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
+                        }
+                        else {
+                            syncResult = [];
+                        }
+                        return Rx.Observable.return(syncResult);
                     }
-                    if (moduleNames.length > 0) {
-                        var observables = moduleNames.map(function (x) { return wx.loadModule(x); });
-                        disp = Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (modules) {
-                            var moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
-                            var merged = new internal.moduleConstructor(moduleName);
-                            merged.merge(module || wx.app);
-                            modules.forEach(function (x) { return merged.merge(x); });
-                            self.applyValue(el, merged, template, ctx, state, initialApply);
-                            initialApply = false;
-                        });
-                        if (disp != null)
-                            cleanup.add(disp);
+                    else {
+                        el = options.element;
+                        if (el != null) {
+                            syncResult = wx.app.templateEngine.parse(el.innerHTML);
+                        }
+                        else {
+                            syncResult = [];
+                        }
+                        return Rx.Observable.return(syncResult);
                     }
                 }
-                catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
+            }
+            internal.throwError("invalid template descriptor");
+        };
+        Module.prototype.loadComponentViewModel = function (vm, componentParams) {
+            var syncResult;
+            if (wx.isFunction(vm)) {
+                return Rx.Observable.return(vm);
+            }
+            else if (Array.isArray(vm)) {
+                syncResult = wx.injector.resolve(vm, componentParams);
+                return Rx.Observable.return(syncResult);
+            }
+            else if (typeof vm === "object") {
+                var options = vm;
+                if (options.resolve) {
+                    syncResult = wx.injector.get(options.resolve, componentParams);
+                    return Rx.Observable.return(syncResult);
                 }
-            }));
-            state.cleanup.add(Rx.Disposable.create(function () {
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-                obs = null;
-                self = null;
-            }));
-        };
-        ModuleBinding.prototype.configure = function (options) {
-        };
-        ModuleBinding.prototype.applyValue = function (el, module, template, ctx, state, initialApply) {
-            var i;
-            if (initialApply) {
-                for (i = 0; i < el.childNodes.length; i++) {
-                    template.push(el.childNodes[i].cloneNode(true));
+                else if (options.promise) {
+                    var promise = options.promise;
+                    return Rx.Observable.fromPromise(promise);
+                }
+                else if (options.require) {
+                    return wx.observableRequire(options.require);
+                }
+                else if (options.instance) {
+                    return Rx.Observable.return(options.instance);
                 }
             }
-            state.module = module;
-            this.domManager.cleanDescendants(el);
-            while (el.firstChild) {
-                el.removeChild(el.firstChild);
-            }
-            for (i = 0; i < template.length; i++) {
-                var node = template[i].cloneNode(true);
-                el.appendChild(node);
-            }
-            this.domManager.applyBindingsToDescendants(ctx, el);
+            internal.throwError("invalid view-model descriptor");
         };
-        return ModuleBinding;
+        return Module;
     })();
+    var App = (function (_super) {
+        __extends(App, _super);
+        function App() {
+            _super.call(this, "app");
+            this.defaultExceptionHandler = Rx.Observer.create(function (ex) {
+                if (!wx.isInUnitTest()) {
+                    wx.log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
+                }
+            });
+            this.title = wx.property();
+            if (!wx.isInUnitTest()) {
+                this.history = this.createHistory();
+            }
+            else {
+                this.history = createMockHistory();
+            }
+        }
+        Object.defineProperty(App.prototype, "mainThreadScheduler", {
+            get: function () {
+                return this._unitTestMainThreadScheduler || this._mainThreadScheduler
+                    || Rx.Scheduler.currentThread;
+            },
+            set: function (value) {
+                if (wx.isInUnitTest()) {
+                    this._unitTestMainThreadScheduler = value;
+                    this._mainThreadScheduler = this._mainThreadScheduler || value;
+                }
+                else {
+                    this._mainThreadScheduler = value;
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(App.prototype, "templateEngine", {
+            get: function () {
+                if (!this._templateEngine) {
+                    this._templateEngine = wx.injector.get(wx.res.htmlTemplateEngine);
+                }
+                return this._templateEngine;
+            },
+            set: function (newVal) {
+                this._templateEngine = newVal;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        App.prototype.createHistory = function () {
+            var result = {
+                back: window.history.back.bind(window.history),
+                forward: window.history.forward.bind(window.history),
+                pushState: window.history.pushState.bind(window.history),
+                replaceState: window.history.replaceState.bind(window.history)
+            };
+            Object.defineProperty(result, "length", {
+                get: function () {
+                    return window.history.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(result, "state", {
+                get: function () {
+                    return window.history.state;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(result, "location", {
+                get: function () {
+                    return window.location;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            result.onPopState = Rx.Observable.fromEventPattern(function (h) { return window.addEventListener("popstate", h); }, function (h) { return window.removeEventListener("popstate", h); })
+                .publish()
+                .refCount();
+            return result;
+        };
+        return App;
+    })(Module);
     var internal;
     (function (internal) {
-        internal.moduleBindingConstructor = ModuleBinding;
+        internal.moduleConstructor = Module;
     })(internal = wx.internal || (wx.internal = {}));
+    wx.app = new App();
+    var modules = {
+        'app': { instance: wx.app }
+    };
+    function module(name, descriptor) {
+        modules[name] = descriptor;
+        return wx;
+    }
+    wx.module = module;
+    function loadModule(name) {
+        var md = modules[name];
+        var result = undefined;
+        var module;
+        if (md != null) {
+            if (Array.isArray(md)) {
+                module = new Module(name);
+                wx.injector.resolve(md, module);
+                result = Rx.Observable.return(module);
+            }
+            else if (wx.isFunction(md)) {
+                module = new Module(name);
+                md(module);
+                result = Rx.Observable.return(module);
+            }
+            else {
+                var mdd = md;
+                if (mdd.instance) {
+                    result = Rx.Observable.return(mdd.instance);
+                }
+                else {
+                    module = new Module(name);
+                    if (mdd.resolve) {
+                        wx.injector.get(mdd.resolve, module);
+                        result = Rx.Observable.return(module);
+                    }
+                    else if (mdd.require) {
+                        result = wx.observableRequire(mdd.require)
+                            .do(function (x) { return x(module); })
+                            .select(function (x) { return module; });
+                    }
+                }
+            }
+        }
+        else {
+            result = Rx.Observable.return(undefined);
+        }
+        return result.take(1).do(function (x) { return modules[name] = { instance: x }; });
+    }
+    wx.loadModule = loadModule;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Core/Module.ts" />
+/// <reference path="../Bindings/Module.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -1855,6 +1944,9 @@ var wx;
         internal.componentBindingConstructor = ComponentBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -1931,6 +2023,7 @@ var wx;
         internal.eventBindingConstructor = EventBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 var wx;
 (function (wx) {
     var internal;
@@ -1950,16 +2043,15 @@ var wx;
             }
             VirtualChildNodes.prototype.appendChilds = function (nodes, callbackData) {
                 var length = nodes.length;
-                var i;
                 if (nodes.length > 1)
                     Array.prototype.push.apply(this.childNodes, nodes);
                 else
                     this.childNodes.push(nodes[0]);
-                for (i = 0; i < length; i++) {
+                for (var i = 0; i < length; i++) {
                     this.targetNode.appendChild(nodes[i]);
                 }
                 if (this.insertCB) {
-                    for (i = 0; i < length; i++) {
+                    for (var i = 0; i < length; i++) {
                         this.insertCB(nodes[i], callbackData);
                     }
                 }
@@ -1970,14 +2062,13 @@ var wx;
                 }
                 else {
                     var refNode = this.childNodes[index];
-                    var length = nodes.length;
-                    var i;
+                    var length_2 = nodes.length;
                     Array.prototype.splice.apply(this.childNodes, [index, 0].concat(nodes));
-                    for (i = 0; i < length; i++) {
+                    for (var i = 0; i < length_2; i++) {
                         this.targetNode.insertBefore(nodes[i], refNode);
                     }
                     if (this.insertCB) {
-                        for (i = 0; i < length; i++) {
+                        for (var i = 0; i < length_2; i++) {
                             this.insertCB(nodes[i], callbackData);
                         }
                     }
@@ -1990,8 +2081,8 @@ var wx;
                 var nodes = this.childNodes.slice(index, index + count);
                 this.childNodes.splice(index, count);
                 if (!keepDom) {
-                    var length = nodes.length;
-                    for (var i = 0; i < length; i++) {
+                    var length_3 = nodes.length;
+                    for (var i = 0; i < length_3; i++) {
                         node = nodes[i];
                         if (this.removeCB)
                             this.removeCB(node);
@@ -2016,6 +2107,7 @@ var wx;
         internal.VirtualChildNodes = VirtualChildNodes;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2042,6 +2134,11 @@ var wx;
     })();
     wx.RefCountDisposeWrapper = RefCountDisposeWrapper;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Core/VirtualChildNodes.ts" />
+/// <reference path="../Core/RefCountDisposeWrapper.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2142,7 +2239,8 @@ var wx;
                         obs.onNext(index);
                     });
                 });
-            }).toProperty(startIndex);
+            })
+                .toProperty(startIndex);
         };
         ForEachBinding.prototype.appendAllRows = function (proxy, list, ctx, template, hooks, animations, indexTrigger, isInitial) {
             var length = list.length();
@@ -2172,7 +2270,9 @@ var wx;
                     hooks.afterAdd(nodes, item, index);
             }
             if (enterAnimation) {
-                var disp = enterAnimation.run(nodes).continueWith(function () { return enterAnimation.complete(nodes); }).subscribe(function (x) {
+                var disp = enterAnimation.run(nodes)
+                    .continueWith(function () { return enterAnimation.complete(nodes); })
+                    .subscribe(function (x) {
                     if (disp != null)
                         disp.dispose();
                 });
@@ -2197,7 +2297,9 @@ var wx;
                     hooks.afterAdd(nodes, item, index);
             }
             if (enterAnimation) {
-                var disp = enterAnimation.run(nodes).continueWith(function () { return enterAnimation.complete(nodes); }).subscribe(function (x) {
+                var disp = enterAnimation.run(nodes)
+                    .continueWith(function () { return enterAnimation.complete(nodes); })
+                    .subscribe(function (x) {
                     if (disp != null)
                         disp.dispose();
                 });
@@ -2219,7 +2321,10 @@ var wx;
             else {
                 if (leaveAnimation != null) {
                     leaveAnimation.prepare(nodes);
-                    var disp = leaveAnimation.run(nodes).continueWith(function () { return leaveAnimation.complete(nodes); }).continueWith(removeNodes).subscribe(function (x) {
+                    var disp = leaveAnimation.run(nodes)
+                        .continueWith(function () { return leaveAnimation.complete(nodes); })
+                        .continueWith(removeNodes)
+                        .subscribe(function (x) {
                         if (disp != null)
                             disp.dispose();
                     });
@@ -2262,7 +2367,9 @@ var wx;
             }
             if (leaveAnimation) {
                 leaveAnimation.prepare(nodes);
-                obs = leaveAnimation.run(nodes).continueWith(function () { return leaveAnimation.complete(nodes); }).continueWith(removeNodes);
+                obs = leaveAnimation.run(nodes)
+                    .continueWith(function () { return leaveAnimation.complete(nodes); })
+                    .continueWith(removeNodes);
             }
             else {
                 obs = Rx.Observable.startDeferred(removeNodes);
@@ -2270,7 +2377,8 @@ var wx;
             combined.push(obs);
             obs = Rx.Observable.startDeferred(createRow);
             if (enterAnimation) {
-                obs = obs.continueWith(enterAnimation.run(nodes)).continueWith(function () { return enterAnimation.complete(nodes); });
+                obs = obs.continueWith(enterAnimation.run(nodes))
+                    .continueWith(function () { return enterAnimation.complete(nodes); });
             }
             combined.push(obs);
             if (combined.length > 1)
@@ -2308,21 +2416,21 @@ var wx;
             cleanup.add(list.itemsAdded.subscribe(function (e) {
                 length = e.items.length;
                 if (e.from === list.length()) {
-                    for (i = 0; i < length; i++) {
-                        _this.appendRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger, false);
+                    for (var i_1 = 0; i_1 < length; i_1++) {
+                        _this.appendRow(proxy, i_1 + e.from, e.items[i_1], ctx, template, hooks, animations, indexTrigger, false);
                     }
                 }
                 else {
-                    for (i = 0; i < e.items.length; i++) {
-                        _this.insertRow(proxy, i + e.from, e.items[i], ctx, template, hooks, animations, indexTrigger);
+                    for (var i_2 = 0; i_2 < e.items.length; i_2++) {
+                        _this.insertRow(proxy, i_2 + e.from, e.items[i_2], ctx, template, hooks, animations, indexTrigger);
                     }
                 }
                 indexTrigger.onNext(true);
             }));
             cleanup.add(list.itemsRemoved.subscribe(function (e) {
                 length = e.items.length;
-                for (i = 0; i < length; i++) {
-                    _this.removeRow(proxy, i + e.from, e.items[i], template, hooks, animations);
+                for (var i_3 = 0; i_3 < length; i_3++) {
+                    _this.removeRow(proxy, i_3 + e.from, e.items[i_3], template, hooks, animations);
                 }
                 indexTrigger.onNext(true);
             }));
@@ -2344,8 +2452,8 @@ var wx;
             var i, length;
             if (initialApply) {
                 length = el.childNodes.length;
-                for (i = 0; i < length; i++) {
-                    template.push(el.childNodes[i].cloneNode(true));
+                for (var i_4 = 0; i_4 < length; i_4++) {
+                    template.push(el.childNodes[i_4].cloneNode(true));
                 }
             }
             while (el.firstChild) {
@@ -2386,14 +2494,14 @@ var wx;
             if (Array.isArray(value)) {
                 var arr = value;
                 length = arr.length;
-                for (i = 0; i < length; i++) {
-                    this.appendRow(proxy, i, arr[i], ctx, template, hooks, animations, undefined, true);
+                for (var i_5 = 0; i_5 < length; i_5++) {
+                    this.appendRow(proxy, i_5, arr[i_5], ctx, template, hooks, animations, undefined, true);
                 }
             }
             else if (wx.isList(value)) {
-                var list = value;
+                var list_1 = value;
                 recalcIndextrigger = new Rx.Subject();
-                this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
+                this.observeList(proxy, ctx, template, cleanup, list_1, hooks, animations, recalcIndextrigger);
             }
         };
         return ForEachBinding;
@@ -2403,6 +2511,8 @@ var wx;
         internal.forEachBindingConstructor = ForEachBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2518,6 +2628,11 @@ var wx;
         internal.hasFocusBindingConstructor = HasFocusBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
+/// <reference path="../Core/Resources.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2594,11 +2709,10 @@ var wx;
         IfBinding.prototype.applyValue = function (el, value, template, ctx, animations, initialApply) {
             var leaveAnimation = animations.leave;
             var enterAnimation = animations.enter;
-            var i;
             var self = this;
             var obs = undefined;
             if (initialApply) {
-                for (i = 0; i < el.childNodes.length; i++) {
+                for (var i = 0; i < el.childNodes.length; i++) {
                     template.push(el.childNodes[i].cloneNode(true));
                 }
                 while (el.firstChild) {
@@ -2617,7 +2731,9 @@ var wx;
                 if (oldElements.length > 0) {
                     if (leaveAnimation) {
                         leaveAnimation.prepare(oldElements);
-                        obs = leaveAnimation.run(oldElements).continueWith(function () { return leaveAnimation.complete(oldElements); }).continueWith(removeOldElements);
+                        obs = leaveAnimation.run(oldElements)
+                            .continueWith(function () { return leaveAnimation.complete(oldElements); })
+                            .continueWith(removeOldElements);
                     }
                     else {
                         removeOldElements();
@@ -2628,12 +2744,13 @@ var wx;
                 var nodes = template.map(function (x) { return x.cloneNode(true); });
                 if (enterAnimation)
                     enterAnimation.prepare(nodes);
-                for (i = 0; i < template.length; i++) {
+                for (var i = 0; i < template.length; i++) {
                     el.appendChild(nodes[i]);
                 }
                 this.domManager.applyBindingsToDescendants(ctx, el);
                 if (enterAnimation) {
-                    obs = enterAnimation.run(nodes).continueWith(function () { return enterAnimation.complete(nodes); });
+                    obs = enterAnimation.run(nodes)
+                        .continueWith(function () { return enterAnimation.complete(nodes); });
                 }
             }
             return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
@@ -2654,6 +2771,9 @@ var wx;
         internal.notifBindingConstructor = NotIfBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2687,7 +2807,10 @@ var wx;
                 internal.throwError("invalid binding-options!");
             var el = node;
             var tokens = this.domManager.getObjectLiteralTokens(options);
-            var obs = Rx.Observable.fromEvent(el, "keydown").where(function (x) { return !x.repeat; }).publish().refCount();
+            var obs = Rx.Observable.fromEvent(el, "keydown")
+                .where(function (x) { return !x.repeat; })
+                .publish()
+                .refCount();
             tokens.forEach(function (token) {
                 var keyDesc = token.key;
                 var combination, combinations = [];
@@ -2726,7 +2849,11 @@ var wx;
             if ((!shiftPressed || shiftRequired) && keyCode >= 65 && keyCode <= 90)
                 keyCode = keyCode + 32;
             var mainKeyPressed = combination.keys[keysByCode[keyCode]] || combination.keys[keyCode.toString()] || combination.keys[String.fromCharCode(keyCode)];
-            return (mainKeyPressed && (metaRequired === metaPressed) && (altRequired === altPressed) && (ctrlRequired === ctrlPressed) && (shiftRequired === shiftPressed));
+            return (mainKeyPressed &&
+                (metaRequired === metaPressed) &&
+                (altRequired === altPressed) &&
+                (ctrlRequired === ctrlPressed) &&
+                (shiftRequired === shiftPressed));
         };
         KeyPressBinding.prototype.testCombinations = function (combinations, event) {
             for (var i = 0; i < combinations.length; i++) {
@@ -2778,6 +2905,10 @@ var wx;
         internal.keyPressBindingConstructor = KeyPressBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2800,7 +2931,6 @@ var wx;
             var obs;
             var exp;
             var keys = Object.keys(compiled);
-            var i;
             var key;
             if (typeof compiled === "function") {
                 exp = compiled;
@@ -2808,7 +2938,7 @@ var wx;
                 observables.push(["", obs]);
             }
             else {
-                for (i = 0; i < keys.length; i++) {
+                for (var i = 0; i < keys.length; i++) {
                     key = keys[i];
                     var value = compiled[key];
                     exp = value;
@@ -2816,7 +2946,7 @@ var wx;
                     observables.push([key, obs]);
                 }
             }
-            for (i = 0; i < observables.length; i++) {
+            for (var i = 0; i < observables.length; i++) {
                 key = observables[i][0];
                 obs = observables[i][1];
                 this.subscribe(el, obs, key, state);
@@ -2915,6 +3045,8 @@ var wx;
         internal.styleBindingConstructor = StyleBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -2924,7 +3056,9 @@ var wx;
             this.domManager = domManager;
         }
         RadioSingleSelectionImpl.prototype.supports = function (el, model) {
-            return (el.tagName.toLowerCase() === 'input' && el.getAttribute("type") === 'radio') && !wx.isList(model);
+            return (el.tagName.toLowerCase() === 'input' &&
+                el.getAttribute("type") === 'radio') &&
+                !wx.isList(model);
         };
         RadioSingleSelectionImpl.prototype.observeElement = function (el) {
             return Rx.Observable.merge(Rx.Observable.fromEvent(el, 'click'), Rx.Observable.fromEvent(el, 'change'));
@@ -2953,7 +3087,8 @@ var wx;
             this.domManager = domManager;
         }
         OptionSingleSelectionImpl.prototype.supports = function (el, model) {
-            return el.tagName.toLowerCase() === 'select' && !wx.isList(model);
+            return el.tagName.toLowerCase() === 'select' &&
+                !wx.isList(model);
         };
         OptionSingleSelectionImpl.prototype.observeElement = function (el) {
             return Rx.Observable.fromEvent(el, 'change');
@@ -2984,7 +3119,9 @@ var wx;
         };
         OptionSingleSelectionImpl.prototype.updateModel = function (el, model, e) {
             var select = el;
-            var value = select.selectedIndex !== -1 ? internal.getNodeValue(select.options[select.selectedIndex], this.domManager) : undefined;
+            var value = select.selectedIndex !== -1 ?
+                internal.getNodeValue(select.options[select.selectedIndex], this.domManager) :
+                undefined;
             model(value);
         };
         return OptionSingleSelectionImpl;
@@ -3066,6 +3203,10 @@ var wx;
         internal.selectedValueBindingConstructor = SelectedValueBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -3178,7 +3319,9 @@ var wx;
         }
         DisableBinding.prototype.applyValue = function (el, value) {
             value = this.inverse ? !value : value;
-            el.disabled = value;
+            if (wx.elementCanBeDisabled(el)) {
+                el.disabled = value;
+            }
         };
         return DisableBinding;
     })(SingleOneWayChangeBindingBase);
@@ -3200,6 +3343,9 @@ var wx;
         internal.enableBindingConstructor = EnableBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Core/Environment.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -3314,6 +3460,8 @@ var wx;
         internal.textInputBindingConstructor = TextInputBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/DomManager.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -3430,6 +3578,11 @@ var wx;
         internal.valueBindingConstructor = ValueBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Interfaces.ts" />
+/// <reference path="../Core/Resources.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -3503,6 +3656,8 @@ var wx;
     })();
     wx.Lazy = Lazy;
 })(wx || (wx = {}));
+/// <reference path="../Interfaces.ts" />
+/// <reference path="Utils.ts" />
 var wx;
 (function (wx) {
     var internal;
@@ -3516,7 +3671,9 @@ var wx;
                 this._defaultObserver = defaultObserver;
                 this._subject = defaultSubject || new Rx.Subject();
                 if (defaultObserver != null) {
-                    this._defaultObserverSub = this._subject.observeOn(this._scheduler).subscribe(this._defaultObserver);
+                    this._defaultObserverSub = this._subject
+                        .observeOn(this._scheduler)
+                        .subscribe(this._defaultObserver);
                 }
             }
             ScheduledSubject.prototype.dispose = function () {
@@ -3554,13 +3711,18 @@ var wx;
         internal.createScheduledSubject = createScheduledSubject;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts" />
+/// <reference path="Core/ScheduledSubject.ts" />
+/// <reference path="Core/Module.ts" />
+/// <reference path="IID.ts" />
 var wx;
 (function (wx) {
     "use strict";
     var RxObsConstructor = Rx.Observable;
-    RxObsConstructor.prototype.toProperty = function (initialValue, scheduler) {
+    function toProperty(initialValue, scheduler) {
         scheduler = scheduler || Rx.Scheduler.currentThread;
-        var accessor = function (newVal) {
+        var accessor = function propertyAccessor(newVal) {
             if (arguments.length > 0) {
                 wx.internal.throwError("attempt to write to a read-only observable property");
             }
@@ -3569,11 +3731,8 @@ var wx;
             }
             return accessor.value;
         };
-        accessor.queryInterface = function (iid) {
-            if (iid === wx.IID.IUnknown || iid === wx.IID.IObservableProperty || iid === wx.IID.IDisposable)
-                return true;
-            return false;
-        };
+        wx.Implements(wx.IID.IObservableProperty)(accessor);
+        wx.Implements(wx.IID.IDisposable)(accessor);
         accessor.dispose = function () {
             if (accessor.sub) {
                 accessor.sub.dispose();
@@ -3582,13 +3741,19 @@ var wx;
         };
         accessor.value = initialValue;
         accessor.changedSubject = new Rx.Subject();
-        accessor.changed = accessor.changedSubject.publish().refCount();
+        accessor.changed = accessor.changedSubject
+            .publish()
+            .refCount();
         accessor.changingSubject = new Rx.Subject();
-        accessor.changing = accessor.changingSubject.publish().refCount();
+        accessor.changing = accessor.changingSubject
+            .publish()
+            .refCount();
         accessor.source = this;
         accessor.thrownExceptions = wx.internal.createScheduledSubject(scheduler, wx.app.defaultExceptionHandler);
         var firedInitial = false;
-        accessor.sub = this.distinctUntilChanged().subscribe(function (x) {
+        accessor.sub = this
+            .distinctUntilChanged()
+            .subscribe(function (x) {
             if (firedInitial && x === accessor.value) {
                 return;
             }
@@ -3598,7 +3763,8 @@ var wx;
             accessor.changedSubject.onNext(x);
         }, function (x) { return accessor.thrownExceptions.onNext(x); });
         return accessor;
-    };
+    }
+    RxObsConstructor.prototype.toProperty = toProperty;
     RxObsConstructor.prototype.continueWith = function () {
         var args = wx.args2Array(arguments);
         var val = args.shift();
@@ -3625,10 +3791,12 @@ var wx;
         });
     };
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="Utils.ts" />
 var wx;
 (function (wx) {
     var log;
-    (function (_log) {
+    (function (log_1) {
         "use strict";
         function log() {
             var args = [];
@@ -3657,7 +3825,7 @@ var wx;
             }
             log("**** WebRx Critical: " + fmt);
         }
-        _log.critical = critical;
+        log_1.critical = critical;
         function error(fmt) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
@@ -3668,7 +3836,7 @@ var wx;
             }
             log("*** WebRx Error: " + fmt);
         }
-        _log.error = error;
+        log_1.error = error;
         function info(fmt) {
             var args = [];
             for (var _i = 1; _i < arguments.length; _i++) {
@@ -3679,9 +3847,25 @@ var wx;
             }
             log("* WebRx Info: " + fmt);
         }
-        _log.info = info;
+        log_1.info = info;
     })(log = wx.log || (wx.log = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../IID.ts" />
+/// <reference path="../Core/Lazy.ts" />
+/// <reference path="../Core/RefCountDisposeWrapper.ts" />
+/// <reference path="../RxJsExtensions.ts" />
+/// <reference path="../core/Log.ts" />
+/// <reference path="../core/Module.ts" />
+if (typeof __decorate !== "function") __decorate = function (decorators, target, key, desc) {
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
+    switch (arguments.length) {
+        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
+        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
+        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
+    }
+};
 var wx;
 (function (wx) {
     "use strict";
@@ -3697,11 +3881,6 @@ var wx;
             this.hasWhinedAboutNoResetSub = false;
             this.setupRx(initialContents, resetChangeThreshold, scheduler);
         }
-        ObservableList.prototype.queryInterface = function (iid) {
-            if (iid === wx.IID.IUnknown || iid === wx.IID.IDisposable || iid === wx.IID.IObservableList || iid === wx.IID.IReadOnlyList || iid === wx.IID.IList)
-                return true;
-            return false;
-        };
         ObservableList.prototype.dispose = function () {
             this.clearAllPropertyChangeWatchers();
         };
@@ -3788,7 +3967,9 @@ var wx;
             get: function () {
                 var _this = this;
                 if (!this._lengthChanging)
-                    this._lengthChanging = this.listChanging.select(function (_) { return _this.inner.length; }).distinctUntilChanged();
+                    this._lengthChanging = this.listChanging.select(function (_) {
+                        return _this.inner.length;
+                    }).distinctUntilChanged();
                 return this._lengthChanging;
             },
             enumerable: true,
@@ -3798,7 +3979,9 @@ var wx;
             get: function () {
                 var _this = this;
                 if (!this._lengthChanged)
-                    this._lengthChanged = this.listChanged.select(function (_) { return _this.inner.length; }).distinctUntilChanged();
+                    this._lengthChanged = this.listChanged.select(function (_) {
+                        return _this.inner.length;
+                    }).distinctUntilChanged();
                 return this._lengthChanged;
             },
             enumerable: true,
@@ -3825,7 +4008,8 @@ var wx;
         Object.defineProperty(ObservableList.prototype, "shouldReset", {
             get: function () {
                 var _this = this;
-                return this.refcountSubscribers(this.listChanged.selectMany(function (x) { return !x ? Rx.Observable.empty() : Rx.Observable.return(null); }), function (x) { return _this.resetSubCount += x; });
+                return this.refcountSubscribers(this.listChanged.selectMany(function (x) { return !x ? Rx.Observable.empty() :
+                    Rx.Observable.return(null); }), function (x) { return _this.resetSubCount += x; });
             },
             enumerable: true,
             configurable: true
@@ -3924,7 +4108,8 @@ var wx;
             if (items == null) {
                 internal.throwError("items");
             }
-            var disp = this.isLengthAboveResetThreshold(items.length) ? this.suppressChangeNotifications() : Rx.Disposable.empty;
+            var disp = this.isLengthAboveResetThreshold(items.length) ?
+                this.suppressChangeNotifications() : Rx.Disposable.empty;
             wx.using(disp, function () {
                 items.forEach(function (x) { return _this.remove(x); });
             });
@@ -4084,17 +4269,27 @@ var wx;
             this.itemReplacedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
             this.resetSubject = new Rx.Subject();
             this.beforeResetSubject = new Rx.Subject();
-            this.itemChangingSubject = new wx.Lazy(function () { return internal.createScheduledSubject(scheduler); });
-            this.itemChangedSubject = new wx.Lazy(function () { return internal.createScheduledSubject(scheduler); });
+            this.itemChangingSubject = new wx.Lazy(function () {
+                return internal.createScheduledSubject(scheduler);
+            });
+            this.itemChangedSubject = new wx.Lazy(function () {
+                return internal.createScheduledSubject(scheduler);
+            });
             this.beforeItemsMovedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
             this.itemsMovedSubject = new wx.Lazy(function () { return new Rx.Subject(); });
-            this.listChanged = Rx.Observable.merge(this.itemsAdded.select(function (x) { return false; }), this.itemsRemoved.select(function (x) { return false; }), this.itemReplaced.select(function (x) { return false; }), this.itemsMoved.select(function (x) { return false; }), this.resetSubject.select(function (x) { return true; })).publish().refCount();
-            this.listChanging = Rx.Observable.merge(this.beforeItemsAdded.select(function (x) { return false; }), this.beforeItemsRemoved.select(function (x) { return false; }), this.beforeItemReplaced.select(function (x) { return false; }), this.beforeItemsMoved.select(function (x) { return false; }), this.beforeResetSubject.select(function (x) { return true; })).publish().refCount();
+            this.listChanged = Rx.Observable.merge(this.itemsAdded.select(function (x) { return false; }), this.itemsRemoved.select(function (x) { return false; }), this.itemReplaced.select(function (x) { return false; }), this.itemsMoved.select(function (x) { return false; }), this.resetSubject.select(function (x) { return true; }))
+                .publish()
+                .refCount();
+            this.listChanging = Rx.Observable.merge(this.beforeItemsAdded.select(function (x) { return false; }), this.beforeItemsRemoved.select(function (x) { return false; }), this.beforeItemReplaced.select(function (x) { return false; }), this.beforeItemsMoved.select(function (x) { return false; }), this.beforeResetSubject.select(function (x) { return true; }))
+                .publish()
+                .refCount();
             if (initialContents) {
                 Array.prototype.splice.apply(this.inner, [0, 0].concat(initialContents));
             }
             this.length = this.lengthChanged.toProperty(this.inner.length);
-            this.isEmpty = this.lengthChanged.select(function (x) { return (x === 0); }).toProperty(this.inner.length === 0);
+            this.isEmpty = this.lengthChanged
+                .select(function (x) { return (x === 0); })
+                .toProperty(this.inner.length === 0);
         };
         ObservableList.prototype.areChangeNotificationsEnabled = function () {
             return this.changeNotificationsSuppressed === 0;
@@ -4165,8 +4360,10 @@ var wx;
                 rcd.addRef();
                 return;
             }
-            var changing = wx.observeObject(toTrack, true).select(function (i) { return new internal.PropertyChangedEventArgs(toTrack, i.propertyName); });
-            var changed = wx.observeObject(toTrack, false).select(function (i) { return new internal.PropertyChangedEventArgs(toTrack, i.propertyName); });
+            var changing = wx.observeObject(toTrack, true)
+                .select(function (i) { return new internal.PropertyChangedEventArgs(toTrack, i.propertyName); });
+            var changed = wx.observeObject(toTrack, false)
+                .select(function (i) { return new internal.PropertyChangedEventArgs(toTrack, i.propertyName); });
             var disp = new Rx.CompositeDisposable(changing.where(function (_) { return self.areChangeNotificationsEnabled(); }).subscribe(function (x) { return self.itemChangingSubject.value.onNext(x); }), changed.where(function (_) { return self.areChangeNotificationsEnabled(); }).subscribe(function (x) { return self.itemChangedSubject.value.onNext(x); }));
             this.propertyChangeWatchers[wx.getOid(toTrack)] = new wx.RefCountDisposeWrapper(Rx.Disposable.create(function () {
                 disp.dispose();
@@ -4203,6 +4400,10 @@ var wx;
         ObservableList.prototype.isLengthAboveResetThreshold = function (toChangeLength) {
             return toChangeLength / this.inner.length > this.resetChangeThreshold && toChangeLength > 10;
         };
+        ObservableList = __decorate([
+            wx.Implements(wx.IID.IObservableList),
+            wx.Implements(wx.IID.IDisposable)
+        ], ObservableList);
         return ObservableList;
     })();
     var ObservableListProjection = (function (_super) {
@@ -4493,12 +4694,17 @@ var wx;
             _super.prototype.removeAt.call(this, destinationIndex);
         };
         ObservableListProjection.prototype.positionForNewItem = function (sourceIndex, value) {
-            return this.orderer == null ? ObservableListProjection.positionForNewItemArray(this.indexToSourceIndexMap, sourceIndex, ObservableListProjection.defaultOrderer) : ObservableListProjection.positionForNewItemArray2(this.inner, 0, this.inner.length, value, this.orderer);
+            return this.orderer == null
+                ? ObservableListProjection.positionForNewItemArray(this.indexToSourceIndexMap, sourceIndex, ObservableListProjection.defaultOrderer)
+                : ObservableListProjection.positionForNewItemArray2(this.inner, 0, this.inner.length, value, this.orderer);
         };
         ObservableListProjection.positionForNewItemArray = function (array, item, orderer) {
             return ObservableListProjection.positionForNewItemArray2(array, 0, array.length, item, orderer);
         };
         ObservableListProjection.positionForNewItemArray2 = function (array, index, count, item, orderer) {
+            // Debug.Assert(index >= 0);
+            // Debug.Assert(count >= 0);
+            // Debug.Assert((list.length - index) >= count);
             if (count === 0) {
                 return index;
             }
@@ -4525,9 +4731,15 @@ var wx;
             return low;
         };
         ObservableListProjection.prototype.newPositionForExistingItem = function (sourceIndex, currentIndex, item) {
-            return this.orderer == null ? ObservableListProjection.newPositionForExistingItem2(this.indexToSourceIndexMap, sourceIndex, currentIndex) : ObservableListProjection.newPositionForExistingItem2(this.inner, item, currentIndex, this.orderer);
+            return this.orderer == null
+                ? ObservableListProjection.newPositionForExistingItem2(this.indexToSourceIndexMap, sourceIndex, currentIndex)
+                : ObservableListProjection.newPositionForExistingItem2(this.inner, item, currentIndex, this.orderer);
         };
         ObservableListProjection.newPositionForExistingItem2 = function (array, item, currentIndex, orderer) {
+            // Since the item changed is most likely a value type we must refrain from ever comparing it to itself.
+            // We do this by figuring out how the updated item compares to its neighbors. By knowing if it's
+            // less than or greater than either one of its neighbors we can limit the search range to a range exlusive
+            // of the current index.
             if (array.length === 1) {
                 return 0;
             }
@@ -4580,6 +4792,10 @@ var wx;
     }
     wx.list = list;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Collections/List.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -4593,7 +4809,9 @@ var wx;
             };
             this.viewModel = function (params) {
                 var opt = params;
-                var groupName = opt.groupName != null ? opt.groupName : wx.formatString("wx-radiogroup-{0}", groupId++);
+                var groupName = opt.groupName != null ?
+                    opt.groupName :
+                    wx.formatString("wx-radiogroup-{0}", groupId++);
                 return {
                     items: params.items,
                     selectedValue: params.selectedValue,
@@ -4608,7 +4826,10 @@ var wx;
             var key = undefined;
             var nodes;
             if (!params.noCache) {
-                key = (params.itemText != null ? params.itemText : "") + "-" + (params.itemValue != null ? params.itemValue : "") + "-" + (params.itemClass != null ? params.itemClass : "") + "-" + (params.selectedValue != null ? "true" : "false");
+                key = (params.itemText != null ? params.itemText : "") + "-" +
+                    (params.itemValue != null ? params.itemValue : "") + "-" +
+                    (params.itemClass != null ? params.itemClass : "") + "-" +
+                    (params.selectedValue != null ? "true" : "false");
                 nodes = templateCache[key];
                 if (nodes != null) {
                     return nodes;
@@ -4653,6 +4874,10 @@ var wx;
         internal.radioGroupComponentConstructor = RadioGroupComponent;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Core/DomManager.ts" />
+/// <reference path="../Collections/List.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -4678,7 +4903,15 @@ var wx;
             var key = undefined;
             var nodes;
             if (!params.noCache) {
-                key = (params.name != null ? params.name : "") + "-" + (params.itemText != null ? params.itemText : "") + "-" + (params.itemValue != null ? params.itemValue : "") + "-" + (params.itemClass != null ? params.itemClass : "") + "-" + (params.selectedValue != null ? "true" : "false") + "-" + (params.multiple ? "true" : "false") + "-" + (params.required ? "true" : "false") + "-" + (params.autofocus ? "true" : "false") + "-" + (params.size ? params.size.toString() : "0");
+                key = (params.name != null ? params.name : "") + "-" +
+                    (params.itemText != null ? params.itemText : "") + "-" +
+                    (params.itemValue != null ? params.itemValue : "") + "-" +
+                    (params.itemClass != null ? params.itemClass : "") + "-" +
+                    (params.selectedValue != null ? "true" : "false") + "-" +
+                    (params.multiple ? "true" : "false") + "-" +
+                    (params.required ? "true" : "false") + "-" +
+                    (params.autofocus ? "true" : "false") + "-" +
+                    (params.size ? params.size.toString() : "0");
                 nodes = templateCache[key];
                 if (nodes != null) {
                     return nodes;
@@ -4732,6 +4965,11 @@ var wx;
         internal.selectComponentConstructor = SelectComponent;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="Utils.ts" />
+/// <reference path="Injector.ts" />
+/// <reference path="Resources.ts" />
+/// <reference path="Property.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -4911,6 +5149,11 @@ var wx;
     }
     wx.animation = animation;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../IID.ts" />
+/// <reference path="Utils.ts" />
+/// <reference path="../Core/Module.ts" />
+/// <reference path="../Core/Lazy.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -4924,24 +5167,25 @@ var wx;
             this.canExecuteDisp = null;
             this.scheduler = scheduler || wx.app.mainThreadScheduler;
             this.func = executeAsync;
-            this.canExecuteObs = canExecute.combineLatest(this.isExecutingSubject.startWith(false), function (ce, ie) { return ce && !ie; }).catch(function (ex) {
+            this.canExecuteObs = canExecute
+                .combineLatest(this.isExecutingSubject.startWith(false), function (ce, ie) { return ce && !ie; })
+                .catch(function (ex) {
                 _this.exceptionsSubject.onNext(ex);
                 return Rx.Observable.return(false);
-            }).do(function (x) {
+            })
+                .do(function (x) {
                 _this.canExecuteLatest = x;
-            }).publish();
+            })
+                .publish();
             if (wx.isInUnitTest()) {
                 this.canExecuteObs.connect();
             }
             this.exceptionsSubject = new Rx.Subject();
             this.thrownExceptions = this.exceptionsSubject.asObservable();
-            this.exceptionsSubject.observeOn(this.scheduler).subscribe(wx.app.defaultExceptionHandler);
+            this.exceptionsSubject
+                .observeOn(this.scheduler)
+                .subscribe(wx.app.defaultExceptionHandler);
         }
-        Command.prototype.queryInterface = function (iid) {
-            if (iid === wx.IID.IUnknown || iid === wx.IID.ICommand || iid === wx.IID.IHandleObservableErrors || iid === wx.IID.IDisposable)
-                return true;
-            return false;
-        };
         Command.prototype.dispose = function () {
             var disp = this.canExecuteDisp;
             if (disp != null)
@@ -4982,7 +5226,9 @@ var wx;
             return this.canExecuteLatest;
         };
         Command.prototype.execute = function (parameter) {
-            this.executeAsync(parameter).catch(Rx.Observable.empty()).subscribe();
+            this.executeAsync(parameter)
+                .catch(Rx.Observable.empty())
+                .subscribe();
         };
         Command.prototype.executeAsync = function (parameter) {
             var self = this;
@@ -4996,12 +5242,21 @@ var wx;
                         self.isExecutingSubject.onNext(false);
                     }
                 }));
-                var disp = self.func(parameter).observeOn(self.scheduler).do(function (_) {
-                }, function (e) { return decrement.setDisposable(Rx.Disposable.empty); }, function () { return decrement.setDisposable(Rx.Disposable.empty); }).do(function (x) { return self.resultsSubject.onNext(x); }, function (x) { return self.exceptionsSubject.onNext(x); }).subscribe(subj);
+                var disp = self.func(parameter)
+                    .observeOn(self.scheduler)
+                    .do(function (_) { }, function (e) { return decrement.setDisposable(Rx.Disposable.empty); }, function () { return decrement.setDisposable(Rx.Disposable.empty); })
+                    .do(function (x) { return self.resultsSubject.onNext(x); }, function (x) { return self.exceptionsSubject.onNext(x); })
+                    .subscribe(subj);
                 return new Rx.CompositeDisposable(disp, decrement);
             });
-            return ret.publish().refCount();
+            return ret
+                .publish()
+                .refCount();
         };
+        Command = __decorate([
+            wx.Implements(wx.IID.ICommand),
+            wx.Implements(wx.IID.IDisposable)
+        ], Command);
         return Command;
     })();
     var internal;
@@ -5021,17 +5276,19 @@ var wx;
             thisArg = args.shift();
             if (thisArg != null)
                 execute = execute.bind(thisArg);
-            return asyncCommand(canExecute, function (parameter) { return Rx.Observable.create(function (obs) {
-                try {
-                    execute(parameter);
-                    obs.onNext(null);
-                    obs.onCompleted();
-                }
-                catch (e) {
-                    obs.onError(e);
-                }
-                return Rx.Disposable.empty;
-            }); }, scheduler);
+            return asyncCommand(canExecute, function (parameter) {
+                return Rx.Observable.create(function (obs) {
+                    try {
+                        execute(parameter);
+                        obs.onNext(null);
+                        obs.onCompleted();
+                    }
+                    catch (e) {
+                        obs.onError(e);
+                    }
+                    return Rx.Disposable.empty;
+                });
+            }, scheduler);
         }
         canExecute = args.shift() || Rx.Observable.return(true);
         scheduler = wx.isRxScheduler(args[0]) ? args.shift() : undefined;
@@ -5060,8 +5317,11 @@ var wx;
     wx.asyncCommand = asyncCommand;
     function combinedCommand() {
         var args = wx.args2Array(arguments);
-        var commands = args.filter(function (x) { return wx.isCommand(x); });
-        var canExecute = args.filter(function (x) { return wx.isRxObservable(x); }).pop();
+        var commands = args
+            .filter(function (x) { return wx.isCommand(x); });
+        var canExecute = args
+            .filter(function (x) { return wx.isRxObservable(x); })
+            .pop();
         if (!canExecute)
             canExecute = Rx.Observable.return(true);
         var childrenCanExecute = Rx.Observable.combineLatest(commands.map(function (x) { return x.canExecuteObservable; }), function () {
@@ -5080,6 +5340,10 @@ var wx;
     }
     wx.combinedCommand = combinedCommand;
 })(wx || (wx = {}));
+/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Interfaces.ts" />
+/// <reference path="../Core/Injector.ts" />
+/// <reference path="../Core/Resources.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -5101,7 +5365,7 @@ var wx;
             var result = new Array(), toks = str.match(bindingToken), key, values, depth = 0;
             if (toks) {
                 toks.push(',');
-                for (var i = 0, tok; tok = toks[i]; ++i) {
+                for (var i = 0, tok = void 0; tok = toks[i]; ++i) {
                     var c = tok.charCodeAt(0);
                     if (c === 44) {
                         if (depth <= 0) {
@@ -5145,8 +5409,7 @@ var wx;
         }
         compiler.parseObjectLiteral = parseObjectLiteral;
         var hookField = "___runtimeHooks";
-        function noop() {
-        }
+        function noop() { }
         function extend(dst, obj) {
             var key;
             for (key in obj) {
@@ -5156,9 +5419,7 @@ var wx;
             }
             return dst;
         }
-        function isDefined(value) {
-            return typeof value !== "undefined";
-        }
+        function isDefined(value) { return typeof value !== "undefined"; }
         function $parseMinErr(module, message, arg1, arg2, arg3, arg4, arg5) {
             var args = arguments;
             message = message.replace(/{(\d)}/g, function (match) {
@@ -5166,9 +5427,7 @@ var wx;
             });
             throw new SyntaxError(message);
         }
-        function lowercase(string) {
-            return typeof string === "string" ? string.toLowerCase() : string;
-        }
+        function lowercase(string) { return typeof string === "string" ? string.toLowerCase() : string; }
         function ensureSafeMemberName(name, fullExpression) {
             if (name === "constructor") {
                 throw $parseMinErr("isecfld", "Referencing \"constructor\" field in WebRx expressions is disallowed! Expression: {0}", fullExpression);
@@ -5190,15 +5449,9 @@ var wx;
             return obj;
         }
         var OPERATORS = {
-            'null': function () {
-                return null;
-            },
-            'true': function () {
-                return true;
-            },
-            'false': function () {
-                return false;
-            },
+            'null': function () { return null; },
+            'true': function () { return true; },
+            'false': function () { return false; },
             undefined: noop,
             '+': function (self, locals, a, b) {
                 a = a(self, locals);
@@ -5216,58 +5469,24 @@ var wx;
                 b = b(self, locals);
                 return (isDefined(a) ? a : 0) - (isDefined(b) ? b : 0);
             },
-            '*': function (self, locals, a, b) {
-                return a(self, locals) * b(self, locals);
-            },
-            '/': function (self, locals, a, b) {
-                return a(self, locals) / b(self, locals);
-            },
-            '%': function (self, locals, a, b) {
-                return a(self, locals) % b(self, locals);
-            },
-            '^': function (self, locals, a, b) {
-                return a(self, locals) ^ b(self, locals);
-            },
+            '*': function (self, locals, a, b) { return a(self, locals) * b(self, locals); },
+            '/': function (self, locals, a, b) { return a(self, locals) / b(self, locals); },
+            '%': function (self, locals, a, b) { return a(self, locals) % b(self, locals); },
+            '^': function (self, locals, a, b) { return a(self, locals) ^ b(self, locals); },
             '=': noop,
-            '===': function (self, locals, a, b) {
-                return a(self, locals) === b(self, locals);
-            },
-            '!==': function (self, locals, a, b) {
-                return a(self, locals) !== b(self, locals);
-            },
-            '==': function (self, locals, a, b) {
-                return a(self, locals) === b(self, locals);
-            },
-            '!=': function (self, locals, a, b) {
-                return a(self, locals) !== b(self, locals);
-            },
-            '<': function (self, locals, a, b) {
-                return a(self, locals) < b(self, locals);
-            },
-            '>': function (self, locals, a, b) {
-                return a(self, locals) > b(self, locals);
-            },
-            '<=': function (self, locals, a, b) {
-                return a(self, locals) <= b(self, locals);
-            },
-            '>=': function (self, locals, a, b) {
-                return a(self, locals) >= b(self, locals);
-            },
-            '&&': function (self, locals, a, b) {
-                return a(self, locals) && b(self, locals);
-            },
-            '||': function (self, locals, a, b) {
-                return a(self, locals) || b(self, locals);
-            },
-            '&': function (self, locals, a, b) {
-                return a(self, locals) & b(self, locals);
-            },
-            '|': function (self, locals, a, b) {
-                return b(self, locals)(self, locals, a(self, locals));
-            },
-            '!': function (self, locals, a) {
-                return !a(self, locals);
-            }
+            '===': function (self, locals, a, b) { return a(self, locals) === b(self, locals); },
+            '!==': function (self, locals, a, b) { return a(self, locals) !== b(self, locals); },
+            '==': function (self, locals, a, b) { return a(self, locals) === b(self, locals); },
+            '!=': function (self, locals, a, b) { return a(self, locals) !== b(self, locals); },
+            '<': function (self, locals, a, b) { return a(self, locals) < b(self, locals); },
+            '>': function (self, locals, a, b) { return a(self, locals) > b(self, locals); },
+            '<=': function (self, locals, a, b) { return a(self, locals) <= b(self, locals); },
+            '>=': function (self, locals, a, b) { return a(self, locals) >= b(self, locals); },
+            '&&': function (self, locals, a, b) { return a(self, locals) && b(self, locals); },
+            '||': function (self, locals, a, b) { return a(self, locals) || b(self, locals); },
+            '&': function (self, locals, a, b) { return a(self, locals) & b(self, locals); },
+            '|': function (self, locals, a, b) { return b(self, locals)(self, locals, a(self, locals)); },
+            '!': function (self, locals, a) { return !a(self, locals); }
         };
         var ESCAPE = { "n": "\n", "f": "\f", "r": "\r", "t": "\t", "v": "\v", "'": "'", '"': "\"" };
         var Lexer = (function () {
@@ -5292,7 +5511,8 @@ var wx;
                     }
                     else if (this.isIdent(this.ch)) {
                         this.readIdent();
-                        if (this.was("{,") && json[0] === "{" && (token = this.tokens[this.tokens.length - 1])) {
+                        if (this.was("{,") && json[0] === "{" &&
+                            (token = this.tokens[this.tokens.length - 1])) {
                             token.json = token.text.indexOf(".") === -1;
                         }
                     }
@@ -5357,17 +5577,22 @@ var wx;
                 return ("0" <= ch && ch <= "9");
             };
             Lexer.prototype.isWhitespace = function (ch) {
-                return (ch === " " || ch === "\r" || ch === "\t" || ch === "\n" || ch === "\v" || ch === "\u00A0");
+                return (ch === " " || ch === "\r" || ch === "\t" ||
+                    ch === "\n" || ch === "\v" || ch === "\u00A0");
             };
             Lexer.prototype.isIdent = function (ch) {
-                return ("a" <= ch && ch <= "z" || "A" <= ch && ch <= "Z" || "_" === ch || ch === "$" || ch === "@");
+                return ("a" <= ch && ch <= "z" ||
+                    "A" <= ch && ch <= "Z" ||
+                    "_" === ch || ch === "$" || ch === "@");
             };
             Lexer.prototype.isExpOperator = function (ch) {
                 return (ch === "-" || ch === "+" || this.isNumber(ch));
             };
             Lexer.prototype.throwError = function (error, start, end) {
                 end = end || this.index;
-                var colStr = (isDefined(start) ? "s " + start + "-" + this.index + " [" + this.text.substring(start, end) + "]" : " " + end);
+                var colStr = (isDefined(start)
+                    ? "s " + start + "-" + this.index + " [" + this.text.substring(start, end) + "]"
+                    : " " + end);
                 throw $parseMinErr("lexerr", "Lexer Error: {0} at column{1} in expression [{2}].", error, colStr, this.text);
             };
             Lexer.prototype.readNumber = function () {
@@ -5383,10 +5608,14 @@ var wx;
                         if (ch === "e" && this.isExpOperator(peekCh)) {
                             n += ch;
                         }
-                        else if (this.isExpOperator(ch) && peekCh && this.isNumber(peekCh) && n.charAt(n.length - 1) === "e") {
+                        else if (this.isExpOperator(ch) &&
+                            peekCh && this.isNumber(peekCh) &&
+                            n.charAt(n.length - 1) === "e") {
                             n += ch;
                         }
-                        else if (this.isExpOperator(ch) && (!peekCh || !this.isNumber(peekCh)) && n.charAt(n.length - 1) === "e") {
+                        else if (this.isExpOperator(ch) &&
+                            (!peekCh || !this.isNumber(peekCh)) &&
+                            n.charAt(n.length - 1) === "e") {
                             this.throwError("Invalid exponent");
                         }
                         else {
@@ -5596,7 +5825,8 @@ var wx;
                 if (this.tokens.length > 0) {
                     var token = this.tokens[0];
                     var t = token.text;
-                    if (t === e1 || t === e2 || t === e3 || t === e4 || (!e1 && !e2 && !e3 && !e4)) {
+                    if (t === e1 || t === e2 || t === e3 || t === e4 ||
+                        (!e1 && !e2 && !e3 && !e4)) {
                         return token;
                     }
                 }
@@ -5642,16 +5872,18 @@ var wx;
                     if (this.tokens.length > 0 && !this.peek("}", ")", ";", "]"))
                         statements.push(this.filterChain());
                     if (!this.expect(";")) {
-                        return (statements.length === 1) ? statements[0] : function (self, locals) {
-                            var value;
-                            for (var i = 0; i < statements.length; i++) {
-                                var statement = statements[i];
-                                if (statement) {
-                                    value = statement(self, locals);
+                        return (statements.length === 1)
+                            ? statements[0] :
+                            function (self, locals) {
+                                var value;
+                                for (var i = 0; i < statements.length; i++) {
+                                    var statement = statements[i];
+                                    if (statement) {
+                                        value = statement(self, locals);
+                                    }
                                 }
-                            }
-                            return value;
-                        };
+                                return value;
+                            };
                     }
                 }
             };
@@ -5698,7 +5930,8 @@ var wx;
                 var token;
                 if ((token = this.expect("="))) {
                     if (!left.assign) {
-                        this.throwError("implies assignment but [" + this.text.substring(0, token.index) + "] can not be assigned to", token);
+                        this.throwError("implies assignment but [" +
+                            this.text.substring(0, token.index) + "] can not be assigned to", token);
                     }
                     right = this.ternary();
                     return function (scope, locals) {
@@ -5847,7 +6080,9 @@ var wx;
                     var fnPtr = fn(scope, locals, context) || noop;
                     ensureSafeObject(context, parser.text);
                     ensureSafeObject(fnPtr, parser.text);
-                    var v = fnPtr.apply ? fnPtr.apply(context, args) : fnPtr(args[0], args[1], args[2], args[3], args[4]);
+                    var v = fnPtr.apply
+                        ? fnPtr.apply(context, args)
+                        : fnPtr(args[0], args[1], args[2], args[3], args[4]);
                     return ensureSafeObject(v, parser.text);
                 };
             };
@@ -5910,9 +6145,7 @@ var wx;
             };
             return Parser;
         })();
-        function ZERO() {
-            return 0;
-        }
+        function ZERO() { return 0; }
         ;
         function setter(obj, path, setValue, fullExp, options, locals) {
             var element = path.split("."), key;
@@ -5920,9 +6153,11 @@ var wx;
             var propertyObj;
             var hooks = getRuntimeHooks(locals);
             if (hooks) {
-                for (i = 0; element.length > 1; i++) {
+                for (var i_6 = 0; element.length > 1; i_6++) {
                     key = ensureSafeMemberName(element.shift(), fullExp);
-                    propertyObj = hooks.readFieldHook ? hooks.readFieldHook(obj, key) : obj[key];
+                    propertyObj = hooks.readFieldHook ?
+                        hooks.readFieldHook(obj, key) :
+                        obj[key];
                     if (!propertyObj) {
                         propertyObj = {};
                         if (hooks.writeFieldHook)
@@ -5934,7 +6169,7 @@ var wx;
                 }
             }
             else {
-                for (i = 0; element.length > 1; i++) {
+                for (var i_7 = 0; element.length > 1; i_7++) {
                     key = ensureSafeMemberName(element.shift(), fullExp);
                     propertyObj = obj[key];
                     if (!propertyObj) {
@@ -6108,6 +6343,9 @@ var wx;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
 ;
+/// <reference path="../Interfaces.ts" />
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../../test/typings/jquery.d.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -6193,6 +6431,9 @@ var wx;
         internal.htmlTemplateEngineConstructor = HtmlTemplateEngine;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+/// <reference path="../Interfaces.ts" />
+/// <reference path="Injector.ts" />
+/// <reference path="ScheduledSubject.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -6232,300 +6473,20 @@ var wx;
     })();
     wx.messageBus;
     Object.defineProperty(wx, "messageBus", {
-        get: function () {
-            return wx.injector.get(wx.res.messageBus);
-        }
+        get: function () { return wx.injector.get(wx.res.messageBus); }
     });
     var internal;
     (function (internal) {
         internal.messageBusConstructor = MessageBus;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
-    var StateActiveBinding = (function () {
-        function StateActiveBinding(domManager, router) {
-            this.priority = 5;
-            this.domManager = domManager;
-            this.router = router;
-        }
-        StateActiveBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-            var _this = this;
-            if (node.nodeType !== 1)
-                internal.throwError("stateActive-binding only operates on elements!");
-            if (options == null)
-                internal.throwError("invalid binding-options!");
-            var el = node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var exp;
-            var observables = [];
-            var opt = compiled;
-            var paramsKeys = [];
-            var stateName;
-            var stateParams;
-            var cssClass = "active";
-            observables.push(wx.router.current.changed.startWith(wx.router.current()));
-            if (typeof compiled === "function") {
-                exp = compiled;
-                observables.push(this.domManager.expressionToObservable(exp, ctx));
-            }
-            else {
-                observables.push(this.domManager.expressionToObservable(opt.name, ctx));
-                if (opt.params) {
-                    Object.keys(opt.params).forEach(function (x) {
-                        paramsKeys.push(x);
-                        observables.push(_this.domManager.expressionToObservable(opt.params[x], ctx));
-                    });
-                }
-                if (opt.cssClass) {
-                    cssClass = this.domManager.evaluateExpression(opt.cssClass, ctx);
-                }
-            }
-            state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
-                try {
-                    var currentState = latest.shift();
-                    stateName = wx.unwrapProperty(latest.shift());
-                    stateParams = {};
-                    for (var i = 0; i < paramsKeys.length; i++) {
-                        stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
-                    }
-                    var active = _this.router.includes(stateName, stateParams);
-                    var classes = cssClass.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
-                    if (classes.length) {
-                        wx.toggleCssClass.apply(null, [el, active].concat(classes));
-                    }
-                }
-                catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                }
-            }));
-            state.cleanup.add(Rx.Disposable.create(function () {
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-                observables = null;
-                compiled = null;
-                stateName = null;
-                stateParams = null;
-                opt = null;
-                paramsKeys = null;
-            }));
-        };
-        StateActiveBinding.prototype.configure = function (options) {
-        };
-        return StateActiveBinding;
-    })();
-    var internal;
-    (function (internal) {
-        internal.stateActiveBindingConstructor = StateActiveBinding;
-    })(internal = wx.internal || (wx.internal = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
-    var StateRefBinding = (function () {
-        function StateRefBinding(domManager, router) {
-            this.priority = 5;
-            this.domManager = domManager;
-            this.router = router;
-        }
-        StateRefBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-            var _this = this;
-            if (node.nodeType !== 1 || node.tagName.toLowerCase() !== 'a')
-                internal.throwError("stateRef-binding only operates on anchor-elements!");
-            if (options == null)
-                internal.throwError("invalid binding-options!");
-            var el = node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var exp;
-            var observables = [];
-            var opt = compiled;
-            var paramsKeys = [];
-            var stateName;
-            var stateParams;
-            if (typeof compiled === "function") {
-                exp = compiled;
-                observables.push(this.domManager.expressionToObservable(exp, ctx));
-            }
-            else {
-                observables.push(this.domManager.expressionToObservable(opt.name, ctx));
-                if (opt.params) {
-                    Object.keys(opt.params).forEach(function (x) {
-                        paramsKeys.push(x);
-                        observables.push(_this.domManager.expressionToObservable(opt.params[x], ctx));
-                    });
-                }
-            }
-            state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
-                try {
-                    stateName = wx.unwrapProperty(latest.shift());
-                    stateParams = {};
-                    for (var i = 0; i < paramsKeys.length; i++) {
-                        stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
-                    }
-                    el.href = _this.router.uri(stateName, stateParams);
-                }
-                catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                }
-            }));
-            state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
-                e.preventDefault();
-                _this.router.go(stateName, stateParams, { location: true });
-            }));
-            state.cleanup.add(Rx.Disposable.create(function () {
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-                observables = null;
-                compiled = null;
-                stateName = null;
-                stateParams = null;
-                opt = null;
-                paramsKeys = null;
-            }));
-        };
-        StateRefBinding.prototype.configure = function (options) {
-        };
-        return StateRefBinding;
-    })();
-    var internal;
-    (function (internal) {
-        internal.stateRefBindingConstructor = StateRefBinding;
-    })(internal = wx.internal || (wx.internal = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
-    var ViewBinding = (function () {
-        function ViewBinding(domManager, router) {
-            this.priority = 1000;
-            this.controlsDescendants = true;
-            this.domManager = domManager;
-            this.router = router;
-        }
-        ViewBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-            var _this = this;
-            if (node.nodeType !== 1)
-                internal.throwError("view-binding only operates on elements!");
-            if (options == null)
-                internal.throwError("invalid binding-options!");
-            var el = node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var viewName = this.domManager.evaluateExpression(compiled, ctx);
-            var currentConfig;
-            var cleanup;
-            function doCleanup() {
-                if (cleanup) {
-                    cleanup.dispose();
-                    cleanup = null;
-                }
-            }
-            if (viewName == null || typeof viewName !== "string")
-                internal.throwError("views must be named!");
-            state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(function (newState) {
-                try {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-                    var config = _this.router.getViewComponent(viewName);
-                    if (config != null) {
-                        if (!wx.isEqual(currentConfig, config)) {
-                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
-                            currentConfig = config;
-                        }
-                    }
-                    else {
-                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module));
-                        currentConfig = {};
-                    }
-                }
-                catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                }
-            }));
-            state.cleanup.add(Rx.Disposable.create(function () {
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-            }));
-        };
-        ViewBinding.prototype.configure = function (options) {
-        };
-        ViewBinding.prototype.applyTemplate = function (componentName, componentParams, animations, el, ctx, module) {
-            var self = this;
-            var oldElements = wx.nodeChildrenToArray(el);
-            var combined = [];
-            var obs;
-            function removeOldElements() {
-                oldElements.forEach(function (x) {
-                    self.domManager.cleanNode(x);
-                    el.removeChild(x);
-                });
-            }
-            function instantiateComponent(animation) {
-                ctx.$componentParams = componentParams;
-                var container = document.createElement("div");
-                var binding = wx.formatString("component: { name: '{0}', params: $componentParams }", componentName);
-                container.setAttribute("data-bind", binding);
-                if (animation != null)
-                    animation.prepare(container);
-                el.appendChild(container);
-                self.domManager.applyBindings(ctx, container);
-            }
-            if (oldElements.length > 0) {
-                var leaveAnimation;
-                if (animations && animations.leave) {
-                    if (typeof animations.leave === "string") {
-                        leaveAnimation = module.animation(animations.leave);
-                    }
-                    else {
-                        leaveAnimation = animations.leave;
-                    }
-                }
-                if (leaveAnimation) {
-                    leaveAnimation.prepare(oldElements);
-                    obs = leaveAnimation.run(oldElements).continueWith(function () { return leaveAnimation.complete(oldElements); }).continueWith(removeOldElements);
-                }
-                else {
-                    obs = Rx.Observable.startDeferred(removeOldElements);
-                }
-                combined.push(obs);
-            }
-            if (componentName != null) {
-                var enterAnimation;
-                if (animations && animations.enter) {
-                    if (typeof animations.enter === "string") {
-                        enterAnimation = module.animation(animations.enter);
-                    }
-                    else {
-                        enterAnimation = animations.enter;
-                    }
-                }
-                obs = Rx.Observable.startDeferred(function () { return instantiateComponent(enterAnimation); });
-                if (enterAnimation) {
-                    obs = obs.continueWith(enterAnimation.run(el.childNodes)).continueWith(function () { return enterAnimation.complete(el.childNodes); });
-                }
-                combined.push(obs);
-            }
-            if (combined.length > 1)
-                obs = Rx.Observable.combineLatest(combined, wx.noop).take(1);
-            else if (combined.length === 1)
-                obs = combined[0].take(1);
-            else
-                obs = null;
-            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
-        };
-        return ViewBinding;
-    })();
-    var internal;
-    (function (internal) {
-        internal.viewBindingConstructor = ViewBinding;
-    })(internal = wx.internal || (wx.internal = {}));
-})(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Collections/WeakMap.ts" />
+/// <reference path="../Core/Resources.ts" />
+/// <reference path="../Core/Injector.ts" />
+/// <reference path="../Collections/Set.ts" />
+/// <reference path="../Core/Environment.ts" />
+/// <reference path="../Core/Module.ts" />
 var wx;
 (function (wx) {
     "use strict";
@@ -6630,12 +6591,22 @@ var wx;
     }
     wx.route = route;
 })(wx || (wx = {}));
+///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Collections/WeakMap.ts" />
+/// <reference path="../Core/Resources.ts" />
+/// <reference path="../Core/Injector.ts" />
+/// <reference path="../Collections/Set.ts" />
+/// <reference path="../Core/Environment.ts" />
+/// <reference path="../Core/Module.ts" />
+/// <reference path="../Core/Property.ts" />
+/// <reference path="RouteMatcher.ts" />
 var wx;
 (function (wx) {
     "use strict";
     var Router = (function () {
         function Router(domManager) {
             var _this = this;
+            this.baseUrl = "/";
             this.current = wx.property();
             this.states = {};
             this.pathSeparator = ".";
@@ -6703,7 +6674,8 @@ var wx;
             if (isActive) {
                 var currentParamsKeys = Object.keys(_current.params);
                 var paramsKeys = Object.keys(params);
-                paramsKeys = paramsKeys.length <= currentParamsKeys.length ? paramsKeys : currentParamsKeys;
+                paramsKeys = paramsKeys.length <= currentParamsKeys.length ?
+                    paramsKeys : currentParamsKeys;
                 for (var i = 0; i < paramsKeys.length; i++) {
                     if (_current.params[paramsKeys[i]] != params[paramsKeys[i]]) {
                         isActive = false;
@@ -6713,7 +6685,7 @@ var wx;
             }
             return isActive;
         };
-        Router.prototype.uri = function (state, params) {
+        Router.prototype.url = function (state, params) {
             state = this.mapPath(state);
             var route = this.getAbsoluteRouteForState(state);
             if (route != null)
@@ -6724,9 +6696,9 @@ var wx;
             this.states = {};
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                route: wx.route("/")
+                route: wx.route(this.baseUrl)
             });
-            this.go(this.rootStateName, {}, { location: 2 /* replace */ });
+            this.go(this.rootStateName, {}, { location: 2 });
         };
         Router.prototype.sync = function () {
             var uri = wx.app.history.location.pathname;
@@ -6735,9 +6707,9 @@ var wx;
             var params;
             for (var i = 0; i < length; i++) {
                 var state = this.states[keys[i]];
-                var route = this.getAbsoluteRouteForState(state.name);
-                if ((params = route.parse(uri)) != null) {
-                    this.go(state.name, params, { location: 2 /* replace */ });
+                var route_1 = this.getAbsoluteRouteForState(state.name);
+                if ((params = route_1.parse(uri)) != null) {
+                    this.go(state.name, params, { location: 2 });
                     break;
                 }
             }
@@ -6796,7 +6768,7 @@ var wx;
                 if (state.name !== this.rootStateName)
                     state.route = wx.route(parts[parts.length - 1]);
                 else
-                    state.route = wx.route("/");
+                    state.route = wx.route(this.baseUrl);
             }
             if (state.name === this.rootStateName)
                 this.root = state;
@@ -6808,7 +6780,7 @@ var wx;
                 params: state.params,
                 title: title != null ? title : document.title
             };
-            wx.app.history.pushState(hs, "", state.uri);
+            wx.app.history.pushState(hs, "", state.url);
         };
         Router.prototype.replaceHistoryState = function (state, title) {
             var hs = {
@@ -6816,17 +6788,17 @@ var wx;
                 params: state.params,
                 title: title != null ? title : document.title
             };
-            wx.app.history.replaceState(hs, "", state.uri);
+            wx.app.history.replaceState(hs, "", state.url);
         };
         Router.prototype.mapPath = function (path) {
             if (path.indexOf(this.pathSeparator) === 0) {
                 return this.current().name + path;
             }
             else if (path.indexOf(this.parentPathDirective) === 0) {
-                var parent = this.current().name;
-                if (parent === this.rootStateName)
-                    return parent;
-                var parts = parent.split(this.pathSeparator);
+                var parent_1 = this.current().name;
+                if (parent_1 === this.rootStateName)
+                    return parent_1;
+                var parts = parent_1.split(this.pathSeparator);
                 for (var i = parts.length - 1; i > 0; i--) {
                     var tmp = parts.slice(0, i).join(this.pathSeparator);
                     if (this.get(tmp) || this.get(tmp + path.substr(1))) {
@@ -6867,11 +6839,11 @@ var wx;
             var result = null;
             hierarchy.forEach(function (state) {
                 if (result != null) {
-                    var route = state.route;
-                    if (!route.isAbsolute)
+                    var route_2 = state.route;
+                    if (!route_2.isAbsolute)
                         result = result.concat(state.route);
                     else
-                        result = route;
+                        result = route_2;
                 }
                 else {
                     result = state.route;
@@ -6896,11 +6868,13 @@ var wx;
             }
             var route = this.getAbsoluteRouteForState(to, hierarchy);
             var state = wx.extend(this.states[to], {});
-            state.uri = route.stringify(params);
+            state.url = route.stringify(params);
             state.views = stateViews;
             state.params = stateParams;
             var _current = this.current();
-            if ((options && options.force) || _current == null || _current.name !== to || !wx.isEqual(_current.params, state.params)) {
+            if ((options && options.force) || _current == null ||
+                _current.name !== to ||
+                !wx.isEqual(_current.params, state.params)) {
                 if (_current != null && _current.views != null && state.views != null) {
                     Object.keys(_current.views).forEach(function (x) {
                         if (!state.views.hasOwnProperty(x)) {
@@ -6909,7 +6883,7 @@ var wx;
                     });
                 }
                 if (options && options.location) {
-                    if (options.location === 2 /* replace */)
+                    if (options.location === 2)
                         this.replaceHistoryState(state, wx.app.title());
                     else
                         this.pushHistoryState(state, wx.app.title());
@@ -6958,23 +6932,400 @@ var wx;
     })();
     wx.router;
     Object.defineProperty(wx, "router", {
-        get: function () {
-            return wx.injector.get(wx.res.router);
-        }
+        get: function () { return wx.injector.get(wx.res.router); }
     });
     var internal;
     (function (internal) {
         internal.routerConstructor = Router;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
+///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../Core/DomManager.ts" />
+/// <reference path="../../Interfaces.ts" />
+/// <reference path="../Router.ts" />
 var wx;
 (function (wx) {
     "use strict";
-    wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true).register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true).register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true).register(wx.res.messageBus, [wx.internal.messageBusConstructor], true);
-    wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true).register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true).register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true).register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true).register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true).register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true).register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true).register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true).register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true).register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true).register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true).register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true).register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true).register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true).register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true).register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true).register("wx.bindings.keyPress", [wx.res.domManager, wx.internal.keyPressBindingConstructor], true).register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true).register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true).register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true).register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true).register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true).register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true).register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true).register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true).register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
-    wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
-    wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["keyPress", "keypress"], "wx.bindings.keyPress").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding("sref", "wx.bindings.sref").binding(["sactive", "state-active"], "wx.bindings.sactive");
-    wx.app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" }).component("wx-select", { resolve: "wx.components.select" });
+    var StateActiveBinding = (function () {
+        function StateActiveBinding(domManager, router) {
+            this.priority = 5;
+            this.domManager = domManager;
+            this.router = router;
+        }
+        StateActiveBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+            var _this = this;
+            if (node.nodeType !== 1)
+                internal.throwError("stateActive-binding only operates on elements!");
+            if (options == null)
+                internal.throwError("invalid binding-options!");
+            var el = node;
+            var compiled = this.domManager.compileBindingOptions(options, module);
+            var exp;
+            var observables = [];
+            var opt = compiled;
+            var paramsKeys = [];
+            var stateName;
+            var stateParams;
+            var cssClass = "active";
+            observables.push(wx.router.current.changed.startWith(wx.router.current()));
+            if (typeof compiled === "function") {
+                exp = compiled;
+                observables.push(this.domManager.expressionToObservable(exp, ctx));
+            }
+            else {
+                observables.push(this.domManager.expressionToObservable(opt.name, ctx));
+                if (opt.params) {
+                    Object.keys(opt.params).forEach(function (x) {
+                        paramsKeys.push(x);
+                        observables.push(_this.domManager.expressionToObservable(opt.params[x], ctx));
+                    });
+                }
+                if (opt.cssClass) {
+                    cssClass = this.domManager.evaluateExpression(opt.cssClass, ctx);
+                }
+            }
+            state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
+                try {
+                    var currentState = latest.shift();
+                    stateName = wx.unwrapProperty(latest.shift());
+                    stateParams = {};
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
+                    }
+                    var active = _this.router.includes(stateName, stateParams);
+                    var classes = cssClass.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+                    if (classes.length) {
+                        wx.toggleCssClass.apply(null, [el, active].concat(classes));
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
+            }));
+            state.cleanup.add(Rx.Disposable.create(function () {
+                node = null;
+                options = null;
+                ctx = null;
+                state = null;
+                observables = null;
+                compiled = null;
+                stateName = null;
+                stateParams = null;
+                opt = null;
+                paramsKeys = null;
+            }));
+        };
+        StateActiveBinding.prototype.configure = function (options) {
+        };
+        return StateActiveBinding;
+    })();
+    var internal;
+    (function (internal) {
+        internal.stateActiveBindingConstructor = StateActiveBinding;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../Core/DomManager.ts" />
+/// <reference path="../../Interfaces.ts" />
+var wx;
+(function (wx) {
+    "use strict";
+    var StateRefBinding = (function () {
+        function StateRefBinding(domManager, router) {
+            this.priority = 5;
+            this.domManager = domManager;
+            this.router = router;
+        }
+        StateRefBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+            var _this = this;
+            if (node.nodeType !== 1)
+                internal.throwError("stateRef-binding only operates on elements!");
+            if (options == null)
+                internal.throwError("invalid binding-options!");
+            var el = node;
+            var isAnchor = el.tagName.toLowerCase() === "a";
+            var anchor = isAnchor ? el : undefined;
+            var compiled = this.domManager.compileBindingOptions(options, module);
+            var exp;
+            var observables = [];
+            var opt = compiled;
+            var paramsKeys = [];
+            var stateName;
+            var stateParams;
+            if (typeof compiled === "function") {
+                exp = compiled;
+                observables.push(this.domManager.expressionToObservable(exp, ctx));
+            }
+            else {
+                observables.push(this.domManager.expressionToObservable(opt.name, ctx));
+                if (opt.params) {
+                    Object.keys(opt.params).forEach(function (x) {
+                        paramsKeys.push(x);
+                        observables.push(_this.domManager.expressionToObservable(opt.params[x], ctx));
+                    });
+                }
+            }
+            state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
+                try {
+                    stateName = wx.unwrapProperty(latest.shift());
+                    stateParams = {};
+                    for (var i = 0; i < paramsKeys.length; i++) {
+                        stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
+                    }
+                    if (anchor != null) {
+                        anchor.href = _this.router.url(stateName, stateParams);
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
+            }));
+            state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
+                e.preventDefault();
+                _this.router.go(stateName, stateParams, { location: true });
+            }));
+            state.cleanup.add(Rx.Disposable.create(function () {
+                node = null;
+                options = null;
+                ctx = null;
+                state = null;
+                observables = null;
+                compiled = null;
+                stateName = null;
+                stateParams = null;
+                opt = null;
+                paramsKeys = null;
+            }));
+        };
+        StateRefBinding.prototype.configure = function (options) {
+        };
+        return StateRefBinding;
+    })();
+    var internal;
+    (function (internal) {
+        internal.stateRefBindingConstructor = StateRefBinding;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../Core/DomManager.ts" />
+/// <reference path="../../Interfaces.ts" />
+/// <reference path="../../Core/Log.ts" />
+/// <reference path="../../Core/Animation.ts" />
+var wx;
+(function (wx) {
+    "use strict";
+    var ViewBinding = (function () {
+        function ViewBinding(domManager, router) {
+            this.priority = 1000;
+            this.controlsDescendants = true;
+            this.domManager = domManager;
+            this.router = router;
+        }
+        ViewBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+            var _this = this;
+            if (node.nodeType !== 1)
+                internal.throwError("view-binding only operates on elements!");
+            if (options == null)
+                internal.throwError("invalid binding-options!");
+            var el = node;
+            var compiled = this.domManager.compileBindingOptions(options, module);
+            var viewName = this.domManager.evaluateExpression(compiled, ctx);
+            var currentConfig;
+            var cleanup;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
+            if (viewName == null || typeof viewName !== "string")
+                internal.throwError("views must be named!");
+            state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(function (newState) {
+                try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+                    var config = _this.router.getViewComponent(viewName);
+                    if (config != null) {
+                        if (!wx.isEqual(currentConfig, config)) {
+                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
+                            currentConfig = config;
+                        }
+                    }
+                    else {
+                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module));
+                        currentConfig = {};
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
+            }));
+            state.cleanup.add(Rx.Disposable.create(function () {
+                node = null;
+                options = null;
+                ctx = null;
+                state = null;
+            }));
+        };
+        ViewBinding.prototype.configure = function (options) {
+        };
+        ViewBinding.prototype.applyTemplate = function (componentName, componentParams, animations, el, ctx, module) {
+            var self = this;
+            var oldElements = wx.nodeChildrenToArray(el);
+            var combined = [];
+            var obs;
+            function removeOldElements() {
+                oldElements.forEach(function (x) {
+                    self.domManager.cleanNode(x);
+                    el.removeChild(x);
+                });
+            }
+            function instantiateComponent(animation) {
+                ctx.$componentParams = componentParams;
+                var container = document.createElement("div");
+                var binding = wx.formatString("component: { name: '{0}', params: $componentParams }", componentName);
+                container.setAttribute("data-bind", binding);
+                if (animation != null)
+                    animation.prepare(container);
+                el.appendChild(container);
+                self.domManager.applyBindings(ctx, container);
+            }
+            if (oldElements.length > 0) {
+                var leaveAnimation;
+                if (animations && animations.leave) {
+                    if (typeof animations.leave === "string") {
+                        leaveAnimation = module.animation(animations.leave);
+                    }
+                    else {
+                        leaveAnimation = animations.leave;
+                    }
+                }
+                if (leaveAnimation) {
+                    leaveAnimation.prepare(oldElements);
+                    obs = leaveAnimation.run(oldElements)
+                        .continueWith(function () { return leaveAnimation.complete(oldElements); })
+                        .continueWith(removeOldElements);
+                }
+                else {
+                    obs = Rx.Observable.startDeferred(removeOldElements);
+                }
+                combined.push(obs);
+            }
+            if (componentName != null) {
+                var enterAnimation;
+                if (animations && animations.enter) {
+                    if (typeof animations.enter === "string") {
+                        enterAnimation = module.animation(animations.enter);
+                    }
+                    else {
+                        enterAnimation = animations.enter;
+                    }
+                }
+                obs = Rx.Observable.startDeferred(function () { return instantiateComponent(enterAnimation); });
+                if (enterAnimation) {
+                    obs = obs.continueWith(enterAnimation.run(el.childNodes))
+                        .continueWith(function () { return enterAnimation.complete(el.childNodes); });
+                }
+                combined.push(obs);
+            }
+            if (combined.length > 1)
+                obs = Rx.Observable.combineLatest(combined, wx.noop).take(1);
+            else if (combined.length === 1)
+                obs = combined[0].take(1);
+            else
+                obs = null;
+            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
+        };
+        return ViewBinding;
+    })();
+    var internal;
+    (function (internal) {
+        internal.viewBindingConstructor = ViewBinding;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+/// <reference path="Core/Injector.ts" />
+/// <reference path="Core/ExpressionCompiler.ts" />
+/// <reference path="Core/DomManager.ts" />
+/// <reference path="Core/HtmlTemplateEngine.ts" />
+/// <reference path="Bindings/Command.ts" />
+/// <reference path="Bindings/If.ts" />
+/// <reference path="Bindings/MultiOneWay.ts" />
+/// <reference path="Bindings/SimpleOneWay.ts" />
+/// <reference path="Bindings/ForEach.ts" />
+/// <reference path="Bindings/Event.ts" />
+/// <reference path="Bindings/KeyPress.ts" />
+/// <reference path="Bindings/TextInput.ts" />
+/// <reference path="Bindings/SelectedValue.ts" />
+/// <reference path="Bindings/Component.ts" />
+/// <reference path="Routing/Bindings/StateActive.ts" />
+/// <reference path="Routing/Bindings/StateRef.ts" />
+/// <reference path="Routing/Bindings/View.ts" />
+/// <reference path="Routing/Router.ts" />
+/// <reference path="Core/MessageBus.ts" />
+var wx;
+(function (wx) {
+    "use strict";
+    wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor)
+        .register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true)
+        .register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true)
+        .register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true)
+        .register(wx.res.messageBus, [wx.internal.messageBusConstructor], true);
+    wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true)
+        .register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true)
+        .register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true)
+        .register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true)
+        .register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true)
+        .register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true)
+        .register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true)
+        .register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true)
+        .register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true)
+        .register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true)
+        .register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true)
+        .register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true)
+        .register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true)
+        .register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true)
+        .register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true)
+        .register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true)
+        .register("wx.bindings.keyPress", [wx.res.domManager, wx.internal.keyPressBindingConstructor], true)
+        .register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true)
+        .register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true)
+        .register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true)
+        .register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true)
+        .register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true)
+        .register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true)
+        .register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true)
+        .register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true)
+        .register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
+    wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor])
+        .register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
+    wx.app.binding("module", "wx.bindings.module")
+        .binding("css", "wx.bindings.css")
+        .binding("attr", "wx.bindings.attr")
+        .binding("style", "wx.bindings.style")
+        .binding("command", "wx.bindings.command")
+        .binding("if", "wx.bindings.if")
+        .binding("with", "wx.bindings.with")
+        .binding("ifnot", "wx.bindings.notif")
+        .binding("text", "wx.bindings.text")
+        .binding("html", "wx.bindings.html")
+        .binding("visible", "wx.bindings.visible")
+        .binding("hidden", "wx.bindings.hidden")
+        .binding("disabled", "wx.bindings.disabled")
+        .binding("enabled", "wx.bindings.enabled")
+        .binding("foreach", "wx.bindings.foreach")
+        .binding("event", "wx.bindings.event")
+        .binding(["keyPress", "keypress"], "wx.bindings.keyPress")
+        .binding(["textInput", "textinput"], "wx.bindings.textInput")
+        .binding("checked", "wx.bindings.checked")
+        .binding("selectedValue", "wx.bindings.selectedValue")
+        .binding("component", "wx.bindings.component")
+        .binding("value", "wx.bindings.value")
+        .binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus")
+        .binding("view", "wx.bindings.view")
+        .binding(["sref", "stateRef", "stateref"], "wx.bindings.sref")
+        .binding(["sactive", "stateActive", "stateactive"], "wx.bindings.sactive");
+    wx.app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" })
+        .component("wx-select", { resolve: "wx.components.select" });
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
