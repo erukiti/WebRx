@@ -678,7 +678,7 @@ module wx {
 
     export interface IRouterState {
         name: string;
-        uri: string;
+        url: string;
         params: any;
         views: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
         onEnter?: (config: IRouterStateConfig, params?: any) => void;
@@ -722,6 +722,13 @@ module wx {
 
     export interface IRouter {
         /**
+        * An absolute path to which all registered routes will be relative to.
+        * This property must initialized before registering any states.
+        * Default: /
+        **/
+        baseUrl: string;
+        
+        /**
         * Transitions to the state inferred from the browser's current location
         * This method should be invoked once after registering application states.
         **/
@@ -734,7 +741,7 @@ module wx {
         state(config: IRouterStateConfig): IRouter;
 
         /**
-        * Current state's configuration.
+        * Represents the configuration object for the router's 
         **/
         current: IObservableProperty<IRouterState>;
 
@@ -756,13 +763,13 @@ module wx {
         go(to: string, params?: Object, options?: IStateChangeOptions): void;    // Rx.Observable<any>
 
         /**
-        * An uri generation method that returns the uri for the given state populated with the given params.
+        * An URL generation method that returns the URL for the given state populated with the given params.
         * @param {string} state Absolute or relative destination state path. 'contact.detail' - will go to the 
         * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
         * '.child.grandchild' will go to grandchild state
         * @param {Object} params An object of parameter values to fill the state's required parameters.
         **/
-        uri(state: string, params?: {}): string;
+        url(state: string, params?: {}): string;
 
         /**
         * A method that force reloads the current state. All resolves are re-resolved, events are not re-fired, 

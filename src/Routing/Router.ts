@@ -47,6 +47,8 @@ module wx {
 
         //////////////////////////////////
         // IRouter
+        
+        public baseUrl: string = "/";
 
         public state(config: IRouterStateConfig): IRouter {
             this.registerStateInternal(config);
@@ -119,7 +121,7 @@ module wx {
             return isActive;
         }
 
-        public uri(state: string, params?: {}): string {
+        public url(state: string, params?: {}): string {
             state = this.mapPath(state);
 
             let route = this.getAbsoluteRouteForState(state);
@@ -135,7 +137,7 @@ module wx {
             // Implicit root state that is always present
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                route: route("/")
+                route: route(this.baseUrl)
             });
 
             this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
@@ -243,7 +245,7 @@ module wx {
                 if(state.name !== this.rootStateName) 
                     state.route = route(parts[parts.length - 1]);
                 else
-                    state.route = route("/");
+                    state.route = route(this.baseUrl);
             }
 
             // detect root-state override
@@ -260,7 +262,7 @@ module wx {
                 title: title != null ? title : document.title
             };
 
-            app.history.pushState(hs, "", state.uri);
+            app.history.pushState(hs, "", state.url);
         }
 
         private replaceHistoryState(state: IRouterState, title?: string): void {
@@ -270,7 +272,7 @@ module wx {
                 title: title != null ? title : document.title
             };
 
-            app.history.replaceState(hs, "", state.uri);
+            app.history.replaceState(hs, "", state.url);
         }
 
         private mapPath(path: string): string {
@@ -384,7 +386,8 @@ module wx {
             // construct resulting state
             let route = this.getAbsoluteRouteForState(to, hierarchy);
             let state = <IRouterState> extend(this.states[to], {});
-            state.uri = route.stringify(params);
+            state.url = route.stringify(params);
+
             state.views = stateViews;
             state.params = stateParams;
 

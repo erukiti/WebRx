@@ -31,7 +31,7 @@ describe('Routing',() => {
             });
 
             wx.router.go("foo");
-            expect(wx.router.current().uri).toEqual("/foo");
+            expect(wx.router.current().url).toEqual("/foo");
 
             wx.router.reset();
 
@@ -43,7 +43,7 @@ describe('Routing',() => {
             });
 
             wx.router.go("foo.bar");
-            expect(wx.router.current().uri).toEqual("/foo/bar");
+            expect(wx.router.current().url).toEqual("/foo/bar");
         });
 
         it('preserves properties which have been manually added to current state params',() => {
@@ -137,7 +137,7 @@ describe('Routing',() => {
             expect(wx.router.current().views['main']).toEqual("bar");
         });
 
-        it('child states can override current.uri',() => {
+        it('child states can override current.url',() => {
             wx.router.state({
                 name: "foo",
                 views: {
@@ -154,10 +154,10 @@ describe('Routing',() => {
             });
 
             wx.router.go("foo.bar", { id: 5 });
-            expect(wx.router.current().uri).toEqual("/baz/5");
+            expect(wx.router.current().url).toEqual("/baz/5");
         });
 
-        it('current.uri reflects state-hierarchy',() => {
+        it('current.url reflects state-hierarchy',() => {
             wx.router.state({
                 name: "foo",
                 views: {
@@ -173,10 +173,10 @@ describe('Routing',() => {
             });
 
             wx.router.go("foo");
-            expect(wx.router.current().uri).toEqual("/foo");
+            expect(wx.router.current().url).toEqual("/foo");
 
             wx.router.go("foo.bar");
-            expect(wx.router.current().uri).toEqual("/foo/bar");
+            expect(wx.router.current().url).toEqual("/foo/bar");
 
             wx.router.reset();
 
@@ -197,7 +197,7 @@ describe('Routing',() => {
             });
 
             wx.router.go("foo.bar", { fooId: 3, barId: 5 });
-            expect(wx.router.current().uri).toEqual("/foo/3/bar/5");
+            expect(wx.router.current().url).toEqual("/foo/3/bar/5");
         });
 
         it('go() with history = true pushes a history record',() => {
@@ -209,7 +209,7 @@ describe('Routing',() => {
             });
 
             wx.router.go("foo", {}, { location: true });
-            expect(wx.router.current().uri).toEqual("/foo");
+            expect(wx.router.current().url).toEqual("/foo");
             expect(wx.app.history.length).toEqual(1);
         });
 

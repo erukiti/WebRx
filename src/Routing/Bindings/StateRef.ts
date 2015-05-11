@@ -69,7 +69,7 @@ module wx {
                     }
 
                     if(anchor != null) {
-                        anchor.href = this.router.uri(stateName, stateParams);
+                        anchor.href = this.router.url(stateName, stateParams);
                     }
                 } catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
