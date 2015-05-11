@@ -46,7 +46,7 @@ WebRx's documentation can be found on [here](http://webrxjs.org/docs).
 
 #### Support 
 
-Post your questions to [Stackoverflow](https://stackoverflow.com/questions/tagged/webrx) tagged with <code>webrx</code>.
+Post your questions to [Stack Overflow](https://stackoverflow.com/questions/tagged/webrx) tagged with <code>webrx</code>.
 
 #### Contributing
 
