@@ -6333,11 +6333,13 @@ var wx;
         }
         StateRefBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
             var _this = this;
-            if (node.nodeType !== 1 || node.tagName.toLowerCase() !== 'a')
-                internal.throwError("stateRef-binding only operates on anchor-elements!");
+            if (node.nodeType !== 1)
+                internal.throwError("stateRef-binding only operates on elements!");
             if (options == null)
                 internal.throwError("invalid binding-options!");
             var el = node;
+            var isAnchor = el.tagName.toLowerCase() === "a";
+            var anchor = isAnchor ? el : undefined;
             var compiled = this.domManager.compileBindingOptions(options, module);
             var exp;
             var observables = [];
@@ -6358,14 +6360,18 @@ var wx;
                     });
                 }
             }
-            state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (latest) {
+            state.cleanup.add(Rx.Observable.combineLatest(observables, function (_) {
+                return wx.args2Array(arguments);
+            }).subscribe(function (latest) {
                 try {
                     stateName = wx.unwrapProperty(latest.shift());
                     stateParams = {};
                     for (var i = 0; i < paramsKeys.length; i++) {
                         stateParams[paramsKeys[i]] = wx.unwrapProperty(latest[i]);
                     }
-                    el.href = _this.router.uri(stateName, stateParams);
+                    if (anchor != null) {
+                        anchor.href = _this.router.url(stateName, stateParams);
+                    }
                 }
                 catch (e) {
                     wx.app.defaultExceptionHandler.onNext(e);
@@ -6636,6 +6642,7 @@ var wx;
     var Router = (function () {
         function Router(domManager) {
             var _this = this;
+            this.baseUrl = "/";
             this.current = wx.property();
             this.states = {};
             this.pathSeparator = ".";
@@ -6713,7 +6720,7 @@ var wx;
             }
             return isActive;
         };
-        Router.prototype.uri = function (state, params) {
+        Router.prototype.url = function (state, params) {
             state = this.mapPath(state);
             var route = this.getAbsoluteRouteForState(state);
             if (route != null)
@@ -6724,7 +6731,7 @@ var wx;
             this.states = {};
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                route: wx.route("/")
+                route: wx.route(this.baseUrl)
             });
             this.go(this.rootStateName, {}, { location: 2 /* replace */ });
         };
@@ -6796,7 +6803,7 @@ var wx;
                 if (state.name !== this.rootStateName)
                     state.route = wx.route(parts[parts.length - 1]);
                 else
-                    state.route = wx.route("/");
+                    state.route = wx.route(this.baseUrl);
             }
             if (state.name === this.rootStateName)
                 this.root = state;
@@ -6808,7 +6815,7 @@ var wx;
                 params: state.params,
                 title: title != null ? title : document.title
             };
-            wx.app.history.pushState(hs, "", state.uri);
+            wx.app.history.pushState(hs, "", state.url);
         };
         Router.prototype.replaceHistoryState = function (state, title) {
             var hs = {
@@ -6816,7 +6823,7 @@ var wx;
                 params: state.params,
                 title: title != null ? title : document.title
             };
-            wx.app.history.replaceState(hs, "", state.uri);
+            wx.app.history.replaceState(hs, "", state.url);
         };
         Router.prototype.mapPath = function (path) {
             if (path.indexOf(this.pathSeparator) === 0) {
@@ -6896,7 +6903,7 @@ var wx;
             }
             var route = this.getAbsoluteRouteForState(to, hierarchy);
             var state = wx.extend(this.states[to], {});
-            state.uri = route.stringify(params);
+            state.url = route.stringify(params);
             state.views = stateViews;
             state.params = stateParams;
             var _current = this.current();
@@ -6973,11 +6980,11 @@ var wx;
     wx.injector.register(wx.res.expressionCompiler, wx.internal.expressionCompilerConstructor).register(wx.res.htmlTemplateEngine, [wx.internal.htmlTemplateEngineConstructor], true).register(wx.res.domManager, [wx.res.expressionCompiler, wx.internal.domManagerConstructor], true).register(wx.res.router, [wx.res.domManager, wx.internal.routerConstructor], true).register(wx.res.messageBus, [wx.internal.messageBusConstructor], true);
     wx.injector.register("wx.bindings.module", [wx.res.domManager, wx.internal.moduleBindingConstructor], true).register("wx.bindings.command", [wx.res.domManager, wx.internal.commandBindingConstructor], true).register("wx.bindings.if", [wx.res.domManager, wx.internal.ifBindingConstructor], true).register("wx.bindings.with", [wx.res.domManager, wx.internal.withBindingConstructor], true).register("wx.bindings.notif", [wx.res.domManager, wx.internal.notifBindingConstructor], true).register("wx.bindings.css", [wx.res.domManager, wx.internal.cssBindingConstructor], true).register("wx.bindings.attr", [wx.res.domManager, wx.internal.attrBindingConstructor], true).register("wx.bindings.style", [wx.res.domManager, wx.internal.styleBindingConstructor], true).register("wx.bindings.text", [wx.res.domManager, wx.internal.textBindingConstructor], true).register("wx.bindings.html", [wx.res.domManager, wx.internal.htmlBindingConstructor], true).register("wx.bindings.visible", [wx.res.domManager, wx.internal.visibleBindingConstructor], true).register("wx.bindings.hidden", [wx.res.domManager, wx.internal.hiddenBindingConstructor], true).register("wx.bindings.enabled", [wx.res.domManager, wx.internal.enableBindingConstructor], true).register("wx.bindings.disabled", [wx.res.domManager, wx.internal.disableBindingConstructor], true).register("wx.bindings.foreach", [wx.res.domManager, wx.internal.forEachBindingConstructor], true).register("wx.bindings.event", [wx.res.domManager, wx.internal.eventBindingConstructor], true).register("wx.bindings.keyPress", [wx.res.domManager, wx.internal.keyPressBindingConstructor], true).register("wx.bindings.textInput", [wx.res.domManager, wx.internal.textInputBindingConstructor], true).register("wx.bindings.checked", [wx.res.domManager, wx.internal.checkedBindingConstructor], true).register("wx.bindings.selectedValue", [wx.res.domManager, wx.internal.selectedValueBindingConstructor], true).register("wx.bindings.component", [wx.res.domManager, wx.internal.componentBindingConstructor], true).register("wx.bindings.value", [wx.res.domManager, wx.internal.valueBindingConstructor], true).register("wx.bindings.hasFocus", [wx.res.domManager, wx.internal.hasFocusBindingConstructor], true).register("wx.bindings.view", [wx.res.domManager, wx.res.router, wx.internal.viewBindingConstructor], true).register("wx.bindings.sref", [wx.res.domManager, wx.res.router, wx.internal.stateRefBindingConstructor], true).register("wx.bindings.sactive", [wx.res.domManager, wx.res.router, wx.internal.stateActiveBindingConstructor], true);
     wx.injector.register("wx.components.radiogroup", [wx.res.htmlTemplateEngine, wx.internal.radioGroupComponentConstructor]).register("wx.components.select", [wx.res.htmlTemplateEngine, wx.internal.selectComponentConstructor]);
-    wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["keyPress", "keypress"], "wx.bindings.keyPress").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding("sref", "wx.bindings.sref").binding(["sactive", "state-active"], "wx.bindings.sactive");
+    wx.app.binding("module", "wx.bindings.module").binding("css", "wx.bindings.css").binding("attr", "wx.bindings.attr").binding("style", "wx.bindings.style").binding("command", "wx.bindings.command").binding("if", "wx.bindings.if").binding("with", "wx.bindings.with").binding("ifnot", "wx.bindings.notif").binding("text", "wx.bindings.text").binding("html", "wx.bindings.html").binding("visible", "wx.bindings.visible").binding("hidden", "wx.bindings.hidden").binding("disabled", "wx.bindings.disabled").binding("enabled", "wx.bindings.enabled").binding("foreach", "wx.bindings.foreach").binding("event", "wx.bindings.event").binding(["keyPress", "keypress"], "wx.bindings.keyPress").binding(["textInput", "textinput"], "wx.bindings.textInput").binding("checked", "wx.bindings.checked").binding("selectedValue", "wx.bindings.selectedValue").binding("component", "wx.bindings.component").binding("value", "wx.bindings.value").binding(["hasFocus", "hasfocus"], "wx.bindings.hasFocus").binding("view", "wx.bindings.view").binding(["sref", "stateRef", "stateref"], "wx.bindings.sref").binding(["sactive", "stateActive", "stateactive"], "wx.bindings.sactive");
     wx.app.component("wx-radiogroup", { resolve: "wx.components.radiogroup" }).component("wx-select", { resolve: "wx.components.select" });
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.78';
+    wx.version = '0.9.79';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map

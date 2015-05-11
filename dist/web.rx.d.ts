@@ -296,7 +296,7 @@ declare module wx {
     }
     interface IRouterState {
         name: string;
-        uri: string;
+        url: string;
         params: any;
         views: {
             [view: string]: string | {
@@ -332,12 +332,13 @@ declare module wx {
         pushState(statedata: any, title: string, url?: string): void;
     }
     interface IRouter {
+        baseUrl: string;
         sync(): void;
         state(config: IRouterStateConfig): IRouter;
         current: IObservableProperty<IRouterState>;
         updateCurrentStateParams(withParamsAction: (params: any) => void): void;
         go(to: string, params?: Object, options?: IStateChangeOptions): void;
-        uri(state: string, params?: {}): string;
+        url(state: string, params?: {}): string;
         reload(): void;
         get(state: string): IRouterStateConfig;
         is(state: string, params?: any, options?: any): any;
