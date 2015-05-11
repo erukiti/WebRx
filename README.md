@@ -54,7 +54,7 @@ There are many ways to [contribute](https://github.com/oliverw/WebRx/blob/master
 
 * [Submit bugs](https://github.com/oliverw/WebRx/issues) and help us verify fixes as they are checked in.
 * Review the [source code changes](https://github.com/oliverw/WebRx/pulls).
-* Engage with other WebRx users and developers on [StackOverflow](http://stackoverflow.com/questions/tagged/webrx). 
+* Engage with other WebRx users and developers on [Stack Overflow](http://stackoverflow.com/questions/tagged/webrx). 
 * Join the [#webrx](http://twitter.com/#!/search/realtime/%23webrx) discussion on Twitter.
 * [Contribute bug fixes](https://github.com/oliverw/WebRx/blob/master/CONTRIBUTING.md).
 * Cast your vote at [AlternativeTo](http://alternativeto.net/software/webrx/)
