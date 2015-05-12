@@ -21,7 +21,7 @@ module wx {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
 
-            this.reset();
+            this.reset(false);
 
             // monitor navigation history
             app.history.onPopState.subscribe((e) => {
@@ -41,15 +41,14 @@ module wx {
             app.title.changed.subscribe(x => {
                 document.title = x;
 
-                this.replaceHistoryState(this.current(), x);
+                if(this.current() != null)
+                    this.replaceHistoryState(this.current(), x);
             });
         }
 
         //////////////////////////////////
         // IRouter
         
-        public baseUrl: string = "/";
-
         public state(config: IRouterStateConfig): IRouter {
             this.registerStateInternal(config);
             return this;
@@ -131,16 +130,17 @@ module wx {
             return null;
         }
 
-        public reset(): void {
+        public reset(enterRootState: boolean = true): void {
             this.states = {};
 
             // Implicit root state that is always present
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                route: route(this.baseUrl)
+                route: route("/")
             });
-
-            this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
+            
+            if(enterRootState)
+                this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
         }
 
         public sync(): void {
@@ -245,7 +245,7 @@ module wx {
                 if(state.name !== this.rootStateName) 
                     state.route = route(parts[parts.length - 1]);
                 else
-                    state.route = route(this.baseUrl);
+                    state.route = route("/");
             }
 
             // detect root-state override
