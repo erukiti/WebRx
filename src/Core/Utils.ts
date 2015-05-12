@@ -13,7 +13,7 @@
 module wx {
     "use strict";
 
-    let cssClassNameRegex = /\S+/g;
+    let regexCssClassName = /\S+/g;
     let RxObsConstructor = (<new <T>() => Rx.Observable<T>> <any> Rx.Observable); // the cast is neccessary because the rx.js.d.ts declares Observable as an interface
 
     export var noop = () => {};
@@ -116,6 +116,16 @@ module wx {
         }
 
         return false;
+    }
+        
+    /**
+    * Extracts a query parameter from the current location
+    */
+    export function getQueryParameter(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regexQueryParam = new RegExp("[\\?&]" + name + "=([^&#]*)");
+        var results = regexQueryParam.exec(app.history.location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     }
 
     /**

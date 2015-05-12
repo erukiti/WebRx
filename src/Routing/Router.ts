@@ -136,16 +136,16 @@ module wx {
             // Implicit root state that is always present
             this.root = this.registerStateInternal({
                 name: this.rootStateName,
-                route: route("/")
+                url: route("/")
             });
             
             if(enterRootState)
                 this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
         }
 
-        public sync(): void {
-            // infer initial state from browser-location
-            let uri = app.history.location.pathname;// + app.history.location.search;
+        public sync(url?:string): void {
+            if(url == null)
+                url = app.history.location.pathname;// + app.history.location.search;
 
             // iterate over registered states to find matching uri
             let keys = Object.keys(this.states);
@@ -156,7 +156,7 @@ module wx {
                 let state = this.states[keys[i]];
                 let route = this.getAbsoluteRouteForState(state.name);
 
-                if ((params = route.parse(uri)) != null) {
+                if ((params = route.parse(url)) != null) {
                     this.go(state.name, params, { location: RouterLocationChangeMode.replace });
                     break;
                 }
@@ -235,17 +235,17 @@ module wx {
             state = <IRouterStateConfig> extend(state, {});
             this.states[state.name] = state;
 
-            if (state.route != null) {
+            if (state.url != null) {
                 // create route from string
-                if (typeof state.route === "string") {
-                    state.route = route(state.route);
+                if (typeof state.url === "string") {
+                    state.url = route(state.url);
                 }
             } else {
                 // derive relative route from name
                 if(state.name !== this.rootStateName) 
-                    state.route = route(parts[parts.length - 1]);
+                    state.url = route(parts[parts.length - 1]);
                 else
-                    state.route = route("/");
+                    state.url = route("/");
             }
 
             // detect root-state override
@@ -329,7 +329,7 @@ module wx {
                 if (state == null) {
                     state = {
                         name: stateName,
-                        route: route(stateName)
+                        url: route(stateName)
                     };
                 }
 
@@ -346,15 +346,15 @@ module wx {
             hierarchy.forEach(state => {
                 // concat urls
                 if (result != null) {
-                    let route = <IRoute> state.route;
+                    let route = <IRoute> state.url;
 
                     // individual states may use absolute urls as well
                     if (!route.isAbsolute)
-                        result = result.concat(<IRoute> state.route);
+                        result = result.concat(<IRoute> state.url);
                     else
                         result = route;
                 } else {
-                    result = <IRoute> state.route;
+                    result = <IRoute> state.url;
                 }
             });
 
@@ -468,7 +468,7 @@ module wx {
                 result = Object.keys(stateParams);
 
                 // append any route-params
-                result = result.concat((<IRoute> config.route).params);
+                result = result.concat((<IRoute> config.url).params);
             }
 
             return result;

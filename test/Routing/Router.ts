@@ -147,7 +147,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "/baz/:id",
+                url: "/baz/:id",
                 views: {
                     'main': "bar"
                 }
@@ -182,7 +182,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo",
-                route: "foo/:fooId",
+                url: "foo/:fooId",
                 views: {
                     'main': "foo"
                 }
@@ -190,7 +190,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': "bar"
                 }
@@ -216,7 +216,7 @@ describe('Routing',() => {
         it('transitions to the the correct state on history.popstate event',() => {
             wx.router.state({
                 name: "foo",
-                route: "foo/:fooId",
+                url: "foo/:fooId",
                 views: {
                     'main': "foo"
                 }
@@ -224,7 +224,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': "bar"
                 }
@@ -252,7 +252,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': "bar"
                 }
@@ -274,7 +274,7 @@ describe('Routing',() => {
         it('includes() correctly tests child and parent states including params',() => {
             wx.router.state({
                 name: "foo",
-                route: "foo/:fooId",
+                url: "foo/:fooId",
                 views: {
                     'main': "foo"
                 }
@@ -282,7 +282,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': "bar"
                 }
@@ -302,7 +302,7 @@ describe('Routing',() => {
         it('is() correctly tests state including missing-, too many-, too few-params or different param values',() => {
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 params: { fooId: 3 },
                 views: {
                     'main': "bar"
@@ -474,7 +474,7 @@ describe('Routing',() => {
         it('sync() correctly inferes the state from the browsers current location',() => {
             wx.router.state({
                 name: "foo",
-                route: "foo/:fooId",
+                url: "foo/:fooId",
                 views: {
                     'main': "foo"
                 }
@@ -489,7 +489,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': "bar"
                 }
@@ -522,7 +522,7 @@ describe('Routing',() => {
         it('getViewComponent() only returns params present at the state that introduced the view into the hierarchy',() => {
             wx.router.state({
                 name: "foo",
-                route: "foo/:fooId",
+                url: "foo/:fooId",
                 params: { baz: 3 },
                 views: {
                     'main': "foo"
@@ -531,7 +531,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bar",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': "foo"
                 }
@@ -539,7 +539,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.baz",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'main': {
                         component: "foo",
@@ -553,7 +553,7 @@ describe('Routing',() => {
 
             wx.router.state({
                 name: "foo.bad",
-                route: "bar/:barId",
+                url: "bar/:barId",
                 views: {
                     'details': "bar"
                 }

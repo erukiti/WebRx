@@ -683,7 +683,7 @@ module wx {
 
     export interface IRouterStateConfig {
         name: string;
-        route?: string|IRoute;   // relative or absolute
+        url?: string|IRoute;   // relative or absolute
         views?: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
         params?: any;
         onEnter?: (config: IRouterStateConfig, params?: any)=> void;
@@ -739,8 +739,9 @@ module wx {
         /**
         * Transitions to the state inferred from the browser's current location
         * This method should be invoked once after registering application states.
+        * @param {string} url If specified the router state will be synced to this value, otherwise to window.location.path 
         **/
-        sync(): void;
+        sync(url?:string): void;
 
         /**
         * Registers a state configuration under a given state name.
