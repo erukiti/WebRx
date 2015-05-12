@@ -37,7 +37,7 @@ describe('Routing',() => {
 
                 router.state({
                     name: "foo",
-                    route: "foo/:bar"
+                    url: "foo/:bar"
                 });
 
                 var el = <HTMLAnchorElement> document.querySelector("#fixture2");
