@@ -735,13 +735,6 @@ module wx {
 
     export interface IRouter {
         /**
-        * An absolute path to which all registered routes will be relative to.
-        * This property must initialized before registering any states.
-        * Default: /
-        **/
-        baseUrl: string;
-        
-        /**
         * Transitions to the state inferred from the browser's current location
         * This method should be invoked once after registering application states.
         **/
