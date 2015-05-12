@@ -1,7 +1,9 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../node_modules/reflect-metadata/reflect-metadata.d.ts" />
 /// <reference path="../Interfaces.ts" />
-/// <reference path="Events.ts" />
+/// <reference path="./Command.ts" />
+/// <reference path="../Collections/List.ts" />
+/// <reference path="./Events.ts" />
+/// <reference path="./Reflect.ts" />
 /// <reference path="../IID.ts" />
 
 /*

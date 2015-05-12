@@ -1,6 +1,7 @@
-﻿/// <reference path="../Core/Utils.ts" />
+/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
 
-declare var Set: any;
+/// <reference path="../Core/Utils.ts" />
+/// <reference path="../Interfaces.ts" />
 
 module wx {
     "use strict";

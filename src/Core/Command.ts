@@ -1,6 +1,6 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../IID.ts" />
-/// <reference path="Utils.ts" />
+/// <reference path="./Utils.ts" />
 /// <reference path="../Core/Module.ts" />
 /// <reference path="../Core/Lazy.ts" />
 

@@ -2,7 +2,7 @@
 /// <reference path="../node_modules/reflect-metadata/reflect-metadata.d.ts" />
 /// <reference path="Core/ScheduledSubject.ts" />
 /// <reference path="Core/Module.ts" />
-/// <reference path="IID.ts" />
+/// <reference path="./IID.ts" />
 
 module wx {
     "use strict";

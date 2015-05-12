@@ -1,4 +1,6 @@
-﻿declare var Map;
+﻿/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+
+/// <reference path="../Interfaces.ts" />
 
 module wx {
     "use strict";
@@ -27,7 +29,7 @@ module wx {
         }
 
         public get(key: any): any {
-            let index = this.find(key);
+            var index = this.find(key);
             if (index >= 0) {
                 this.cache = key;
                 return this.values[index];
@@ -44,7 +46,7 @@ module wx {
         }
 
         public delete(key: any): boolean {
-            let index = this.find(key);
+            var index = this.find(key);
             if (index >= 0) {
                 this.keys.splice(index, 1);
                 this.values.splice(index, 1);
@@ -61,10 +63,10 @@ module wx {
         }
 
         public forEach(callback: (value: any, key: any, map: IMap<any, any>) => void, thisArg?: any): void {
-            let size = this.size;
-            for (let i = 0; i < size; ++i) {
-                let key = this.keys[i];
-                let value = this.values[i];
+            var size = this.size;
+            for (var i = 0; i < size; ++i) {
+                var key = this.keys[i];
+                var value = this.values[i];
                 this.cache = key;
                 callback.call(this, value, key, this);
             }
@@ -83,9 +85,9 @@ module wx {
         cache = this.cacheSentinel;
 
         private find(key: any): number {
-            const keys = this.keys;
-            const size = keys.length;
-            for (let i = 0; i < size; ++i) {
+            var keys = this.keys;
+            var size = keys.length;
+            for (var i = 0; i < size; ++i) {
                 if (keys[i] === key) {
                     return i;
                 }
@@ -96,7 +98,7 @@ module wx {
 
     var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty("forEach")
         && Map.prototype.hasOwnProperty("add") && Map.prototype.hasOwnProperty("clear")
-        && Map.prototype.hasOwnProperty("delete") && Map.prototype.hasOwnProperty("has");
+        && Map.prototype.hasOwnProperty("devare") && Map.prototype.hasOwnProperty("has");
 
     /**
     * Creates a new WeakMap instance
