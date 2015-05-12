@@ -1,4 +1,6 @@
-﻿module wx {
+﻿/// <reference path="../Interfaces.ts" />
+
+module wx {
     "use strict";
 
     /**
