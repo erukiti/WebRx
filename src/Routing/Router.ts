@@ -159,13 +159,29 @@ module wx {
 
                 if ((params = route.parse(url)) != null) {
                     this.go(state.name, params, { location: RouterLocationChangeMode.replace });
-                    break;
+                    return;
                 }
             }
+            
+            // not found, enter root state as fallback
+            if(this.current() == null)
+                this.reload();
         }
 
         public reload(): void {
-            this.go(this.current().name, this.current().params, { force: true, location: false });
+            var state: string;
+            var params: Object;
+
+            // reload current state or enter inital root state            
+            if(this.current() != null) {
+                state = this.current().name;
+                params = this.current().params;
+            } else {
+                state = this.rootStateName;
+                params = {};
+            }
+
+            this.go(state, params, { force: true, location: RouterLocationChangeMode.replace });
         }
 
         public getViewComponent(viewName: string): IViewConfig {
