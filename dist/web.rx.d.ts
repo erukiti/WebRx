@@ -418,7 +418,7 @@ declare module wx {
     function isRxObservable(target: any): boolean;
     function unwrapProperty(prop: any): any;
     function isInUnitTest(): boolean;
-    function getQueryParameter(name: any): string;
+    function getSearchParameters(query?: string): {};
     function args2Array(args: IArguments): Array<any>;
     function formatString(fmt: string, ...args: any[]): string;
     function extend(src: Object, dst: Object, inherited?: boolean): Object;

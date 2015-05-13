@@ -163,13 +163,20 @@ var wx;
         return false;
     }
     wx.isInUnitTest = isInUnitTest;
-    function getQueryParameter(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regexQueryParam = new RegExp("[\\?&]" + name + "=([^&#]*)");
-        var results = regexQueryParam.exec(wx.app.history.location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    function getSearchParameters(query) {
+        query = query || wx.app.history.location.search.substr(1);
+        if (query) {
+            var result = {};
+            var params = query.split("&");
+            for (var i = 0; i < params.length; i++) {
+                var tmp = params[i].split("=");
+                result[tmp[0]] = decodeURIComponent(tmp[1]);
+            }
+            return result;
+        }
+        return {};
     }
-    wx.getQueryParameter = getQueryParameter;
+    wx.getSearchParameters = getSearchParameters;
     function args2Array(args) {
         var result = [];
         for (var i = 0, len = args.length; i < len; i++) {
@@ -6849,12 +6856,24 @@ var wx;
                 var route = this.getAbsoluteRouteForState(state.name);
                 if ((params = route.parse(url)) != null) {
                     this.go(state.name, params, { location: 2 /* replace */ });
-                    break;
+                    return;
                 }
             }
+            if (this.current() == null)
+                this.reload();
         };
         Router.prototype.reload = function () {
-            this.go(this.current().name, this.current().params, { force: true, location: false });
+            var state;
+            var params;
+            if (this.current() != null) {
+                state = this.current().name;
+                params = this.current().params;
+            }
+            else {
+                state = this.rootStateName;
+                params = {};
+            }
+            this.go(state, params, { force: true, location: 2 /* replace */ });
         };
         Router.prototype.getViewComponent = function (viewName) {
             var _current = this.current();
@@ -7089,6 +7108,6 @@ var wx;
 })(wx || (wx = {}));
 var wx;
 (function (wx) {
-    wx.version = '0.9.82';
+    wx.version = '0.9.83';
 })(wx || (wx = {}));
 //# sourceMappingURL=web.rx.js.map
