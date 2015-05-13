@@ -168,8 +168,8 @@ module wx {
         }
 
         public reload(): void {
-            var state: string;
-            var params: Object;
+            let state: string;
+            let params: Object;
 
             // reload current state or enter inital root state            
             if(this.current() != null) {

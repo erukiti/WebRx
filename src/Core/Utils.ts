@@ -125,8 +125,8 @@ module wx {
         query = query || app.history.location.search.substr(1);
         
         if(query) {
-            var result = {};
-            var params = query.split("&");
+            let result = {};
+            let params = query.split("&");
             for ( var i = 0; i < params.length; i++) {
                 var tmp = params[i].split("=");
                 result[tmp[0]] = decodeURIComponent(tmp[1]);
