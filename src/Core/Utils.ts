@@ -117,15 +117,25 @@ module wx {
 
         return false;
     }
-        
+    
     /**
-    * Extracts a query parameter from the current location
+    * Extracts query parameters and returns than as associative array
     */
-    export function getQueryParameter(name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regexQueryParam = new RegExp("[\\?&]" + name + "=([^&#]*)");
-        var results = regexQueryParam.exec(app.history.location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    export function getSearchParameters(query?:string) {
+        query = query || app.history.location.search.substr(1);
+        
+        if(query) {
+            var result = {};
+            var params = query.split("&");
+            for ( var i = 0; i < params.length; i++) {
+                var tmp = params[i].split("=");
+                result[tmp[0]] = decodeURIComponent(tmp[1]);
+            }
+
+            return result;
+        } 
+        
+        return {};
     }
 
     /**
