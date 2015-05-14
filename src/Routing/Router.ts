@@ -25,17 +25,27 @@ module wx {
 
             // monitor navigation history
             app.history.onPopState.subscribe((e) => {
-                let state = <IHistoryState> e.state;
-                let stateName = state.stateName;
-
-                if (stateName != null) {
-                    // enter state using extracted params
-                    this.go(stateName, state.params, { location: false });
-
-                    // update title
-                    app.title(state.title);
+                try {
+                    // certain versions of WebKit raise an empty popstate event on page-load
+                    if(e && e.state) {
+                        let state = <IHistoryState> e.state;
+                        let stateName = state.stateName;
+        
+                        if (stateName != null) {
+                            // enter state using extracted params
+                            this.go(stateName, state.params, { location: false });
+        
+                            // update title
+                            app.title(state.title);
+                        }
+                    }
+                }
+                
+                catch(e) {
+                    app.defaultExceptionHandler.onNext(e);                
                 }
             });
+
 
             // monitor title changes
             app.title.changed.subscribe(x => {
