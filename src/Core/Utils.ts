@@ -278,7 +278,7 @@ module wx {
     */
     export function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...classNames: string[]): void {
         if (classNames) {
-            let currentClassNames = node.className.match(cssClassNameRegex) || [];
+            let currentClassNames = node.className.match(regexCssClassName) || [];
             let index: number;
             let className;
 
