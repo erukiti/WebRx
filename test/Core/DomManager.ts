@@ -339,31 +339,6 @@ describe('DomManager',() => {
             expect(prop()).toEqual("bar");
         });
 
-        it('returned observable shares subscriptions',() => {
-            var def = "{ text: foo + bar }";
-            var compiled: any;
-
-            var model: any = {
-                foo: wx.property(42),
-                bar: wx.property("hello")
-            };
-
-            var ctx = testutils.createModelContext(model);
-            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
-
-            // count evals
-            var evalCount = 0;
-            var evalObs = Rx.Observer.create<any>(x => evalCount++);
-            var obs = domManager.expressionToObservable(compiled['text'], ctx, evalObs);
-
-            var val;
-            obs.subscribe(x => { val = x });
-            obs.subscribe(x => { val = x });
-            model.foo(3);
-
-            expect(evalCount).toEqual(1 + 1);   // + 1 for initial evaluation
-        });
-
         it('an expression evaluating to an observable property result, using the propref-modifier (@) should return the property itself instead of its value ',() => {
             var compiled: any;
 

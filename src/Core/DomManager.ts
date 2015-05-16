@@ -300,10 +300,7 @@ module wx {
                 result :
                 Rx.Observable.return(result);
 
-            return obs.startWith(startValue)
-                .concatAll()
-                .publish()
-                .refCount();
+            return obs.startWith(startValue).concatAll();
         }
 
         //////////////////////////////////
