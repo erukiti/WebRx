@@ -1,4 +1,4 @@
-﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+﻿///<reference path="../Interfaces.ts" />
 
 module wx.internal {
     "use strict";

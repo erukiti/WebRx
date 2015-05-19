@@ -1,5 +1,4 @@
-﻿///<reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Core/DomManager.ts" />
+﻿/// <reference path="../../Core/DomManager.ts" />
 /// <reference path="../../Interfaces.ts" />
 /// <reference path="../../Core/Log.ts" />
 /// <reference path="../../Core/Animation.ts" />

@@ -1,5 +1,4 @@
-﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../RTTI/IID.ts" />
+﻿/// <reference path="../RTTI/IID.ts" />
 /// <reference path="../Core/Module.ts" />
 
 // NOTE: The factory method approach is necessary because it is  

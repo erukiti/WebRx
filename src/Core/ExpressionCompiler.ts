@@ -1,5 +1,4 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Core/Resources.ts" />
 

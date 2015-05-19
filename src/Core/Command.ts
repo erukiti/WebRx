@@ -1,5 +1,4 @@
-﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../RTTI/IID.ts" />
+﻿/// <reference path="../RTTI/IID.ts" />
 /// <reference path="Utils.ts" />
 /// <reference path="../Core/Module.ts" />
 

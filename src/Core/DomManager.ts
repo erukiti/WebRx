@@ -1,5 +1,4 @@
-﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Collections/WeakMap.ts" />
+﻿/// <reference path="../Collections/WeakMap.ts" />
 /// <reference path="../Core/Resources.ts" />
 /// <reference path="../Core/Injector.ts" />
 /// <reference path="../Collections/Set.ts" />
