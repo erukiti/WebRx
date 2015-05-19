@@ -1,4 +1,4 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
 /// <reference path="./Command.ts" />
 /// <reference path="../Collections/List.ts" />
