@@ -354,7 +354,7 @@ module wx {
         }
 
         public history: IHistory;
-        public title: IObservableProperty<string> = property<string>();
+        public title: IObservableProperty<string> = property<string>(document.title);
 
         ///////////////////////
         // Implementation
