@@ -32,6 +32,8 @@ module wx {
             var viewName = this.domManager.evaluateExpression(compiled, ctx);
             var currentConfig: IViewConfig;
             var cleanup: Rx.CompositeDisposable;
+            var enterAnimation: any = undefined;
+            var leaveAnimation: any = undefined;
 
             function doCleanup() {
                 if (cleanup) {
@@ -53,12 +55,31 @@ module wx {
 
                     if (config != null) {
                         if (!isEqual(currentConfig, config)) {
-                            cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
+                            if(config.animations != null) {
+                                // setup enter animation setup
+                                enterAnimation = config.animations.enter;
+                                
+                                if (typeof enterAnimation === "string") {
+                                    enterAnimation = module.animation(enterAnimation);
+                                }
+
+                                // setup leave animation
+                                leaveAnimation = config.animations.leave;
+                                
+                                if (typeof leaveAnimation === "string") {
+                                    leaveAnimation = module.animation(leaveAnimation);
+                                }
+                            }
+                            
+                            cleanup.add(this.applyTemplate(config.component, config.params, enterAnimation, leaveAnimation, el, ctx, module));
 
                             currentConfig = config;
                         }
                     } else {
-                        cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module));
+                        cleanup.add(this.applyTemplate(null, null, enterAnimation, leaveAnimation, el, ctx, module));
+
+                        enterAnimation = undefined;
+                        leaveAnimation = undefined;
 
                         currentConfig = <any> {};
                     }
@@ -93,7 +114,7 @@ module wx {
         protected router: IRouter;
 
         protected applyTemplate(componentName: string, componentParams: Object,
-            animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.IDisposable {
+            enterAnimation: IAnimation, leaveAnimation: IAnimation, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.IDisposable {
             var self = this;
             var oldElements = nodeChildrenToArray<Node>(el);
             var combined: Array<Rx.Observable<any>> = [];
@@ -128,16 +149,6 @@ module wx {
 
             // construct leave-observable
             if (oldElements.length > 0) {
-                var leaveAnimation: IAnimation;
-
-                if (animations && animations.leave) {
-                    if (typeof animations.leave === "string") {
-                        leaveAnimation = module.animation(<string> animations.leave);
-                    } else {
-                        leaveAnimation = <IAnimation> animations.leave;
-                    }
-                }
-
                 if (leaveAnimation) {
                     leaveAnimation.prepare(oldElements);
 
@@ -153,16 +164,6 @@ module wx {
 
             // construct enter-observable
             if (componentName != null) {
-                var enterAnimation: IAnimation;
-
-                if (animations && animations.enter) {
-                    if (typeof animations.enter === "string") {
-                        enterAnimation = module.animation(<string> animations.enter);
-                    } else {
-                        enterAnimation = <IAnimation> animations.enter;
-                    }
-                }
-
                 obs = Rx.Observable.startDeferred<any>(() => instantiateComponent(enterAnimation));
 
                 if (enterAnimation) {
