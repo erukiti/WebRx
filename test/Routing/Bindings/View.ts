@@ -77,6 +77,57 @@ describe('Routing', () => {
                         .map(x => wx.internal.getNodeValue(x, domManager))).toEqual(items);
                 });
 
+                it('view transitions are exposed via the router\'s viewTransitionsObservable', () => {
+                    loadFixtures('templates/Routing/Bindings/View.html');
+
+                    var items = [3, 2, 1];
+
+                    if (!animated) {
+                        router.state({
+                            name: "foo",
+                            views: {
+                                'main': {
+                                    component: "wx-select",
+                                    params: {
+                                        items: items
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        router.state({
+                            name: "foo",
+                            views: {
+                                'main': {
+                                    component: "wx-select",
+                                    params: {
+                                        items: items
+                                    },
+                                    animations: {
+                                        enter: "dummyEnter",
+                                        leave: "dummyLeave"
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    var el = <HTMLElement> document.querySelector("#fixture1");
+                    var model = {};
+                    expect(() => wx.applyBindings(model, el)).not.toThrow();
+                    
+                    var witnessedTransition = false;
+                    router.viewTransitions.subscribe(x=> {
+                        witnessedTransition = x.view === 'main' &&
+                            x.fromComponent === undefined &&
+                            x.toComponent === "wx-select";
+                    });
+
+                    router.go("foo");
+
+                    expect(witnessedTransition).toBeTruthy();
+                });
+
                 it("cleans up view if there's no component registered for the current state", () => {
                     loadFixtures('templates/Routing/Bindings/View.html');
 

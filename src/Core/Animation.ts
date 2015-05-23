@@ -236,12 +236,12 @@ module wx {
      * elements targeted by the animation as soon as the transition has ended.
      * @param {string} startTransitionClass The css class(es) to apply to trigger the transition.
      * @param {string} completeTransitionClass The css class(es) to apply to trigger to the element
-     * as soon as the animation has ended. 
+     * as soon as the animation has ended (optional). 
      * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
      */
     export function animation(prepareTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>,
         startTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>,
-        completeTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>): IAnimation;
+        completeTransitionClass?: string|Array<string>|Array<IAnimationCssClassInstruction>): IAnimation;
      
     /**
      * Registers a scripted animation

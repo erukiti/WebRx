@@ -631,7 +631,7 @@ module wx {
     }
 
     export interface IAnimationRegistry {
-        animation(name: string, filter: IAnimation): IAnimationRegistry;
+        animation(name: string, animation: IAnimation): IAnimationRegistry;
         animation(name: string): IAnimation;
     }
 
@@ -702,6 +702,12 @@ module wx {
         animations?: IViewAnimationDescriptor;
     }
 
+    export interface IViewTransition {
+        view: string;
+        fromComponent?: string;
+        toComponent: string;
+    }
+
     export const enum RouterLocationChangeMode {
         add = 1,
         replace = 2
@@ -733,7 +739,7 @@ module wx {
 
     export interface IRouter {
         /**
-        * Transitions to the state inferred from the browser's current location
+        * Transitions to the state inferred from the specified url or the browser's current location
         * This method should be invoked once after registering application states.
         * @param {string} url If specified the router state will be synced to this value, otherwise to window.location.path 
         **/
@@ -749,6 +755,11 @@ module wx {
         * Represents the configuration object for the router's 
         **/
         current: IObservableProperty<IRouterState>;
+
+        /**
+        * An observable that notifies of completed view transitions in response to router state changes 
+        **/
+        viewTransitions: Rx.Observable<IViewTransition>;
 
         /**
         * Invoke this method to programatically alter or extend IRouter.current.params. 

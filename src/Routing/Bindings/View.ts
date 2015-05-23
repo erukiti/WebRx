@@ -2,6 +2,7 @@
 /// <reference path="../../Interfaces.ts" />
 /// <reference path="../../Core/Log.ts" />
 /// <reference path="../../Core/Animation.ts" />
+/// <reference path="../Router.ts" />
 
 module wx {
     "use strict";
@@ -71,12 +72,14 @@ module wx {
                                 }
                             }
                             
-                            cleanup.add(this.applyTemplate(config.component, config.params, enterAnimation, leaveAnimation, el, ctx, module));
+                            cleanup.add(this.applyTemplate(viewName, config.component, currentConfig ? currentConfig.component : undefined, 
+                                config.params, enterAnimation, leaveAnimation, el, ctx, module));
 
                             currentConfig = config;
                         }
                     } else {
-                        cleanup.add(this.applyTemplate(null, null, enterAnimation, leaveAnimation, el, ctx, module));
+                        cleanup.add(this.applyTemplate(viewName, null, currentConfig ? currentConfig.component : undefined, 
+                            null, enterAnimation, leaveAnimation, el, ctx, module));
 
                         enterAnimation = undefined;
                         leaveAnimation = undefined;
@@ -113,7 +116,7 @@ module wx {
         protected domManager: IDomManager;
         protected router: IRouter;
 
-        protected applyTemplate(componentName: string, componentParams: Object,
+        protected applyTemplate(viewName: string, componentName: string, previousComponentName: string, componentParams: Object, 
             enterAnimation: IAnimation, leaveAnimation: IAnimation, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.IDisposable {
             var self = this;
             var oldElements = nodeChildrenToArray<Node>(el);
@@ -170,6 +173,18 @@ module wx {
                     obs = obs.continueWith(enterAnimation.run(el.childNodes))
                         .continueWith(() => enterAnimation.complete(el.childNodes));
                 }
+                
+                // notify world
+                obs = obs.continueWith(() => {
+                    var routerInternal = <internal.IRouterInternals> <any> this.router;
+
+                    var transition: IViewTransition = {
+                        view: viewName,
+                        fromComponent: previousComponentName,
+                        toComponent: componentName 
+                    }
+                    routerInternal.viewTransitionsSubject.onNext(transition);
+                });
 
                 combined.push(obs);
             }

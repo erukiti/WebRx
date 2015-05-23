@@ -15,10 +15,17 @@ module wx {
         params: Object;
         title?: string;
     }
+    
+    export module internal {
+        export interface IRouterInternals {
+            viewTransitionsSubject: Rx.Subject<IViewTransition>;
+        }
+    }
 
-    class Router implements IRouter {
+    class Router implements IRouter, internal.IRouterInternals {
         constructor(domManager: IDomManager) {
             this.domManager = domManager;
+            this.viewTransitions = this.viewTransitionsSubject.asObservable();
 
             this.reset(false);
 
@@ -231,6 +238,8 @@ module wx {
         }
 
         public current = property<IRouterState>();
+        
+        public viewTransitions: Rx.Observable<IViewTransition>;
 
         //////////////////////////////////
         // Implementation
@@ -243,6 +252,7 @@ module wx {
         private parentPathDirective = "^";
         private rootStateName = "$";
         private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
+        public viewTransitionsSubject = new Rx.Subject<IViewTransition>();
 
         private registerStateInternal(state: IRouterStateConfig) {
             var parts = state.name.split(this.pathSeparator);
