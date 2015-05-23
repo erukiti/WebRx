@@ -585,7 +585,6 @@ module wx {
     }
 
     export interface IComponentTemplateDescriptor {
-        (params?: any): string|Node[];  // Factory 
         require?: string;       // Async AMD
         promise?: Rx.IPromise<Node[]>;  // Async Promise
         resolve?: string;       // DI
@@ -593,7 +592,6 @@ module wx {
     }
 
     export interface IComponentViewModelDescriptor {
-        (params: any): any;     // Factory 
         require?: string;       // Async AMD loading
         promise?: Rx.IPromise<string>;  // Async Promise
         resolve?: string;       // DI
@@ -605,8 +603,8 @@ module wx {
         resolve?: string;       // DI
 
         // template & viewModel are mutually exclusive with require and resolve
-        template?: string|Node[]|IComponentTemplateDescriptor;
-        viewModel?: Array<any>|IComponentViewModelDescriptor;
+        template?: string|Node[]|IComponentTemplateDescriptor|((params?: any)=> string|Node[]);
+        viewModel?: Array<any>|IComponentViewModelDescriptor|((params: any)=> any);
 
         preBindingInit?: string;   // name of method on view-model to invoke before bindings get applied
         postBindingInit?: string;  // name of method on view-model to invoke after binding have been applied
