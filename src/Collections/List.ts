@@ -172,14 +172,16 @@ module wx {
                 }
                 // range notification
                 else {
+                    var from = this.inner.length;   // need to capture this before "inner" gets modified 
+                    
                     if (this.beforeItemsAddedSubject.isValueCreated) {
-                        this.beforeItemsAddedSubject.value.onNext({ items: items, from: this.inner.length });
+                        this.beforeItemsAddedSubject.value.onNext({ items: items, from: from });
                     }
 
                     Array.prototype.push.apply(this.inner, items);
 
                     if (this.itemsAddedSubject.isValueCreated) {
-                        this.itemsAddedSubject.value.onNext({ items: items, from: this.inner.length });
+                        this.itemsAddedSubject.value.onNext({ items: items, from: from });
                     }
 
                     if (this.changeTrackingEnabled) {
