@@ -947,7 +947,7 @@ var wx;
                     wx.log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
                 }
             });
-            this.title = wx.property();
+            this.title = wx.property(document.title);
             if (!wx.isInUnitTest()) {
                 this.history = this.createHistory();
             }
@@ -1289,7 +1289,7 @@ var wx;
                 return innerDisp;
             });
             var startValue = wx.isRxObservable(result) ? result : Rx.Observable.return(result);
-            return obs.startWith(startValue).concatAll().publish().refCount();
+            return obs.startWith(startValue).concatAll();
         };
         DomManager.prototype.applyBindingsInternal = function (ctx, el, module) {
             var result = false;
@@ -1541,7 +1541,12 @@ var wx;
                         if (!prop.source) {
                             var events = _this.getCheckedEventObservables(el);
                             cleanup.add(Rx.Observable.merge(events).subscribe(function (e) {
-                                prop(el.checked);
+                                try {
+                                    prop(el.checked);
+                                }
+                                catch (e) {
+                                    wx.app.defaultExceptionHandler.onNext(e);
+                                }
                             }));
                         }
                     }
@@ -1699,12 +1704,17 @@ var wx;
                     if (moduleNames.length > 0) {
                         var observables = moduleNames.map(function (x) { return wx.loadModule(x); });
                         disp = Rx.Observable.combineLatest(observables, function (_) { return wx.args2Array(arguments); }).subscribe(function (modules) {
-                            var moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
-                            var merged = new internal.moduleConstructor(moduleName);
-                            merged.merge(module || wx.app);
-                            modules.forEach(function (x) { return merged.merge(x); });
-                            self.applyValue(el, merged, template, ctx, state, initialApply);
-                            initialApply = false;
+                            try {
+                                var moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
+                                var merged = new internal.moduleConstructor(moduleName);
+                                merged.merge(module || wx.app);
+                                modules.forEach(function (x) { return merged.merge(x); });
+                                self.applyValue(el, merged, template, ctx, state, initialApply);
+                                initialApply = false;
+                            }
+                            catch (e) {
+                                wx.app.defaultExceptionHandler.onNext(e);
+                            }
                         });
                         if (disp != null)
                             cleanup.add(disp);
@@ -1931,7 +1941,12 @@ var wx;
                 if (exp.hasOwnProperty("parameter"))
                     commandParameter = this.domManager.evaluateExpression(opt.parameter, ctx);
                 state.cleanup.add(obs.subscribe(function (_) {
-                    command.execute(commandParameter);
+                    try {
+                        command.execute(commandParameter);
+                    }
+                    catch (e) {
+                        wx.app.defaultExceptionHandler.onNext(e);
+                    }
                 }));
             }
             else {
@@ -2759,15 +2774,25 @@ var wx;
                 handler = wx.unwrapProperty(handler);
                 if (!wx.isCommand(handler)) {
                     state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (e) {
-                        handler.apply(ctx.$data, [ctx]);
-                        e.preventDefault();
+                        try {
+                            handler.apply(ctx.$data, [ctx]);
+                            e.preventDefault();
+                        }
+                        catch (e) {
+                            wx.app.defaultExceptionHandler.onNext(e);
+                        }
                     }));
                 }
                 else {
                     command = handler;
                     state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (e) {
-                        command.execute(undefined);
-                        e.preventDefault();
+                        try {
+                            command.execute(undefined);
+                            e.preventDefault();
+                        }
+                        catch (e) {
+                            wx.app.defaultExceptionHandler.onNext(e);
+                        }
                     }));
                 }
             }
@@ -2777,8 +2802,13 @@ var wx;
                 if (exp.hasOwnProperty("parameter"))
                     commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
                 state.cleanup.add(obs.where(function (e) { return _this.testCombinations(combinations, e); }).subscribe(function (e) {
-                    command.execute(commandParameter);
-                    e.preventDefault();
+                    try {
+                        command.execute(commandParameter);
+                        e.preventDefault();
+                    }
+                    catch (e) {
+                        wx.app.defaultExceptionHandler.onNext(e);
+                    }
                 }));
             }
             else {
@@ -3272,7 +3302,12 @@ var wx;
                         if (!prop.source) {
                             var events = _this.getTextInputEventObservables(el, isTextArea);
                             eventSubscription = Rx.Observable.merge(events).subscribe(function (e) {
-                                prop(el.value);
+                                try {
+                                    prop(el.value);
+                                }
+                                catch (e) {
+                                    wx.app.defaultExceptionHandler.onNext(e);
+                                }
                             });
                         }
                     }
@@ -3380,10 +3415,15 @@ var wx;
                         updateElement(_this.domManager, prop());
                         if (!prop.source) {
                             cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(function (e) {
-                                if (useDomManagerForValueUpdates)
-                                    prop(internal.getNodeValue(el, _this.domManager));
-                                else
-                                    prop(el.value);
+                                try {
+                                    if (useDomManagerForValueUpdates)
+                                        prop(internal.getNodeValue(el, _this.domManager));
+                                    else
+                                        prop(el.value);
+                                }
+                                catch (e) {
+                                    wx.app.defaultExceptionHandler.onNext(e);
+                                }
                             }));
                         }
                     }
@@ -3882,12 +3922,13 @@ var wx;
                     }
                 }
                 else {
+                    var from = _this.inner.length;
                     if (_this.beforeItemsAddedSubject.isValueCreated) {
-                        _this.beforeItemsAddedSubject.value.onNext({ items: items, from: _this.inner.length });
+                        _this.beforeItemsAddedSubject.value.onNext({ items: items, from: from });
                     }
                     Array.prototype.push.apply(_this.inner, items);
                     if (_this.itemsAddedSubject.isValueCreated) {
-                        _this.itemsAddedSubject.value.onNext({ items: items, from: _this.inner.length });
+                        _this.itemsAddedSubject.value.onNext({ items: items, from: from });
                     }
                     if (_this.changeTrackingEnabled) {
                         items.forEach(function (x) {
@@ -6514,135 +6555,6 @@ var wx;
 var wx;
 (function (wx) {
     "use strict";
-    var ViewBinding = (function () {
-        function ViewBinding(domManager, router) {
-            this.priority = 1000;
-            this.controlsDescendants = true;
-            this.domManager = domManager;
-            this.router = router;
-        }
-        ViewBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-            var _this = this;
-            if (node.nodeType !== 1)
-                internal.throwError("view-binding only operates on elements!");
-            if (options == null)
-                internal.throwError("invalid binding-options!");
-            var el = node;
-            var compiled = this.domManager.compileBindingOptions(options, module);
-            var viewName = this.domManager.evaluateExpression(compiled, ctx);
-            var currentConfig;
-            var cleanup;
-            function doCleanup() {
-                if (cleanup) {
-                    cleanup.dispose();
-                    cleanup = null;
-                }
-            }
-            if (viewName == null || typeof viewName !== "string")
-                internal.throwError("views must be named!");
-            state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(function (newState) {
-                try {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-                    var config = _this.router.getViewComponent(viewName);
-                    if (config != null) {
-                        if (!wx.isEqual(currentConfig, config)) {
-                            cleanup.add(_this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
-                            currentConfig = config;
-                        }
-                    }
-                    else {
-                        cleanup.add(_this.applyTemplate(null, null, currentConfig ? currentConfig.animations : {}, el, ctx, module));
-                        currentConfig = {};
-                    }
-                }
-                catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                }
-            }));
-            state.cleanup.add(Rx.Disposable.create(function () {
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-            }));
-        };
-        ViewBinding.prototype.configure = function (options) {
-        };
-        ViewBinding.prototype.applyTemplate = function (componentName, componentParams, animations, el, ctx, module) {
-            var self = this;
-            var oldElements = wx.nodeChildrenToArray(el);
-            var combined = [];
-            var obs;
-            function removeOldElements() {
-                oldElements.forEach(function (x) {
-                    self.domManager.cleanNode(x);
-                    el.removeChild(x);
-                });
-            }
-            function instantiateComponent(animation) {
-                ctx.$componentParams = componentParams;
-                var container = document.createElement("div");
-                var binding = wx.formatString("component: { name: '{0}', params: $componentParams }", componentName);
-                container.setAttribute("data-bind", binding);
-                if (animation != null)
-                    animation.prepare(container);
-                el.appendChild(container);
-                self.domManager.applyBindings(ctx, container);
-            }
-            if (oldElements.length > 0) {
-                var leaveAnimation;
-                if (animations && animations.leave) {
-                    if (typeof animations.leave === "string") {
-                        leaveAnimation = module.animation(animations.leave);
-                    }
-                    else {
-                        leaveAnimation = animations.leave;
-                    }
-                }
-                if (leaveAnimation) {
-                    leaveAnimation.prepare(oldElements);
-                    obs = leaveAnimation.run(oldElements).continueWith(function () { return leaveAnimation.complete(oldElements); }).continueWith(removeOldElements);
-                }
-                else {
-                    obs = Rx.Observable.startDeferred(removeOldElements);
-                }
-                combined.push(obs);
-            }
-            if (componentName != null) {
-                var enterAnimation;
-                if (animations && animations.enter) {
-                    if (typeof animations.enter === "string") {
-                        enterAnimation = module.animation(animations.enter);
-                    }
-                    else {
-                        enterAnimation = animations.enter;
-                    }
-                }
-                obs = Rx.Observable.startDeferred(function () { return instantiateComponent(enterAnimation); });
-                if (enterAnimation) {
-                    obs = obs.continueWith(enterAnimation.run(el.childNodes)).continueWith(function () { return enterAnimation.complete(el.childNodes); });
-                }
-                combined.push(obs);
-            }
-            if (combined.length > 1)
-                obs = Rx.Observable.combineLatest(combined, wx.noop).take(1);
-            else if (combined.length === 1)
-                obs = combined[0].take(1);
-            else
-                obs = null;
-            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
-        };
-        return ViewBinding;
-    })();
-    var internal;
-    (function (internal) {
-        internal.viewBindingConstructor = ViewBinding;
-    })(internal = wx.internal || (wx.internal = {}));
-})(wx || (wx = {}));
-var wx;
-(function (wx) {
-    "use strict";
     var reEscape = /[\-\[\]{}()+?.,\\\^$|#\s]/g;
     var reParam = /([:*])(\w+)/g;
     var RouteMatcher = (function () {
@@ -6756,14 +6668,23 @@ var wx;
             this.parentPathDirective = "^";
             this.rootStateName = "$";
             this.validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
+            this.viewTransitionsSubject = new Rx.Subject();
             this.domManager = domManager;
+            this.viewTransitions = this.viewTransitionsSubject.asObservable();
             this.reset(false);
             wx.app.history.onPopState.subscribe(function (e) {
-                var state = e.state;
-                var stateName = state.stateName;
-                if (stateName != null) {
-                    _this.go(stateName, state.params, { location: false });
-                    wx.app.title(state.title);
+                try {
+                    if (e && e.state) {
+                        var state = e.state;
+                        var stateName = state.stateName;
+                        if (stateName != null) {
+                            _this.go(stateName, state.params, { location: false });
+                            wx.app.title(state.title);
+                        }
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
                 }
             });
             wx.app.title.changed.subscribe(function (x) {
@@ -7095,6 +7016,141 @@ var wx;
     var internal;
     (function (internal) {
         internal.routerConstructor = Router;
+    })(internal = wx.internal || (wx.internal = {}));
+})(wx || (wx = {}));
+var wx;
+(function (wx) {
+    "use strict";
+    var ViewBinding = (function () {
+        function ViewBinding(domManager, router) {
+            this.priority = 1000;
+            this.controlsDescendants = true;
+            this.domManager = domManager;
+            this.router = router;
+        }
+        ViewBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+            var _this = this;
+            if (node.nodeType !== 1)
+                internal.throwError("view-binding only operates on elements!");
+            if (options == null)
+                internal.throwError("invalid binding-options!");
+            var el = node;
+            var compiled = this.domManager.compileBindingOptions(options, module);
+            var viewName = this.domManager.evaluateExpression(compiled, ctx);
+            var currentConfig;
+            var cleanup;
+            var enterAnimation = undefined;
+            var leaveAnimation = undefined;
+            function doCleanup() {
+                if (cleanup) {
+                    cleanup.dispose();
+                    cleanup = null;
+                }
+            }
+            if (viewName == null || typeof viewName !== "string")
+                internal.throwError("views must be named!");
+            state.cleanup.add(this.router.current.changed.startWith(this.router.current()).subscribe(function (newState) {
+                try {
+                    doCleanup();
+                    cleanup = new Rx.CompositeDisposable();
+                    var config = _this.router.getViewComponent(viewName);
+                    if (config != null) {
+                        if (!wx.isEqual(currentConfig, config)) {
+                            if (config.animations != null) {
+                                enterAnimation = config.animations.enter;
+                                if (typeof enterAnimation === "string") {
+                                    enterAnimation = module.animation(enterAnimation);
+                                }
+                                leaveAnimation = config.animations.leave;
+                                if (typeof leaveAnimation === "string") {
+                                    leaveAnimation = module.animation(leaveAnimation);
+                                }
+                            }
+                            cleanup.add(_this.applyTemplate(viewName, config.component, currentConfig ? currentConfig.component : undefined, config.params, enterAnimation, leaveAnimation, el, ctx, module));
+                            currentConfig = config;
+                        }
+                    }
+                    else {
+                        cleanup.add(_this.applyTemplate(viewName, null, currentConfig ? currentConfig.component : undefined, null, enterAnimation, leaveAnimation, el, ctx, module));
+                        enterAnimation = undefined;
+                        leaveAnimation = undefined;
+                        currentConfig = {};
+                    }
+                }
+                catch (e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
+            }));
+            state.cleanup.add(Rx.Disposable.create(function () {
+                node = null;
+                options = null;
+                ctx = null;
+                state = null;
+            }));
+        };
+        ViewBinding.prototype.configure = function (options) {
+        };
+        ViewBinding.prototype.applyTemplate = function (viewName, componentName, previousComponentName, componentParams, enterAnimation, leaveAnimation, el, ctx, module) {
+            var _this = this;
+            var self = this;
+            var oldElements = wx.nodeChildrenToArray(el);
+            var combined = [];
+            var obs;
+            function removeOldElements() {
+                oldElements.forEach(function (x) {
+                    self.domManager.cleanNode(x);
+                    el.removeChild(x);
+                });
+            }
+            function instantiateComponent(animation) {
+                ctx.$componentParams = componentParams;
+                var container = document.createElement("div");
+                var binding = wx.formatString("component: { name: '{0}', params: $componentParams }", componentName);
+                container.setAttribute("data-bind", binding);
+                if (animation != null)
+                    animation.prepare(container);
+                el.appendChild(container);
+                self.domManager.applyBindings(ctx, container);
+            }
+            if (oldElements.length > 0) {
+                if (leaveAnimation) {
+                    leaveAnimation.prepare(oldElements);
+                    obs = leaveAnimation.run(oldElements).continueWith(function () { return leaveAnimation.complete(oldElements); }).continueWith(removeOldElements);
+                }
+                else {
+                    obs = Rx.Observable.startDeferred(removeOldElements);
+                }
+                combined.push(obs);
+            }
+            if (componentName != null) {
+                obs = Rx.Observable.startDeferred(function () { return instantiateComponent(enterAnimation); });
+                if (enterAnimation) {
+                    obs = obs.continueWith(enterAnimation.run(el.childNodes)).continueWith(function () { return enterAnimation.complete(el.childNodes); });
+                }
+                obs = obs.continueWith(function () {
+                    var routerInternal = _this.router;
+                    var transition = {
+                        view: viewName,
+                        fromComponent: previousComponentName,
+                        toComponent: componentName
+                    };
+                    routerInternal.viewTransitionsSubject.onNext(transition);
+                });
+                combined.push(obs);
+            }
+            if (combined.length > 1)
+                obs = Rx.Observable.combineLatest(combined, wx.noop).take(1);
+            else if (combined.length === 1)
+                obs = combined[0].take(1);
+            else
+                obs = null;
+            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
+        };
+        return ViewBinding;
+    })();
+    var internal;
+    (function (internal) {
+        internal.viewBindingConstructor = ViewBinding;
     })(internal = wx.internal || (wx.internal = {}));
 })(wx || (wx = {}));
 var wx;
