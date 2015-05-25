@@ -80,7 +80,11 @@ module wx {
                             // wire change-events depending on browser and version
                             let events = this.getTextInputEventObservables(el, isTextArea);
                             eventSubscription = Rx.Observable.merge(events).subscribe(e => {
-                                prop(el.value);
+                                try {
+                                    prop(el.value);
+                                } catch(e) {
+                                    app.defaultExceptionHandler.onNext(e);
+                                }                                    
                             });
                         }
                     }

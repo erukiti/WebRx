@@ -144,17 +144,25 @@ module wx {
 
                 if (!isCommand(handler)) {
                     state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(e => {
-                        handler.apply(ctx.$data, [ctx]);
+                        try {
+                            handler.apply(ctx.$data, [ctx]);
 
-                        e.preventDefault();
+                            e.preventDefault();
+                        } catch(e) {
+                            app.defaultExceptionHandler.onNext(e);
+                        }
                     }));
                 } else {
                     command = <ICommand<any>> <any> handler;
 
                     state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(e => {
-                        command.execute(undefined);
-
-                        e.preventDefault();
+                        try {
+                            command.execute(undefined);
+    
+                            e.preventDefault();
+                        } catch(e) {
+                            app.defaultExceptionHandler.onNext(e);
+                        }
                     }));
                 }
             } else if (typeof exp === "object") {
@@ -165,9 +173,13 @@ module wx {
                     commandParameter = this.domManager.evaluateExpression(exp.parameter, ctx);
 
                 state.cleanup.add(obs.where(e => this.testCombinations(combinations, e)).subscribe(e => {
-                    command.execute(commandParameter);
-
-                    e.preventDefault();
+                    try {
+                        command.execute(commandParameter);
+    
+                        e.preventDefault();
+                    } catch(e) {
+                        app.defaultExceptionHandler.onNext(e);
+                    }
                 }));
             } else {
                 internal.throwError("invalid binding options");

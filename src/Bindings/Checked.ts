@@ -65,7 +65,11 @@ module wx {
                             // wire change-events depending on browser and version
                             let events = this.getCheckedEventObservables(el);
                             cleanup.add(Rx.Observable.merge(events).subscribe(e => {
-                                prop(el.checked);
+                                try {
+                                    prop(el.checked);
+                                } catch(e) {
+                                    app.defaultExceptionHandler.onNext(e);
+                                }
                             }));
                         }
                     }

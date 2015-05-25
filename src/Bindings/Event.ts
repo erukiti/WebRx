@@ -97,7 +97,11 @@ module wx {
                     commandParameter = this.domManager.evaluateExpression(opt.parameter, ctx);
 
                 state.cleanup.add(obs.subscribe(_ => {
-                    command.execute(commandParameter);
+                    try {
+                        command.execute(commandParameter);
+                    } catch(e) {
+                        app.defaultExceptionHandler.onNext(e);
+                    }
                 }));
             } else {
                 internal.throwError("invalid binding options");

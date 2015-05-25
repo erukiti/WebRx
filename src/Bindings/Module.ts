@@ -61,18 +61,22 @@ module wx {
                         let observables = moduleNames.map(x => loadModule(x));
 
                         disp = Rx.Observable.combineLatest(observables,
-                            function(_) { return <IModule[]> args2Array(arguments) }).subscribe(modules => {
-                            // create intermediate module
-                            let moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
-                            let merged: IModule = new internal.moduleConstructor(moduleName);
-
-                            // merge modules into intermediate
-                            merged.merge(module || wx.app);
-                            modules.forEach(x => merged.merge(x));
-
-                            // done
-                            self.applyValue(el, merged, template, ctx, state, initialApply);
-                            initialApply = false;
+                            (_) => <IModule[]> args2Array(arguments)).subscribe(modules => {
+                            try {
+                                // create intermediate module
+                                let moduleName = (module || wx.app).name + "+" + moduleNames.join("+");
+                                let merged: IModule = new internal.moduleConstructor(moduleName);
+    
+                                // merge modules into intermediate
+                                merged.merge(module || wx.app);
+                                modules.forEach(x => merged.merge(x));
+    
+                                // done
+                                self.applyValue(el, merged, template, ctx, state, initialApply);
+                                initialApply = false;
+                            } catch(e) {
+                                app.defaultExceptionHandler.onNext(e);
+                            }
                         });
 
                         if (disp != null)

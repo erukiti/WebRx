@@ -70,10 +70,14 @@ module wx {
                         // don't attempt to updated computed properties
                         if (!prop.source) {
                             cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
-                                if (useDomManagerForValueUpdates)
-                                    prop(internal.getNodeValue(el, this.domManager));
-                                else
-                                    prop(el.value);
+                                try {
+                                    if (useDomManagerForValueUpdates)
+                                        prop(internal.getNodeValue(el, this.domManager));
+                                    else
+                                        prop(el.value);
+                                } catch(e) {
+                                    app.defaultExceptionHandler.onNext(e);
+                                }
                             }));
                         }
                     }
