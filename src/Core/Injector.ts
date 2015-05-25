@@ -1,6 +1,5 @@
-﻿/// <reference path="Utils.ts" />
-/// <reference path="Resources.ts" />
-/// <reference path="Utils.ts" />
+﻿/// <reference path="./Utils.ts" />
+/// <reference path="./Resources.ts" />
 
 module wx {
     "use strict";
@@ -25,7 +24,7 @@ module wx {
             if (this.registrations.hasOwnProperty(key))
                 internal.throwError("'{0}' is already registered", key);
 
-            if (isFunction(val)) {
+            if (wx.isFunction(val)) {
                 // second overload
                 // it's a factory function
                 factory = (args: any, deps) => val.apply(null, args);

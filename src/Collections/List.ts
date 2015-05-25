@@ -4,8 +4,9 @@
 /// <reference path="../Core/Lazy.ts" />
 /// <reference path="../Core/RefCountDisposeWrapper.ts" />
 /// <reference path="../RxJsExtensions.ts" />
-/// <reference path="../core/Log.ts" />
-/// <reference path="../core/Module.ts" />
+/// <reference path="../Core/Log.ts" />
+/// <reference path="../Core/Module.ts" />
+/// <reference path="../Core/Reflect.ts" />
 
 module wx {
     "use strict";

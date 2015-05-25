@@ -27,7 +27,6 @@
     "ix": "^1.0.6",
     "jasmine-jquery": "^2.0.6",
     "jasmine-node": "^1.14.5",
-    "reflect-metadata": "^0.1.0",
     "requirejs": "^2.1.16",
     "requirejs-text": "^2.0.12",
     "rsvp": "^3.0.17",

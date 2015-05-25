@@ -1,6 +1,7 @@
 ﻿///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../IID.ts" />
 /// <reference path="../Core/Module.ts" />
+/// <reference path="./Reflect.ts" />
 
 // NOTE: The factory method approach is necessary because it is  
 // currently impossible to implement a Typescript interface 

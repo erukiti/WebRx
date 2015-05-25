@@ -3,6 +3,7 @@
 /// <reference path="./Utils.ts" />
 /// <reference path="../Core/Module.ts" />
 /// <reference path="../Core/Lazy.ts" />
+/// <reference path="./Reflect.ts" />
 
 module wx {
     "use strict";

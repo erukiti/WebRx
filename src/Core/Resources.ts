@@ -1,5 +1,4 @@
-﻿
-module wx.res {
+﻿module wx.res {
     "use strict";
 
     export const injector = "wx.injector";

@@ -1,5 +1,4 @@
-﻿/// <reference path="Core/Injector.ts" />
-/// <reference path="Core/ExpressionCompiler.ts" />
+﻿/// <reference path="Core/ExpressionCompiler.ts" />
 /// <reference path="Core/DomManager.ts" />
 /// <reference path="Core/HtmlTemplateEngine.ts" />
 /// <reference path="Bindings/Command.ts" />
@@ -17,6 +16,7 @@
 /// <reference path="Routing/Bindings/View.ts" />
 /// <reference path="Routing/Router.ts" />
 /// <reference path="Core/MessageBus.ts" />
+/// <reference path="Core/Injector.ts" />
 
 module wx {
     "use strict";

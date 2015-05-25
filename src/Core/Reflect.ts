@@ -1240,3 +1240,56 @@ module Reflect {
         return constructor;
     }
 }
+
+module wx {
+    const implementsMetaDataKey = "wx:interfaceImpl";
+
+    /**
+    * Interface decorator
+    * @param {string} interfaceName Name of an interface
+    */
+    export function Implements(value: string|Array<string>) {
+        return function (target: Function|Object) {
+            let interfaces = Reflect.getMetadata(implementsMetaDataKey, target) || {};
+
+            if(typeof(value) === "string")
+                value = (<string> value).split(/\s+/).map(x => x.trim()).filter(x => <any> x);
+
+            for(let i=0;i<value.length;i++)            
+                interfaces[value[i]] = true;
+
+            Reflect.defineMetadata(implementsMetaDataKey, interfaces, target);
+        }
+    }
+
+    /**
+    * Tests if the target supports the interface
+    * @param {any} target
+    * @param {string} iid
+    */
+    export function queryInterface(target: any, iid: string): boolean {
+        if(target == null || isPrimitive(target))
+            return false;
+        
+        if(typeof target === "object")
+            target = target.constructor;
+            
+        let interfaces = Reflect.getMetadata(implementsMetaDataKey, target);
+        return interfaces != null && interfaces[iid];
+    }
+    
+    /**
+    * Returns all own properties of target implementing interface iid
+    * @param {any} target
+    * @param {string} iid
+    */
+    export function getOwnPropertiesImplementingInterface<T>(target: any, iid: string): PropertyInfo<T>[] {
+        return Object.keys(target).filter(propertyName => {
+            // lookup object for name
+            let o = target[propertyName];
+
+            // is it an ObservableProperty?
+            return queryInterface(o, iid);
+        }).map(x => new PropertyInfo<T>(x, <T> target[x]));
+    }
+}
