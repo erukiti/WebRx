@@ -252,8 +252,7 @@ module wx {
                 return Rx.Observable.return(undefined);
             } 
 
-            // Optimization: If we didn't capture any observables during 
-            // initial evaluation, it is treated as a constant expression
+            // Optimization: If the initial evaluation didn't touch any observables, treat it as constant expression
             if (captured.size === 0) {
                 if (isRxObservable(result))
                     return result;
