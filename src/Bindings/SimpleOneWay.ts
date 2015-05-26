@@ -1,184 +1,176 @@
-﻿/// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomManager.ts" />
-/// <reference path="../Interfaces.ts" />
+﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+import IID from "../IID"
+import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
+    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
 
-    class SingleOneWayChangeBindingBase implements IBindingHandler {
-        constructor(domManager: IDomManager) {
-            this.domManager = domManager;
-        } 
- 
-      ////////////////////
-        // IBinding
+"use strict";
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
-            if (node.nodeType !== 1)
-                internal.throwError("binding only operates on elements!");
+export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager) {
+        this.domManager = domManager;
+    } 
 
-            if (options == null)
-                internal.throwError("invalid binding-options!");
+  ////////////////////
+    // IBinding
 
-            let el = <HTMLElement> node;
-            let self = this;
-            let exp = this.domManager.compileBindingOptions(options, module);
-            let obs = this.domManager.expressionToObservable(exp, ctx);
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+        if (node.nodeType !== 1)
+            throwError("binding only operates on elements!");
 
-            // subscribe
-            state.cleanup.add(obs.subscribe(x => {
-                try {
-                    self.applyValue(el, unwrapProperty(x));
-                } catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                } 
-            }));
+        if (options == null)
+            throwError("invalid binding-options!");
 
-            // release closure references to GC 
-            state.cleanup.add(Rx.Disposable.create(() => {
-                // nullify args
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
+        let el = <HTMLElement> node;
+        let self = this;
+        let exp = this.domManager.compileBindingOptions(options, module);
+        let obs = this.domManager.expressionToObservable(exp, ctx);
 
-                // nullify common locals
-                el = null;
-                obs = null;
-                self = null;
-            }));
-        }
+        // subscribe
+        state.cleanup.add(obs.subscribe(x => {
+            try {
+                self.applyValue(el, unwrapProperty(x));
+            } catch (e) {
+                wx.app.defaultExceptionHandler.onNext(e);
+            } 
+        }));
 
-        public configure(options): void {
-            // intentionally left blank
-        }
+        // release closure references to GC 
+        state.cleanup.add(Rx.Disposable.create(() => {
+            // nullify args
+            node = null;
+            options = null;
+            ctx = null;
+            state = null;
 
-        public priority = 0;
+            // nullify common locals
+            el = null;
+            obs = null;
+            self = null;
+        }));
+    }
 
-        ////////////////////
-        // Implementation
+    public configure(options): void {
+        // intentionally left blank
+    }
 
-        protected domManager: IDomManager;
+    public priority = 0;
 
-        protected applyValue(el: HTMLElement, value: any): void {
-            internal.throwError("you need to override this method!");
-        }
+    ////////////////////
+    // Implementation
+
+    protected domManager: wx.IDomManager;
+
+    protected applyValue(el: HTMLElement, value: any): void {
+        throwError("you need to override this method!");
+    }
+}
+
+////////////////////
+// Bindings
+
+export class TextBinding extends SingleOneWayChangeBindingBase {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
+    } 
+
+    protected applyValue(el: HTMLElement, value: any): void {
+        if ((value === null) || (value === undefined))
+            value = "";
+
+        el.textContent = value;
+    }
+}
+
+export interface IVisibleBindingOptions {
+    useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css class rather than modifying the elements style property
+    hiddenClass: string;    // the css class to apply when the object is hidden
+}
+
+export class VisibleBinding extends SingleOneWayChangeBindingBase {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
+
+        this.inverse = false;
+        this.priority = 10;
+    }
+
+    public configure(_options): void {
+        let options = <IVisibleBindingOptions> _options;
+
+        VisibleBinding.useCssClass = options.useCssClass;
+        VisibleBinding.hiddenClass = options.hiddenClass;
     }
 
     ////////////////////
-    // Bindings
+    // implementation
 
-    class TextBinding extends SingleOneWayChangeBindingBase {
-        constructor(domManager: IDomManager) {
-            super(domManager);
-        } 
+    protected applyValue(el: HTMLElement, value: any): void {
+        value = this.inverse ? !value : value;
 
-        protected applyValue(el: HTMLElement, value: any): void {
-            if ((value === null) || (value === undefined))
-                value = "";
-
-            el.textContent = value;
-        }
-    }
-
-    export interface IVisibleBindingOptions {
-        useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css class rather than modifying the elements style property
-        hiddenClass: string;    // the css class to apply when the object is hidden
-    }
-
-    class VisibleBinding extends SingleOneWayChangeBindingBase {
-        constructor(domManager: IDomManager) {
-            super(domManager);
-
-            this.inverse = false;
-            this.priority = 10;
-        }
-
-        public configure(_options): void {
-            let options = <IVisibleBindingOptions> _options;
-
-            VisibleBinding.useCssClass = options.useCssClass;
-            VisibleBinding.hiddenClass = options.hiddenClass;
-        }
-
-        ////////////////////
-        // implementation
-
-        protected applyValue(el: HTMLElement, value: any): void {
-            value = this.inverse ? !value : value;
-
-            if (!VisibleBinding.useCssClass) {
-                if (!value) {
-                    el.style.display = "none";
-                } else {
-                    el.style.display = "";
-                }
+        if (!VisibleBinding.useCssClass) {
+            if (!value) {
+                el.style.display = "none";
             } else {
-                toggleCssClass(el, !value, VisibleBinding.hiddenClass);
+                el.style.display = "";
             }
-        }
-
-        protected inverse: boolean = false;
-        private static useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css classes rather than modifying the elements style property
-        private static hiddenClass: string;    // the css class to apply when the object is hidden
-    }
-
-    class HiddenBinding extends VisibleBinding {
-        constructor(domManager: IDomManager) {
-            super(domManager);
-
-            this.inverse = true;
-        } 
-    }
-
-    class HtmlBinding extends SingleOneWayChangeBindingBase {
-        constructor(domManager: IDomManager) {
-            super(domManager);
-        } 
-
-        protected applyValue(el: HTMLElement, value: any): void {
-            if ((value === null) || (value === undefined))
-                value = "";
-
-            el.innerHTML = value;
+        } else {
+            toggleCssClass(el, !value, VisibleBinding.hiddenClass);
         }
     }
 
-    class DisableBinding extends SingleOneWayChangeBindingBase {
-        constructor(domManager: IDomManager) {
-            super(domManager);
+    protected inverse: boolean = false;
+    private static useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css classes rather than modifying the elements style property
+    private static hiddenClass: string;    // the css class to apply when the object is hidden
+}
 
-            this.inverse = false;
-        }
+export class HiddenBinding extends VisibleBinding {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
 
-        ////////////////////
-        // implementation
+        this.inverse = true;
+    } 
+}
 
-        protected applyValue(el: HTMLElement, value: any): void {
-            value = this.inverse ? !value : value;
+export class HtmlBinding extends SingleOneWayChangeBindingBase {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
+    } 
 
-            if(elementCanBeDisabled(el)) {
-                (<any> el).disabled = value;
-            }
-        }
+    protected applyValue(el: HTMLElement, value: any): void {
+        if ((value === null) || (value === undefined))
+            value = "";
 
-        protected inverse: boolean = false;
+        el.innerHTML = value;
+    }
+}
+
+export class DisableBinding extends SingleOneWayChangeBindingBase {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
+
+        this.inverse = false;
     }
 
-    class EnableBinding extends DisableBinding {
-        constructor(domManager: IDomManager) {
-            super(domManager);
+    ////////////////////
+    // implementation
 
-            this.inverse = true;
+    protected applyValue(el: HTMLElement, value: any): void {
+        value = this.inverse ? !value : value;
+
+        if(elementCanBeDisabled(el)) {
+            (<any> el).disabled = value;
         }
     }
 
-    export module internal {
-        export var textBindingConstructor = <any> TextBinding;
-        export var htmlBindingConstructor = <any> HtmlBinding;
-        export var visibleBindingConstructor = <any> VisibleBinding;
-        export var hiddenBindingConstructor = <any> HiddenBinding;
-        export var disableBindingConstructor = <any> DisableBinding;
-        export var enableBindingConstructor = <any> EnableBinding;
+    protected inverse: boolean = false;
+}
+
+export class EnableBinding extends DisableBinding {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
+
+        this.inverse = true;
     }
 }

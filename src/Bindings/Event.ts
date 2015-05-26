@@ -1,115 +1,113 @@
-﻿/// <reference path="../Core/DomManager.ts" />
-/// <reference path="../Interfaces.ts" />
+﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+import IID from "../IID"
+import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
+    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, noop } from "../Core/Utils"
 
-    export interface IEventBindingOptions {
-        [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>|{ command: ICommand<any>; parameter: any };
+"use strict";
+
+export interface IEventBindingOptions {
+    [eventName: string]: (ctx: wx.IDataContext, event: Event) => any|Rx.Observer<Event>|{ command: wx.ICommand<any>; parameter: any };
+}
+
+export default class EventBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager) {
+        this.domManager = domManager;
+    } 
+
+    ////////////////////
+    // IBinding
+
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+        if (node.nodeType !== 1)
+            throwError("event-binding only operates on elements!");
+
+        if (options == null)
+            throwError("invalid binding-options!");
+
+        let el = <HTMLElement> node;
+
+        // create an observable for each event handler value
+        let tokens = this.domManager.getObjectLiteralTokens(options);
+
+        tokens.forEach(token => {
+            this.wireEvent(el, token.value, token.key, ctx, state, module);
+        });
+
+        // release closure references to GC 
+        state.cleanup.add(Rx.Disposable.create(() => {
+            // nullify args
+            node = null;
+            options = null;
+            ctx = null;
+            state = null;
+
+            // nullify common locals
+            el = null;
+
+            // nullify locals
+        }));
     }
 
-    class EventBinding implements IBindingHandler {
-        constructor(domManager: IDomManager) {
-            this.domManager = domManager;
-        } 
+    public configure(options): void {
+        // intentionally left blank
+    }
 
-        ////////////////////
-        // IBinding
+    public priority = 0;
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
-            if (node.nodeType !== 1)
-                internal.throwError("event-binding only operates on elements!");
+    ////////////////////
+    // Implementation
 
-            if (options == null)
-                internal.throwError("invalid binding-options!");
+    protected domManager: wx.IDomManager;
 
-            let el = <HTMLElement> node;
+    private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule) {
+        let exp = this.domManager.compileBindingOptions(value, module);
+        let command: wx.ICommand<any>;
+        let commandParameter = undefined;
+        let obs = Rx.Observable.fromEvent<Event>(el, eventName);
 
-            // create an observable for each event handler value
-            let tokens = this.domManager.getObjectLiteralTokens(options);
+        if (typeof exp === "function") {
+            let handler = this.domManager.evaluateExpression(exp, ctx);
+            handler = unwrapProperty(handler);
 
-            tokens.forEach(token => {
-                this.wireEvent(el, token.value, token.key, ctx, state, module);
-            });
-
-            // release closure references to GC 
-            state.cleanup.add(Rx.Disposable.create(() => {
-                // nullify args
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-
-                // nullify common locals
-                el = null;
-
-                // nullify locals
-            }));
-        }
-
-        public configure(options): void {
-            // intentionally left blank
-        }
-
-        public priority = 0;
-
-        ////////////////////
-        // Implementation
-
-        protected domManager: IDomManager;
-
-        private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: IDataContext, state: INodeState, module: IModule) {
-            let exp = this.domManager.compileBindingOptions(value, module);
-            let command: ICommand<any>;
-            let commandParameter = undefined;
-            let obs = Rx.Observable.fromEvent<Event>(el, eventName);
-
-            if (typeof exp === "function") {
-                let handler = this.domManager.evaluateExpression(exp, ctx);
-                handler = unwrapProperty(handler);
-
-                if (isFunction(handler)) {
-                    state.cleanup.add(obs.subscribe(e => {
-                        handler.apply(ctx.$data, [ctx, e]);
-                    }));
-                } else {
-                    if (isCommand(handler)) {
-                        command = <ICommand<any>> <any> handler;
-
-                        state.cleanup.add(obs.subscribe(_ => {
-                            command.execute(undefined);
-                        }));
-                    } else {
-                        // assumed to be an Rx.Observer
-                        let observer = <Rx.Observer<Event>> handler;
-
-                        // subscribe event directly to observer
-                        state.cleanup.add(obs.subscribe(observer));
-                    }
-                }
-            } else if (typeof exp === "object") {
-                let opt = <{ command: ICommand<any>; parameter: any }> exp;
-
-                command = <ICommand<any>> <any> this.domManager.evaluateExpression(<any> opt.command, ctx);
-                command = unwrapProperty(command);
-
-                if (exp.hasOwnProperty("parameter"))
-                    commandParameter = this.domManager.evaluateExpression(opt.parameter, ctx);
-
-                state.cleanup.add(obs.subscribe(_ => {
-                    try {
-                        command.execute(commandParameter);
-                    } catch(e) {
-                        app.defaultExceptionHandler.onNext(e);
-                    }
+            if (isFunction(handler)) {
+                state.cleanup.add(obs.subscribe(e => {
+                    handler.apply(ctx.$data, [ctx, e]);
                 }));
             } else {
-                internal.throwError("invalid binding options");
-            }
-        }
-    }
+                if (isCommand(handler)) {
+                    command = <wx.ICommand<any>> <any> handler;
 
-    export module internal {
-        export var eventBindingConstructor = <any> EventBinding;
+                    state.cleanup.add(obs.subscribe(_ => {
+                        command.execute(undefined);
+                    }));
+                } else {
+                    // assumed to be an Rx.Observer
+                    let observer = <Rx.Observer<Event>> handler;
+
+                    // subscribe event directly to observer
+                    state.cleanup.add(obs.subscribe(observer));
+                }
+            }
+        } else if (typeof exp === "object") {
+            let opt = <{ command: wx.ICommand<any>; parameter: any }> exp;
+
+            command = <wx.ICommand<any>> <any> this.domManager.evaluateExpression(<any> opt.command, ctx);
+            command = unwrapProperty(command);
+
+            if (exp.hasOwnProperty("parameter"))
+                commandParameter = this.domManager.evaluateExpression(opt.parameter, ctx);
+
+            state.cleanup.add(obs.subscribe(_ => {
+                try {
+                    command.execute(commandParameter);
+                } catch(e) {
+                    wx.app.defaultExceptionHandler.onNext(e);
+                }
+            }));
+        } else {
+            throwError("invalid binding options");
+        }
     }
 }

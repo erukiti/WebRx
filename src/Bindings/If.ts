@@ -1,197 +1,192 @@
-﻿/// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomManager.ts" />
-/// <reference path="../Interfaces.ts" />
-/// <reference path="../Core/Resources.ts" />
+﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+import IID from "../IID"
+import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
+    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, nodeChildrenToArray } from "../Core/Utils"
 
-    export interface IIfAnimationDescriptor {
-        enter?: string|IAnimation;
-        leave?: string|IAnimation;
-    }
+"use strict";
 
-    export interface IIfBindingOptions extends IIfAnimationDescriptor {
-        condition: string;
-    }
+export interface IIfAnimationDescriptor {
+    enter?: string|wx.IAnimation;
+    leave?: string|wx.IAnimation;
+}
 
-    class IfBinding implements IBindingHandler {
-        constructor(domManager: IDomManager) {
-            this.domManager = domManager;
-        } 
- 
-        ////////////////////
-        // IBinding
+export interface IIfBindingOptions extends IIfAnimationDescriptor {
+    condition: string;
+}
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
-            if (node.nodeType !== 1)
-                internal.throwError("if-binding only operates on elements!");
+export class IfBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager) {
+        this.domManager = domManager;
+    } 
 
-            if (options == null)
-                internal.throwError("invalid binding-options!");
+    ////////////////////
+    // IBinding
 
-            let compiled = this.domManager.compileBindingOptions(options, module);
-            let el = <HTMLElement> node;
-            let self = this;
-            let initialApply = true;
-            let exp: ICompiledExpression;
-            let animations: IIfAnimationDescriptor = <IIfAnimationDescriptor> {};
-            let cleanup: Rx.CompositeDisposable;
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+        if (node.nodeType !== 1)
+            throwError("if-binding only operates on elements!");
 
-            function doCleanup() {
-                if (cleanup) {
-                    cleanup.dispose();
-                    cleanup = null;
-                }
+        if (options == null)
+            throwError("invalid binding-options!");
+
+        let compiled = this.domManager.compileBindingOptions(options, module);
+        let el = <HTMLElement> node;
+        let self = this;
+        let initialApply = true;
+        let exp: wx.ICompiledExpression;
+        let animations: IIfAnimationDescriptor = <IIfAnimationDescriptor> {};
+        let cleanup: Rx.CompositeDisposable;
+
+        function doCleanup() {
+            if (cleanup) {
+                cleanup.dispose();
+                cleanup = null;
             }
-
-            if (typeof compiled === "object") {
-                let opt = <IIfBindingOptions> compiled;
-                exp = <ICompiledExpression> <any> opt.condition;
-
-                // extract animations
-                if (opt.enter) {
-                    animations.enter = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.enter, ctx);
-
-                    if (typeof animations.enter === "string") {
-                        animations.enter = module.animation(<string> animations.enter);
-                    }
-                }
-
-                if (opt.leave) {
-                    animations.leave = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.leave, ctx);
-
-                    if (typeof animations.leave === "string") {
-                        animations.leave = module.animation(<string> animations.leave);
-                    }
-                }
-            } else {
-                exp = compiled;
-            }
-
-            let obs = this.domManager.expressionToObservable(exp, ctx);
-
-            // backup inner HTML
-            let template = new Array<Node>();
-
-            // subscribe
-            state.cleanup.add(obs.subscribe(x => {
-                try {
-                    doCleanup();
-                    cleanup = new Rx.CompositeDisposable();
-
-                    cleanup.add(self.applyValue(el, unwrapProperty(x), template, ctx, animations, initialApply));
-
-                    initialApply = false;
-                } catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                } 
-            }));
-
-            // release closure references to GC 
-            state.cleanup.add(Rx.Disposable.create(() => {
-                // nullify args
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-
-                // nullify common locals
-                obs = null;
-                el = null;
-                self = null;
-
-                // nullify locals
-                template = null;
-            }));
         }
 
-        public configure(options): void {
-            // intentionally left blank
+        if (typeof compiled === "object") {
+            let opt = <IIfBindingOptions> compiled;
+            exp = <wx.ICompiledExpression> <any> opt.condition;
+
+            // extract animations
+            if (opt.enter) {
+                animations.enter = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.enter, ctx);
+
+                if (typeof animations.enter === "string") {
+                    animations.enter = module.animation(<string> animations.enter);
+                }
+            }
+
+            if (opt.leave) {
+                animations.leave = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.leave, ctx);
+
+                if (typeof animations.leave === "string") {
+                    animations.leave = module.animation(<string> animations.leave);
+                }
+            }
+        } else {
+            exp = compiled;
         }
 
-        public priority = 50;
-        public controlsDescendants = true;
+        let obs = this.domManager.expressionToObservable(exp, ctx);
 
-        ////////////////////
-        // Implementation
+        // backup inner HTML
+        let template = new Array<Node>();
 
-        protected inverse: boolean = false;
-        protected domManager: IDomManager;
+        // subscribe
+        state.cleanup.add(obs.subscribe(x => {
+            try {
+                doCleanup();
+                cleanup = new Rx.CompositeDisposable();
 
-        protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext,
-            animations: IIfAnimationDescriptor, initialApply: boolean): Rx.IDisposable {
-            let leaveAnimation: IAnimation = <IAnimation> animations.leave;
-            let enterAnimation: IAnimation = <IAnimation> animations.enter;
-            let self = this;
-            let obs: Rx.Observable<any> = undefined;
+                cleanup.add(self.applyValue(el, unwrapProperty(x), template, ctx, animations, initialApply));
 
-            if (initialApply) {
-                // clone to template
-                for(let i= 0; i < el.childNodes.length; i++) {
-                    template.push(el.childNodes[i].cloneNode(true));
-                }
+                initialApply = false;
+            } catch (e) {
+                wx.app.defaultExceptionHandler.onNext(e);
+            } 
+        }));
 
-                // clear
-                while (el.firstChild) {
-                    el.removeChild(el.firstChild);
-                }
+        // release closure references to GC 
+        state.cleanup.add(Rx.Disposable.create(() => {
+            // nullify args
+            node = null;
+            options = null;
+            ctx = null;
+            state = null;
+
+            // nullify common locals
+            obs = null;
+            el = null;
+            self = null;
+
+            // nullify locals
+            template = null;
+        }));
+    }
+
+    public configure(options): void {
+        // intentionally left blank
+    }
+
+    public priority = 50;
+    public controlsDescendants = true;
+
+    ////////////////////
+    // Implementation
+
+    protected inverse: boolean = false;
+    protected domManager: wx.IDomManager;
+
+    protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: wx.IDataContext,
+        animations: IIfAnimationDescriptor, initialApply: boolean): Rx.IDisposable {
+        let leaveAnimation: wx.IAnimation = <wx.IAnimation> animations.leave;
+        let enterAnimation: wx.IAnimation = <wx.IAnimation> animations.enter;
+        let self = this;
+        let obs: Rx.Observable<any> = undefined;
+
+        if (initialApply) {
+            // clone to template
+            for(let i= 0; i < el.childNodes.length; i++) {
+                template.push(el.childNodes[i].cloneNode(true));
             }
 
-            let oldElements = nodeChildrenToArray<Node>(el);
-            value = this.inverse ? !value : value;
-
-            function removeOldElements() {
-                oldElements.forEach(x => {
-                    self.domManager.cleanNode(x);
-                    el.removeChild(x);
-                });
+            // clear
+            while (el.firstChild) {
+                el.removeChild(el.firstChild);
             }
-
-            if (!value) {
-                if (oldElements.length > 0) {
-                    if (leaveAnimation) {
-                        leaveAnimation.prepare(oldElements);
-
-                        obs = leaveAnimation.run(oldElements)
-                            .continueWith(() => leaveAnimation.complete(oldElements))
-                            .continueWith(removeOldElements);
-                    } else {
-                        removeOldElements();
-                    }
-                }
-            } else {
-                let nodes = template.map(x => x.cloneNode(true));
-
-                if (enterAnimation)
-                    enterAnimation.prepare(nodes);
-
-                for(let i= 0; i < template.length; i++) {
-                    el.appendChild(nodes[i]);
-                }
-
-                this.domManager.applyBindingsToDescendants(ctx, el);
-
-                if (enterAnimation) {
-                    obs = enterAnimation.run(nodes)
-                        .continueWith(() => enterAnimation.complete(nodes));
-                }
-            }
-
-            return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
         }
-    }
 
-    class NotIfBinding extends IfBinding {
-        constructor(domManager: IDomManager) {
-            super(domManager);
+        let oldElements = nodeChildrenToArray<Node>(el);
+        value = this.inverse ? !value : value;
 
-            this.inverse = true;
-        } 
-    }
+        function removeOldElements() {
+            oldElements.forEach(x => {
+                self.domManager.cleanNode(x);
+                el.removeChild(x);
+            });
+        }
 
-    export module internal {
-        export var ifBindingConstructor = <any> IfBinding;
-        export var notifBindingConstructor = <any> NotIfBinding;
+        if (!value) {
+            if (oldElements.length > 0) {
+                if (leaveAnimation) {
+                    leaveAnimation.prepare(oldElements);
+
+                    obs = leaveAnimation.run(oldElements)
+                        .continueWith(() => leaveAnimation.complete(oldElements))
+                        .continueWith(removeOldElements);
+                } else {
+                    removeOldElements();
+                }
+            }
+        } else {
+            let nodes = template.map(x => x.cloneNode(true));
+
+            if (enterAnimation)
+                enterAnimation.prepare(nodes);
+
+            for(let i= 0; i < template.length; i++) {
+                el.appendChild(nodes[i]);
+            }
+
+            this.domManager.applyBindingsToDescendants(ctx, el);
+
+            if (enterAnimation) {
+                obs = enterAnimation.run(nodes)
+                    .continueWith(() => enterAnimation.complete(nodes));
+            }
+        }
+
+        return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
     }
+}
+
+export class NotIfBinding extends IfBinding {
+    constructor(domManager: wx.IDomManager) {
+        super(domManager);
+
+        this.inverse = true;
+    } 
 }

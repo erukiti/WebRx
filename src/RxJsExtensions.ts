@@ -1,120 +1,120 @@
-/// <reference path="Core/ScheduledSubject.ts" />
-/// <reference path="Core/Reflect.ts" />
-/// <reference path="Core/Module.ts" />
-/// <reference path="./IID.ts" />
+/// <reference path="./Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+import { args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError } from "./Core/Utils"
+import IID from "./IID"
+import { createScheduledSubject } from "./Core/ScheduledSubject"
+import { Implements } from "./Core/Reflect"
 
-    let RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
+"use strict";
 
-    /**
-    * Creates an read-only observable property with an optional default value from the current (this) observable
-    * (Note: This is the equivalent to Knockout's ko.computed)
-    * @param {T} initialValue? Optional initial value, valid until the observable produces a value
-    */
-    function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
-        scheduler = scheduler || Rx.Scheduler.currentThread;
+let RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 
-        // initialize accessor function (read-only)
-        let accessor: any = function propertyAccessor(newVal?: any): any {
-            if (arguments.length > 0) {
-                internal.throwError("attempt to write to a read-only observable property");
-            }
+/**
+* Creates an read-only observable property with an optional default value from the current (this) observable
+* (Note: This is the equivalent to Knockout's ko.computed)
+* @param {T} initialValue? Optional initial value, valid until the observable produces a value
+*/
+function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
+    scheduler = scheduler || Rx.Scheduler.currentThread;
 
-            if (accessor.sub == null) {
-                accessor.sub = accessor._source.connect();
-            }
-
-            return accessor.value;
-        };
-
-        Implements(IID.IObservableProperty)(accessor);
-        Implements(IID.IDisposable)(accessor);
-
-        //////////////////////////////////
-        // IDisposable implementation
-
-        accessor.dispose = () => {
-            if (accessor.sub) {
-                accessor.sub.dispose();
-                accessor.sub = null;
-            }
-        };
-
-        //////////////////////////////////
-        // IObservableProperty<T> implementation
-
-        accessor.value = initialValue;
-
-        // setup observables
-        accessor.changedSubject = new Rx.Subject<any>();
-        accessor.changed = accessor.changedSubject
-            .publish()
-            .refCount();
-
-        accessor.changingSubject = new Rx.Subject<any>();
-        accessor.changing = accessor.changingSubject
-            .publish()
-            .refCount();
-
-        accessor.source = this;
-        accessor.thrownExceptions = internal.createScheduledSubject<Error>(scheduler, app.defaultExceptionHandler);
-
-        //////////////////////////////////
-        // implementation
-
-        let firedInitial = false;
-
-        accessor.sub = this
-            .distinctUntilChanged()
-            .subscribe(x => {
-                // Suppress a non-change between initialValue and the first value
-                // from a Subscribe
-                if (firedInitial && x === accessor.value) {
-                    return;
-                }
-
-                firedInitial = true;
-
-                accessor.changingSubject.onNext(x);
-                accessor.value = x;
-                accessor.changedSubject.onNext(x);
-            }, x=> accessor.thrownExceptions.onNext(x));
-
-        return accessor;
-    }
-    
-    RxObsConstructor.prototype.toProperty = toProperty;
-
-    RxObsConstructor.prototype.continueWith = function() {
-        let args = args2Array(arguments);
-        let val = args.shift();
-        let obs: Rx.Observable<any> = undefined;
-
-        if (isRxObservable(val)) {
-            obs = <Rx.Observable<any>> val;
-        } else if(isFunction(val)) {
-            let action = <() => any> val;
-            obs = Rx.Observable.startDeferred(action);
+    // initialize accessor function (read-only)
+    let accessor: any = function propertyAccessor(newVal?: any): any {
+        if (arguments.length > 0) {
+            throwError("attempt to write to a read-only observable property");
         }
 
-        return this.selectMany(_ => obs);
+        if (accessor.sub == null) {
+            accessor.sub = accessor._source.connect();
+        }
+
+        return accessor.value;
+    };
+
+    Implements(IID.IObservableProperty)(accessor);
+    Implements(IID.IDisposable)(accessor);
+
+    //////////////////////////////////
+    // IDisposable implementation
+
+    accessor.dispose = () => {
+        if (accessor.sub) {
+            accessor.sub.dispose();
+            accessor.sub = null;
+        }
+    };
+
+    //////////////////////////////////
+    // IObservableProperty<T> implementation
+
+    accessor.value = initialValue;
+
+    // setup observables
+    accessor.changedSubject = new Rx.Subject<any>();
+    accessor.changed = accessor.changedSubject
+        .publish()
+        .refCount();
+
+    accessor.changingSubject = new Rx.Subject<any>();
+    accessor.changing = accessor.changingSubject
+        .publish()
+        .refCount();
+
+    accessor.source = this;
+    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, wx.app.defaultExceptionHandler);
+
+    //////////////////////////////////
+    // implementation
+
+    let firedInitial = false;
+
+    accessor.sub = this
+        .distinctUntilChanged()
+        .subscribe(x => {
+            // Suppress a non-change between initialValue and the first value
+            // from a Subscribe
+            if (firedInitial && x === accessor.value) {
+                return;
+            }
+
+            firedInitial = true;
+
+            accessor.changingSubject.onNext(x);
+            accessor.value = x;
+            accessor.changedSubject.onNext(x);
+        }, x=> accessor.thrownExceptions.onNext(x));
+
+    return accessor;
+}
+
+RxObsConstructor.prototype.toProperty = toProperty;
+
+RxObsConstructor.prototype.continueWith = function() {
+    let args = args2Array(arguments);
+    let val = args.shift();
+    let obs: Rx.Observable<any> = undefined;
+
+    if (isRxObservable(val)) {
+        obs = <Rx.Observable<any>> val;
+    } else if(isFunction(val)) {
+        let action = <() => any> val;
+        obs = Rx.Observable.startDeferred(action);
     }
 
-    RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
-        return Rx.Observable.defer(() => {
-            return Rx.Observable.create<T>(observer => {
-                let cancelled = false;
+    return this.selectMany(_ => obs);
+}
 
-                if(!cancelled)
-                    action();
+RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
+    return Rx.Observable.defer(() => {
+        return Rx.Observable.create<T>(observer => {
+            let cancelled = false;
 
-                observer.onNext(<any> undefined);
-                observer.onCompleted();
+            if(!cancelled)
+                action();
 
-                return Rx.Disposable.create(()=> cancelled = true);
-            });
+            observer.onNext(<any> undefined);
+            observer.onCompleted();
+
+            return Rx.Disposable.create(()=> cancelled = true);
         });
-    }
+    });
 }

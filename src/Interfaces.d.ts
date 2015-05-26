@@ -1,8 +1,6 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
-module wx {
-    "use strict";
-
+declare module wx {
    /**
     * Dependency Injector and service locator
     * @interface 
@@ -378,6 +376,7 @@ module wx {
         cleanup: Rx.CompositeDisposable;
         isBound: boolean;   // true of this node has been touched by applyBindings
         model?: any;        // scope model 
+        module?: IModule;
     }
 
     export interface IObjectLiteralToken {

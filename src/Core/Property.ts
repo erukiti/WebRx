@@ -1,61 +1,60 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../IID.ts" />
-/// <reference path="../Core/Module.ts" />
-/// <reference path="./Reflect.ts" />
+/// <reference path="../Interfaces.d.ts" />
+
+import { Implements } from "./Reflect"
+import IID from "../IID"
 
 // NOTE: The factory method approach is necessary because it is  
 // currently impossible to implement a Typescript interface 
 // with a function signature in a Typescript class.
 
-module wx {
-    "use strict";
+"use strict";
 
-    /**
-    * Creates an observable property with an optional default value
-    * @param {T} initialValue?
-    */
-    export function property<T>(initialValue?: T): IObservableProperty<T> {
-        // initialize accessor function
-        let accessor: any = function(newVal?: T): T {
-            if (arguments.length > 0) {
-                // set
-                if (newVal !== accessor.value) {
-                    accessor.changingSubject.onNext(newVal);
-                    accessor.value = newVal;
-                    accessor.changedSubject.onNext(newVal);
-                }
-            } else {
-                // get
-                return accessor.value;
+/**
+* Creates an observable property with an optional default value
+* @param {T} initialValue?
+*/
+export function property<T>(initialValue?: T): wx.IObservableProperty<T> {
+    // initialize accessor function
+    let accessor: any = function(newVal?: T): T {
+        if (arguments.length > 0) {
+            // set
+            if (newVal !== accessor.value) {
+                accessor.changingSubject.onNext(newVal);
+                accessor.value = newVal;
+                accessor.changedSubject.onNext(newVal);
             }
-        };
-        
-        Implements(IID.IObservableProperty)(accessor);
-        Implements(IID.IDisposable)(accessor);
+        } else {
+            // get
+            return accessor.value;
+        }
+    };
+    
+    Implements(IID.IObservableProperty)(accessor);
+    Implements(IID.IDisposable)(accessor);
 
-        //////////////////////////////////
-        // IDisposable implementation
+    //////////////////////////////////
+    // IDisposable implementation
 
-        accessor.dispose = () => {
-        };
+    accessor.dispose = () => {
+    };
 
-        //////////////////////////////////
-        // IObservableProperty<T> implementation
+    //////////////////////////////////
+    // IObservableProperty<T> implementation
 
-        if (initialValue !== undefined)
-            accessor.value = initialValue;
+    if (initialValue !== undefined)
+        accessor.value = initialValue;
 
-        // setup observables
-        accessor.changedSubject = new Rx.Subject<T>();
-        accessor.changed = accessor.changedSubject
-            .publish()
-            .refCount();
+    // setup observables
+    accessor.changedSubject = new Rx.Subject<T>();
+    accessor.changed = accessor.changedSubject
+        .publish()
+        .refCount();
 
-        accessor.changingSubject = new Rx.Subject<T>();
-        accessor.changing = accessor.changingSubject
-            .publish()
-            .refCount();
+    accessor.changingSubject = new Rx.Subject<T>();
+    accessor.changing = accessor.changingSubject
+        .publish()
+        .refCount();
 
-        return accessor;
-    }
+    return accessor;
 }

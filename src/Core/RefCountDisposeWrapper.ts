@@ -1,32 +1,30 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+"use strict";
 
-    export class RefCountDisposeWrapper implements Rx.IDisposable {
-        constructor(inner: Rx.IDisposable, initialRefCount: number = 1) {
-            this.inner = inner;
-            this.refCount = initialRefCount;
+export default class RefCountDisposeWrapper implements Rx.IDisposable {
+    constructor(inner: Rx.IDisposable, initialRefCount: number = 1) {
+        this.inner = inner;
+        this.refCount = initialRefCount;
+    }
+
+    private inner: Rx.IDisposable;
+    private refCount: number;
+
+    public addRef(): void {
+        this.refCount++;
+    }
+
+    public release():number {
+        if (--this.refCount === 0) {
+            this.inner.dispose();
+            this.inner = null;
         }
 
-        private inner: Rx.IDisposable;
-        private refCount: number;
+        return this.refCount;
+    }
 
-        public addRef(): void {
-            this.refCount++;
-        }
-
-        public release():number {
-            if (--this.refCount === 0) {
-                this.inner.dispose();
-                this.inner = null;
-            }
-
-            return this.refCount;
-        }
-
-        public dispose() {
-            this.release();
-        }
+    public dispose() {
+        this.release();
     }
 }

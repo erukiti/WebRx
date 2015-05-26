@@ -1,79 +1,78 @@
-﻿/// <reference path="../Core/Utils.ts" />
-/// <reference path="../Core/DomManager.ts" />
-/// <reference path="../Interfaces.ts" />
-/// <reference path="../Core/Resources.ts" />
+﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+import IID from "../IID"
+import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
+    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty } from "../Core/Utils"
+import * as log from "../Core/Log"
+import { property } from "../Core/Property"
+import { applyBindings, cleanNode } from "../Core/DomManager"
 
-    class WithBinding implements IBindingHandler {
-        constructor(domManager: IDomManager) {
-            this.domManager = domManager;
-        } 
- 
-        ////////////////////
-        // IBinding
+"use strict";
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
-            if (node.nodeType !== 1)
-                internal.throwError("with-binding only operates on elements!");
+export default class WithBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager) {
+        this.domManager = domManager;
+    } 
 
-            if (options == null)
-                internal.throwError("invalid binding-options!");
+    ////////////////////
+    // IBinding
 
-            let el = <HTMLElement> node;
-            let self = this;
-            let exp = this.domManager.compileBindingOptions(options, module);
-            let obs = this.domManager.expressionToObservable(exp, ctx);
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+        if (node.nodeType !== 1)
+            throwError("with-binding only operates on elements!");
 
-            // subscribe
-            state.cleanup.add(obs.subscribe(x => {
-                try {
-                    self.applyValue(el, unwrapProperty(x), state);
-                } catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                } 
-            }));
+        if (options == null)
+            throwError("invalid binding-options!");
 
-            // release closure references to GC 
-            state.cleanup.add(Rx.Disposable.create(() => {
-                // nullify args
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
+        let el = <HTMLElement> node;
+        let self = this;
+        let exp = this.domManager.compileBindingOptions(options, module);
+        let obs = this.domManager.expressionToObservable(exp, ctx);
 
-                // nullify common locals
-                obs = null;
-                el = null;
-                self = null;
+        // subscribe
+        state.cleanup.add(obs.subscribe(x => {
+            try {
+                self.applyValue(el, unwrapProperty(x), state);
+            } catch (e) {
+                wx.app.defaultExceptionHandler.onNext(e);
+            } 
+        }));
 
-                // nullify locals
-            }));
-        }
+        // release closure references to GC 
+        state.cleanup.add(Rx.Disposable.create(() => {
+            // nullify args
+            node = null;
+            options = null;
+            ctx = null;
+            state = null;
 
-        public configure(options): void {
-            // intentionally left blank
-        }
+            // nullify common locals
+            obs = null;
+            el = null;
+            self = null;
 
-        public priority = 50;
-        public controlsDescendants = true;
-
-        ////////////////////
-        // implementation
-
-        protected domManager: IDomManager;
-
-        protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
-            state.model = value;
-            let ctx = this.domManager.getDataContext(el);
-
-            this.domManager.cleanDescendants(el);
-            this.domManager.applyBindingsToDescendants(ctx, el);
-        }
+            // nullify locals
+        }));
     }
 
-    export module internal {
-        export var withBindingConstructor = <any> WithBinding;
+    public configure(options): void {
+        // intentionally left blank
+    }
+
+    public priority = 50;
+    public controlsDescendants = true;
+
+    ////////////////////
+    // implementation
+
+    protected domManager: wx.IDomManager;
+
+    protected applyValue(el: HTMLElement, value: any, state: wx.INodeState): void {
+        state.model = value;
+        let ctx = this.domManager.getDataContext(el);
+
+        this.domManager.cleanDescendants(el);
+        this.domManager.applyBindingsToDescendants(ctx, el);
     }
 }

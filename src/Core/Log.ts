@@ -1,42 +1,39 @@
-///<reference path="./Utils.ts" />
+import { formatString } from "../Core/Utils"
 
-module wx.log {
-    "use strict";
+"use strict";
 
-    function log(...args:any[]) {
+function log(...args:any[]) {
+    try {
+        console.log.apply(console, arguments);
+    } catch (e) {
         try {
-            console.log.apply(console, arguments);
+            window['opera'].postError.apply(window['opera'], arguments);
         } catch (e) {
-            try {
-                window['opera'].postError.apply(window['opera'], arguments);
-            } catch (e) {
-                alert(Array.prototype.join.call(arguments, " "));
-            }
+            alert(Array.prototype.join.call(arguments, " "));
         }
-    }
-
-    export function critical(fmt: string, ...args: any[]) {
-        if (args.length) {
-            fmt = formatString.apply(null, [fmt].concat(args));
-        }
-
-        log("**** WebRx Critical: " + fmt);
-    }
-
-    export function error(fmt: string, ...args: any[]) {
-        if (args.length) {
-            fmt = formatString.apply(null, [fmt].concat(args));
-        }
-
-        log("*** WebRx Error: " + fmt);
-    }
-
-    export function info(fmt: string, ...args: any[]) {
-        if (args.length) {
-            fmt = formatString.apply(null, [fmt].concat(args));
-        }
-
-        log("* WebRx Info: " + fmt);
     }
 }
 
+export function critical(fmt: string, ...args: any[]) {
+    if (args.length) {
+        fmt = formatString.apply(null, [fmt].concat(args));
+    }
+
+    log("**** WebRx Critical: " + fmt);
+}
+
+export function error(fmt: string, ...args: any[]) {
+    if (args.length) {
+        fmt = formatString.apply(null, [fmt].concat(args));
+    }
+
+    log("*** WebRx Error: " + fmt);
+}
+
+export function info(fmt: string, ...args: any[]) {
+    if (args.length) {
+        fmt = formatString.apply(null, [fmt].concat(args));
+    }
+
+    log("* WebRx Info: " + fmt);
+}

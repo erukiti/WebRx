@@ -1,120 +1,118 @@
-﻿/// <reference path="../../Core/DomManager.ts" />
-/// <reference path="../../Interfaces.ts" />
+﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
+/// <reference path="../../Interfaces.d.ts" />
 
-module wx {
-    "use strict";
+import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
+    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, toggleCssClass } from "../../Core/Utils"
+import { router } from "../Router"
 
-    export interface IStateRefBindingOptions {
-        name: string;
-        params?: Object;
-    }
+"use strict";
 
-    class StateRefBinding implements IBindingHandler {
-        constructor(domManager: IDomManager, router: IRouter) {
-            this.domManager = domManager;
-            this.router = router;
-        } 
+export interface IStateRefBindingOptions {
+    name: string;
+    params?: Object;
+}
 
-        ////////////////////
-        // IBinding
+export default class StateRefBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, router: wx.IRouter) {
+        this.domManager = domManager;
+        this.router = router;
+    } 
 
-        public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
-            if (node.nodeType !== 1)
-                internal.throwError("stateRef-binding only operates on elements!");
+    ////////////////////
+    // IBinding
 
-            if (options == null)
-                internal.throwError("invalid binding-options!");
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+        if (node.nodeType !== 1)
+            throwError("stateRef-binding only operates on elements!");
 
-            let el = <HTMLElement> node;
-            let isAnchor = el.tagName.toLowerCase() === "a";
-            let anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
-            let compiled = this.domManager.compileBindingOptions(options, module);
-            let exp: ICompiledExpression;
-            let observables: Array<Rx.Observable<any>> = [];
-            let opt = <IStateRefBindingOptions> compiled;
-            let paramsKeys: Array<string> = [];
-            let stateName;
-            let stateParams: Object;
+        if (options == null)
+            throwError("invalid binding-options!");
 
-            if (typeof compiled === "function") {
-                exp = <ICompiledExpression> compiled;
+        let el = <HTMLElement> node;
+        let isAnchor = el.tagName.toLowerCase() === "a";
+        let anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
+        let compiled = this.domManager.compileBindingOptions(options, module);
+        let exp: wx.ICompiledExpression;
+        let observables: Array<Rx.Observable<any>> = [];
+        let opt = <IStateRefBindingOptions> compiled;
+        let paramsKeys: Array<string> = [];
+        let stateName;
+        let stateParams: Object;
 
-                observables.push(this.domManager.expressionToObservable(exp, ctx));
-            } else {
-                // collect state-name observable
-                observables.push(this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
+        if (typeof compiled === "function") {
+            exp = <wx.ICompiledExpression> compiled;
 
-                // collect params observables
-                if (opt.params) {
-                    Object.keys(opt.params).forEach(x => {
-                        paramsKeys.push(x);
+            observables.push(this.domManager.expressionToObservable(exp, ctx));
+        } else {
+            // collect state-name observable
+            observables.push(this.domManager.expressionToObservable(<wx.ICompiledExpression> <any> opt.name, ctx));
 
-                        observables.push(this.domManager.expressionToObservable(opt.params[x], ctx));
-                    });
-                }
+            // collect params observables
+            if (opt.params) {
+                Object.keys(opt.params).forEach(x => {
+                    paramsKeys.push(x);
+
+                    observables.push(this.domManager.expressionToObservable(opt.params[x], ctx));
+                });
             }
-
-            // subscribe to any input changes
-            state.cleanup.add(Rx.Observable.combineLatest(observables, function(_) { return args2Array(arguments) }).subscribe(latest => {
-                try {
-                    // first element is always the state-name
-                    stateName = unwrapProperty(latest.shift());
-
-                    // subsequent entries are latest param values
-                    stateParams = {};
-
-                    for(let i = 0; i < paramsKeys.length; i++) {
-                        stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
-                    }
-
-                    if(anchor != null) {
-                        anchor.href = this.router.url(stateName, stateParams);
-                    }
-                } catch (e) {
-                    wx.app.defaultExceptionHandler.onNext(e);
-                } 
-            }));
-
-            // subscribe to anchor's click event
-            state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
-                e.preventDefault();
-
-                // initiate state change using latest name and params
-                this.router.go(stateName, stateParams, { location: true });
-            }));
-
-            // release closure references to GC 
-            state.cleanup.add(Rx.Disposable.create(() => {
-                // nullify args
-                node = null;
-                options = null;
-                ctx = null;
-                state = null;
-
-                // nullify locals
-                observables = null;
-                compiled = null;
-                stateName = null;
-                stateParams = null;
-                opt = null;
-                paramsKeys = null;
-            }));
         }
 
-        public configure(options): void {
-            // intentionally left blank
-        }
+        // subscribe to any input changes
+        state.cleanup.add(Rx.Observable.combineLatest(observables, function(_) { return args2Array(arguments) }).subscribe(latest => {
+            try {
+                // first element is always the state-name
+                stateName = unwrapProperty(latest.shift());
 
-        public priority = 5;
+                // subsequent entries are latest param values
+                stateParams = {};
 
-        ////////////////////
-        // Implementation
+                for(let i = 0; i < paramsKeys.length; i++) {
+                    stateParams[paramsKeys[i]] = unwrapProperty(latest[i]);
+                }
 
-        protected domManager: IDomManager;
-        protected router: IRouter;
+                if(anchor != null) {
+                    anchor.href = this.router.url(stateName, stateParams);
+                }
+            } catch (e) {
+                wx.app.defaultExceptionHandler.onNext(e);
+            } 
+        }));
+
+        // subscribe to anchor's click event
+        state.cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
+            e.preventDefault();
+
+            // initiate state change using latest name and params
+            this.router.go(stateName, stateParams, { location: true });
+        }));
+
+        // release closure references to GC 
+        state.cleanup.add(Rx.Disposable.create(() => {
+            // nullify args
+            node = null;
+            options = null;
+            ctx = null;
+            state = null;
+
+            // nullify locals
+            observables = null;
+            compiled = null;
+            stateName = null;
+            stateParams = null;
+            opt = null;
+            paramsKeys = null;
+        }));
     }
 
-    export module internal {
-        export var stateRefBindingConstructor = <any> StateRefBinding;
+    public configure(options): void {
+        // intentionally left blank
     }
+
+    public priority = 5;
+
+    ////////////////////
+    // Implementation
+
+    protected domManager: wx.IDomManager;
+    protected router: wx.IRouter;
 }
