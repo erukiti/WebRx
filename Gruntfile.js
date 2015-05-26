@@ -1,47 +1,14 @@
 module.exports = function (grunt) {
     "use strict";
 
-    var conf = {
-        ts: {
-            default: {
-                src: [ "src/**/*.ts"],
-                outDir: "build"
+    var conf = { 
+        shell: {
+            tsc_src: {
+                command: 'node node_modules/typescript/bin/tsc.js --rootDir src -p src --out build/web.rx.js',
             },
-            src: {
-                src: ["src/**/*.ts"],
-                out: "build/web.rx.js",
-                options: {
-                    declaration: true,
-                    fast: "never"
-                }
-            },
-            specs: {
-                src: [ "test/**/*.ts", "!test/typings/*.ts"],
-                outDir: "build/test"
-            },
-            dist: {
-                src: ["src/**/*.ts"],
-                out: "dist/web.rx.js",
-                options: {
-                    declaration: true,
-                    fast: "never"
-                }
-            },
-            // use to override the default options, See: http://gruntjs.com/configuring-tasks#options
-            // these are the default options to the typescript compiler for grunt-ts:
-            // see `tsc --help` for a list of supported options.
-            options: {
-                compile: true,                 // perform compilation. [true (default) | false]
-                comments: false,               // same as !removeComments. [true | false (default)]
-                target: "es5",                 // target javascript language. [es3 | es5 (grunt-ts default) | es6]
-                module: "amd",                 // target javascript module style. [amd (default) | commonjs]
-                sourceMap: true,               // generate a source map for every output js file. [true (default) | false]
-                sourceRoot: "",                // where to locate TypeScript files. [(default) '' == source ts location]
-                mapRoot: "",                   // where to locate .map.js files. [(default) '' == generated js location.]
-                declaration: false,            // generate a declaration .d.ts file for every output js file. [true | false (default)]
-                noImplicitAny: false,          // set to true to pass --noImplicitAny to the compiler. [true | false (default)]
-                fast: "watch"                  // see https://github.com/TypeStrong/grunt-ts/blob/master/docs/fast.md ["watch" (default) | "always" | "never"]
-            },
+            gitadd: {
+                command: 'git add .'
+            }
         },
         
         jasmine: {
@@ -74,7 +41,7 @@ module.exports = function (grunt) {
         watch: {
             src: {
                 files: [ "src/**/*.ts"],
-                tasks: ['ts:src']
+                tasks: ['shell:tsc_src']
             },
             specs: {
                 files: [ "test/**/*.ts", "!test/typings/*.ts"],
@@ -163,13 +130,7 @@ module.exports = function (grunt) {
                 src: ['src/Interfaces.ts']
             }
         },
-
-        shell: {
-            gitadd: {
-                command: 'git add .'
-            }
-        },
-
+        
         release: {  
             options: {
                 bump: false
@@ -209,7 +170,6 @@ module.exports = function (grunt) {
 
     grunt.initConfig(conf);
 
-    grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks('grunt-contrib-jasmine');
     grunt.loadNpmTasks("grunt-contrib-connect");
     grunt.loadNpmTasks('grunt-contrib-clean');
@@ -230,10 +190,10 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default" ]);
-    grunt.registerTask("test", ["gen-ver", "ts:src", "ts:specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["gen-ver", "clean:build", "ts:src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
-    grunt.registerTask("xtest", ["gen-ver", "ts:src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
+    grunt.registerTask("test", ["gen-ver", "shell:tsc_src", "ts:specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  
     grunt.registerTask('publish:minor', ['bump:minor', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  
