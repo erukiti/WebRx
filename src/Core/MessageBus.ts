@@ -117,8 +117,3 @@ export default class MessageBus implements IMessageBus {
         return scheduler || Rx.Scheduler.currentThread;
    }
 }
-
-export var messageBus: IMessageBus;
-Object.defineProperty(wx, "messageBus", {
-    get() { return injector.get<IMessageBus>(res.messageBus); }
-});

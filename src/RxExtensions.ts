@@ -1,4 +1,3 @@
-import { app } from "./Core/Module"
 import { args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"

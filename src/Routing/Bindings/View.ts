@@ -1,14 +1,12 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 
 import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IViewAnimationDescriptor  } from "../../Interfaces"
-import { app  } from "../../Core/Module"
 import { IViewConfig  } from "../Router"
 import { IDomManager  } from "../../Core/DomManager"
 import { ICompiledExpression  } from "../../Core/ExpressionCompiler"
 import { IRouter  } from "../Router"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../../Core/Utils"
-import { router } from "../Router"
 import * as log from "../../Core/Log"
 import { animation } from "../../Core/Animation"
 

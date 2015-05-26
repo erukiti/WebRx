@@ -10,18 +10,7 @@ import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
 
-declare var createMockHistory: () => IHistory;
-
 "use strict";
-
-export interface IWebRxApp extends IModule {
-    defaultExceptionHandler: Rx.Observer<Error>;
-    mainThreadScheduler: Rx.IScheduler;
-    templateEngine: ITemplateEngine;
-    history: IHistory;
-    title: IObservableProperty<string>;
-}
-
 
 // extend descriptor
 interface IComponentDescriptorEx extends IComponentDescriptor {
@@ -313,121 +302,7 @@ export class Module implements IModule {
     }
 }
 
-class App extends Module implements IWebRxApp {
-    constructor() {
-        super("app");
-
-        if (!isInUnitTest()) {
-            this.history = this.createHistory();
-        } else {
-            this.history = createMockHistory();
-        }
-    }
-
-    /// <summary>
-    /// This Observer is signalled whenever an object that has a
-    /// ThrownExceptions property doesn't Subscribe to that Observable. Use
-    /// Observer.Create to set up what will happen - the default is to crash
-    /// the application with an error message.
-    /// </summary>
-    public defaultExceptionHandler: Rx.Observer<Error> = Rx.Observer.create<Error>(ex => {
-        if (!isInUnitTest()) {
-            log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
-        }
-    });
-
-    /// <summary>
-    /// MainThreadScheduler is the scheduler used to schedule work items that
-    /// should be run "on the UI thread". In normal mode, this will be
-    /// DispatcherScheduler, and in Unit Test mode this will be Immediate,
-    /// to simplify writing common unit tests.
-    /// </summary>
-    public get mainThreadScheduler(): Rx.IScheduler {
-        return this._unitTestMainThreadScheduler || this._mainThreadScheduler
-            || Rx.Scheduler.currentThread; // OW: return a default if schedulers haven't been setup by in
-    }
-
-    public set mainThreadScheduler(value: Rx.IScheduler) {
-        if (isInUnitTest()) {
-            this._unitTestMainThreadScheduler = value;
-            this._mainThreadScheduler = this._mainThreadScheduler || value;
-        } else {
-            this._mainThreadScheduler = value;
-        }
-    }
-
-    public get templateEngine(): ITemplateEngine {
-        if (!this._templateEngine) {
-            this._templateEngine = injector.get<ITemplateEngine>(res.htmlTemplateEngine);
-        }
-
-        return this._templateEngine;
-    }
-
-    public set templateEngine(newVal: ITemplateEngine) {
-        this._templateEngine = newVal;
-    }
-
-    public history: IHistory;
-    public title: IObservableProperty<string> = property<string>(document.title);
-
-    ///////////////////////
-    // Implementation
-
-    private _templateEngine: ITemplateEngine;
-    private _mainThreadScheduler: Rx.IScheduler;
-    private _unitTestMainThreadScheduler: Rx.IScheduler;
-
-    private createHistory(): IHistory {
-        // inherit default implementation
-        let result = <IHistory> {
-            back: window.history.back.bind(window.history),
-            forward: window.history.forward.bind(window.history),
-            //go: window.history.go,
-            pushState: window.history.pushState.bind(window.history),
-            replaceState: window.history.replaceState.bind(window.history)
-        };
-
-        Object.defineProperty(result, "length", {
-            get() {
-                return window.history.length;
-            },
-            enumerable: true,
-            configurable: true
-        });
-
-        Object.defineProperty(result, "state", {
-            get() {
-                return window.history.state;
-            },
-            enumerable: true,
-            configurable: true
-        });
-
-        Object.defineProperty(result, "location", {
-            get() {
-                return window.location;
-            },
-            enumerable: true,
-            configurable: true
-        });
-
-        // enrich with observable
-        result.onPopState = Rx.Observable.fromEventPattern<PopStateEvent>(
-            (h) => window.addEventListener("popstate", <EventListener> h),
-            (h) => window.removeEventListener("popstate", <EventListener> h))
-            .publish()
-            .refCount();
-
-        return result;
-    }
-}
-
-export var app: IWebRxApp = new App();
-
-var modules: { [name: string]: Array<any>|IModuleDescriptor } = {
-    'app': <IModuleDescriptor> <any> { instance: app } // auto-register 'app' module
-};
+export var modules: { [name: string]: Array<any>|IModuleDescriptor } = { };
 
 /**
 * Defines a module.
@@ -436,7 +311,7 @@ var modules: { [name: string]: Array<any>|IModuleDescriptor } = {
 */
 export function module(name: string, descriptor: Array<any>|IModuleDescriptor) {
     modules[name] = <IModuleDescriptor> descriptor;
-    return wx;
+    return this;
 }
 
 /**

@@ -1,7 +1,6 @@
 /// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
 import { IHandleObservableErrors, IObservableProperty } from "../Interfaces"
-import { app } from "./Module"
 import { IPropertyChangedEventArgs } from "./Events"
 import { command, Command } from "./Command"
 import { getMetadata, implementsMetaDataKey } from "./Reflect"

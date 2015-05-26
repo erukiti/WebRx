@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
 import { IObservableProperty, IViewAnimationDescriptor  } from "../Interfaces"
-import { app } from "../Core/Module"
 import { IDomManager  } from "../Core/DomManager"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
@@ -631,8 +630,3 @@ export class Router implements IRouter {
         return result;
     }
 }
-
-export var router: IRouter;
-Object.defineProperty(wx, "router", {
-    get() { return injector.get<IRouter>(res.router); }
-});

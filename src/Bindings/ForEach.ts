@@ -2,7 +2,6 @@
 /// <reference path="../RxExtensions.d.ts" />
 
 import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
-import { app  } from "../Core/Module"
 import { IDomManager  } from "../Core/DomManager"
 import { ICompiledExpression  } from "../Core/ExpressionCompiler"
 import { IObservableList } from "../Collections/List"

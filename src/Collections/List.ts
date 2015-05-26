@@ -1,5 +1,4 @@
 import { IObservableProperty  } from "../Interfaces"
-import { app  } from "../Core/Module"
 import { isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
 import IID from "./../IID"
 import Lazy from "./../Core/Lazy"

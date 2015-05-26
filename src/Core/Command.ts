@@ -1,7 +1,6 @@
 /// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
 import { IHandleObservableErrors } from "../Interfaces"
-import { app  } from "./Module"
 import IID from "./../IID"
 import { isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isRxScheduler } from "././Utils"
 import Lazy from "./../Core/Lazy"

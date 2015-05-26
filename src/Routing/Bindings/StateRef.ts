@@ -1,13 +1,11 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 
 import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../../Interfaces"
-import { app  } from "../../Core/Module"
 import { IDomManager  } from "../../Core/DomManager"
 import { ICompiledExpression  } from "../../Core/ExpressionCompiler"
 import { IRouter  } from "../Router"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, toggleCssClass } from "../../Core/Utils"
-import { router } from "../Router"
 
 "use strict";
 

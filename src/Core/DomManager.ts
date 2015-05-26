@@ -1,7 +1,6 @@
 ﻿
 import { IObservableProperty, IExpressionFilter, IDataContext, INodeState, IBindingHandler, IModule  } from "../Interfaces"
 import { ICompiledExpression, IObjectLiteralToken, IExpressionCompiler, IExpressionCompilerOptions, ICompiledExpressionRuntimeHooks  } from "./ExpressionCompiler"
-import { app  } from "./Module"
 import { IWeakMap, createWeakMap } from "../Collections/WeakMap"
 import { ISet, createSet, setToArray } from "../Collections/Set"
 import { IObservableList } from "../Collections/List"
