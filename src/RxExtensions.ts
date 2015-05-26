@@ -1,5 +1,4 @@
-/// <reference path="./Interfaces.d.ts" />
-
+import { app } from "./Core/Module"
 import { args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
@@ -60,7 +59,7 @@ function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
         .refCount();
 
     accessor.source = this;
-    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, wx.app.defaultExceptionHandler);
+    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, app.defaultExceptionHandler);
 
     //////////////////////////////////
     // implementation

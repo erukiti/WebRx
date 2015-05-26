@@ -1,6 +1,9 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
+import { ICompiledExpression  } from "../Core/ExpressionCompiler"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -12,15 +15,15 @@ export interface IHasFocusBindingOptions {
     delay: number;
 }
 
-export default class HasFocusBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export default class HasFocusBinding implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
     } 
 
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("hasFocus-binding only operates on elements!");
         
@@ -28,17 +31,17 @@ export default class HasFocusBinding implements wx.IBindingHandler {
             throwError("invalid binding-options!");
 
         let el = <HTMLInputElement> node;
-        let prop: wx.IObservableProperty<any>;
+        let prop: IObservableProperty<any>;
         let cleanup: Rx.CompositeDisposable;
         let compiled = this.domManager.compileBindingOptions(options, module);
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let delay = 0;
 
         if (typeof compiled === "object" && compiled.hasOwnProperty("property")) {
             let opt = <IHasFocusBindingOptions> compiled;
             exp = opt.property;
 
-            delay = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.delay, ctx);
+            delay = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.delay, ctx);
 
             // convert boolean to number
             if (typeof delay === "boolean")
@@ -121,7 +124,7 @@ export default class HasFocusBinding implements wx.IBindingHandler {
                     }
                 }
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -150,7 +153,7 @@ export default class HasFocusBinding implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
     protected getFocusEventObservables(el: HTMLInputElement): Array<Rx.Observable<boolean>> {
         let result: Array<Rx.Observable<boolean>> = [];

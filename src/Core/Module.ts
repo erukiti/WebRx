@@ -1,24 +1,34 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IModule, IHistory, ITemplateEngine, IComponentDescriptor, IComponent, IComponentRegistry, IAnimation, 
+    IAnimationRegistry, IObservableProperty, IBindingHandler, IBindingRegistry, IExpressionFilter, IExpressionFilterRegistry,
+    IComponentTemplateDescriptor, IComponentViewModelDescriptor, IModuleDescriptor } from "../Interfaces"
 import IID from "../IID"
-
 import { injector } from "./Injector"
 import { extend, observableRequire, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
 
-declare var createMockHistory: () => wx.IHistory;
+declare var createMockHistory: () => IHistory;
 
 "use strict";
 
+export interface IWebRxApp extends IModule {
+    defaultExceptionHandler: Rx.Observer<Error>;
+    mainThreadScheduler: Rx.IScheduler;
+    templateEngine: ITemplateEngine;
+    history: IHistory;
+    title: IObservableProperty<string>;
+}
+
+
 // extend descriptor
-interface IComponentDescriptorEx extends wx.IComponentDescriptor {
+interface IComponentDescriptorEx extends IComponentDescriptor {
     instance: any;
 }
 
-export class Module implements wx.IModule {
+export class Module implements IModule {
     constructor(name: string) {
         this.name = name;
     }
@@ -26,7 +36,7 @@ export class Module implements wx.IModule {
     //////////////////////////////////
     // IModule
 
-    public merge(other: wx.IModule): wx.IModule {
+    public merge(other: IModule): IModule {
         let _other = <Module> other;
 
         extend(_other.components, this.components);
@@ -37,7 +47,7 @@ export class Module implements wx.IModule {
         return this;
     }
 
-    public component(name: string, component: wx.IComponentDescriptor): wx.IComponentRegistry {
+    public component(name: string, component: IComponentDescriptor): IComponentRegistry {
         this.components[name] = <IComponentDescriptorEx> component;
         return this;
     }
@@ -46,19 +56,19 @@ export class Module implements wx.IModule {
         return this.components[name] != null;
     }
 
-    public loadComponent(name: string, params?: Object): Rx.Observable<wx.IComponent> {
+    public loadComponent(name: string, params?: Object): Rx.Observable<IComponent> {
         return this.initializeComponent(this.instantiateComponent(name), params);
     }
 
-    public binding(name: string, handler: wx.IBindingHandler): wx.IBindingRegistry;
-    public binding(name: string, handler: string): wx.IBindingRegistry;
-    public binding(names: string[], handler: wx.IBindingHandler): wx.IBindingRegistry;
-    public binding(names: string[], handler: string): wx.IBindingRegistry;
-    public binding(name: string): wx.IBindingHandler;
+    public binding(name: string, handler: IBindingHandler): IBindingRegistry;
+    public binding(name: string, handler: string): IBindingRegistry;
+    public binding(names: string[], handler: IBindingHandler): IBindingRegistry;
+    public binding(names: string[], handler: string): IBindingRegistry;
+    public binding(name: string): IBindingHandler;
     public binding() {
         let args = args2Array(arguments);
         let name = args.shift();
-        let handler: wx.IBindingHandler;
+        let handler: IBindingHandler;
 
         // lookup?
         if (args.length === 0) {
@@ -66,7 +76,7 @@ export class Module implements wx.IModule {
             handler = this.bindings[name];
 
             if (typeof handler === "string") {
-                handler = injector.get<wx.IBindingHandler>(<any> handler);
+                handler = injector.get<IBindingHandler>(<any> handler);
                 this.bindings[name] = handler;
             }
 
@@ -85,12 +95,12 @@ export class Module implements wx.IModule {
         return <any> this;
     }
 
-    public filter(name: string, filter: wx.IExpressionFilter): wx.IExpressionFilterRegistry;
-    public filter(name: string): wx.IExpressionFilter;
+    public filter(name: string, filter: IExpressionFilter): IExpressionFilterRegistry;
+    public filter(name: string): IExpressionFilter;
     public filter() {
         let args = args2Array(arguments);
         let name = args.shift();
-        let filter: wx.IExpressionFilter;
+        let filter: IExpressionFilter;
 
         // lookup?
         if (args.length === 0) {
@@ -98,7 +108,7 @@ export class Module implements wx.IModule {
             filter = this.expressionFilters[name];
 
             if (typeof filter === "string") {
-                filter = injector.get<wx.IExpressionFilter>(<any> filter);
+                filter = injector.get<IExpressionFilter>(<any> filter);
                 this.bindings[name] = filter;
             }
 
@@ -112,16 +122,16 @@ export class Module implements wx.IModule {
         return <any> this;
     }
 
-    public filters(): { [index: string]: wx.IExpressionFilter; } {
+    public filters(): { [index: string]: IExpressionFilter; } {
         return this.expressionFilters;
     }
 
-    public animation(name: string, animation: wx.IAnimation): wx.IAnimationRegistry;
-    public animation(name: string): wx.IAnimation;
+    public animation(name: string, animation: IAnimation): IAnimationRegistry;
+    public animation(name: string): IAnimation;
     public animation() {
         let args = args2Array(arguments);
         let name = args.shift();
-        let animation: wx.IAnimation;
+        let animation: IAnimation;
 
         // lookup?
         if (args.length === 0) {
@@ -129,7 +139,7 @@ export class Module implements wx.IModule {
             animation = this.animations[name];
 
             if (typeof animation === "string") {
-                animation = injector.get<wx.IAnimation>(<any> animation);
+                animation = injector.get<IAnimation>(<any> animation);
                 this.bindings[name] = animation;
             }
 
@@ -150,8 +160,8 @@ export class Module implements wx.IModule {
 
     private bindings: { [name: string]: any } = {};
     private components: { [name: string]: IComponentDescriptorEx } = {};
-    private expressionFilters: { [index: string]: wx.IExpressionFilter; } = {};
-    private animations: { [index: string]: wx.IAnimation; } = {};
+    private expressionFilters: { [index: string]: IExpressionFilter; } = {};
+    private animations: { [index: string]: IAnimation; } = {};
 
     private instantiateComponent(name: string): Rx.Observable<IComponentDescriptorEx> {
         let cd = this.components[name];
@@ -176,10 +186,10 @@ export class Module implements wx.IModule {
         return result.do(x => this.components[name].instance = x); // cache instantiated component
     }
 
-    private initializeComponent(obs: Rx.Observable<IComponentDescriptorEx>, params?: Object): Rx.Observable<wx.IComponent> {
+    private initializeComponent(obs: Rx.Observable<IComponentDescriptorEx>, params?: Object): Rx.Observable<IComponent> {
         return obs.take(1).selectMany(component => {
                 if (component == null) {
-                    return Rx.Observable.return<wx.IComponent>(undefined);
+                    return Rx.Observable.return<IComponent>(undefined);
                 }
 
                 if (component.viewModel) {
@@ -193,7 +203,7 @@ export class Module implements wx.IModule {
                                 vm = new vm(params);
                             }
 
-                            return <wx.IComponent> {
+                            return <IComponent> {
                                 template: t,
                                 viewModel: vm,
                                 preBindingInit: component.preBindingInit,
@@ -204,7 +214,7 @@ export class Module implements wx.IModule {
 
                 // template-only component
                 return this.loadComponentTemplate(component.template, params)
-                    .select(template => <wx.IComponent> {
+                    .select(template => <IComponent> {
                         template: template,
                         preBindingInit: component.preBindingInit,
                         postBindingInit: component.postBindingInit
@@ -231,7 +241,7 @@ export class Module implements wx.IModule {
         } else if (Array.isArray(template)) {
             return Rx.Observable.return(<Node[]> template);
         } else if (typeof template === "object") {
-            let options = <wx.IComponentTemplateDescriptor> template;
+            let options = <IComponentTemplateDescriptor> template;
 
             if (options.resolve) {
                 syncResult = injector.get<Node[]>(options.resolve);
@@ -284,7 +294,7 @@ export class Module implements wx.IModule {
             syncResult = injector.resolve<any>(vm, componentParams);
             return Rx.Observable.return(syncResult);
         } else if (typeof vm === "object") {
-            let options = <wx.IComponentViewModelDescriptor> vm;
+            let options = <IComponentViewModelDescriptor> vm;
 
             if (options.resolve) {
                 syncResult = injector.get<any>(options.resolve, componentParams);
@@ -303,7 +313,7 @@ export class Module implements wx.IModule {
     }
 }
 
-class App extends Module implements wx.IWebRxApp {
+class App extends Module implements IWebRxApp {
     constructor() {
         super("app");
 
@@ -346,31 +356,31 @@ class App extends Module implements wx.IWebRxApp {
         }
     }
 
-    public get templateEngine(): wx.ITemplateEngine {
+    public get templateEngine(): ITemplateEngine {
         if (!this._templateEngine) {
-            this._templateEngine = injector.get<wx.ITemplateEngine>(res.htmlTemplateEngine);
+            this._templateEngine = injector.get<ITemplateEngine>(res.htmlTemplateEngine);
         }
 
         return this._templateEngine;
     }
 
-    public set templateEngine(newVal: wx.ITemplateEngine) {
+    public set templateEngine(newVal: ITemplateEngine) {
         this._templateEngine = newVal;
     }
 
-    public history: wx.IHistory;
-    public title: wx.IObservableProperty<string> = property<string>(document.title);
+    public history: IHistory;
+    public title: IObservableProperty<string> = property<string>(document.title);
 
     ///////////////////////
     // Implementation
 
-    private _templateEngine: wx.ITemplateEngine;
+    private _templateEngine: ITemplateEngine;
     private _mainThreadScheduler: Rx.IScheduler;
     private _unitTestMainThreadScheduler: Rx.IScheduler;
 
-    private createHistory(): wx.IHistory {
+    private createHistory(): IHistory {
         // inherit default implementation
-        let result = <wx.IHistory> {
+        let result = <IHistory> {
             back: window.history.back.bind(window.history),
             forward: window.history.forward.bind(window.history),
             //go: window.history.go,
@@ -413,10 +423,10 @@ class App extends Module implements wx.IWebRxApp {
     }
 }
 
-export var app: wx.IWebRxApp = new App();
+export var app: IWebRxApp = new App();
 
-var modules: { [name: string]: Array<any>|wx.IModuleDescriptor } = {
-    'app': <wx.IModuleDescriptor> <any> { instance: app } // auto-register 'app' module
+var modules: { [name: string]: Array<any>|IModuleDescriptor } = {
+    'app': <IModuleDescriptor> <any> { instance: app } // auto-register 'app' module
 };
 
 /**
@@ -424,8 +434,8 @@ var modules: { [name: string]: Array<any>|wx.IModuleDescriptor } = {
 * @param {string} name The module name
 * @return {IModule} The module handle
 */
-export function module(name: string, descriptor: Array<any>|wx.IModuleDescriptor) {
-    modules[name] = <wx.IModuleDescriptor> descriptor;
+export function module(name: string, descriptor: Array<any>|IModuleDescriptor) {
+    modules[name] = <IModuleDescriptor> descriptor;
     return wx;
 }
 
@@ -434,17 +444,17 @@ export function module(name: string, descriptor: Array<any>|wx.IModuleDescriptor
 * @param {string} name The module name
 * @return {IModule} The module handle
 */
-export function loadModule(name: string): Rx.Observable<wx.IModule> {
-    let md: Array<any>|wx.IModuleDescriptor = modules[name];
-    let result: Rx.Observable<wx.IModule> = undefined;
-    let module: wx.IModule;
+export function loadModule(name: string): Rx.Observable<IModule> {
+    let md: Array<any>|IModuleDescriptor = modules[name];
+    let result: Rx.Observable<IModule> = undefined;
+    let module: IModule;
 
     if (md != null) {
         if (Array.isArray(md)) {
             // assumed to be inline-annotated-array
             // resolve the configuration function via DI and invoke it with the module instance as argument
             module = new Module(name);
-            injector.resolve<wx.IModule>(<Array<any>> md, module);
+            injector.resolve<IModule>(<Array<any>> md, module);
             result = Rx.Observable.return(module);
         } else if (isFunction(md)) {
             // configuration function
@@ -452,17 +462,17 @@ export function loadModule(name: string): Rx.Observable<wx.IModule> {
             (<any> md)(module);
             result = Rx.Observable.return(module);
         } else {
-            let mdd = <wx.IModuleDescriptor> md;
+            let mdd = <IModuleDescriptor> md;
 
             if (mdd.instance) {
-                result = Rx.Observable.return<wx.IModule>(mdd.instance);
+                result = Rx.Observable.return<IModule>(mdd.instance);
             } else {
                 module = new Module(name);
 
                 if (mdd.resolve) {
                     // resolve the configuration function via DI and invoke it with the module instance as argument
-                    injector.get<wx.IModule>(mdd.resolve, module);
-                    result = Rx.Observable.return<wx.IModule>(module);
+                    injector.get<IModule>(mdd.resolve, module);
+                    result = Rx.Observable.return<IModule>(module);
                 } else if (mdd.require) {
                     // load the configuration function from external module and invoke it with the module instance as argument
                     result = observableRequire<{ (any): any }>(mdd.require)
@@ -472,8 +482,8 @@ export function loadModule(name: string): Rx.Observable<wx.IModule> {
             }
         }
     } else {
-        result = Rx.Observable.return<wx.IModule>(undefined);
+        result = Rx.Observable.return<IModule>(undefined);
     }
 
-    return result.take(1).do(x => modules[name] = <wx.IModuleDescriptor> <any> { instance: x }); // cache instantiated module
+    return result.take(1).do(x => modules[name] = <IModuleDescriptor> <any> { instance: x }); // cache instantiated module
 }

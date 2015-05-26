@@ -1,6 +1,9 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
+import { ICompiledExpression  } from "../Core/ExpressionCompiler"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, nodeChildrenToArray } from "../Core/Utils"
@@ -8,23 +11,23 @@ import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable
 "use strict";
 
 export interface IIfAnimationDescriptor {
-    enter?: string|wx.IAnimation;
-    leave?: string|wx.IAnimation;
+    enter?: string|IAnimation;
+    leave?: string|IAnimation;
 }
 
 export interface IIfBindingOptions extends IIfAnimationDescriptor {
     condition: string;
 }
 
-export class IfBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export class IfBinding implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
     } 
 
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("if-binding only operates on elements!");
 
@@ -35,7 +38,7 @@ export class IfBinding implements wx.IBindingHandler {
         let el = <HTMLElement> node;
         let self = this;
         let initialApply = true;
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let animations: IIfAnimationDescriptor = <IIfAnimationDescriptor> {};
         let cleanup: Rx.CompositeDisposable;
 
@@ -48,11 +51,11 @@ export class IfBinding implements wx.IBindingHandler {
 
         if (typeof compiled === "object") {
             let opt = <IIfBindingOptions> compiled;
-            exp = <wx.ICompiledExpression> <any> opt.condition;
+            exp = <ICompiledExpression> <any> opt.condition;
 
             // extract animations
             if (opt.enter) {
-                animations.enter = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.enter, ctx);
+                animations.enter = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.enter, ctx);
 
                 if (typeof animations.enter === "string") {
                     animations.enter = module.animation(<string> animations.enter);
@@ -60,7 +63,7 @@ export class IfBinding implements wx.IBindingHandler {
             }
 
             if (opt.leave) {
-                animations.leave = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.leave, ctx);
+                animations.leave = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.leave, ctx);
 
                 if (typeof animations.leave === "string") {
                     animations.leave = module.animation(<string> animations.leave);
@@ -85,7 +88,7 @@ export class IfBinding implements wx.IBindingHandler {
 
                 initialApply = false;
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -118,12 +121,12 @@ export class IfBinding implements wx.IBindingHandler {
     // Implementation
 
     protected inverse: boolean = false;
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
-    protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: wx.IDataContext,
+    protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext,
         animations: IIfAnimationDescriptor, initialApply: boolean): Rx.IDisposable {
-        let leaveAnimation: wx.IAnimation = <wx.IAnimation> animations.leave;
-        let enterAnimation: wx.IAnimation = <wx.IAnimation> animations.enter;
+        let leaveAnimation: IAnimation = <IAnimation> animations.leave;
+        let enterAnimation: IAnimation = <IAnimation> animations.enter;
         let self = this;
         let obs: Rx.Observable<any> = undefined;
 
@@ -184,7 +187,7 @@ export class IfBinding implements wx.IBindingHandler {
 }
 
 export class NotIfBinding extends IfBinding {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
 
         this.inverse = true;

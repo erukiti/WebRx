@@ -1,9 +1,10 @@
 ///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IAnimation } from "../Interfaces"
 import { args2Array, throwError, getOid, nodeListToArray, toggleCssClass, noop } from "../Core/Utils"
 
 "use strict";
+
 
 function toElementList(element: Node|Array<Node>|HTMLElement|Array<HTMLElement>|NodeList): Array<HTMLElement> {
     let nodes: Array<Node>;
@@ -69,8 +70,8 @@ function getKeyframeAnimationDuration(el: HTMLElement) {
 
 function scriptedAnimation(run: (element: HTMLElement, params?: any) => Rx.Observable<any>,
     prepare?: (element: HTMLElement, params?: any) => void,
-    complete?: (element: HTMLElement, params?: any) => void): wx.IAnimation {
-    let result: wx.IAnimation = <any> {};
+    complete?: (element: HTMLElement, params?: any) => void): IAnimation {
+    let result: IAnimation = <any> {};
 
     if (prepare) {
         result.prepare = (nodes, params) => {
@@ -104,8 +105,8 @@ function scriptedAnimation(run: (element: HTMLElement, params?: any) => Rx.Obser
     return result;
 }
 
-function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnimation {
-    let result: wx.IAnimation = <any> {};
+function cssTransitionAnimation(prepare: any, run: any, complete: any): IAnimation {
+    let result: IAnimation = <any> {};
     let prepToAdd: Array<any>;
     let prepToRemove: Array<any>;
     let runToAdd: Array<any>;
@@ -121,7 +122,7 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
         } 
 
         if (typeof prepare[0] === "string") {
-            // convert into wx.IAnimationCssClassInstruction
+            // convert into IAnimationCssClassInstruction
             prepIns = prepare.map(x => <IAnimationCssClassInstruction> { css: x, add: true });
         } else {
             prepIns = prepare;
@@ -148,7 +149,7 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
     }
 
     if (typeof run[0] === "string") {
-        // convert into wx.IAnimationCssClassInstruction
+        // convert into IAnimationCssClassInstruction
         runIns = run.map(x => <IAnimationCssClassInstruction> { css: x, add: true });
     } else {
         runIns = run;
@@ -190,7 +191,7 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
         }
 
         if (typeof complete[0] === "string") {
-            // convert into wx.IAnimationCssClassInstruction
+            // convert into IAnimationCssClassInstruction
             completeIns = complete.map(x => <IAnimationCssClassInstruction> { css: x, add: true });
         } else {
             completeIns = complete;
@@ -240,7 +241,7 @@ export interface IAnimationCssClassInstruction {
  */
 export function animation(prepareTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>,
     startTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>,
-    completeTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>): wx.IAnimation;
+    completeTransitionClass: string|Array<string>|Array<IAnimationCssClassInstruction>): IAnimation;
  
 /**
  * Registers a scripted animation
@@ -252,7 +253,7 @@ export function animation(prepareTransitionClass: string|Array<string>|Array<IAn
  */
 export function animation(run:(element: HTMLElement, params?: any)=> Rx.Observable<any>,
     prepare?: (element: HTMLElement, params?: any) => void,
-    complete?: (element: HTMLElement, params?: any) => void): wx.IAnimation;
+    complete?: (element: HTMLElement, params?: any) => void): IAnimation;
 
 export function animation() {
     let args = args2Array(arguments);

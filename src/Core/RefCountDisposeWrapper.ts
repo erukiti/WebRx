@@ -1,6 +1,4 @@
-﻿/// <reference path="../Interfaces.d.ts" />
-
-"use strict";
+﻿"use strict";
 
 export default class RefCountDisposeWrapper implements Rx.IDisposable {
     constructor(inner: Rx.IDisposable, initialRefCount: number = 1) {

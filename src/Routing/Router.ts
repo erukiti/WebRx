@@ -1,9 +1,10 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IViewAnimationDescriptor  } from "../Interfaces"
+import { app } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
-
 import { createWeakMap } from "./../Collections/WeakMap"
 import { createSet } from "./../Collections/Set"
 import * as res from "../Core/Resources"
@@ -11,7 +12,7 @@ import * as env from "../Core/Environment"
 import { injector } from "./../Core/Injector"
 import { Module } from "./../Core/Module"
 import { property } from "./../Core/Property"
-import { route } from "./RouteMatcher"
+import { IRoute, route } from "./RouteMatcher"
 
 "use strict";
 
@@ -21,14 +22,140 @@ interface IHistoryState {
     title?: string;
 }
 
-export class Router implements wx.IRouter {
-    constructor(domManager: wx.IDomManager) {
+export interface IRouterStateConfig {
+    name: string;
+    url?: string|IRoute;   // relative or absolute
+    views?: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
+    params?: any;
+    onEnter?: (config: IRouterStateConfig, params?: any)=> void;
+    onLeave?: (config: IRouterStateConfig, params?: any) => void;
+    //reloadOnSearch?: boolean;
+}
+
+export interface IRouterState {
+    name: string;
+    url: string;
+    params: any;
+    views: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
+    onEnter?: (config: IRouterStateConfig, params?: any) => void;
+    onLeave?: (config: IRouterStateConfig, params?: any) => void;
+}
+
+export interface IViewConfig {
+    component: string;
+    params?: any;
+    animations?: IViewAnimationDescriptor;
+}
+
+export const enum RouterLocationChangeMode {
+    add = 1,
+    replace = 2
+}
+
+export interface IStateChangeOptions {
+    /**
+    * If true will update the url in the location bar, if false will not.
+    **/
+    location?: boolean|RouterLocationChangeMode; 
+
+    /**
+    * If true will force transition even if the state or params have not changed, aka a reload of the same state. 
+    **/
+    force?: boolean;
+}
+
+export interface IRouter {
+    /**
+    * Transitions to the state inferred from the browser's current location
+    * This method should be invoked once after registering application states.
+    * @param {string} url If specified the router state will be synced to this value, otherwise to window.location.path 
+    **/
+    sync(url?:string): void;
+
+    /**
+    * Registers a state configuration under a given state name.
+    * @param {IRouterStateConfig} config State configuration to register
+    **/
+    state(config: IRouterStateConfig): IRouter;
+
+    /**
+    * Represents the configuration object for the router's 
+    **/
+    current: IObservableProperty<IRouterState>;
+
+    /**
+    * Invoke this method to programatically alter or extend IRouter.current.params. 
+    * Failure to modify params through this method will result in those modifications getting lost after state transitions. 
+    **/
+    updateCurrentStateParams(withParamsAction: (params: any)=> void): void;
+
+    /**
+    * Method for transitioning to a new state.
+    * @param {string} to Absolute or relative destination state path. 'contact.detail' - will go to the 
+    * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
+    * '.child.grandchild' will go to grandchild state
+    * @param {Object} params A map of the parameters that will be sent to the state. 
+    * Any parameters that are not specified will be inherited from currently defined parameters. 
+    * @param {IStateChangeOptions} options Options controlling how the state transition will be performed
+    **/
+    go(to: string, params?: Object, options?: IStateChangeOptions): void;    // Rx.Observable<any>
+
+    /**
+    * An URL generation method that returns the URL for the given state populated with the given params.
+    * @param {string} state Absolute or relative destination state path. 'contact.detail' - will go to the 
+    * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
+    * '.child.grandchild' will go to grandchild state
+    * @param {Object} params An object of parameter values to fill the state's required parameters.
+    **/
+    url(state: string, params?: {}): string;
+
+    /**
+    * A method that force reloads the current state. All resolves are re-resolved, events are not re-fired, 
+    * and components reinstantiated.
+    **/
+    reload(): void;
+
+    /**
+    * Returns the state configuration object for any specific state.
+    * @param {string} state Absolute state path.
+    **/
+    get(state: string): IRouterStateConfig;
+
+    /**
+    * Similar to IRouter.includes, but only checks for the full state name. If params is supplied then it will 
+    * be tested for strict equality against the current active params object, so all params must match with none 
+    * missing and no extras.
+    * @param {string} state Absolute state path.
+    **/
+    is(state: string, params?: any, options?: any);
+
+    /**
+    * A method to determine if the current active state is equal to or is the child of the state stateName. 
+    * If any params are passed then they will be tested for a match as well. Not all the parameters need 
+    * to be passed, just the ones you'd like to test for equality.
+    * @param {string} state Absolute state path.
+    **/
+    includes(state: string, params?: any, options?: any);
+
+    /**
+    * Resets internal state configuration to defaults (for unit-testing)
+    **/
+    reset(): void;
+
+    /**
+    * Returns the view-configuration for the specified view at the current state
+    **/
+    getViewComponent(viewName: string): IViewConfig;
+}
+
+export class Router implements IRouter {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
 
         this.reset(false);
 
         // monitor navigation history
-        wx.app.history.onPopState.subscribe((e) => {
+        app.history.onPopState.subscribe((e) => {
             try {
                 // certain versions of WebKit raise an empty popstate event on page-load
                 if(e && e.state) {
@@ -40,19 +167,19 @@ export class Router implements wx.IRouter {
                         this.go(stateName, state.params, { location: false });
     
                         // update title
-                        wx.app.title(state.title);
+                        app.title(state.title);
                     }
                 }
             }
             
             catch(e) {
-                wx.app.defaultExceptionHandler.onNext(e);                
+                app.defaultExceptionHandler.onNext(e);                
             }
         });
 
 
         // monitor title changes
-        wx.app.title.changed.subscribe(x => {
+        app.title.changed.subscribe(x => {
             document.title = x;
 
             if(this.current() != null)
@@ -63,7 +190,7 @@ export class Router implements wx.IRouter {
     //////////////////////////////////
     // IRouter
     
-    public state(config: wx.IRouterStateConfig): wx.IRouter {
+    public state(config: IRouterStateConfig): IRouter {
         this.registerStateInternal(config);
         return this;
     }
@@ -71,10 +198,10 @@ export class Router implements wx.IRouter {
     public updateCurrentStateParams(withParamsAction: (params: any) => void): void {
         let _current = this.current();
         withParamsAction(_current.params);
-        this.replaceHistoryState(_current, wx.app.title());
+        this.replaceHistoryState(_current, app.title());
     }
 
-    public go(to: string, params?: {}, options?: wx.IStateChangeOptions): void {
+    public go(to: string, params?: {}, options?: IStateChangeOptions): void {
         to = this.mapPath(to);
 
         if (this.states[to] == null)
@@ -83,7 +210,7 @@ export class Router implements wx.IRouter {
         this.activateState(to, params, options);
     }
 
-    public get(state: string): wx.IRouterStateConfig {
+    public get(state: string): IRouterStateConfig {
         return this.states[state];
     }
 
@@ -154,12 +281,12 @@ export class Router implements wx.IRouter {
         });
         
         if(enterRootState)
-            this.go(this.rootStateName, {}, { location: wx.RouterLocationChangeMode.replace });
+            this.go(this.rootStateName, {}, { location: RouterLocationChangeMode.replace });
     }
 
     public sync(url?:string): void {
         if(url == null)
-            url = wx.app.history.location.pathname;// + app.history.location.search;
+            url = app.history.location.pathname;// + app.history.location.search;
 
         // iterate over registered states to find matching uri
         let keys = Object.keys(this.states);
@@ -171,7 +298,7 @@ export class Router implements wx.IRouter {
             let route = this.getAbsoluteRouteForState(state.name);
 
             if ((params = route.parse(url)) != null) {
-                this.go(state.name, params, { location: wx.RouterLocationChangeMode.replace });
+                this.go(state.name, params, { location: RouterLocationChangeMode.replace });
                 return;
             }
         }
@@ -194,12 +321,12 @@ export class Router implements wx.IRouter {
             params = {};
         }
 
-        this.go(state, params, { force: true, location: wx.RouterLocationChangeMode.replace });
+        this.go(state, params, { force: true, location: RouterLocationChangeMode.replace });
     }
 
-    public getViewComponent(viewName: string): wx.IViewConfig {
+    public getViewComponent(viewName: string): IViewConfig {
         let _current = this.current();
-        let result: wx.IViewConfig = undefined;
+        let result: IViewConfig = undefined;
 
         if (_current.views != null) {
             let component = _current.views[viewName];
@@ -235,21 +362,21 @@ export class Router implements wx.IRouter {
         return result;
     }
 
-    public current = property<wx.IRouterState>();
+    public current = property<IRouterState>();
 
     //////////////////////////////////
     // Implementation
 
-    private states: { [name: string]: wx.IRouterStateConfig } = {};
-    private root: wx.IRouterStateConfig;
-    private domManager: wx.IDomManager;
+    private states: { [name: string]: IRouterStateConfig } = {};
+    private root: IRouterStateConfig;
+    private domManager: IDomManager;
 
     private pathSeparator = ".";
     private parentPathDirective = "^";
     private rootStateName = "$";
     private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
 
-    private registerStateInternal(state: wx.IRouterStateConfig) {
+    private registerStateInternal(state: IRouterStateConfig) {
         let parts = state.name.split(this.pathSeparator);
 
         if (state.name !== this.rootStateName) {
@@ -262,7 +389,7 @@ export class Router implements wx.IRouter {
         }
 
         // wrap and store
-        state = <wx.IRouterStateConfig> extend(state, {});
+        state = <IRouterStateConfig> extend(state, {});
         this.states[state.name] = state;
 
         if (state.url != null) {
@@ -285,24 +412,24 @@ export class Router implements wx.IRouter {
         return state;
     }
 
-    private pushHistoryState(state: wx.IRouterState, title?: string): void {
+    private pushHistoryState(state: IRouterState, title?: string): void {
         let hs = <IHistoryState> {
             stateName: state.name,
             params: state.params,
             title: title != null ? title : document.title
         };
 
-        wx.app.history.pushState(hs, "", state.url);
+        app.history.pushState(hs, "", state.url);
     }
 
-    private replaceHistoryState(state: wx.IRouterState, title?: string): void {
+    private replaceHistoryState(state: IRouterState, title?: string): void {
         let hs = <IHistoryState> {
             stateName: state.name,
             params: state.params,
             title: title != null ? title : document.title
         };
 
-        wx.app.history.replaceState(hs, "", state.url);
+        app.history.replaceState(hs, "", state.url);
     }
 
     private mapPath(path: string): string {
@@ -338,11 +465,11 @@ export class Router implements wx.IRouter {
         return path;
     }
 
-    private getStateHierarchy(name: string): wx.IRouterStateConfig[] {
+    private getStateHierarchy(name: string): IRouterStateConfig[] {
         let parts = name.split(this.pathSeparator);
         let stateName: string = "";
         let result = [];
-        let state: wx.IRouterStateConfig;
+        let state: IRouterStateConfig;
 
         if (name !== this.rootStateName)
             result.push(this.root);
@@ -369,29 +496,29 @@ export class Router implements wx.IRouter {
         return result;
     }
 
-    private getAbsoluteRouteForState(name: string, hierarchy?: wx.IRouterStateConfig[]): wx.IRoute {
+    private getAbsoluteRouteForState(name: string, hierarchy?: IRouterStateConfig[]): IRoute {
         hierarchy = hierarchy != null ? hierarchy : this.getStateHierarchy(name);
-        let result: wx.IRoute = null;
+        let result: IRoute = null;
 
         hierarchy.forEach(state => {
             // concat urls
             if (result != null) {
-                let route = <wx.IRoute> state.url;
+                let route = <IRoute> state.url;
 
                 // individual states may use absolute urls as well
                 if (!route.isAbsolute)
-                    result = result.concat(<wx.IRoute> state.url);
+                    result = result.concat(<IRoute> state.url);
                 else
                     result = route;
             } else {
-                result = <wx.IRoute> state.url;
+                result = <IRoute> state.url;
             }
         });
 
         return result;
     }
 
-    private activateState(to: string, params?: Object, options?: wx.IStateChangeOptions): void {
+    private activateState(to: string, params?: Object, options?: IStateChangeOptions): void {
         let hierarchy = this.getStateHierarchy(to);
         let stateViews: { [view: string]: string|{ component: string; params?: any } } = {};
         let stateParams = {};
@@ -415,7 +542,7 @@ export class Router implements wx.IRouter {
 
         // construct resulting state
         let route = this.getAbsoluteRouteForState(to, hierarchy);
-        let state = <wx.IRouterState> extend(this.states[to], {});
+        let state = <IRouterState> extend(this.states[to], {});
         state.url = route.stringify(params);
 
         state.views = stateViews;
@@ -439,10 +566,10 @@ export class Router implements wx.IRouter {
 
             // update history
             if (options && options.location) {
-                if(options.location === wx.RouterLocationChangeMode.replace)
-                    this.replaceHistoryState(state, wx.app.title());
+                if(options.location === RouterLocationChangeMode.replace)
+                    this.replaceHistoryState(state, app.title());
                 else
-                    this.pushHistoryState(state, wx.app.title());
+                    this.pushHistoryState(state, app.title());
             }
 
             if (_current != null) {
@@ -462,7 +589,7 @@ export class Router implements wx.IRouter {
         let hierarchy = this.getStateHierarchy(this.current().name);
         let stateParams = {};
         let result = [];
-        let config: wx.IRouterStateConfig;
+        let config: IRouterStateConfig;
         let index = -1;
 
         // walk the hierarchy backward to figure out when the component was introduced at the specified view-slot
@@ -498,14 +625,14 @@ export class Router implements wx.IRouter {
             result = Object.keys(stateParams);
 
             // append any route-params
-            result = result.concat((<wx.IRoute> config.url).params);
+            result = result.concat((<IRoute> config.url).params);
         }
 
         return result;
     }
 }
 
-export var router: wx.IRouter;
+export var router: IRouter;
 Object.defineProperty(wx, "router", {
-    get() { return injector.get<wx.IRouter>(res.router); }
+    get() { return injector.get<IRouter>(res.router); }
 });

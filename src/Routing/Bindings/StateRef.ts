@@ -1,6 +1,10 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../../Interfaces"
+import { app  } from "../../Core/Module"
+import { IDomManager  } from "../../Core/DomManager"
+import { ICompiledExpression  } from "../../Core/ExpressionCompiler"
+import { IRouter  } from "../Router"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, toggleCssClass } from "../../Core/Utils"
 import { router } from "../Router"
@@ -12,8 +16,8 @@ export interface IStateRefBindingOptions {
     params?: Object;
 }
 
-export default class StateRefBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager, router: wx.IRouter) {
+export default class StateRefBinding implements IBindingHandler {
+    constructor(domManager: IDomManager, router: IRouter) {
         this.domManager = domManager;
         this.router = router;
     } 
@@ -21,7 +25,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("stateRef-binding only operates on elements!");
 
@@ -32,7 +36,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
         let isAnchor = el.tagName.toLowerCase() === "a";
         let anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
         let compiled = this.domManager.compileBindingOptions(options, module);
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let observables: Array<Rx.Observable<any>> = [];
         let opt = <IStateRefBindingOptions> compiled;
         let paramsKeys: Array<string> = [];
@@ -40,12 +44,12 @@ export default class StateRefBinding implements wx.IBindingHandler {
         let stateParams: Object;
 
         if (typeof compiled === "function") {
-            exp = <wx.ICompiledExpression> compiled;
+            exp = <ICompiledExpression> compiled;
 
             observables.push(this.domManager.expressionToObservable(exp, ctx));
         } else {
             // collect state-name observable
-            observables.push(this.domManager.expressionToObservable(<wx.ICompiledExpression> <any> opt.name, ctx));
+            observables.push(this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
 
             // collect params observables
             if (opt.params) {
@@ -74,7 +78,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
                     anchor.href = this.router.url(stateName, stateParams);
                 }
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -113,6 +117,6 @@ export default class StateRefBinding implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
-    protected router: wx.IRouter;
+    protected domManager: IDomManager;
+    protected router: IRouter;
 }

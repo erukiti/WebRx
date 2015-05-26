@@ -1,9 +1,20 @@
 /// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
 import { getOid } from "../Core/Utils"
 
 "use strict";
+
+/**
+* The WeakMap object is a collection of key/value pairs in which the keys are objects and the values can be arbitrary values. The keys are held using weak references.
+* @interface 
+**/
+export interface IWeakMap<TKey extends Object, T> {
+    set(key: TKey, value: T): void;
+    get(key: TKey): T;
+    has(key: TKey): boolean;
+    delete(key: TKey): void;
+    isEmulated: boolean;
+}
 
 /**
 * This class emulates the semantics of a WeakMap.
@@ -11,7 +22,7 @@ import { getOid } from "../Core/Utils"
 * requiring manual housekeeping of entries otherwise they are kept forever.
 * @class
 */
-class WeakMapEmulated<TKey extends Object, T> implements wx.IWeakMap<TKey, T> {
+class WeakMapEmulated<TKey extends Object, T> implements IWeakMap<TKey, T> {
     ////////////////////
     /// IWeakMap
 
@@ -52,10 +63,10 @@ let hasNativeSupport = typeof WeakMap === "function";
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
 * @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
 */
-export function createWeakMap<TKey, T>(disableNativeSupport?: boolean): wx.IWeakMap<TKey, T> {
+export function createWeakMap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T> {
     if (disableNativeSupport || !hasNativeSupport) {
         return new WeakMapEmulated<TKey, T>();
     }
 
-    return <wx.IWeakMap<TKey, T>> <any> new WeakMap();
+    return <IWeakMap<TKey, T>> <any> new WeakMap();
 }

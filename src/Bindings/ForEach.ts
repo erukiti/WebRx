@@ -1,6 +1,11 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
+/// <reference path="../RxExtensions.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
+import { ICompiledExpression  } from "../Core/ExpressionCompiler"
+import { IObservableList } from "../Collections/List"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, noop } from "../Core/Utils"
@@ -11,18 +16,18 @@ import { injector } from "../Core/Injector"
 "use strict";
 
 // Binding contributions to node-state
-interface IForEachNodeState extends wx.INodeState {
+interface IForEachNodeState extends INodeState {
     index?: any;
 }
 
 // Binding contributions to data-context
-interface IForEachDataContext extends wx.IDataContext {
+interface IForEachDataContext extends IDataContext {
     $index: number;
 }
 
 export interface IForeachAnimationDescriptor {
-    itemEnter?: string|wx.IAnimation;
-    itemLeave?: string|wx.IAnimation;
+    itemEnter?: string|IAnimation;
+    itemLeave?: string|IAnimation;
 }
 
 export interface IForEachBindingOptions extends IForeachAnimationDescriptor {
@@ -72,8 +77,8 @@ export interface IForEachBindingHooks {
     afterMove? (nodes: Node[], data: any, index: number): void;
 }
 
-export default class ForEachBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export default class ForEachBinding implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
 
         // hook into getDataContext() to map state['index'] to ctx['$index']
@@ -86,7 +91,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("forEach binding only operates on elements!");
 
@@ -100,7 +105,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
         let initialApply = true;
         let cleanup: Rx.CompositeDisposable = null;
         let hooks: IForEachBindingHooks|string;
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let setProxyFunc: (VirtualChildNodes) => void;
         let animations: IForeachAnimationDescriptor = <IForeachAnimationDescriptor> {};
 
@@ -110,7 +115,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
 
             // extract animations
             if (opt.itemEnter) {
-                animations.itemEnter = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.itemEnter, ctx);
+                animations.itemEnter = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.itemEnter, ctx);
 
                 if (typeof animations.itemEnter === "string") {
                     animations.itemEnter = module.animation(<string> animations.itemEnter);
@@ -118,7 +123,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
             }
 
             if (opt.itemLeave) {
-                animations.itemLeave = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.itemLeave, ctx);
+                animations.itemLeave = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.itemLeave, ctx);
 
                 if (typeof animations.itemLeave === "string") {
                     animations.itemLeave = module.animation(<string> animations.itemLeave);
@@ -127,7 +132,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
 
             if (opt.hooks) {
                 // extract hooks
-                hooks = this.domManager.evaluateExpression(<wx.ICompiledExpression> opt.hooks, ctx);
+                hooks = this.domManager.evaluateExpression(<ICompiledExpression> opt.hooks, ctx);
             }
 
             // optionally resolve hooks if passed as string identifier
@@ -136,7 +141,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
 
             if (opt['debug']) {
                 if (opt['debug']['setProxyFunc']) {
-                    setProxyFunc = this.domManager.evaluateExpression(<wx.ICompiledExpression> opt['debug']['setProxyFunc'], ctx);
+                    setProxyFunc = this.domManager.evaluateExpression(<ICompiledExpression> opt['debug']['setProxyFunc'], ctx);
                 }
             }
         } else {
@@ -168,7 +173,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
                 self.applyValue(el, x, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc);
                 initialApply = false;
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -201,10 +206,10 @@ export default class ForEachBinding implements wx.IBindingHandler {
     ////////////////////
     // implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
     protected createIndexPropertyForNode(proxy: VirtualChildNodes, child: Node, startIndex: number,
-        trigger: Rx.Observable<any>, templateLength: number): wx.IObservableProperty<number> {
+        trigger: Rx.Observable<any>, templateLength: number): IObservableProperty<number> {
             return Rx.Observable.defer(()=> {
                 return Rx.Observable.create<number>(obs => {
                     return trigger.subscribe(_ => {
@@ -219,7 +224,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
         .toProperty(startIndex);
     }
 
-    protected appendAllRows(proxy: VirtualChildNodes, list: wx.IObservableList<any>, ctx: wx.IDataContext,
+    protected appendAllRows(proxy: VirtualChildNodes, list: IObservableList<any>, ctx: IDataContext,
         template: Array<Node>, hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor,
         indexTrigger: Rx.Subject<any>, isInitial: boolean) {
         let length = list.length();
@@ -229,11 +234,11 @@ export default class ForEachBinding implements wx.IBindingHandler {
         }
     }
 
-    protected appendRow(proxy: VirtualChildNodes, index: number, item: any, ctx: wx.IDataContext, template: Array<Node>,
+    protected appendRow(proxy: VirtualChildNodes, index: number, item: any, ctx: IDataContext, template: Array<Node>,
         hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor, indexTrigger?: Rx.Subject<any>, isInitial?: boolean): void {
         let nodes = cloneNodeArray(template);
         let _index: any = index;
-        let enterAnimation: wx.IAnimation = <wx.IAnimation> animations.itemEnter;
+        let enterAnimation: IAnimation = <IAnimation> animations.itemEnter;
 
         let cbData = <any> {
             item: item
@@ -269,11 +274,11 @@ export default class ForEachBinding implements wx.IBindingHandler {
         }
     }
 
-    protected insertRow(proxy: VirtualChildNodes, index: number, item: any, ctx: wx.IDataContext,
+    protected insertRow(proxy: VirtualChildNodes, index: number, item: any, ctx: IDataContext,
         template: Array<Node>, hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor,
         indexTrigger: Rx.Subject<any>): void {
         let templateLength = template.length;
-        let enterAnimation: wx.IAnimation = <wx.IAnimation> animations.itemEnter;
+        let enterAnimation: IAnimation = <IAnimation> animations.itemEnter;
 
         let nodes = cloneNodeArray(template);
         let _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
@@ -310,7 +315,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
         let templateLength = template.length;
         let el = <Element> proxy.targetNode;
         let nodes = proxy.removeChilds(index * templateLength, templateLength, true);
-        let leaveAnimation: wx.IAnimation = <wx.IAnimation> animations.itemLeave;
+        let leaveAnimation: IAnimation = <IAnimation> animations.itemLeave;
 
         function removeNodes() {
             for(let i = 0; i < templateLength; i++) {
@@ -343,8 +348,8 @@ export default class ForEachBinding implements wx.IBindingHandler {
         let templateLength = template.length;
         let el = <Element> proxy.targetNode;
         let nodes = proxy.removeChilds(from * templateLength, templateLength, true);
-        let leaveAnimation: wx.IAnimation = <wx.IAnimation> animations.itemLeave;
-        let enterAnimation: wx.IAnimation = <wx.IAnimation> animations.itemEnter;
+        let leaveAnimation: IAnimation = <IAnimation> animations.itemLeave;
+        let enterAnimation: IAnimation = <IAnimation> animations.itemEnter;
         let combined: Array<Rx.Observable<any>> = [];
         let obs: Rx.Observable<any>;
         let self = this;
@@ -436,8 +441,8 @@ export default class ForEachBinding implements wx.IBindingHandler {
         }
     }
     
-    protected observeList(proxy: VirtualChildNodes, ctx: wx.IDataContext, template: Array<Node>,
-        cleanup: Rx.CompositeDisposable, list: wx.IObservableList<any>, hooks: IForEachBindingHooks,
+    protected observeList(proxy: VirtualChildNodes, ctx: IDataContext, template: Array<Node>,
+        cleanup: Rx.CompositeDisposable, list: IObservableList<any>, hooks: IForEachBindingHooks,
         animations: IForeachAnimationDescriptor, indexTrigger: Rx.Subject<any>) {
         let i: number;
         let length: number;
@@ -495,7 +500,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
     }
 
     protected applyValue(el: HTMLElement, value: any, hooks: IForEachBindingHooks, animations: IForeachAnimationDescriptor,
-        template: Array<Node>, ctx: wx.IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable,
+        template: Array<Node>, ctx: IDataContext, initialApply: boolean, cleanup: Rx.CompositeDisposable,
         setProxyFunc: (VirtualChildNodes) => void): void {
         let i, length;
 
@@ -566,7 +571,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
                 this.appendRow(proxy, i, arr[i], ctx, template, hooks, animations, undefined, true);
             }
         } else if(isList(value)) {
-            let list = <wx.IObservableList<any>> value;
+            let list = <IObservableList<any>> value;
             recalcIndextrigger = new Rx.Subject<any>();
 
             this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);

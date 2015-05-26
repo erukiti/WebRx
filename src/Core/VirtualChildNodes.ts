@@ -1,6 +1,4 @@
-﻿/// <reference path="../Interfaces.d.ts" />
-
-"use strict";
+﻿"use strict";
 
 /**
 * VirtualChildNodes implements consisent and predictable manipulation 

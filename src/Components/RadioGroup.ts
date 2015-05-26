@@ -1,5 +1,4 @@
-﻿/// <reference path="../Interfaces.d.ts" />
-
+﻿import { IComponentDescriptor, ITemplateEngine } from "../Interfaces"
 import {  formatString } from "../Core/Utils"
 
 "use strict";
@@ -18,8 +17,8 @@ export interface IRadioGroupComponentParams {
 let groupId = 0;
 let templateCache: { [key: string]: any } = {};
 
-class RadioGroupComponent implements wx.IComponentDescriptor {
-    constructor(htmlTemplateEngine: wx.ITemplateEngine) {
+export default class RadioGroupComponent implements IComponentDescriptor {
+    constructor(htmlTemplateEngine: ITemplateEngine) {
         this.htmlTemplateEngine = htmlTemplateEngine;
     }
 
@@ -45,7 +44,7 @@ class RadioGroupComponent implements wx.IComponentDescriptor {
     ////////////////////
     // Implementation
 
-    htmlTemplateEngine: wx.ITemplateEngine;
+    htmlTemplateEngine: ITemplateEngine;
 
     protected buildTemplate(params: IRadioGroupComponentParams): Node[] {
         let result: string;

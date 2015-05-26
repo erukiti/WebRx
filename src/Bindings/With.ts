@@ -1,6 +1,8 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty } from "../Core/Utils"
@@ -10,15 +12,15 @@ import { applyBindings, cleanNode } from "../Core/DomManager"
 
 "use strict";
 
-export default class WithBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export default class WithBinding implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
     } 
 
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("with-binding only operates on elements!");
 
@@ -35,7 +37,7 @@ export default class WithBinding implements wx.IBindingHandler {
             try {
                 self.applyValue(el, unwrapProperty(x), state);
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -66,9 +68,9 @@ export default class WithBinding implements wx.IBindingHandler {
     ////////////////////
     // implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
-    protected applyValue(el: HTMLElement, value: any, state: wx.INodeState): void {
+    protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
         state.model = value;
         let ctx = this.domManager.getDataContext(el);
 

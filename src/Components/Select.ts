@@ -1,5 +1,5 @@
-﻿/// <reference path="../Interfaces.d.ts" />
-
+﻿
+import { IComponentDescriptor, ITemplateEngine } from "../Interfaces"
 import {  formatString } from "../Core/Utils"
 
 "use strict";
@@ -21,8 +21,8 @@ export interface ISelectComponentParams {
 
 let templateCache: { [key: string]: any } = {};
 
-export default class SelectComponent implements wx.IComponentDescriptor {
-    constructor(htmlTemplateEngine: wx.ITemplateEngine) {
+export default class SelectComponent implements IComponentDescriptor {
+    constructor(htmlTemplateEngine: ITemplateEngine) {
         this.htmlTemplateEngine = htmlTemplateEngine;
     }
 
@@ -43,7 +43,7 @@ export default class SelectComponent implements wx.IComponentDescriptor {
     ////////////////////
     // Implementation
 
-    htmlTemplateEngine: wx.ITemplateEngine;
+    htmlTemplateEngine: ITemplateEngine;
 
     protected buildTemplate(params: ISelectComponentParams): Node[] {
         let result: string;

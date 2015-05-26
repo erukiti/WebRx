@@ -1,16 +1,227 @@
-/// <reference path="../Interfaces.d.ts" />
-
+import { IObservableProperty  } from "../Interfaces"
+import { app  } from "../Core/Module"
 import { isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
 import IID from "./../IID"
 import Lazy from "./../Core/Lazy"
 import { createScheduledSubject } from "./../Core/ScheduledSubject"
-import PropertyChangedEventArgs from "../Core/Events"
+import {IPropertyChangedEventArgs, PropertyChangedEventArgs } from "../Core/Events"
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper"
-//import RxJsExtensions from "./../RxJsExtensions"
 import * as log from "./../Core/Log"
 import { Implements } from "./../Core/Reflect"
 
 "use strict";
+
+/**
+* Encapsulates change notifications published by various IObservableList members
+* @interface 
+**/
+export interface IListChangeInfo<T> {
+    items: T[]; // { get; }
+    from: number; // { get; }
+    to?: number; // { get; }
+}
+
+/**
+* INotifyListItemChanged provides notifications for collection item updates, ie when an object in
+* a list changes.
+* @interface 
+**/
+export interface INotifyListItemChanged {
+    /**
+    * Provides Item Changing notifications for any item in collection that
+    * implements IReactiveNotifyPropertyChanged. This is only enabled when
+    * ChangeTrackingEnabled is set to True.
+    **/
+    itemChanging: Rx.Observable<IPropertyChangedEventArgs>; // { get; }
+
+    /**
+    * Provides Item Changed notifications for any item in collection that
+    * implements IReactiveNotifyPropertyChanged. This is only enabled when
+    * ChangeTrackingEnabled is set to True.
+    **/
+    itemChanged: Rx.Observable<IPropertyChangedEventArgs>; //  { get; }
+
+    /**
+    * Enables the ItemChanging and ItemChanged properties; when this is
+    * enabled, whenever a property on any object implementing
+    * IReactiveNotifyPropertyChanged changes, the change will be
+    * rebroadcast through ItemChanging/ItemChanged.
+    **/
+    changeTrackingEnabled: boolean; //  { get; set; }
+}
+
+
+/**
+* INotifyListChanged of T provides notifications when the contents
+* of a list are changed (items are added/removed/moved).
+* @interface 
+**/
+export interface INotifyListChanged<T> {
+    /**
+    * This Observable fires before the list is changing, regardless of reason
+    **/
+    listChanging: Rx.Observable<boolean>;
+
+    /**
+    * This Observable fires after list has changed, regardless of reason
+    **/
+    listChanged: Rx.Observable<boolean>;
+
+    /**
+    * Fires when items are added to the list, once per item added.
+    * Functions that add multiple items such addRange should fire this
+    * multiple times. The object provided is the item that was added.
+    **/
+    itemsAdded: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires before an item is going to be added to the list.
+    **/
+    beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires once an item has been removed from a list, providing the
+    * item that was removed.
+    **/
+    itemsRemoved: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires before an item will be removed from a list, providing
+    * the item that will be removed.
+    **/
+    beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires before an items moves from one position in the list to
+    * another, providing the item(s) to be moved as well as source and destination
+    * indices.
+    **/
+    beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires once one or more items moves from one position in the list to
+    * another, providing the item(s) that was moved as well as source and destination
+    * indices.
+    **/
+    itemsMoved: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires before an item is replaced indices.
+    **/
+    beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires after an item is replaced
+    **/
+    itemReplaced: Rx.Observable<IListChangeInfo<T>>;
+
+    /**
+    * Fires when the list length changes, regardless of reason
+    **/
+    lengthChanging: Rx.Observable<number>;
+
+    /**
+    * Fires when the list length changes, regardless of reason
+    **/
+    lengthChanged: Rx.Observable<number>;
+
+    /**
+    * Fires when the empty state changes, regardless of reason
+    **/
+    isEmptyChanged: Rx.Observable<boolean>;
+
+    /**
+    * This Observable is fired when a shouldReset fires on the list. This
+    * means that you should forget your previous knowledge of the state
+    * of the collection and reread it.
+    *
+    * This does *not* mean Clear, and if you interpret it as such, you are
+    * Doing It Wrong.
+    **/
+    shouldReset: Rx.Observable<any>;
+
+    /**
+    * Suppresses change notification from the list until the disposable returned by this method is disposed
+    **/
+    suppressChangeNotifications(): Rx.IDisposable;
+}
+
+/**
+* Represents a collection of objects that can be individually accessed by index.
+* @interface 
+**/
+export interface IObservableReadOnlyList<T> extends INotifyListChanged<T>, INotifyListItemChanged {
+    length: IObservableProperty<number>;
+    get(index: number): T;
+    isReadOnly: boolean;
+    toArray(): Array<T>;
+
+    /**
+    * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+    * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+    * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
+    * @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
+    * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+    */
+    project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
+        selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+
+    /**
+    * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+    * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+    * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
+    * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+    */
+    project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
+        refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+    /**
+    * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+    * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+    * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+    */
+    project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
+        scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+
+    /**
+    * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
+    * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+    */
+    project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+}
+
+/**
+* IObservableList of T represents a list that can notify when its
+* contents are changed (either items are added/removed, or the object
+* itself changes).
+* @interface 
+**/
+export interface IObservableList<T> extends IObservableReadOnlyList<T> {
+    isEmpty: IObservableProperty<boolean>;
+    set(index: number, item: T);
+
+    add(item: T): void;
+    push(item: T): void;
+    clear(): void;
+    contains(item: T): boolean;
+    remove(item: T): boolean;
+    indexOf(item: T): number;
+    insert(index: number, item: T): void;
+    removeAt(index: number): void;
+    addRange(collection: Array<T>): void;
+    insertRange(index: number, collection: Array<T>): void;
+    move(oldIndex, newIndex): void;
+    removeAll(items: Array<T>): void;
+    removeRange(index: number, count: number): void;
+    reset(): void;
+
+    sort(comparison: (a: T, b: T) => number): void;
+    forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+    map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
+    filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
+    every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+    some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+}
 
 /**
 * ReactiveUI's awesome ReactiveList ported to Typescript
@@ -18,7 +229,7 @@ import { Implements } from "./../Core/Reflect"
 */
 @Implements(IID.IObservableList)
 @Implements(IID.IDisposable)
-export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable {
+export class ObservableList<T> implements IObservableList<T>, Rx.IDisposable {
     constructor(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
         this.setupRx(initialContents, resetChangeThreshold, scheduler);
     }
@@ -31,62 +242,62 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
     }
 
     ////////////////////
-    /// wx.IObservableList<T>
+    /// IObservableList<T>
 
     public get isReadOnly(): boolean {
         return false;
     }
 
-    public get itemsAdded(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get itemsAdded(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._itemsAdded)
             this._itemsAdded = this.itemsAddedSubject.value.asObservable();
 
         return this._itemsAdded;
     }
 
-    public get beforeItemsAdded(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get beforeItemsAdded(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._beforeItemsAdded)
             this._beforeItemsAdded = this.beforeItemsAddedSubject.value.asObservable();
 
         return this._beforeItemsAdded;
     }
 
-    public get itemsRemoved(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get itemsRemoved(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._itemsRemoved)
             this._itemsRemoved = this.itemsRemovedSubject.value.asObservable();
 
         return this._itemsRemoved;
     }
 
-    public get beforeItemsRemoved(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get beforeItemsRemoved(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._beforeItemsRemoved)
             this._beforeItemsRemoved = this.beforeItemsRemovedSubject.value.asObservable();
 
         return this._beforeItemsRemoved;
     }
 
-    public get itemReplaced(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get itemReplaced(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._itemReplaced)
             this._itemReplaced = this.itemReplacedSubject.value.asObservable();
 
         return this._itemReplaced;
     }
 
-    public get beforeItemReplaced(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get beforeItemReplaced(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._beforeItemReplaced)
             this._beforeItemReplaced = this.beforeItemReplacedSubject.value.asObservable();
 
         return this._beforeItemReplaced;
     }
 
-    public get beforeItemsMoved(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get beforeItemsMoved(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._beforeItemsMoved)
             this._beforeItemsMoved = this.beforeItemsMovedSubject.value.asObservable();
 
         return this._beforeItemsMoved;
     }
 
-    public get itemsMoved(): Rx.Observable<wx.IListChangeInfo<T>> {
+    public get itemsMoved(): Rx.Observable<IListChangeInfo<T>> {
         if (!this._itemsMoved)
             this._itemsMoved = this.itemsMovedSubject.value.asObservable();
 
@@ -111,14 +322,14 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
 
     public isEmptyChanged: Rx.Observable<boolean>;
 
-    public get itemChanging(): Rx.Observable<wx.IPropertyChangedEventArgs> {
+    public get itemChanging(): Rx.Observable<IPropertyChangedEventArgs> {
         if (!this._itemChanging)
             this._itemChanging = this.itemChangingSubject.value.asObservable();
 
         return this._itemChanging;
     }
 
-    public get itemChanged(): Rx.Observable<wx.IPropertyChangedEventArgs> {
+    public get itemChanged(): Rx.Observable<IPropertyChangedEventArgs> {
         if (!this._itemChanged)
             this._itemChanged = this.itemChangedSubject.value.asObservable();
 
@@ -150,7 +361,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
         }
     }
 
-    public length: wx.IObservableProperty<number>;
+    public length: IObservableProperty<number>;
 
     public addRange(items: T[]): void {
         if (items == null) {
@@ -346,15 +557,15 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
     }
 
     public project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
-        selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<TNew>;
+        selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
 
     public project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
-        refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+        refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
     public project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
-        scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+        scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
-    public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+    public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
     public project(): any {
         let args = args2Array(arguments);
@@ -427,7 +638,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
             this.itemReplacedSubject.value.onNext({ from: index, items: [item] });
     }
 
-    public isEmpty: wx.IObservableProperty<boolean>;
+    public isEmpty: IObservableProperty<boolean>;
 
     public listChanging: Rx.Observable<boolean>;
     public listChanged: Rx.Observable<boolean>;
@@ -469,16 +680,16 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
     // Implementation
 
     protected inner: Array<T>;
-    private beforeItemsAddedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private itemsAddedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private beforeItemsRemovedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private itemsRemovedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private beforeItemReplacedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private itemReplacedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private itemChangingSubject: Lazy<Rx.Subject<wx.IPropertyChangedEventArgs>>;
-    private itemChangedSubject: Lazy<Rx.Subject<wx.IPropertyChangedEventArgs>>;
-    private beforeItemsMovedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
-    private itemsMovedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
+    private beforeItemsAddedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private itemsAddedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private beforeItemsRemovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private itemsRemovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private beforeItemReplacedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private itemReplacedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private itemChangingSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
+    private itemChangedSubject: Lazy<Rx.Subject<IPropertyChangedEventArgs>>;
+    private beforeItemsMovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
+    private itemsMovedSubject: Lazy<Rx.Subject<IListChangeInfo<T>>>;
     private resetSubject: Rx.Subject<any>;
     private beforeResetSubject: Rx.Subject<any>;
     private changeNotificationsSuppressed: number = 0;
@@ -488,44 +699,44 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
     private hasWhinedAboutNoResetSub = false;
 
     // backing-fields for subjects exposed as observables
-    private _itemsAdded: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _beforeItemsAdded: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _itemsRemoved: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _beforeItemsRemoved: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _beforeItemsMoved: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _itemReplaced: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _beforeItemReplaced: Rx.Observable<wx.IListChangeInfo<T>>;
-    private _itemsMoved: Rx.Observable<wx.IListChangeInfo<T>>;
+    private _itemsAdded: Rx.Observable<IListChangeInfo<T>>;
+    private _beforeItemsAdded: Rx.Observable<IListChangeInfo<T>>;
+    private _itemsRemoved: Rx.Observable<IListChangeInfo<T>>;
+    private _beforeItemsRemoved: Rx.Observable<IListChangeInfo<T>>;
+    private _beforeItemsMoved: Rx.Observable<IListChangeInfo<T>>;
+    private _itemReplaced: Rx.Observable<IListChangeInfo<T>>;
+    private _beforeItemReplaced: Rx.Observable<IListChangeInfo<T>>;
+    private _itemsMoved: Rx.Observable<IListChangeInfo<T>>;
     private _lengthChanging: Rx.Observable<number>;
     private _lengthChanged: Rx.Observable<number>;
-    private _itemChanging: Rx.Observable<wx.IPropertyChangedEventArgs>;
-    private _itemChanged: Rx.Observable<wx.IPropertyChangedEventArgs>;
+    private _itemChanging: Rx.Observable<IPropertyChangedEventArgs>;
+    private _itemChanged: Rx.Observable<IPropertyChangedEventArgs>;
 
     private setupRx(initialContents: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
-        scheduler = scheduler || wx.app.mainThreadScheduler;
+        scheduler = scheduler || app.mainThreadScheduler;
 
         this.resetChangeThreshold = resetChangeThreshold;
 
         if (this.inner === undefined)
             this.inner = new Array<T>();
 
-        this.beforeItemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        this.itemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        this.itemsRemovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        this.beforeItemReplacedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        this.itemReplacedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
+        this.beforeItemsAddedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+        this.itemsAddedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+        this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+        this.itemsRemovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+        this.beforeItemReplacedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+        this.itemReplacedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
         this.resetSubject = new Rx.Subject<any>();
         this.beforeResetSubject = new Rx.Subject<any>();
 
-        this.itemChangingSubject = new Lazy<Rx.ISubject<wx.IPropertyChangedEventArgs>>(() =>
-            <any> createScheduledSubject<wx.IPropertyChangedEventArgs>(scheduler));
+        this.itemChangingSubject = new Lazy<Rx.ISubject<IPropertyChangedEventArgs>>(() =>
+            <any> createScheduledSubject<IPropertyChangedEventArgs>(scheduler));
 
-        this.itemChangedSubject = new Lazy<Rx.ISubject<wx.IPropertyChangedEventArgs>>(() =>
-            <any> createScheduledSubject<wx.IPropertyChangedEventArgs>(scheduler));
+        this.itemChangedSubject = new Lazy<Rx.ISubject<IPropertyChangedEventArgs>>(() =>
+            <any> createScheduledSubject<IPropertyChangedEventArgs>(scheduler));
 
-        this.beforeItemsMovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        this.itemsMovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
+        this.beforeItemsMovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
+        this.itemsMovedSubject = new Lazy<Rx.Subject<IListChangeInfo<T>>>(() => new Rx.Subject<IListChangeInfo<T>>());
 
         this.listChanged = Rx.Observable.merge(
             this.itemsAdded.select(x => false),
@@ -713,8 +924,8 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
     }
 }
 
-class ObservableListProjection<T, TValue> extends ObservableList<TValue> implements wx.IObservableReadOnlyList<TValue> {
-    constructor(source: wx.IObservableList<T>, filter?: (item: T) => boolean,
+class ObservableListProjection<T, TValue> extends ObservableList<TValue> implements IObservableReadOnlyList<TValue> {
+    constructor(source: IObservableList<T>, filter?: (item: T) => boolean,
         orderer?: (a: TValue, b: TValue) => number, selector?: (T) => TValue,
         refreshTrigger?: Rx.Observable<any>, scheduler?: Rx.IScheduler) {
         super();
@@ -806,7 +1017,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     // Implementation
 
     private readonlyExceptionMessage = "Derived collections cannot be modified.";
-    private source: wx.IObservableList<T>;
+    private source: IObservableList<T>;
     private selector: (T) => TValue;
     private _filter: (item: T) => boolean;
     private orderer: (a: TValue, b: TValue) => number;
@@ -873,7 +1084,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         }
     }
 
-    private onItemsAdded(e: wx.IListChangeInfo<T>) {
+    private onItemsAdded(e: IListChangeInfo<T>) {
         this.shiftIndicesAtOrOverThreshold(e.from, e.items.length);
 
         for(let i = 0; i < e.items.length; i++) {
@@ -889,7 +1100,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         }
     }
 
-    private onItemsRemoved(e: wx.IListChangeInfo<T>) {
+    private onItemsRemoved(e: IListChangeInfo<T>) {
         this.sourceCopy.splice(e.from, e.items.length);
 
         for(let i = 0; i < e.items.length; i++) {
@@ -903,7 +1114,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         this.shiftIndicesAtOrOverThreshold(e.from + removedCount, -removedCount);
     }
 
-    private onItemsMoved(e: wx.IListChangeInfo<T>) {
+    private onItemsMoved(e: IListChangeInfo<T>) {
         if (e.items.length > 1) {
             throwError("Derived collections doesn't support multi-item moves");
         }
@@ -950,7 +1161,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         }
     }
 
-    private onItemsReplaced(e: wx.IListChangeInfo<T>) {
+    private onItemsReplaced(e: IListChangeInfo<T>) {
         for(let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
@@ -1270,7 +1481,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
 * @param {Array<T>} initialContents The initial contents of the list
 * @param {number = 0.3} resetChangeThreshold
 */
-export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null): wx.IObservableList<T> {
+export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null): IObservableList<T> {
     return new ObservableList<T>(initialContents, resetChangeThreshold, scheduler);
 }
 

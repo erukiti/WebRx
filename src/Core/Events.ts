@@ -1,9 +1,16 @@
-﻿/// <reference path="../Interfaces.d.ts" />
+﻿"use strict";
 
-"use strict";
+/**
+* Provides information about a changed property value on an object
+* @interface 
+**/
+export interface IPropertyChangedEventArgs {
+    sender: any; //  { get; private set; }
+    propertyName: string;
+}
 
-export default class PropertyChangedEventArgs implements
-    wx.IPropertyChangedEventArgs {
+export class PropertyChangedEventArgs implements
+    IPropertyChangedEventArgs {
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservablePropertyChangedEventArgs{TSender}"/> class.
     /// </summary>

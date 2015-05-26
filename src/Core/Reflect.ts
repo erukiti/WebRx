@@ -1,8 +1,6 @@
-/// <reference path="../Interfaces.d.ts" />
-
-import { createWeakMap } from "../Collections/WeakMap"
-import { createSet } from "../Collections/Set"
-import { createMap } from "../Collections/Map"
+import { IWeakMap, createWeakMap } from "../Collections/WeakMap"
+import { ISet, createSet } from "../Collections/Set"
+import { IMap, createMap } from "../Collections/Map"
 
 /*! *****************************************************************************
 Copyright (C) Microsoft. All rights reserved.
@@ -31,7 +29,7 @@ declare var require: Function;
 const functionPrototype = Object.getPrototypeOf(Function);
 
 // [[Metadata]] internal slot
-const __Metadata__ = createWeakMap<Object, wx.IMap<string | symbol, wx.IMap<any, any>>>();
+const __Metadata__ = createWeakMap<Object, IMap<string | symbol, IMap<any, any>>>();
 
 /**
   * Applies a set of decorators to a target object.
@@ -1040,13 +1038,13 @@ function DecoratePropertyWithoutDescriptor(decorators: PropertyDecorator[], targ
 }
 
 // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#getorcreatemetadatamap--o-p-create-
-function GetOrCreateMetadataMap(target: Object, targetKey: string | symbol, create: boolean): wx.IMap<any, any> {
+function GetOrCreateMetadataMap(target: Object, targetKey: string | symbol, create: boolean): IMap<any, any> {
     let targetMetadata = __Metadata__.get(target);
     if (!targetMetadata) {
         if (!create) {
             return undefined;
         }
-        targetMetadata = createMap<string | symbol, wx.IMap<any, any>>();
+        targetMetadata = createMap<string | symbol, IMap<any, any>>();
         __Metadata__.set(target, targetMetadata);
     }
 

@@ -1,6 +1,10 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../../Interfaces"
+import { app  } from "../../Core/Module"
+import { IDomManager  } from "../../Core/DomManager"
+import { ICompiledExpression  } from "../../Core/ExpressionCompiler"
+import { IRouter  } from "../Router"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, toggleCssClass } from "../../Core/Utils"
 import { router } from "../Router"
@@ -13,8 +17,8 @@ export interface IStateActiveBindingOptions {
     cssClass?: string;
 }
 
-export default class StateActiveBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager, router: wx.IRouter) {
+export default class StateActiveBinding implements IBindingHandler {
+    constructor(domManager: IDomManager, router: IRouter) {
         this.domManager = domManager;
         this.router = router;
     } 
@@ -22,7 +26,7 @@ export default class StateActiveBinding implements wx.IBindingHandler {
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("stateActive-binding only operates on elements!");
 
@@ -31,7 +35,7 @@ export default class StateActiveBinding implements wx.IBindingHandler {
 
         let el = <HTMLAnchorElement> node;
         let compiled = this.domManager.compileBindingOptions(options, module);
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let observables = [];
         let opt = <IStateActiveBindingOptions> compiled;
         let paramsKeys: Array<string> = [];
@@ -42,12 +46,12 @@ export default class StateActiveBinding implements wx.IBindingHandler {
         observables.push(router.current.changed.startWith(router.current()));
 
         if (typeof compiled === "function") {
-            exp = <wx.ICompiledExpression> compiled;
+            exp = <ICompiledExpression> compiled;
 
             observables.push(this.domManager.expressionToObservable(exp, ctx));
         } else {
             // collect state-name observable
-            observables.push(this.domManager.expressionToObservable(<wx.ICompiledExpression> <any> opt.name, ctx));
+            observables.push(this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx));
 
             // collect params observables
             if (opt.params) {
@@ -59,7 +63,7 @@ export default class StateActiveBinding implements wx.IBindingHandler {
             }
 
             if (opt.cssClass) {
-                cssClass = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.cssClass, ctx);
+                cssClass = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.cssClass, ctx);
             }
         }
 
@@ -86,7 +90,7 @@ export default class StateActiveBinding implements wx.IBindingHandler {
                     toggleCssClass.apply(null, [el, active].concat(classes));
                 }
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -117,6 +121,6 @@ export default class StateActiveBinding implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
-    protected router: wx.IRouter;
+    protected domManager: IDomManager;
+    protected router: IRouter;
 }

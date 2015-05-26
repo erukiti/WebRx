@@ -1,6 +1,4 @@
-﻿/// <reference path="../Interfaces.d.ts" />
-
-import { createWeakMap } from "../Collections/WeakMap"
+﻿import { createWeakMap } from "../Collections/WeakMap"
 
 "use strict";
 

@@ -1,6 +1,9 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IComponent, IComponentDescriptor  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
+import { ICompiledExpression  } from "../Core/ExpressionCompiler"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, noop } from "../Core/Utils"
@@ -12,15 +15,15 @@ export interface IComponentBindingOptions {
     params?: Object;
 }
 
-export default class ComponentBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export default class ComponentBinding implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
     } 
 
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("component-binding only operates on elements!");
 
@@ -30,7 +33,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
         let el = <HTMLElement> node;
         let compiled = this.domManager.compileBindingOptions(options, module);
         let opt = <IComponentBindingOptions> compiled;
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let componentNameObservable: Rx.Observable<string>;
         let componentParams = {};
         let cleanup: Rx.CompositeDisposable;
@@ -43,18 +46,18 @@ export default class ComponentBinding implements wx.IBindingHandler {
         }
 
         if (typeof compiled === "function") {
-            exp = <wx.ICompiledExpression> compiled;
+            exp = <ICompiledExpression> compiled;
 
             componentNameObservable = <any> this.domManager.expressionToObservable(exp, ctx);
         } else {
             // collect component-name observable
-            componentNameObservable = <any> this.domManager.expressionToObservable(<wx.ICompiledExpression> <any> opt.name, ctx);
+            componentNameObservable = <any> this.domManager.expressionToObservable(<ICompiledExpression> <any> opt.name, ctx);
 
             // collect params observables
             if (opt.params) {
                 if (isFunction(opt.params)) {
                     // opt params is object passed by value (probably $componentParams from view-binding)
-                    componentParams = this.domManager.evaluateExpression(<wx.ICompiledExpression> opt.params, ctx);
+                    componentParams = this.domManager.evaluateExpression(<ICompiledExpression> opt.params, ctx);
                 } else if (typeof opt.params === "object") {
                     Object.keys(opt.params).forEach(x => {
                         componentParams[x] = this.domManager.evaluateExpression(opt.params[x], ctx);
@@ -78,7 +81,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
                 cleanup = new Rx.CompositeDisposable();
 
                 // lookup component
-                let obs: Rx.Observable<wx.IComponent> = module.loadComponent(componentName, componentParams);
+                let obs: Rx.Observable<IComponent> = module.loadComponent(componentName, componentParams);
                 let disp: Rx.IDisposable = undefined;
 
                 if (obs == null)
@@ -105,7 +108,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
                 if (disp != null)
                     cleanup.add(disp);
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -135,9 +138,9 @@ export default class ComponentBinding implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
-    protected applyTemplate(component: wx.IComponentDescriptor, el: HTMLElement, ctx: wx.IDataContext, state: wx.INodeState, template: Node[], vm?: any) {
+    protected applyTemplate(component: IComponentDescriptor, el: HTMLElement, ctx: IDataContext, state: INodeState, template: Node[], vm?: any) {
         // clear
         while (el.firstChild) {
             this.domManager.cleanNode(el.firstChild);

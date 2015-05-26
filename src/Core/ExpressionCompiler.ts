@@ -1,5 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
+
+import { IObservableProperty, IExpressionFilter  } from "../Interfaces"
 
 import IID from "../IID"
 
@@ -10,6 +11,40 @@ import * as log from "./Log"
 import { property } from "./Property"
 
 "use strict";
+
+export interface IObjectLiteralToken {
+    key?: string;
+    unknown?: string;
+    value?: string;
+}
+
+export interface IExpressionCompilerOptions {
+    disallowFunctionCalls?: boolean;
+    filters?: { [filterName: string]: IExpressionFilter };
+}
+
+export interface ICompiledExpression {
+    (scope?: any, locals?: any): any;
+
+    literal?: boolean;
+    constant?: boolean;
+    assign?: (self, value, locals) => any;
+}
+
+export interface ICompiledExpressionRuntimeHooks {
+    readFieldHook?: (o: any, field: any) => any;
+    writeFieldHook?: (o: any, field: any, newValue: any) => any;
+    readIndexHook?: (o: any, field: any) => any;
+    writeIndexHook?: (o: any, field: any, newValue: any) => any;
+}
+
+export interface IExpressionCompiler {
+    compileExpression(src: string, options?: IExpressionCompilerOptions, cache?: { [exp: string]: ICompiledExpression }): ICompiledExpression;
+    getRuntimeHooks(locals: any): ICompiledExpressionRuntimeHooks;
+    setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void;
+    parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
+}
+
 
 /**
 * Knockout's object-literal parser ported to Typescript
@@ -46,7 +81,7 @@ const keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 };
 * @param {string} objectLiteralString A javascript-style object literal without leading and trailing curly brances
 * @return {Command<any>} A Command whose ExecuteAsync just returns the CommandParameter immediately. Which you should ignore!
 */
-export function parseObjectLiteral(objectLiteralString): Array<wx.IObjectLiteralToken> {
+export function parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken> {
     // Trim leading and trailing spaces from the string
     let str = objectLiteralString.trim();
 
@@ -54,7 +89,7 @@ export function parseObjectLiteral(objectLiteralString): Array<wx.IObjectLiteral
     if (str.charCodeAt(0) === 123) str = str.slice(1, -1);
 
     // Split into tokens
-    let result = new Array<wx.IObjectLiteralToken>(), toks = str.match(bindingToken), key, values, depth = 0;
+    let result = new Array<IObjectLiteralToken>(), toks = str.match(bindingToken), key, values, depth = 0;
 
     if (toks) {
         // Append a comma so that we don't need a separate code block to deal with the last item
@@ -520,17 +555,17 @@ class Lexer {
 * @constructor
 */
 class Parser {
-    constructor(lexer: Lexer, options?: wx.IExpressionCompilerOptions) {
+    constructor(lexer: Lexer, options?: IExpressionCompilerOptions) {
         this.lexer = lexer;
         this.options = options || { filters: {} };
     }
 
     private lexer: Lexer;
-    private options: wx.IExpressionCompilerOptions;
+    private options: IExpressionCompilerOptions;
     private text: string;
     private tokens: Array<any>;
 
-    public parse(text): (scope: any, locals: any) => wx.ICompiledExpression {
+    public parse(text): (scope: any, locals: any) => ICompiledExpression {
         this.text = text;
 
         this.tokens = this.lexer.lex(text);
@@ -547,7 +582,7 @@ class Parser {
         return value;
     }
 
-    private primary(): wx.ICompiledExpression {
+    private primary(): ICompiledExpression {
         let primary;
         if (this.expect("(")) {
             primary = this.filterChain();
@@ -625,31 +660,31 @@ class Parser {
         }
     }
 
-    private unaryFn(fn, right): wx.ICompiledExpression {
-        return <wx.ICompiledExpression> extend((self: any, locals: any) => {
+    private unaryFn(fn, right): ICompiledExpression {
+        return <ICompiledExpression> extend((self: any, locals: any) => {
             return fn(self, locals, right);
         }, {
             constant: right.constant
         }, true);
     }
 
-    private ternaryFn(left, middle, right): wx.ICompiledExpression {
-        return <wx.ICompiledExpression> extend((self: any, locals: any) => {
+    private ternaryFn(left, middle, right): ICompiledExpression {
+        return <ICompiledExpression> extend((self: any, locals: any) => {
             return left(self, locals) ? middle(self, locals) : right(self, locals);
         }, {
             constant: left.constant && middle.constant && right.constant
         }, true);
     }
 
-    private binaryFn(left, fn, right): wx.ICompiledExpression {
-        return <wx.ICompiledExpression> extend((self: any, locals: any) => {
+    private binaryFn(left, fn, right): ICompiledExpression {
+        return <ICompiledExpression> extend((self: any, locals: any) => {
             return fn(self, locals, left, right);
         }, {
             constant: left.constant && right.constant
         }, true);
     }
 
-    private statements(): wx.ICompiledExpression {
+    private statements(): ICompiledExpression {
         let statements = [];
         while (true) {
             if (this.tokens.length > 0 && !this.peek("}", ")", ";", "]"))
@@ -673,7 +708,7 @@ class Parser {
         }
     }
 
-    private filterChain(): wx.ICompiledExpression {
+    private filterChain(): ICompiledExpression {
         let left = this.expression();
         let token;
         while (true) {
@@ -685,7 +720,7 @@ class Parser {
         }
     }
 
-    private filter(): wx.ICompiledExpression {
+    private filter(): ICompiledExpression {
         let token = this.expect();
         let fn = this.options.filters[token.text];
         let argsFn = [];
@@ -707,11 +742,11 @@ class Parser {
         }
     }
 
-    private expression(): wx.ICompiledExpression {
+    private expression(): ICompiledExpression {
         return this.assignment();
     }
 
-    private assignment(): wx.ICompiledExpression {
+    private assignment(): ICompiledExpression {
         let left = this.ternary();
         let right;
         let token;
@@ -728,7 +763,7 @@ class Parser {
         return left;
     }
 
-    private ternary(): wx.ICompiledExpression {
+    private ternary(): ICompiledExpression {
         let left = this.logicalOR();
         let middle;
         let token;
@@ -744,7 +779,7 @@ class Parser {
         return left;
     }
 
-    private logicalOR(): wx.ICompiledExpression {
+    private logicalOR(): ICompiledExpression {
         let left = this.logicalAND();
         let token;
         while (true) {
@@ -756,7 +791,7 @@ class Parser {
         }
     }
 
-    private logicalAND(): wx.ICompiledExpression {
+    private logicalAND(): ICompiledExpression {
         let left = this.equality();
         let token;
         if ((token = this.expect("&&"))) {
@@ -765,7 +800,7 @@ class Parser {
         return left;
     }
 
-    private equality(): wx.ICompiledExpression {
+    private equality(): ICompiledExpression {
         let left = this.relational();
         let token;
         if ((token = this.expect("==", "!=", "===", "!=="))) {
@@ -774,7 +809,7 @@ class Parser {
         return left;
     }
 
-    private relational(): wx.ICompiledExpression {
+    private relational(): ICompiledExpression {
         let left = this.additive();
         let token;
         if ((token = this.expect("<", ">", "<=", ">="))) {
@@ -783,7 +818,7 @@ class Parser {
         return left;
     }
 
-    private additive(): wx.ICompiledExpression {
+    private additive(): ICompiledExpression {
         let left = this.multiplicative();
         let token;
         while ((token = this.expect("+", "-"))) {
@@ -792,7 +827,7 @@ class Parser {
         return left;
     }
 
-    private multiplicative(): wx.ICompiledExpression {
+    private multiplicative(): ICompiledExpression {
         let left = this.unary();
         let token;
         while ((token = this.expect("*", "/", "%"))) {
@@ -801,7 +836,7 @@ class Parser {
         return left;
     }
 
-    private unary(): wx.ICompiledExpression {
+    private unary(): ICompiledExpression {
         let token;
         if (this.expect("+")) {
             return this.primary();
@@ -814,12 +849,12 @@ class Parser {
         }
     }
 
-    private fieldAccess(object): (scope: any, locals?: any) => wx.ICompiledExpression {
+    private fieldAccess(object): (scope: any, locals?: any) => ICompiledExpression {
         let parser = this;
         let field = this.expect().text;
         let getter = getterFn(field, this.options, this.text);
 
-        return <wx.ICompiledExpression> extend((scope: any, locals?: any, self?) => {
+        return <ICompiledExpression> extend((scope: any, locals?: any, self?) => {
             return getter(self || object(scope, locals));
         }, {
             assign(scope, value, locals) {
@@ -828,13 +863,13 @@ class Parser {
         }, true);
     }
 
-    private objectIndex(obj): wx.ICompiledExpression {
+    private objectIndex(obj): ICompiledExpression {
         let parser = this;
 
         let indexFn = this.expression();
         this.consume("]");
 
-        return <wx.ICompiledExpression> extend((self: any, locals: any) => {
+        return <ICompiledExpression> extend((self: any, locals: any) => {
             let o = obj(self, locals),
                 i = indexFn(self, locals),
                 v,
@@ -865,7 +900,7 @@ class Parser {
         }, true);
     }
 
-    private functionCall(fn, contextGetter): wx.ICompiledExpression {
+    private functionCall(fn, contextGetter): ICompiledExpression {
         if (this.options.disallowFunctionCalls)
             this.throwError("Function calls are not allowed");
 
@@ -901,7 +936,7 @@ class Parser {
     }
 
     // This is used with json array declaration
-    private arrayDeclaration(): wx.ICompiledExpression {
+    private arrayDeclaration(): ICompiledExpression {
         let elementFns = [];
         let allConstant = true;
         if (this.peekToken().text !== "]") {
@@ -919,7 +954,7 @@ class Parser {
         }
         this.consume("]");
 
-        return <wx.ICompiledExpression> extend((self: any, locals: any) => {
+        return <ICompiledExpression> extend((self: any, locals: any) => {
             let array = [];
             for(let i = 0; i < elementFns.length; i++) {
                 array.push(elementFns[i](self, locals));
@@ -931,7 +966,7 @@ class Parser {
         }, true);
     }
 
-    private object(): wx.ICompiledExpression {
+    private object(): ICompiledExpression {
         let keyValues = [];
         let allConstant = true;
         if (this.peekToken().text !== "}") {
@@ -952,7 +987,7 @@ class Parser {
         }
         this.consume("}");
 
-        return <wx.ICompiledExpression> extend((self: any, locals: any) => {
+        return <ICompiledExpression> extend((self: any, locals: any) => {
             let object = {};
             for(let i = 0; i < keyValues.length; i++) {
                 let keyValue = keyValues[i];
@@ -1027,7 +1062,7 @@ let getterFnCache = {};
 * - http://jsperf.com/angularjs-parse-getter/4
 * - http://jsperf.com/path-evaluation-simplified/7
 */
-function cspSafeGetterFn(key0, key1, key2, key3, key4, fullExp, options?): wx.ICompiledExpression {
+function cspSafeGetterFn(key0, key1, key2, key3, key4, fullExp, options?): ICompiledExpression {
     ensureSafeMemberName(key0, fullExp);
     ensureSafeMemberName(key1, fullExp);
     ensureSafeMemberName(key2, fullExp);
@@ -1083,7 +1118,7 @@ function cspSafeGetterFn(key0, key1, key2, key3, key4, fullExp, options?): wx.IC
     };
 }
 
-function simpleGetterFn1(key0, fullExp): wx.ICompiledExpression {
+function simpleGetterFn1(key0, fullExp): ICompiledExpression {
     ensureSafeMemberName(key0, fullExp);
 
     return (scope: any, locals: any) => {
@@ -1098,7 +1133,7 @@ function simpleGetterFn1(key0, fullExp): wx.ICompiledExpression {
     };
 }
 
-function simpleGetterFn2(key0, key1, fullExp): wx.ICompiledExpression {
+function simpleGetterFn2(key0, key1, fullExp): ICompiledExpression {
     ensureSafeMemberName(key0, fullExp);
     ensureSafeMemberName(key1, fullExp);
 
@@ -1186,11 +1221,11 @@ function getterFn(path, options, fullExp): (scope: any, locals?: any, self?: any
     return fn;
 }
 
-export function getRuntimeHooks(locals: any): wx.ICompiledExpressionRuntimeHooks {
+export function getRuntimeHooks(locals: any): ICompiledExpressionRuntimeHooks {
     return locals !== undefined ? locals[hookField] : undefined;
 }
 
-export function setRuntimeHooks(locals: any, hooks: wx.ICompiledExpressionRuntimeHooks): void {
+export function setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void {
     locals[hookField] = hooks;
 }
 
@@ -1201,8 +1236,8 @@ export function setRuntimeHooks(locals: any, hooks: wx.ICompiledExpressionRuntim
  * @param {string} src
  * @returns {function}
  */
-export function compileExpression(src: string, options?: wx.IExpressionCompilerOptions,
-    cache?: { [exp: string]: wx.ICompiledExpression }): wx.ICompiledExpression {
+export function compileExpression(src: string, options?: IExpressionCompilerOptions,
+    cache?: { [exp: string]: ICompiledExpression }): ICompiledExpression {
 
     if (typeof src !== "string") {
         throw new TypeError("src must be a string, instead saw '" + typeof src + "'");

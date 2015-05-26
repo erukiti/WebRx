@@ -1,14 +1,17 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
+import { ICompiledExpression  } from "../Core/ExpressionCompiler"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
 
 "use strict";
 
-export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager, supportsDynamicValues: boolean = false) {
+export class MultiOneWayChangeBindingBase implements IBindingHandler {
+    constructor(domManager: IDomManager, supportsDynamicValues: boolean = false) {
         this.domManager = domManager;
         this.supportsDynamicValues = supportsDynamicValues;
     } 
@@ -16,7 +19,7 @@ export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
    ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("binding only operates on elements!");
 
@@ -28,12 +31,12 @@ export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
         let el = <HTMLElement> node;
         let observables = new Array<[string, Rx.Observable<any>]>();
         let obs: Rx.Observable<any>;
-        let exp: wx.ICompiledExpression;
+        let exp: ICompiledExpression;
         let keys = Object.keys(compiled);
         let key;
 
         if (typeof compiled === "function") {
-            exp = <wx.ICompiledExpression> compiled;
+            exp = <ICompiledExpression> compiled;
 
             obs = this.domManager.expressionToObservable(exp, ctx);
             observables.push(["", obs]);
@@ -42,7 +45,7 @@ export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
                 key = keys[i];
                 let value = compiled[key];
 
-                exp = <wx.ICompiledExpression> value;
+                exp = <ICompiledExpression> value;
                 obs = this.domManager.expressionToObservable(exp, ctx);
 
                 observables.push([key, obs]);
@@ -84,14 +87,14 @@ export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
-    private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: wx.INodeState) {
+    private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: INodeState) {
         state.cleanup.add(obs.subscribe(x => {
             try {
                 this.applyValue(el, unwrapProperty(x), key);
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
     }
@@ -102,12 +105,12 @@ export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
 }
 
 // Binding contributions to node-state
-interface ICssNodeState extends wx.INodeState {
+interface ICssNodeState extends INodeState {
     cssBindingPreviousDynamicClasses: any;
 }
 
 export class CssBinding extends MultiOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager, true);
     }
 
@@ -144,7 +147,7 @@ export class CssBinding extends MultiOneWayChangeBindingBase {
 }
 
 export class AttrBinding extends MultiOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
 
         this.priority = 5;
@@ -164,7 +167,7 @@ export class AttrBinding extends MultiOneWayChangeBindingBase {
 }
 
 export class StyleBinding extends MultiOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
     }
 

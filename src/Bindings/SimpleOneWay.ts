@@ -1,21 +1,23 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
 
 "use strict";
 
-export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export class SingleOneWayChangeBindingBase implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
     } 
 
   ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
         if (node.nodeType !== 1)
             throwError("binding only operates on elements!");
 
@@ -32,7 +34,7 @@ export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
             try {
                 self.applyValue(el, unwrapProperty(x));
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -60,7 +62,7 @@ export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
     protected applyValue(el: HTMLElement, value: any): void {
         throwError("you need to override this method!");
@@ -71,7 +73,7 @@ export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
 // Bindings
 
 export class TextBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
     } 
 
@@ -89,7 +91,7 @@ export interface IVisibleBindingOptions {
 }
 
 export class VisibleBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
 
         this.inverse = false;
@@ -126,7 +128,7 @@ export class VisibleBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class HiddenBinding extends VisibleBinding {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
 
         this.inverse = true;
@@ -134,7 +136,7 @@ export class HiddenBinding extends VisibleBinding {
 }
 
 export class HtmlBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
     } 
 
@@ -147,7 +149,7 @@ export class HtmlBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class DisableBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
 
         this.inverse = false;
@@ -168,7 +170,7 @@ export class DisableBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class EnableBinding extends DisableBinding {
-    constructor(domManager: wx.IDomManager) {
+    constructor(domManager: IDomManager) {
         super(domManager);
 
         this.inverse = true;

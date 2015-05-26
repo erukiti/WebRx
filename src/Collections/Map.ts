@@ -1,15 +1,29 @@
 ﻿/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
 import { getOid } from "../Core/Utils"
 
 "use strict";
 
 /**
+* The Map object is a simple key/value map. Any value (both objects and primitive values) may be used as either a key or a value.
+* @interface 
+**/
+export interface IMap<TKey extends Object, T> {
+    set(key: TKey, value: T): void;
+    get(key: TKey): T;
+    has(key: TKey): boolean;
+    delete(key: TKey): void;
+    clear(): void;
+    forEach(callback: (value: any, key: any, map: IMap<any, any>) => void, thisArg?: any): void;
+    size: number;
+    isEmulated: boolean;
+}
+
+/**
 * ES6 Map Shim
 * @class
 */
-class MapEmulated<TKey extends Object, T> implements wx.IMap<TKey, T> {
+class MapEmulated<TKey extends Object, T> implements IMap<TKey, T> {
     ////////////////////
     /// IMap
 
@@ -37,7 +51,7 @@ class MapEmulated<TKey extends Object, T> implements wx.IMap<TKey, T> {
         return undefined;
     }
 
-    public set(key: any, value: any): wx.IMap<any, any> {
+    public set(key: any, value: any): IMap<any, any> {
         this.delete(key);
         this.keys.push(key);
         this.values.push(value);
@@ -62,7 +76,7 @@ class MapEmulated<TKey extends Object, T> implements wx.IMap<TKey, T> {
         this.cache = this.cacheSentinel;
     }
 
-    public forEach(callback: (value: any, key: any, map: wx.IMap<any, any>) => void, thisArg?: any): void {
+    public forEach(callback: (value: any, key: any, map: IMap<any, any>) => void, thisArg?: any): void {
         var size = this.size;
         for (var i = 0; i < size; ++i) {
             var key = this.keys[i];
@@ -105,10 +119,10 @@ var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
 * @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
 */
-export function createMap<TKey, T>(disableNativeSupport?: boolean): wx.IMap<TKey, T> {
+export function createMap<TKey, T>(disableNativeSupport?: boolean): IMap<TKey, T> {
     if (disableNativeSupport || !hasNativeSupport) {
         return new MapEmulated<TKey, T>();
     }
 
-    return <wx.IMap<TKey, T>> <any> new Map();
+    return <IMap<TKey, T>> <any> new Map();
 }

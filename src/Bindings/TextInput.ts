@@ -1,6 +1,8 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
+import { app  } from "../Core/Module"
+import { IDomManager  } from "../Core/DomManager"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -8,15 +10,15 @@ import * as env from "../Core/Environment"
 
 "use strict";
 
-export default class TextInputBinding implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager) {
+export default class TextInputBinding implements IBindingHandler {
+    constructor(domManager: IDomManager) {
         this.domManager = domManager;
     } 
 
     ////////////////////
     // IBinding
 
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
+    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
          if (node.nodeType !== 1)
              throwError("textInput-binding only operates on elements!");
         
@@ -31,7 +33,7 @@ export default class TextInputBinding implements wx.IBindingHandler {
             throwError("textInput-binding can only be applied to input or textarea elements");
 
         let exp = this.domManager.compileBindingOptions(options, module);
-        let prop: wx.IObservableProperty<any>;
+        let prop: IObservableProperty<any>;
         let propertySubscription: Rx.Disposable;
         let eventSubscription: Rx.Disposable;
         let previousElementValue;
@@ -87,13 +89,13 @@ export default class TextInputBinding implements wx.IBindingHandler {
                             try {
                                 prop(el.value);
                             } catch(e) {
-                                wx.app.defaultExceptionHandler.onNext(e);
+                                app.defaultExceptionHandler.onNext(e);
                             }                                    
                         });
                     }
                 }
             } catch (e) {
-                wx.app.defaultExceptionHandler.onNext(e);
+                app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -122,7 +124,7 @@ export default class TextInputBinding implements wx.IBindingHandler {
     ////////////////////
     // Implementation
 
-    protected domManager: wx.IDomManager;
+    protected domManager: IDomManager;
 
     protected getTextInputEventObservables(el: HTMLInputElement, isTextArea: boolean): Array<Rx.Observable<Object>> {
         let result: Array<Rx.Observable<Object>> = [];

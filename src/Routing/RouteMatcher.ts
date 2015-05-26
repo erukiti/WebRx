@@ -1,15 +1,21 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
-
 import { createWeakMap } from "./../Collections/WeakMap"
 import { createSet } from "./../Collections/Set"
 import * as res from "../Core/Resources"
 import * as env from "../Core/Environment"
 import { injector } from "./../Core/Injector"
 import { property } from "./../Core/Property"
+
+export interface IRoute {
+    parse(url): Object;
+    stringify(params?: Object): string;
+    concat(route: IRoute): IRoute;
+    isAbsolute: boolean;
+    params: Array<string>;
+}
 
 /*
  * JavaScript Route Matcher
@@ -28,7 +34,7 @@ let reEscape = /[\-\[\]{}()+?.,\\\^$|#\s]/g;
 // Match named :param or *splat placeholders.
 let reParam = /([:*])(\w+)/g;
 
-export class RouteMatcher implements wx.IRoute {
+export class RouteMatcher implements IRoute {
     // Pass in a route string (or RegExp) plus an optional map of rules, and get
     // back an object with .parse and .stringify methods.
     constructor(route, rules?) {
@@ -125,7 +131,7 @@ export class RouteMatcher implements wx.IRoute {
 
     public params: Array<string>;
 
-    public concat(route: wx.IRoute): wx.IRoute {
+    public concat(route: IRoute): IRoute {
         let other = <RouteMatcher> route;
         let a = this.stripTrailingSlash(this.route);
         let b = this.stripTrailingSlash(other.route);
@@ -173,6 +179,6 @@ export class RouteMatcher implements wx.IRoute {
     }
 }
 
-export function route(route, rules?): wx.IRoute {
+export function route(route, rules?): IRoute {
     return new RouteMatcher(route, rules);
 }

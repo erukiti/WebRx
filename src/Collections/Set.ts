@@ -1,19 +1,32 @@
 /// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
-/// <reference path="../Interfaces.d.ts" />
 
 import { getOid } from "../Core/Utils"
 
 "use strict";
 
 /**
+* The Set object lets you store unique values of any type, whether primitive values or object references.
+* @interface 
+**/
+export interface ISet<T> {
+    add(value: T): ISet<T>;
+    has(key: T): boolean;
+    delete(key: T): boolean;
+    clear(): void;
+    forEach(callback: (T) => void, thisArg?): void;
+    size: number;
+    isEmulated: boolean;
+}
+
+/**
 * ES6 Set Shim
 * @class
 */
-class SetEmulated<T> implements wx.ISet<T> {
+class SetEmulated<T> implements ISet<T> {
     ////////////////////
     /// ISet
 
-    public add(value: T): wx.ISet<T> {
+    public add(value: T): ISet<T> {
         let key = getOid(value);
 
         if (!this.keys[key]) {
@@ -76,18 +89,18 @@ let hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
 * @return {ISet<T>} A new instance of a suitable ISet implementation
 */
-export function createSet<T>(disableNativeSupport?: boolean): wx.ISet<T> {
+export function createSet<T>(disableNativeSupport?: boolean): ISet<T> {
     if (disableNativeSupport || !hasNativeSupport) {
         return new SetEmulated<T>();
     }
 
-    return <wx.ISet<T>> <any> new Set();
+    return <ISet<T>> <any> new Set();
 }
 
 /**
 * Extracts the values of a Set by invoking its forEach method and capturing the output
 */
-export function setToArray<T>(src: wx.ISet<T>): Array<T> {
+export function setToArray<T>(src: ISet<T>): Array<T> {
     let result = new Array<T>();
     src.forEach(x => result.push(x));
     return result;
