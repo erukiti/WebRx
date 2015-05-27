@@ -1,6 +1,6 @@
 ///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IWebRxApp  } from "./Interfaces"
+import { IWebRxApp, IObservableProperty } from "./Interfaces"
 import { args2Array, isFunction, isCommand, isRxObservable, throwError } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
