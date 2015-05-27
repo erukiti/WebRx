@@ -15,3 +15,5 @@ src/.baseDir.ts
 npm-debug.log
 _SpecRunner.html
 *.tmp.txt
+src/**/*.js
+src/**/*.js.map

@@ -1,13 +1,6 @@
-﻿"use strict";
+﻿import { IPropertyChangedEventArgs } from "../Interfaces"
 
-/**
-* Provides information about a changed property value on an object
-* @interface 
-**/
-export interface IPropertyChangedEventArgs {
-    sender: any; //  { get; private set; }
-    propertyName: string;
-}
+"use strict";
 
 export class PropertyChangedEventArgs implements
     IPropertyChangedEventArgs {

@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -10,8 +9,9 @@ import * as env from "../Core/Environment"
 "use strict";
 
 export default class TextInputBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -88,13 +88,13 @@ export default class TextInputBinding implements IBindingHandler {
                             try {
                                 prop(el.value);
                             } catch(e) {
-                                app.defaultExceptionHandler.onNext(e);
+                                this.app.defaultExceptionHandler.onNext(e);
                             }                                    
                         });
                     }
                 }
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -124,6 +124,7 @@ export default class TextInputBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected getTextInputEventObservables(el: HTMLInputElement, isTextArea: boolean): Array<Rx.Observable<Object>> {
         let result: Array<Rx.Observable<Object>> = [];

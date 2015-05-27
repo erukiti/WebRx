@@ -1,9 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
-import { ICommand  } from "../Core/Command"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, IDomManager, ICompiledExpression, ICommand  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, elementCanBeDisabled } from "../Core/Utils"
@@ -11,8 +8,9 @@ import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable
 "use strict";
 
 export default class CheckedBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -75,13 +73,13 @@ export default class CheckedBinding implements IBindingHandler {
                             try {
                                 prop(el.checked);
                             } catch(e) {
-                                app.defaultExceptionHandler.onNext(e);
+                                this.app.defaultExceptionHandler.onNext(e);
                             }
                         }));
                     }
                 }
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -111,6 +109,7 @@ export default class CheckedBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected getCheckedEventObservables(el: HTMLInputElement): Array<Rx.Observable<Object>> {
         let result: Array<Rx.Observable<Object>> = [];

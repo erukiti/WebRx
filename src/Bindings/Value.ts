@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -10,8 +9,9 @@ import * as res from "../Core/Resources"
 "use strict";
 
 export default class ValueBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -82,13 +82,13 @@ export default class ValueBinding implements IBindingHandler {
                                 else
                                     prop(el.value);
                             } catch(e) {
-                                app.defaultExceptionHandler.onNext(e);
+                                this.app.defaultExceptionHandler.onNext(e);
                             }
                         }));
                     }
                 }
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -118,6 +118,7 @@ export default class ValueBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 }
 
 /**

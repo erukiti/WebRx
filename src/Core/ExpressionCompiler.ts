@@ -1,9 +1,7 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IExpressionFilter  } from "../Interfaces"
-
+import { IObservableProperty, IExpressionFilter, ICompiledExpression, ICompiledExpressionRuntimeHooks, IExpressionCompilerOptions, IObjectLiteralToken  } from "../Interfaces"
 import IID from "../IID"
-
 import { injector } from "./Injector"
 import { noop, extend, isFunction, isCommand, throwError, getOid } from "../Core/Utils"
 import * as res from "./Resources"
@@ -11,40 +9,6 @@ import * as log from "./Log"
 import { property } from "./Property"
 
 "use strict";
-
-export interface IObjectLiteralToken {
-    key?: string;
-    unknown?: string;
-    value?: string;
-}
-
-export interface IExpressionCompilerOptions {
-    disallowFunctionCalls?: boolean;
-    filters?: { [filterName: string]: IExpressionFilter };
-}
-
-export interface ICompiledExpression {
-    (scope?: any, locals?: any): any;
-
-    literal?: boolean;
-    constant?: boolean;
-    assign?: (self, value, locals) => any;
-}
-
-export interface ICompiledExpressionRuntimeHooks {
-    readFieldHook?: (o: any, field: any) => any;
-    writeFieldHook?: (o: any, field: any, newValue: any) => any;
-    readIndexHook?: (o: any, field: any) => any;
-    writeIndexHook?: (o: any, field: any, newValue: any) => any;
-}
-
-export interface IExpressionCompiler {
-    compileExpression(src: string, options?: IExpressionCompilerOptions, cache?: { [exp: string]: ICompiledExpression }): ICompiledExpression;
-    getRuntimeHooks(locals: any): ICompiledExpressionRuntimeHooks;
-    setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void;
-    parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
-}
-
 
 /**
 * Knockout's object-literal parser ported to Typescript

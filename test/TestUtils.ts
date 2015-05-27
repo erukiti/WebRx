@@ -178,7 +178,24 @@ module testutils {
             //go: window.history.go,
             pushState: pushState,
             replaceState: replaceState,
-            reset: reset
+            reset: reset,
+            
+            createHistory: (query?:string)=> {
+                query = query || result.location.search.substr(1);
+                
+                if(query) {
+                    let result = {};
+                    let params = query.split("&");
+                    for ( var i = 0; i < params.length; i++) {
+                        var tmp = params[i].split("=");
+                        result[tmp[0]] = decodeURIComponent(tmp[1]);
+                    }
+            
+                    return result;
+                } 
+                
+                return {};
+            }
         };
 
         Object.defineProperty(result, "length", {

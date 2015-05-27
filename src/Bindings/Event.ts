@@ -1,9 +1,7 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
-import { ICommand  } from "../Core/Command"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, 
+    IDomManager, ICompiledExpression, ICommand  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, noop } from "../Core/Utils"
@@ -15,8 +13,9 @@ export interface IEventBindingOptions {
 }
 
 export default class EventBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -63,6 +62,7 @@ export default class EventBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: IDataContext, state: INodeState, module: IModule) {
         let exp = this.domManager.compileBindingOptions(value, module);
@@ -106,7 +106,7 @@ export default class EventBinding implements IBindingHandler {
                 try {
                     command.execute(commandParameter);
                 } catch(e) {
-                    app.defaultExceptionHandler.onNext(e);
+                    this.app.defaultExceptionHandler.onNext(e);
                 }
             }));
         } else {

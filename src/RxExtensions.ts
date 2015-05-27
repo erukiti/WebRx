@@ -1,11 +1,16 @@
-import { args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError } from "./Core/Utils"
+///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
+
+import { IWebRxApp  } from "./Interfaces"
+import { args2Array, isFunction, isCommand, isRxObservable, throwError } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
 import { Implements } from "./Core/Reflect"
+import { injector } from "./Core/Injector"
+import * as res from "./Core/Resources"
 
 "use strict";
 
-let RxObsConstructor = (<any> Rx.Observable);   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
+let RxObsConstructor = <any> Rx.Observable;   // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 
 /**
 * Creates an read-only observable property with an optional default value from the current (this) observable
@@ -58,7 +63,7 @@ function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
         .refCount();
 
     accessor.source = this;
-    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, app.defaultExceptionHandler);
+    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, injector.get<IWebRxApp>(res.app).defaultExceptionHandler);
 
     //////////////////////////////////
     // implementation

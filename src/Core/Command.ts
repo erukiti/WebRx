@@ -1,60 +1,14 @@
 /// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IHandleObservableErrors } from "../Interfaces"
+import { IHandleObservableErrors, IWebRxApp, ICommand } from "../Interfaces"
 import IID from "./../IID"
 import { isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isRxScheduler } from "././Utils"
 import Lazy from "./../Core/Lazy"
 import { Implements } from "././Reflect"
+import { injector } from "../Core/Injector"
+import * as res from "../Core/Resources"
 
 "use strict";
-
-/**
-* ICommand represents an ICommand which also notifies when it is
-* executed (i.e. when Execute is called) via IObservable. Conceptually,
-* this represents an Event, so as a result this IObservable should never
-* onComplete or onError.
-* @interface 
-**/
-export interface ICommand<T> extends
-    Rx.IDisposable,
-    IHandleObservableErrors {
-    canExecute(parameter: any): boolean;
-    execute(parameter: any): void;
-
-    /**
-    * Gets a value indicating whether this instance can execute observable.
-    **/
-    canExecuteObservable: Rx.Observable<boolean>; //  { get; }
-
-    /**
-    * Gets a value indicating whether this instance is executing. This
-    * Observable is guaranteed to always return a value immediately (i.e.
-    * it is backed by a BehaviorSubject), meaning it is safe to determine
-    * the current state of the command via IsExecuting.First()
-    **/
-    isExecuting: Rx.Observable<boolean>; //  { get; }
-
-    /**
-    * Gets an observable that returns command invocation results
-    **/
-    results: Rx.Observable<T>;
-
-    /**
-    * Executes a Command and returns the result asynchronously. This method
-    * makes it *much* easier to test Command, as well as create
-    * Commands who invoke inferior commands and wait on their results.
-    *
-    * Note that you **must** Subscribe to the Observable returned by
-    * ExecuteAsync or else nothing will happen (i.e. ExecuteAsync is lazy)
-    *
-    * Note also that the command will be executed, irrespective of the current value
-    * of the command's canExecute observable.
-    * @return An Observable representing a single invocation of the Command.
-    * @param parameter Don't use this.
-    **/
-    executeAsync(parameter?: any): Rx.Observable<T>;
-}
-
 
 @Implements(IID.ICommand)
 @Implements(IID.IDisposable)
@@ -63,7 +17,7 @@ export class Command<T> implements ICommand<T> {
     /// Don't use this directly, use commandXYZ instead
     /// </summary>
     constructor(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, scheduler?: Rx.IScheduler) {
-        this.scheduler = scheduler || app.mainThreadScheduler;
+        this.scheduler = scheduler || injector.get<IWebRxApp>(res.app).mainThreadScheduler;
         this.func = executeAsync;
 
         // setup canExecute
@@ -87,7 +41,7 @@ export class Command<T> implements ICommand<T> {
         this.thrownExceptions = this.exceptionsSubject.asObservable();
         this.exceptionsSubject
             .observeOn(this.scheduler)
-            .subscribe(app.defaultExceptionHandler);
+            .subscribe(injector.get<IWebRxApp>(res.app).defaultExceptionHandler);
     }
 
     //////////////////////////////////

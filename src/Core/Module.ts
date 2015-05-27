@@ -2,10 +2,10 @@
 
 import { IModule, IHistory, ITemplateEngine, IComponentDescriptor, IComponent, IComponentRegistry, IAnimation, 
     IAnimationRegistry, IObservableProperty, IBindingHandler, IBindingRegistry, IExpressionFilter, IExpressionFilterRegistry,
-    IComponentTemplateDescriptor, IComponentViewModelDescriptor, IModuleDescriptor } from "../Interfaces"
+    IComponentTemplateDescriptor, IComponentViewModelDescriptor, IModuleDescriptor, IWebRxApp } from "../Interfaces"
 import IID from "../IID"
 import { injector } from "./Injector"
-import { extend, observableRequire, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
+import { extend, observableRequire, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, isRxScheduler, throwError, using, getOid } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
@@ -20,6 +20,7 @@ interface IComponentDescriptorEx extends IComponentDescriptor {
 export class Module implements IModule {
     constructor(name: string) {
         this.name = name;
+        this.app = injector.get<IWebRxApp>(res.app);
     }
 
     //////////////////////////////////
@@ -151,6 +152,7 @@ export class Module implements IModule {
     private components: { [name: string]: IComponentDescriptorEx } = {};
     private expressionFilters: { [index: string]: IExpressionFilter; } = {};
     private animations: { [index: string]: IAnimation; } = {};
+    private app: IWebRxApp;
 
     private instantiateComponent(name: string): Rx.Observable<IComponentDescriptorEx> {
         let cd = this.components[name];
@@ -220,12 +222,12 @@ export class Module implements IModule {
             syncResult = template(params);
 
             if (typeof syncResult === "string") {
-                syncResult = app.templateEngine.parse(<string> template(params));
+                syncResult = this.app.templateEngine.parse(<string> template(params));
             }
 
             return Rx.Observable.return(syncResult);
         } else if (typeof template === "string") {
-            syncResult = app.templateEngine.parse(<string> template);
+            syncResult = this.app.templateEngine.parse(<string> template);
             return Rx.Observable.return(syncResult);
         } else if (Array.isArray(template)) {
             return Rx.Observable.return(<Node[]> template);
@@ -239,7 +241,7 @@ export class Module implements IModule {
                 let promise = <Rx.IPromise<Node[]>> <any> options.promise;
                 return Rx.Observable.fromPromise(promise);
             } else if (options.require) {
-                return observableRequire<string>(options.require).select(x => app.templateEngine.parse(x));
+                return observableRequire<string>(options.require).select(x => this.app.templateEngine.parse(x));
             } else if (options.element) {
                 if (typeof options.element === "string") {
                     // try both getElementById & querySelector
@@ -248,7 +250,7 @@ export class Module implements IModule {
 
                     if (el != null) {
                         // only the nodes inside the specified element will be cloned for use as the component’s template
-                        syncResult = app.templateEngine.parse((<HTMLElement> el).innerHTML);
+                        syncResult = this.app.templateEngine.parse((<HTMLElement> el).innerHTML);
                     } else {
                         syncResult = [];
                     }
@@ -260,7 +262,7 @@ export class Module implements IModule {
                     // unwrap text/html script nodes
                     if (el != null) {
                         // only the nodes inside the specified element will be cloned for use as the component’s template
-                        syncResult = app.templateEngine.parse((<HTMLElement> el).innerHTML);
+                        syncResult = this.app.templateEngine.parse((<HTMLElement> el).innerHTML);
                     } else {
                         syncResult = [];
                     }

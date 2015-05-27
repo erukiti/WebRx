@@ -1,8 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, nodeChildrenToArray } from "../Core/Utils"
@@ -19,8 +17,9 @@ export interface IIfBindingOptions extends IIfAnimationDescriptor {
 }
 
 export class IfBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -87,7 +86,7 @@ export class IfBinding implements IBindingHandler {
 
                 initialApply = false;
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -121,6 +120,7 @@ export class IfBinding implements IBindingHandler {
 
     protected inverse: boolean = false;
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected applyValue(el: HTMLElement, value: any, template: Array<Node>, ctx: IDataContext,
         animations: IIfAnimationDescriptor, initialApply: boolean): Rx.IDisposable {
@@ -186,8 +186,8 @@ export class IfBinding implements IBindingHandler {
 }
 
 export class NotIfBinding extends IfBinding {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
 
         this.inverse = true;
     } 

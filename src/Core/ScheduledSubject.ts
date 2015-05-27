@@ -1,4 +1,4 @@
-﻿import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
+﻿import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, isRxScheduler, throwError, using, getOid } from "../Core/Utils"
 
 "use strict";
 

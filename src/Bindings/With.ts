@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty } from "../Core/Utils"
@@ -12,8 +11,9 @@ import { applyBindings, cleanNode } from "../Core/DomManager"
 "use strict";
 
 export default class WithBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -36,7 +36,7 @@ export default class WithBinding implements IBindingHandler {
             try {
                 self.applyValue(el, unwrapProperty(x), state);
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -68,6 +68,7 @@ export default class WithBinding implements IBindingHandler {
     // implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
         state.model = value;

@@ -1,5 +1,6 @@
 ﻿"use strict";
 
+export const app = "app";
 export const injector = "injector";
 export const domManager = "domservice";
 export const router = "router";

@@ -1,9 +1,7 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICommand  } from "../Core/Command"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, 
+    IDomManager, ICompiledExpression, ICommand  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty } from "../Core/Utils"
@@ -33,8 +31,9 @@ const keysByCode = {
 };
 
 export default class KeyPressBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -102,6 +101,7 @@ export default class KeyPressBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     private testCombination(combination, event: KeyboardEvent): boolean {
         let metaPressed = !!(event.metaKey && !event.ctrlKey);
@@ -155,7 +155,7 @@ export default class KeyPressBinding implements IBindingHandler {
 
                         e.preventDefault();
                     } catch(e) {
-                        app.defaultExceptionHandler.onNext(e);
+                        this.app.defaultExceptionHandler.onNext(e);
                     }
                 }));
             } else {
@@ -167,7 +167,7 @@ export default class KeyPressBinding implements IBindingHandler {
 
                         e.preventDefault();
                     } catch(e) {
-                        app.defaultExceptionHandler.onNext(e);
+                        this.app.defaultExceptionHandler.onNext(e);
                     }
                 }));
             }
@@ -184,7 +184,7 @@ export default class KeyPressBinding implements IBindingHandler {
 
                     e.preventDefault();
                 } catch(e) {
-                    app.defaultExceptionHandler.onNext(e);
+                    this.app.defaultExceptionHandler.onNext(e);
                 }
             }));
         } else {

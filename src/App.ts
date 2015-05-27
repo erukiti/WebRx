@@ -2,15 +2,13 @@
 
 import { IModule, IHistory, ITemplateEngine, IComponentDescriptor, IComponent, IComponentRegistry, IAnimation, 
     IAnimationRegistry, IObservableProperty, IBindingHandler, IBindingRegistry, IExpressionFilter, IExpressionFilterRegistry,
-    IComponentTemplateDescriptor, IComponentViewModelDescriptor, IModuleDescriptor } from "./Interfaces"
+    IComponentTemplateDescriptor, IComponentViewModelDescriptor, IModuleDescriptor, IWebRxApp, IRouter } from "./Interfaces"
 import { injector } from "./Core/Injector"
-import { IRouter } from "./Routing/Router"
 import { isInUnitTest } from "./Core/Utils"
 import * as res from "./Core/Resources"
 import * as log from "./Core/Log"
 import { property } from "./Core/Property"
 import { Module, modules } from "./Core/Module"
-
 import * as ExpressionCompiler from "./Core/ExpressionCompiler"
 import {DomManager } from "./Core/DomManager"
 import HtmlTemplateEngine from "./Core/HtmlTemplateEngine"
@@ -41,15 +39,6 @@ declare var createMockHistory: () => IHistory;
 
 "use strict";
 
-export interface IWebRxApp extends IModule {
-    defaultExceptionHandler: Rx.Observer<Error>;
-    mainThreadScheduler: Rx.IScheduler;
-    templateEngine: ITemplateEngine;
-    router: IRouter;
-    history: IHistory;
-    title: IObservableProperty<string>;
-}
-
 class App extends Module implements IWebRxApp {
     constructor() {
         super("app");
@@ -59,8 +48,6 @@ class App extends Module implements IWebRxApp {
         } else {
             this.history = createMockHistory();
         }
-        
-        this.register();
     }
 
     /// <summary>
@@ -133,7 +120,24 @@ class App extends Module implements IWebRxApp {
             forward: window.history.forward.bind(window.history),
             //go: window.history.go,
             pushState: window.history.pushState.bind(window.history),
-            replaceState: window.history.replaceState.bind(window.history)
+            replaceState: window.history.replaceState.bind(window.history),
+            
+            getSearchParameters: (query?:string)=> {
+                query = query || result.location.search.substr(1);
+                
+                if(query) {
+                    let result = {};
+                    let params = query.split("&");
+                    for ( var i = 0; i < params.length; i++) {
+                        var tmp = params[i].split("=");
+                        result[tmp[0]] = decodeURIComponent(tmp[1]);
+                    }
+            
+                    return result;
+                } 
+                
+                return {};
+            }
         };
 
         Object.defineProperty(result, "length", {
@@ -170,11 +174,12 @@ class App extends Module implements IWebRxApp {
         return result;
     }
     
-    private register() {
-        injector.register(res.expressionCompiler, ExpressionCompiler)
+    public register() {
+        injector.register(res.app, this)    // register with injector
+            .register(res.expressionCompiler, ExpressionCompiler)
             .register(res.templateEngine, [HtmlTemplateEngine], true)
             .register(res.domManager, [res.expressionCompiler, DomManager], true)
-            .register(res.router, [res.domManager, Router], true)
+            .register(res.router, [res.domManager, res.app, Router], true)
             .register(res.messageBus, [MessageBus], true);
 
         injector.register("bindings.module", [res.domManager, ModuleBinding], true)
@@ -238,9 +243,11 @@ class App extends Module implements IWebRxApp {
         this.component("wx-radiogroup", { resolve: "components.radiogroup" })
             .component("wx-select", { resolve: "components.select" });
             
-        // register a pre-initialized
+        // register with module-registry
         modules["app"] = <IModuleDescriptor> <any> { instance: this };
     }
 }
 
-export var app: IWebRxApp = new App();
+let _app = new App();
+export var app: IWebRxApp = _app;
+_app.register();

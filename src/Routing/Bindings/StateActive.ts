@@ -1,9 +1,7 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../../Interfaces"
-import { IDomManager  } from "../../Core/DomManager"
-import { ICompiledExpression  } from "../../Core/ExpressionCompiler"
-import { IRouter  } from "../Router"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, 
+    IRouter, IDomManager, ICompiledExpression } from "../../Interfaces"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, toggleCssClass } from "../../Core/Utils"
 
@@ -16,9 +14,10 @@ export interface IStateActiveBindingOptions {
 }
 
 export default class StateActiveBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, router: IRouter) {
+    constructor(domManager: IDomManager, router: IRouter, app: IWebRxApp) {
         this.domManager = domManager;
         this.router = router;
+        this.app = app;
     } 
 
     ////////////////////
@@ -88,7 +87,7 @@ export default class StateActiveBinding implements IBindingHandler {
                     toggleCssClass.apply(null, [el, active].concat(classes));
                 }
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -120,5 +119,6 @@ export default class StateActiveBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
     protected router: IRouter;
 }

@@ -1,8 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
@@ -10,8 +8,9 @@ import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable
 "use strict";
 
 export class MultiOneWayChangeBindingBase implements IBindingHandler {
-    constructor(domManager: IDomManager, supportsDynamicValues: boolean = false) {
+    constructor(domManager: IDomManager, app: IWebRxApp, supportsDynamicValues: boolean = false) {
         this.domManager = domManager;
+        this.app = app;
         this.supportsDynamicValues = supportsDynamicValues;
     } 
 
@@ -87,13 +86,14 @@ export class MultiOneWayChangeBindingBase implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     private subscribe(el: HTMLElement, obs: Rx.Observable<any>, key: string, state: INodeState) {
         state.cleanup.add(obs.subscribe(x => {
             try {
                 this.applyValue(el, unwrapProperty(x), key);
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
     }
@@ -109,8 +109,8 @@ interface ICssNodeState extends INodeState {
 }
 
 export class CssBinding extends MultiOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager, true);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app, true);
     }
 
     protected applyValue(el: HTMLElement, value: any, key: string): void {
@@ -146,8 +146,8 @@ export class CssBinding extends MultiOneWayChangeBindingBase {
 }
 
 export class AttrBinding extends MultiOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
 
         this.priority = 5;
     }
@@ -166,8 +166,8 @@ export class AttrBinding extends MultiOneWayChangeBindingBase {
 }
 
 export class StyleBinding extends MultiOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
     }
 
     protected applyValue(el: HTMLElement, value: any, key: string): void {

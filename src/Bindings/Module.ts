@@ -1,8 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
@@ -11,8 +9,9 @@ import { Module, loadModule } from "../Core/Module"
 "use strict";
 
 export default class ModuleBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
     ////////////////////
@@ -65,18 +64,18 @@ export default class ModuleBinding implements IBindingHandler {
                         function(_) { return <IModule[]> args2Array(arguments) }).subscribe(modules => {
                         try {
                             // create intermediate module
-                            let moduleName = (module || app).name + "+" + moduleNames.join("+");
+                            let moduleName = (module || this.app).name + "+" + moduleNames.join("+");
                             let merged: IModule = new Module(moduleName);
 
                             // merge modules into intermediate
-                            merged.merge(module || app);
+                            merged.merge(module || this.app);
                             modules.forEach(x => merged.merge(x));
 
                             // done
                             self.applyValue(el, merged, template, ctx, state, initialApply);
                             initialApply = false;
                         } catch(e) {
-                            app.defaultExceptionHandler.onNext(e);
+                            this.app.defaultExceptionHandler.onNext(e);
                         }
                     });
 
@@ -84,7 +83,7 @@ export default class ModuleBinding implements IBindingHandler {
                         cleanup.add(disp);
                 }
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -113,6 +112,7 @@ export default class ModuleBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected applyValue(el: HTMLElement, module: IModule, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
         if (initialApply) {

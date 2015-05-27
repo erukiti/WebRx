@@ -1,10 +1,7 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IViewAnimationDescriptor  } from "../../Interfaces"
-import { IViewConfig  } from "../Router"
-import { IDomManager  } from "../../Core/DomManager"
-import { ICompiledExpression  } from "../../Core/ExpressionCompiler"
-import { IRouter  } from "../Router"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IViewAnimationDescriptor, 
+    IWebRxApp, IRouter, IViewConfig, IDomManager, ICompiledExpression  } from "../../Interfaces"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../../Core/Utils"
 import * as log from "../../Core/Log"
@@ -18,9 +15,10 @@ interface IViewDataContext extends IDataContext {
 }
 
 export default class ViewBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, router: IRouter) {
+    constructor(domManager: IDomManager, router: IRouter, app: IWebRxApp) {
         this.domManager = domManager;
         this.router = router;
+        this.app = app;
     } 
 
     ////////////////////
@@ -69,7 +67,7 @@ export default class ViewBinding implements IBindingHandler {
                     currentConfig = <any> {};
                 }
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -96,6 +94,7 @@ export default class ViewBinding implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
     protected router: IRouter;
 
     protected applyTemplate(componentName: string, componentParams: Object,

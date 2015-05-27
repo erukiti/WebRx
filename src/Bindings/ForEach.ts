@@ -1,10 +1,8 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../RxExtensions.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
-import { ICompiledExpression  } from "../Core/ExpressionCompiler"
-import { IObservableList } from "../Collections/List"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, 
+    IDomManager, ICompiledExpression, IObservableList  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, noop } from "../Core/Utils"
@@ -77,8 +75,9 @@ export interface IForEachBindingHooks {
 }
 
 export default class ForEachBinding implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
 
         // hook into getDataContext() to map state['index'] to ctx['$index']
         domManager.registerDataContextExtension((node: Node, ctx: IForEachDataContext) => {
@@ -172,7 +171,7 @@ export default class ForEachBinding implements IBindingHandler {
                 self.applyValue(el, x, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc);
                 initialApply = false;
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -206,6 +205,7 @@ export default class ForEachBinding implements IBindingHandler {
     // implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected createIndexPropertyForNode(proxy: VirtualChildNodes, child: Node, startIndex: number,
         trigger: Rx.Observable<any>, templateLength: number): IObservableProperty<number> {

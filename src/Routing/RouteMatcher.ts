@@ -1,5 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
+import { IRoute } from "../Interfaces"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
 import { createWeakMap } from "./../Collections/WeakMap"
@@ -8,14 +9,6 @@ import * as res from "../Core/Resources"
 import * as env from "../Core/Environment"
 import { injector } from "./../Core/Injector"
 import { property } from "./../Core/Property"
-
-export interface IRoute {
-    parse(url): Object;
-    stringify(params?: Object): string;
-    concat(route: IRoute): IRoute;
-    isAbsolute: boolean;
-    params: Array<string>;
-}
 
 /*
  * JavaScript Route Matcher

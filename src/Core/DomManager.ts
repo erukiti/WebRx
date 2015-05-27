@@ -1,13 +1,13 @@
 ﻿
-import { IObservableProperty, IExpressionFilter, IDataContext, INodeState, IBindingHandler, IModule  } from "../Interfaces"
-import { ICompiledExpression, IObjectLiteralToken, IExpressionCompiler, IExpressionCompilerOptions, ICompiledExpressionRuntimeHooks  } from "./ExpressionCompiler"
+import { IObservableProperty, IExpressionFilter, IDataContext, INodeState, IBindingHandler, IModule, IObservableList, IDomManager, 
+    ICompiledExpression, IObjectLiteralToken, IExpressionCompiler, IExpressionCompilerOptions, ICompiledExpressionRuntimeHooks, IWebRxApp } from "../Interfaces"
+import {   } from "./ExpressionCompiler"
 import { IWeakMap, createWeakMap } from "../Collections/WeakMap"
 import { ISet, createSet, setToArray } from "../Collections/Set"
-import { IObservableList } from "../Collections/List"
 import IID from "../IID"
 import { injector } from "./Injector"
 import { extend, observableRequire, isInUnitTest, queryInterface, args2Array, isFunction, isProperty, isCommand, isRxObservable, 
-    isDisposable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
+    isDisposable, isRxScheduler, throwError, using, getOid } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
@@ -15,127 +15,11 @@ import * as env from "./Environment"
 
 "use strict";
 
-/**
-* The Dom Manager coordinates everything involving browser DOM-Manipulation
-* @interface 
-**/
-export interface IDomManager {
-    /**
-    * Applies bindings to the specified node and all of its children using the specified data context 
-    * @param {IDataContext} ctx The data context
-    * @param {Node} rootNode The node to be bound
-    */
-    applyBindings(model: any, rootNode: Node): void;
-
-    /**
-    * Applies bindings to all the children of the specified node but not the node itself using the specified data context.
-    * You generally want to use this method if you are authoring a new binding handler that handles children.
-    * @param {IDataContext} ctx The data context
-    * @param {Node} rootNode The node to be bound
-    */
-    applyBindingsToDescendants(ctx: IDataContext, rootNode: Node): void;
-
-    /**
-    * Removes and cleans up any binding-related state from the specified node and its descendants.
-    * @param {Node} rootNode The node to be cleaned
-    */
-    cleanNode(rootNode: Node): void;
-
-    /**
-    * Removes and cleans up any binding-related state from all the children of the specified node but not the node itself.
-    * @param {Node} rootNode The node to be cleaned
-    */
-    cleanDescendants(rootNode: Node): void;
-
-    /**
-    * Stores updated state for the specified node
-    * @param {Node} node The target node
-    * @param {IBindingState} state The updated node state
-    */
-    setNodeState(node: Node, state: INodeState): void;
-
-    /**
-    * Computes the actual data context starting at the specified node
-    * @param {Node} node The node to be bound
-    * @return {IDataContext} The data context to evaluate the expression against
-    */
-    getDataContext(node: Node): IDataContext;
-
-    /**
-    * Retrieves the current node state for the specified node
-    * @param {Node} node The target node
-    */
-    getNodeState(node: Node): INodeState;
-
-    /**
-    * Initializes a new node state
-    * @param {any} model The model 
-    */
-    createNodeState(model?: any): INodeState;
-
-    /**
-    * Returns true if the node is currently bound by one or more binding-handlers
-    * @param {Node} node The node to check
-    */
-    isNodeBound(node: Node): boolean;
-
-    /**
-    * Removes any binding-related state from the specified node. Use with care! In most cases you would want to use cleanNode!
-    * @param {Node} node The node to clear
-    */
-    clearNodeState(node: Node);
-
-    /**
-    * Compiles a simple string expression or multiple expressions within an object-literal recursively into an expression tree
-    * @param {string} value The expression(s) to compile
-    */
-    compileBindingOptions(value: string, module: IModule): any;
-
-    /**
-    * Tokenizes an object-literal into an array of key-value pairs
-    * @param {string} value The object literal tokenize
-    */
-    getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
-
-    /**
-    * Returns data-binding expressions for a DOM-Node
-    * @param {Node} node The node
-    */
-    getBindingDefinitions(node: Node): Array<{ key: string; value: string }>;
-
-    /**
-    * Registers hook that gets invoked whenever a new data-context gets assembled
-    * @param {Node} node The node for which the data-context gets assembled
-    * @param {IDataContext} ctx The current data-context
-    */
-    registerDataContextExtension(extension:(node: Node, ctx:IDataContext)=> void);
-
-    /**
-    * Evaluates an expression against a data-context and returns the result
-    * @param {IExpressionFunc} exp The source expression 
-    * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-    * @param {IDataContext} The data context to evaluate the expression against
-    * @return {any} A value representing the result of the expression-evaluation
-    */
-    evaluateExpression(exp: ICompiledExpression, ctx: IDataContext): any;
-
-    /**
-    * Creates an observable that produces values representing the result of the expression.
-    * If any observable input of the expression changes, the expression gets re-evaluated
-    * and the observable produces a new value.
-    * @param {IExpressionFunc} exp The source expression 
-    * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
-    * @param {IDataContext} The data context to evaluate the expression against
-    * @return {Rx.Observable<any>} A sequence of values representing the result of the last evaluation of the expression
-    */
-    expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
-}
-
-
 export class DomManager implements IDomManager {
-    constructor(compiler: IExpressionCompiler) {
+    constructor(compiler: IExpressionCompiler, app: IWebRxApp) {
         this.nodeState = createWeakMap<Node, INodeState>();
         this.compiler = compiler;
+        this.app = app;
     }
 
     public applyBindings(model: any, rootNode: Node): void {
@@ -227,7 +111,7 @@ export class DomManager implements IDomManager {
             options.filters = {};
 
             // enrich with app filters
-            extend(app.filters(), options.filters);
+            extend(this.app.filters(), options.filters);
 
             // enrich with module filters
             if (module) {
@@ -255,7 +139,7 @@ export class DomManager implements IDomManager {
         }
 
         // default to app
-        return app;
+        return this.app;
     }
 
     public registerDataContextExtension(extension: (node: Node, ctx: IDataContext) => void) {
@@ -370,7 +254,7 @@ export class DomManager implements IDomManager {
             if (evalObs)
                 evalObs.onNext(true);
         } catch (e) {
-            app.defaultExceptionHandler.onNext(e);
+            this.app.defaultExceptionHandler.onNext(e);
 
             return Rx.Observable.return(undefined);
         } 
@@ -410,7 +294,7 @@ export class DomManager implements IDomManager {
                     if (evalObs)
                         evalObs.onNext(true);
                 } catch (e) {
-                    app.defaultExceptionHandler.onNext(e);
+                    this.app.defaultExceptionHandler.onNext(e);
                 }
             });
 
@@ -434,7 +318,7 @@ export class DomManager implements IDomManager {
     private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
     private compiler: IExpressionCompiler;
     private dataContextExtensions = createSet<(node: Node, ctx: IDataContext) => void>();
-
+    private app: IWebRxApp;
     private parserOptions: IExpressionCompilerOptions = {
         disallowFunctionCalls: true
     };
@@ -457,7 +341,7 @@ export class DomManager implements IDomManager {
         let tagName = el.tagName.toLowerCase();
 
         // check if tag represents a component
-        if (module.hasComponent(tagName) || app.hasComponent(tagName)) {
+        if (module.hasComponent(tagName) || this.app.hasComponent(tagName)) {
             // when a component is referenced by element, we just apply a virtual 'component' binding
             let params = el.getAttribute(DomManager.paramsAttributename);
             let componentReference: any;

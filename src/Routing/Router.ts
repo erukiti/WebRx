@@ -1,7 +1,7 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IViewAnimationDescriptor  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
+import { IObservableProperty, IViewAnimationDescriptor, IRoute, IRouter, IHistory, IWebRxApp, 
+    IRouterStateConfig, IRouterState, IStateChangeOptions, RouterLocationChangeMode, IViewConfig, IDomManager } from "../Interfaces"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
 import { createWeakMap } from "./../Collections/WeakMap"
@@ -11,7 +11,7 @@ import * as env from "../Core/Environment"
 import { injector } from "./../Core/Injector"
 import { Module } from "./../Core/Module"
 import { property } from "./../Core/Property"
-import { IRoute, route } from "./RouteMatcher"
+import { route } from "./RouteMatcher"
 
 "use strict";
 
@@ -21,135 +21,10 @@ interface IHistoryState {
     title?: string;
 }
 
-export interface IRouterStateConfig {
-    name: string;
-    url?: string|IRoute;   // relative or absolute
-    views?: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
-    params?: any;
-    onEnter?: (config: IRouterStateConfig, params?: any)=> void;
-    onLeave?: (config: IRouterStateConfig, params?: any) => void;
-    //reloadOnSearch?: boolean;
-}
-
-export interface IRouterState {
-    name: string;
-    url: string;
-    params: any;
-    views: { [view: string]: string|{ component: string; params?: any; animations?: IViewAnimationDescriptor } };
-    onEnter?: (config: IRouterStateConfig, params?: any) => void;
-    onLeave?: (config: IRouterStateConfig, params?: any) => void;
-}
-
-export interface IViewConfig {
-    component: string;
-    params?: any;
-    animations?: IViewAnimationDescriptor;
-}
-
-export const enum RouterLocationChangeMode {
-    add = 1,
-    replace = 2
-}
-
-export interface IStateChangeOptions {
-    /**
-    * If true will update the url in the location bar, if false will not.
-    **/
-    location?: boolean|RouterLocationChangeMode; 
-
-    /**
-    * If true will force transition even if the state or params have not changed, aka a reload of the same state. 
-    **/
-    force?: boolean;
-}
-
-export interface IRouter {
-    /**
-    * Transitions to the state inferred from the browser's current location
-    * This method should be invoked once after registering application states.
-    * @param {string} url If specified the router state will be synced to this value, otherwise to window.location.path 
-    **/
-    sync(url?:string): void;
-
-    /**
-    * Registers a state configuration under a given state name.
-    * @param {IRouterStateConfig} config State configuration to register
-    **/
-    state(config: IRouterStateConfig): IRouter;
-
-    /**
-    * Represents the configuration object for the router's 
-    **/
-    current: IObservableProperty<IRouterState>;
-
-    /**
-    * Invoke this method to programatically alter or extend IRouter.current.params. 
-    * Failure to modify params through this method will result in those modifications getting lost after state transitions. 
-    **/
-    updateCurrentStateParams(withParamsAction: (params: any)=> void): void;
-
-    /**
-    * Method for transitioning to a new state.
-    * @param {string} to Absolute or relative destination state path. 'contact.detail' - will go to the 
-    * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
-    * '.child.grandchild' will go to grandchild state
-    * @param {Object} params A map of the parameters that will be sent to the state. 
-    * Any parameters that are not specified will be inherited from currently defined parameters. 
-    * @param {IStateChangeOptions} options Options controlling how the state transition will be performed
-    **/
-    go(to: string, params?: Object, options?: IStateChangeOptions): void;    // Rx.Observable<any>
-
-    /**
-    * An URL generation method that returns the URL for the given state populated with the given params.
-    * @param {string} state Absolute or relative destination state path. 'contact.detail' - will go to the 
-    * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
-    * '.child.grandchild' will go to grandchild state
-    * @param {Object} params An object of parameter values to fill the state's required parameters.
-    **/
-    url(state: string, params?: {}): string;
-
-    /**
-    * A method that force reloads the current state. All resolves are re-resolved, events are not re-fired, 
-    * and components reinstantiated.
-    **/
-    reload(): void;
-
-    /**
-    * Returns the state configuration object for any specific state.
-    * @param {string} state Absolute state path.
-    **/
-    get(state: string): IRouterStateConfig;
-
-    /**
-    * Similar to IRouter.includes, but only checks for the full state name. If params is supplied then it will 
-    * be tested for strict equality against the current active params object, so all params must match with none 
-    * missing and no extras.
-    * @param {string} state Absolute state path.
-    **/
-    is(state: string, params?: any, options?: any);
-
-    /**
-    * A method to determine if the current active state is equal to or is the child of the state stateName. 
-    * If any params are passed then they will be tested for a match as well. Not all the parameters need 
-    * to be passed, just the ones you'd like to test for equality.
-    * @param {string} state Absolute state path.
-    **/
-    includes(state: string, params?: any, options?: any);
-
-    /**
-    * Resets internal state configuration to defaults (for unit-testing)
-    **/
-    reset(): void;
-
-    /**
-    * Returns the view-configuration for the specified view at the current state
-    **/
-    getViewComponent(viewName: string): IViewConfig;
-}
-
 export class Router implements IRouter {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
 
         this.reset(false);
 
@@ -197,7 +72,7 @@ export class Router implements IRouter {
     public updateCurrentStateParams(withParamsAction: (params: any) => void): void {
         let _current = this.current();
         withParamsAction(_current.params);
-        this.replaceHistoryState(_current, app.title());
+        this.replaceHistoryState(_current, this.app.title());
     }
 
     public go(to: string, params?: {}, options?: IStateChangeOptions): void {
@@ -285,7 +160,7 @@ export class Router implements IRouter {
 
     public sync(url?:string): void {
         if(url == null)
-            url = app.history.location.pathname;// + app.history.location.search;
+            url = this.app.history.location.pathname;// + app.history.location.search;
 
         // iterate over registered states to find matching uri
         let keys = Object.keys(this.states);
@@ -369,6 +244,7 @@ export class Router implements IRouter {
     private states: { [name: string]: IRouterStateConfig } = {};
     private root: IRouterStateConfig;
     private domManager: IDomManager;
+    private app: IWebRxApp; 
 
     private pathSeparator = ".";
     private parentPathDirective = "^";
@@ -418,7 +294,7 @@ export class Router implements IRouter {
             title: title != null ? title : document.title
         };
 
-        app.history.pushState(hs, "", state.url);
+        this.app.history.pushState(hs, "", state.url);
     }
 
     private replaceHistoryState(state: IRouterState, title?: string): void {
@@ -428,7 +304,7 @@ export class Router implements IRouter {
             title: title != null ? title : document.title
         };
 
-        app.history.replaceState(hs, "", state.url);
+        this.app.history.replaceState(hs, "", state.url);
     }
 
     private mapPath(path: string): string {
@@ -566,9 +442,9 @@ export class Router implements IRouter {
             // update history
             if (options && options.location) {
                 if(options.location === RouterLocationChangeMode.replace)
-                    this.replaceHistoryState(state, app.title());
+                    this.replaceHistoryState(state, this.app.title());
                 else
-                    this.pushHistoryState(state, app.title());
+                    this.pushHistoryState(state, this.app.title());
             }
 
             if (_current != null) {

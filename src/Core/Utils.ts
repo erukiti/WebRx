@@ -1,7 +1,6 @@
 /// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IHandleObservableErrors, IObservableProperty } from "../Interfaces"
-import { IPropertyChangedEventArgs } from "./Events"
+import { IHandleObservableErrors, IObservableProperty, IPropertyChangedEventArgs } from "../Interfaces"
 import { command, Command } from "./Command"
 import { getMetadata, implementsMetaDataKey } from "./Reflect"
 import { list, ObservableList } from "../Collections/List"
@@ -149,26 +148,6 @@ export function isInUnitTest(): boolean {
     }
 
     return false;
-}
-
-/**
-* Extracts query parameters and returns than as associative array
-*/
-export function getSearchParameters(query?:string) {
-    query = query || app.history.location.search.substr(1);
-    
-    if(query) {
-        let result = {};
-        let params = query.split("&");
-        for ( var i = 0; i < params.length; i++) {
-            var tmp = params[i].split("=");
-            result[tmp[0]] = decodeURIComponent(tmp[1]);
-        }
-
-        return result;
-    } 
-    
-    return {};
 }
 
 /**
@@ -517,9 +496,9 @@ export function observableRequire<T>(module: string): Rx.Observable<T> {
 * @param {any} target The object to observe
 * @return {Rx.Observable<T>} An observable
 */
-export function observeObject(target: any, onChanging: boolean = false): Rx.Observable<IPropertyChangedEventArgs> {
+export function observeObject(target: any, defaultExceptionHandler: Rx.Observer<Error>, onChanging: boolean = false): Rx.Observable<IPropertyChangedEventArgs> {
     let thrownExceptionsSubject = queryInterface(target, IID.IHandleObservableErrors) ?
-        <Rx.Observer<Error>> <any> (<IHandleObservableErrors> target).thrownExceptions : app.defaultExceptionHandler;
+        <Rx.Observer<Error>> <any> (<IHandleObservableErrors> target).thrownExceptions : defaultExceptionHandler;
 
     return Rx.Observable.create<IPropertyChangedEventArgs>(
         (observer: Rx.Observer<IPropertyChangedEventArgs>): Rx.IDisposable => {
@@ -622,13 +601,4 @@ export function whenAny<TRet>(): Rx.Observable<TRet> {
 export function throwError(fmt: string, ...args: any[]): void {
     let msg = "WebRx: " + formatString(fmt, args);
     throw new Error(msg);
-}
-
-/**
-* FOR INTERNAL USE ONLY
-* Throw an error containing the specified description
-*/
-export function emitError(fmt: string, ...args: any[]): void {
-    let msg = "WebRx: " + formatString(fmt, args);
-    app.defaultExceptionHandler.onNext(Error(msg));
 }

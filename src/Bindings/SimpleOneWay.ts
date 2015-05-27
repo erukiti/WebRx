@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule  } from "../Interfaces"
-import { IDomManager  } from "../Core/DomManager"
+import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
@@ -9,8 +8,9 @@ import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable
 "use strict";
 
 export class SingleOneWayChangeBindingBase implements IBindingHandler {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: IDomManager, app: IWebRxApp) {
         this.domManager = domManager;
+        this.app = app;
     } 
 
   ////////////////////
@@ -33,7 +33,7 @@ export class SingleOneWayChangeBindingBase implements IBindingHandler {
             try {
                 self.applyValue(el, unwrapProperty(x));
             } catch (e) {
-                app.defaultExceptionHandler.onNext(e);
+                this.app.defaultExceptionHandler.onNext(e);
             } 
         }));
 
@@ -62,6 +62,7 @@ export class SingleOneWayChangeBindingBase implements IBindingHandler {
     // Implementation
 
     protected domManager: IDomManager;
+    protected app: IWebRxApp;
 
     protected applyValue(el: HTMLElement, value: any): void {
         throwError("you need to override this method!");
@@ -72,8 +73,8 @@ export class SingleOneWayChangeBindingBase implements IBindingHandler {
 // Bindings
 
 export class TextBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
     } 
 
     protected applyValue(el: HTMLElement, value: any): void {
@@ -90,8 +91,8 @@ export interface IVisibleBindingOptions {
 }
 
 export class VisibleBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
 
         this.inverse = false;
         this.priority = 10;
@@ -127,16 +128,16 @@ export class VisibleBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class HiddenBinding extends VisibleBinding {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
 
         this.inverse = true;
     } 
 }
 
 export class HtmlBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
     } 
 
     protected applyValue(el: HTMLElement, value: any): void {
@@ -148,8 +149,8 @@ export class HtmlBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class DisableBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
 
         this.inverse = false;
     }
@@ -169,8 +170,8 @@ export class DisableBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class EnableBinding extends DisableBinding {
-    constructor(domManager: IDomManager) {
-        super(domManager);
+    constructor(domManager: IDomManager, app: IWebRxApp) {
+        super(domManager, app);
 
         this.inverse = true;
     }
