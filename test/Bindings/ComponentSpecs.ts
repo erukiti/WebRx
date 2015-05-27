@@ -95,7 +95,7 @@ describe('Bindings', () => {
             var template = '<span>foo</span>';
 
             wx.app.component("test1", {
-                template: <any> wx.app.templateEngine.parse(template)
+                template: wx.app.templateEngine.parse(template)
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
@@ -108,7 +108,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Component.html');
 
             wx.app.component("test1", {
-                template: <any> { element: '#template1' }
+                template: { element: '#template1' }
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
@@ -121,7 +121,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Component.html');
 
             wx.app.component("test1", {
-                template: <any> { element: document.querySelector("#template1") }
+                template: { element: document.querySelector("#template1") }
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
@@ -137,7 +137,7 @@ describe('Bindings', () => {
             wx.injector.register("#template1", ()=> wx.app.templateEngine.parse(template));
 
             wx.app.component("test1", {
-                template: <any> { resolve: "#template1" }
+                template: { resolve: "#template1" }
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
@@ -159,10 +159,10 @@ describe('Bindings', () => {
             };
 
             wx.app.component("test1", {
-                template: <any> {
+                template: {
                      require: 'text!templates/AMD/template1.html'
                 },
-                viewModel: <any> { instance: vm },
+                viewModel: { instance: vm },
                 postBindingInit: "init"
             });
 
@@ -208,7 +208,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: <any> { resolve: 'vm1' }
+                viewModel: { resolve: 'vm1' }
             });
 
 
@@ -224,7 +224,7 @@ describe('Bindings', () => {
             var template = "<span data-bind='text: childVm.foo'>invalid</span>";
             wx.injector.register("vm2", { foo: 'bar' });
 
-            wx.app.component("test1", <any> {
+            wx.app.component("test1", {
                 template: template,
                 viewModel: ["vm2", function(childVm, params) {
                     this.childVm = childVm;
@@ -246,7 +246,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: <any> { instance: { foo: 'bar' } } 
+                viewModel: { instance: { foo: 'bar' } } 
             });
 
 
@@ -263,7 +263,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: <any> { require: 'templates/AMD/vm1' },
+                viewModel: { require: 'templates/AMD/vm1' },
                 postBindingInit: "init"
             });
 
@@ -287,7 +287,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: <any> { require: 'templates/AMD/vm2' },
+                viewModel: { require: 'templates/AMD/vm2' },
                 postBindingInit: "init"
             });
 
@@ -346,7 +346,7 @@ describe('Bindings', () => {
                 }
             };
 
-            wx.app.component("test1", <any> {
+            wx.app.component("test1", {
                 template: template,
                 viewModel: { instance: vm },
                 preBindingInit: "init"
@@ -378,7 +378,7 @@ describe('Bindings', () => {
                 }
             };
 
-            wx.app.component("test1", <any> {
+            wx.app.component("test1", {
                 template: template,
                 viewModel: { instance: vm },
                 postBindingInit: "init"
