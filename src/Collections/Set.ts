@@ -5,20 +5,6 @@ import { getOid } from "../Core/Utils"
 "use strict";
 
 /**
-* The Set object lets you store unique values of any type, whether primitive values or object references.
-* @interface 
-**/
-export interface ISet<T> {
-    add(value: T): ISet<T>;
-    has(key: T): boolean;
-    delete(key: T): boolean;
-    clear(): void;
-    forEach(callback: (T) => void, thisArg?): void;
-    size: number;
-    isEmulated: boolean;
-}
-
-/**
 * ES6 Set Shim
 * @class
 */

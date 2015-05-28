@@ -1,12 +1,12 @@
 {
     "compilerOptions": {
-        "target": "ES5",
+        "target": "es6",
         "module": "amd",
         "noImplicitAny": false,
         "removeComments": false,
         "preserveConstEnums": true,
         "emitDecoratorMetadata": true,
-        "rootDir": "../src",
+        "outDir": "../../build/es6",
         "sourceMap": true
     }
 }

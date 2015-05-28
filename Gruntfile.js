@@ -4,7 +4,12 @@ module.exports = function (grunt) {
     var conf = { 
         shell: {
             tsc_src: {
-                command: 'node node_modules/typescript/bin/tsc.js --rootDir src -p src --out build/web.rx.js',
+                command: 'node ../node_modules/typescript/bin/tsc.js -p es5',
+                options: {
+                    execOptions: {
+                        cwd: 'src'
+                    }
+                }
             },
             gitadd: {
                 command: 'git add .'

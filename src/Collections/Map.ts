@@ -5,21 +5,6 @@ import { getOid } from "../Core/Utils"
 "use strict";
 
 /**
-* The Map object is a simple key/value map. Any value (both objects and primitive values) may be used as either a key or a value.
-* @interface 
-**/
-export interface IMap<TKey extends Object, T> {
-    set(key: TKey, value: T): void;
-    get(key: TKey): T;
-    has(key: TKey): boolean;
-    delete(key: TKey): void;
-    clear(): void;
-    forEach(callback: (value: any, key: any, map: IMap<any, any>) => void, thisArg?: any): void;
-    size: number;
-    isEmulated: boolean;
-}
-
-/**
 * ES6 Map Shim
 * @class
 */
