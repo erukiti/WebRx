@@ -1,6 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -8,16 +8,16 @@ import * as env from "../Core/Environment"
 
 "use strict";
 
-export default class TextInputBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class TextInputBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
          if (node.nodeType !== 1)
              throwError("textInput-binding only operates on elements!");
         
@@ -32,7 +32,7 @@ export default class TextInputBinding implements IBindingHandler {
             throwError("textInput-binding can only be applied to input or textarea elements");
 
         let exp = this.domManager.compileBindingOptions(options, module);
-        let prop: IObservableProperty<any>;
+        let prop: wx.IObservableProperty<any>;
         let propertySubscription: Rx.Disposable;
         let eventSubscription: Rx.Disposable;
         let previousElementValue;
@@ -121,17 +121,17 @@ export default class TextInputBinding implements IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
     protected getTextInputEventObservables(el: HTMLInputElement, isTextArea: boolean): Array<Rx.Observable<Object>> {
         let result: Array<Rx.Observable<Object>> = [];
 
         if (env.ie && env.ie.version < 10) {
             if (env.ie.version <= 9) {
-                // Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
+                // wx.Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
                 // the backspace, delete, or ctrl-x keys, clicking the 'x' to clear the input, dragging text
                 // out of the field, and cutting or deleting text using the context menu. 'selectionchange'
                 // can detect all of those except dragging text out of the field, for which we use 'dragend'.
@@ -140,7 +140,7 @@ export default class TextInputBinding implements IBindingHandler {
 
                 result.push(Rx.Observable.fromEvent(el, 'dragend'));
 
-                // IE 9 does support 'input', but since it doesn't fire it when
+                // wx.IE 9 does support 'input', but since it doesn't fire it when
                 // using autocomplete, we'll use 'propertychange' for it also.
                 result.push(Rx.Observable.fromEvent(el, 'input'));
                 result.push(Rx.Observable.fromEvent(el, 'propertychange').where(e=> (<any> e).propertyName === 'value'));

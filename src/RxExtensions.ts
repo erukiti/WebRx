@@ -1,6 +1,5 @@
-///<reference path="../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="./Interfaces.ts" />
 
-import { IWebRxApp, IObservableProperty } from "./Interfaces"
 import { args2Array, isFunction, isCommand, isRxObservable, throwError } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
@@ -63,7 +62,7 @@ function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
         .refCount();
 
     accessor.source = this;
-    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, injector.get<IWebRxApp>(res.app).defaultExceptionHandler);
+    accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, injector.get<wx.IWebRxApp>(res.app).defaultExceptionHandler);
 
     //////////////////////////////////
     // implementation

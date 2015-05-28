@@ -1,4 +1,5 @@
 /// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+///<reference path="../Interfaces.ts" />
 
 import { getOid } from "../Core/Utils"
 
@@ -10,7 +11,7 @@ import { getOid } from "../Core/Utils"
 * requiring manual housekeeping of entries otherwise they are kept forever.
 * @class
 */
-class WeakMapEmulated<TKey extends Object, T> implements IWeakMap<TKey, T> {
+class WeakMapEmulated<TKey extends Object, T> implements wx.IWeakMap<TKey, T> {
     ////////////////////
     /// IWeakMap
 
@@ -51,10 +52,10 @@ let hasNativeSupport = typeof WeakMap === "function";
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
 * @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
 */
-export function createWeakMap<TKey, T>(disableNativeSupport?: boolean): IWeakMap<TKey, T> {
+export function createWeakMap<TKey, T>(disableNativeSupport?: boolean): wx.IWeakMap<TKey, T> {
     if (disableNativeSupport || !hasNativeSupport) {
         return new WeakMapEmulated<TKey, T>();
     }
 
-    return <IWeakMap<TKey, T>> <any> new WeakMap();
+    return <wx.IWeakMap<TKey, T>> <any> new WeakMap();
 }

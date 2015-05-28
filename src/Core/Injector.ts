@@ -1,4 +1,4 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+﻿///<reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, isRxScheduler, throwError, getOid } from "../Core/Utils"
@@ -9,30 +9,17 @@ import { property } from "./Property"
 "use strict";
 
 /**
-* Dependency Injector and service locator
-* @interface 
-**/
-export interface IInjector {
-    register(key: string, factory: Array<any>, singleton?: boolean): IInjector;
-    register(key: string, factory: () => any, singleton?: boolean): IInjector;
-    register(key: string, instance: any): IInjector;
-
-    get<T>(key: string, args?: any): T;
-    resolve<T>(iaa: Array<any>, args?: any): T;
-}
-
-/**
 * Simple IoC & Service Locator
 */
-class Injector implements IInjector {
+class Injector implements wx.IInjector {
     //////////////////////////////////
-    // IInjector implementation
+    // wx.IInjector implementation
 
-    public register(key: string, factory: Array<any>, singleton: boolean): IInjector;
-    public register(key: string, factory: () => any, singleton: boolean): IInjector;
-    public register(key: string, instance: any): IInjector;
+    public register(key: string, factory: Array<any>, singleton: boolean): wx.IInjector;
+    public register(key: string, factory: () => any, singleton: boolean): wx.IInjector;
+    public register(key: string, instance: any): wx.IInjector;
 
-    public register(): IInjector {
+    public register(): wx.IInjector {
         let key = arguments[0];
         let val = arguments[1];
         let isSingleton: boolean = arguments[2];
@@ -135,6 +122,6 @@ class Injector implements IInjector {
     private registrations: { [exp: string]: { factory: (args: any, deps) => any; isSingleton: boolean; value?: any } } = {};
 }
 
-export var injector: IInjector = new Injector();
+export var injector: wx.IInjector = new Injector();
 
 injector.register(res.injector, () => new Injector());

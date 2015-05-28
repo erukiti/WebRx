@@ -1,4 +1,5 @@
 /// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+///<reference path="../Interfaces.ts" />
 
 import { getOid } from "../Core/Utils"
 
@@ -8,11 +9,11 @@ import { getOid } from "../Core/Utils"
 * ES6 Set Shim
 * @class
 */
-class SetEmulated<T> implements ISet<T> {
+class SetEmulated<T> implements wx.ISet<T> {
     ////////////////////
     /// ISet
 
-    public add(value: T): ISet<T> {
+    public add(value: T): wx.ISet<T> {
         let key = getOid(value);
 
         if (!this.keys[key]) {
@@ -75,18 +76,18 @@ let hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
 * @return {ISet<T>} A new instance of a suitable ISet implementation
 */
-export function createSet<T>(disableNativeSupport?: boolean): ISet<T> {
+export function createSet<T>(disableNativeSupport?: boolean): wx.ISet<T> {
     if (disableNativeSupport || !hasNativeSupport) {
         return new SetEmulated<T>();
     }
 
-    return <ISet<T>> <any> new Set();
+    return <wx.ISet<T>> <any> new Set();
 }
 
 /**
 * Extracts the values of a Set by invoking its forEach method and capturing the output
 */
-export function setToArray<T>(src: ISet<T>): Array<T> {
+export function setToArray<T>(src: wx.ISet<T>): Array<T> {
     let result = new Array<T>();
     src.forEach(x => result.push(x));
     return result;

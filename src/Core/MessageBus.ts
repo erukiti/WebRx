@@ -1,6 +1,5 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+﻿///<reference path="../Interfaces.ts" />
 
-import { IMessageBus } from "../Interfaces"
 import { injector } from "./Injector"
 import { createScheduledSubject } from "./../Core/ScheduledSubject"
 import * as res from "./Resources"
@@ -9,7 +8,7 @@ import * as res from "./Resources"
 
 "use strict";
 
-export default class MessageBus implements IMessageBus {
+export default class MessageBus implements wx.IMessageBus {
     //////////////////////////////////
     // IMessageBus
 

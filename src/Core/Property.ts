@@ -1,6 +1,5 @@
-///<reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty } from "../Interfaces"
 import { Implements } from "./Reflect"
 import IID from "../IID"
 
@@ -14,7 +13,7 @@ import IID from "../IID"
 * Creates an observable property with an optional default value
 * @param {T} initialValue?
 */
-export function property<T>(initialValue?: T): IObservableProperty<T> {
+export function property<T>(initialValue?: T): wx.IObservableProperty<T> {
     // initialize accessor function
     let accessor: any = function(newVal?: T): T {
         if (arguments.length > 0) {

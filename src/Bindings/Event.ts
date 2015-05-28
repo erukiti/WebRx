@@ -1,27 +1,22 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, 
-    IDomManager, ICompiledExpression, ICommand  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, noop } from "../Core/Utils"
 
 "use strict";
 
-export interface IEventBindingOptions {
-    [eventName: string]: (ctx: IDataContext, event: Event) => any|Rx.Observer<Event>|{ command: ICommand<any>; parameter: any };
-}
-
-export default class EventBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class EventBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("event-binding only operates on elements!");
 
@@ -59,14 +54,14 @@ export default class EventBinding implements IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
-    private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: IDataContext, state: INodeState, module: IModule) {
+    private wireEvent(el: HTMLElement, value: any, eventName: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule) {
         let exp = this.domManager.compileBindingOptions(value, module);
-        let command: ICommand<any>;
+        let command: wx.ICommand<any>;
         let commandParameter = undefined;
         let obs = Rx.Observable.fromEvent<Event>(el, eventName);
 
@@ -80,7 +75,7 @@ export default class EventBinding implements IBindingHandler {
                 }));
             } else {
                 if (isCommand(handler)) {
-                    command = <ICommand<any>> <any> handler;
+                    command = <wx.ICommand<any>> <any> handler;
 
                     state.cleanup.add(obs.subscribe(_ => {
                         command.execute(undefined);
@@ -94,9 +89,9 @@ export default class EventBinding implements IBindingHandler {
                 }
             }
         } else if (typeof exp === "object") {
-            let opt = <{ command: ICommand<any>; parameter: any }> exp;
+            let opt = <{ command: wx.ICommand<any>; parameter: any }> exp;
 
-            command = <ICommand<any>> <any> this.domManager.evaluateExpression(<any> opt.command, ctx);
+            command = <wx.ICommand<any>> <any> this.domManager.evaluateExpression(<any> opt.command, ctx);
             command = unwrapProperty(command);
 
             if (exp.hasOwnProperty("parameter"))

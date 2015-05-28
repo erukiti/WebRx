@@ -1,6 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -8,16 +8,16 @@ import * as res from "../Core/Resources"
 
 "use strict";
 
-export default class ValueBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class ValueBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("value-binding only operates on elements!");
         
@@ -31,7 +31,7 @@ export default class ValueBinding implements IBindingHandler {
             throwError("value-binding only operates on checkboxes and radio-buttons");
 
         let useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
-        let prop: IObservableProperty<any>;
+        let prop: wx.IObservableProperty<any>;
         let cleanup: Rx.CompositeDisposable;
         let exp = this.domManager.compileBindingOptions(options, module);
 
@@ -42,7 +42,7 @@ export default class ValueBinding implements IBindingHandler {
             }
         }
 
-        function updateElement(domManager: IDomManager, value: any) {
+        function updateElement(domManager: wx.IDomManager, value: any) {
             if (useDomManagerForValueUpdates)
                 setNodeValue(el, value, domManager);
             else {
@@ -115,10 +115,10 @@ export default class ValueBinding implements IBindingHandler {
     public priority = 5;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 }
 
 /**
@@ -128,7 +128,7 @@ export default class ValueBinding implements IBindingHandler {
  * @param {Node} node
  * @param {IDomManager} domManager
  */
-export function getNodeValue(node: Node, domManager: IDomManager): any {
+export function getNodeValue(node: Node, domManager: wx.IDomManager): any {
     let state = <any> domManager.getNodeState(node);
     if (state != null && state[res.hasValueBindingValue]) {
         return state[res.valueBindingValue];
@@ -144,7 +144,7 @@ export function getNodeValue(node: Node, domManager: IDomManager): any {
  * @param {any} value
  * @param {IDomManager} domManager
  */
-export function setNodeValue(node: Node, value: any, domManager: IDomManager): void {
+export function setNodeValue(node: Node, value: any, domManager: wx.IDomManager): void {
     if ((value === null) || (value === undefined))
         value = "";
 

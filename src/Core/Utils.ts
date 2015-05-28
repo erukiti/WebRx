@@ -1,6 +1,5 @@
-/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IHandleObservableErrors, IObservableProperty, IPropertyChangedEventArgs } from "../Interfaces"
 import { command, Command } from "./Command"
 import { getMetadata, implementsMetaDataKey } from "./Reflect"
 import { list, ObservableList } from "../Collections/List"
@@ -496,14 +495,14 @@ export function observableRequire<T>(module: string): Rx.Observable<T> {
 * @param {any} target The object to observe
 * @return {Rx.Observable<T>} An observable
 */
-export function observeObject(target: any, defaultExceptionHandler: Rx.Observer<Error>, onChanging: boolean = false): Rx.Observable<IPropertyChangedEventArgs> {
+export function observeObject(target: any, defaultExceptionHandler: Rx.Observer<Error>, onChanging: boolean = false): Rx.Observable<wx.IPropertyChangedEventArgs> {
     let thrownExceptionsSubject = queryInterface(target, IID.IHandleObservableErrors) ?
-        <Rx.Observer<Error>> <any> (<IHandleObservableErrors> target).thrownExceptions : defaultExceptionHandler;
+        <Rx.Observer<Error>> <any> (<wx.IHandleObservableErrors> target).thrownExceptions : defaultExceptionHandler;
 
-    return Rx.Observable.create<IPropertyChangedEventArgs>(
-        (observer: Rx.Observer<IPropertyChangedEventArgs>): Rx.IDisposable => {
+    return Rx.Observable.create<wx.IPropertyChangedEventArgs>(
+        (observer: Rx.Observer<wx.IPropertyChangedEventArgs>): Rx.IDisposable => {
             let result = new Rx.CompositeDisposable();
-            let observableProperties = getOwnPropertiesImplementingInterface<IObservableProperty<any>>(target, IID.IObservableProperty);
+            let observableProperties = getOwnPropertiesImplementingInterface<wx.IObservableProperty<any>>(target, IID.IObservableProperty);
 
             observableProperties.forEach(x => {
                 let prop = x.property;
@@ -527,47 +526,47 @@ export function observeObject(target: any, defaultExceptionHandler: Rx.Observer<
 }
 
 export function whenAny<TRet, T1>(
-    property1: IObservableProperty<T1>,
+    property1: wx.IObservableProperty<T1>,
     selector: (T1) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
-    property3: IObservableProperty<T3>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    property3: wx.IObservableProperty<T3>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
-    property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
-    property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
-    property5: IObservableProperty<T5>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
+    property5: wx.IObservableProperty<T5>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5, T6>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
-    property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
-    property5: IObservableProperty<T5>, property6: IObservableProperty<T6>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
+    property5: wx.IObservableProperty<T5>, property6: wx.IObservableProperty<T6>,
     selector: (T1, T2, T3, T4, T5, T6) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
-    property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
-    property5: IObservableProperty<T5>, property6: IObservableProperty<T6>,
-    property7: IObservableProperty<T7>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
+    property5: wx.IObservableProperty<T5>, property6: wx.IObservableProperty<T6>,
+    property7: wx.IObservableProperty<T7>,
     selector: (T1, T2, T3, T4, T5, T6, T7) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
-    property1: IObservableProperty<T1>, property2: IObservableProperty<T2>,
-    property3: IObservableProperty<T3>, property4: IObservableProperty<T4>,
-    property5: IObservableProperty<T5>, property6: IObservableProperty<T6>,
-    property7: IObservableProperty<T7>, property8: IObservableProperty<T8>,
+    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
+    property5: wx.IObservableProperty<T5>, property6: wx.IObservableProperty<T6>,
+    property7: wx.IObservableProperty<T7>, property8: wx.IObservableProperty<T8>,
     selector: (T1, T2, T3, T4, T5, T6, T7, T8) => TRet): Rx.Observable<TRet>;
 
 /**

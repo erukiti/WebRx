@@ -1,24 +1,14 @@
-﻿import { IComponentDescriptor, ITemplateEngine } from "../Interfaces"
+﻿///<reference path="../Interfaces.ts" />
+
 import {  formatString } from "../Core/Utils"
 
 "use strict";
 
-export interface IRadioGroupComponentParams {
-    items: any;
-    groupName?: string;
-    itemText?: string;
-    itemValue?: string;
-    itemClass?: string;
-    selectedValue?: any;
-    afterRender?(nodes: Node[], data: any): void;
-    noCache?: boolean;
-}
-
 let groupId = 0;
 let templateCache: { [key: string]: any } = {};
 
-export default class RadioGroupComponent implements IComponentDescriptor {
-    constructor(htmlTemplateEngine: ITemplateEngine) {
+export default class RadioGroupComponent implements wx.IComponentDescriptor {
+    constructor(htmlTemplateEngine: wx.ITemplateEngine) {
         this.htmlTemplateEngine = htmlTemplateEngine;
     }
 
@@ -27,7 +17,7 @@ export default class RadioGroupComponent implements IComponentDescriptor {
     }
 
     public viewModel = (params: any): any => {
-        let opt = <IRadioGroupComponentParams> params;
+        let opt = <wx.IRadioGroupComponentParams> params;
 
         let groupName = opt.groupName != null ?
             opt.groupName :
@@ -44,9 +34,9 @@ export default class RadioGroupComponent implements IComponentDescriptor {
     ////////////////////
     // Implementation
 
-    htmlTemplateEngine: ITemplateEngine;
+    htmlTemplateEngine: wx.ITemplateEngine;
 
-    protected buildTemplate(params: IRadioGroupComponentParams): Node[] {
+    protected buildTemplate(params: wx.IRadioGroupComponentParams): Node[] {
         let result: string;
         let key: string = undefined;
         let nodes: Node[];

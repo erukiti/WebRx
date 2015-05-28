@@ -1,9 +1,7 @@
-﻿
-import { IObservableProperty, IExpressionFilter, IDataContext, INodeState, IBindingHandler, IModule, IObservableList, IDomManager, 
-    ICompiledExpression, IObjectLiteralToken, IExpressionCompiler, IExpressionCompilerOptions, ICompiledExpressionRuntimeHooks, IWebRxApp } from "../Interfaces"
-import {   } from "./ExpressionCompiler"
-import { IWeakMap, createWeakMap } from "../Collections/WeakMap"
-import { ISet, createSet, setToArray } from "../Collections/Set"
+﻿///<reference path="../Interfaces.ts" />
+
+import { createWeakMap } from "../Collections/WeakMap"
+import { createSet, setToArray } from "../Collections/Set"
 import IID from "../IID"
 import { injector } from "./Injector"
 import { extend, observableRequire, isInUnitTest, queryInterface, args2Array, isFunction, isProperty, isCommand, isRxObservable, 
@@ -15,9 +13,9 @@ import * as env from "./Environment"
 
 "use strict";
 
-export class DomManager implements IDomManager {
-    constructor(compiler: IExpressionCompiler, app: IWebRxApp) {
-        this.nodeState = createWeakMap<Node, INodeState>();
+export class DomManager implements wx.IDomManager {
+    constructor(compiler: wx.IExpressionCompiler, app: wx.IWebRxApp) {
+        this.nodeState = createWeakMap<Node, wx.INodeState>();
         this.compiler = compiler;
         this.app = app;
     }
@@ -43,7 +41,7 @@ export class DomManager implements IDomManager {
         this.applyBindingsRecursive(ctx, <HTMLElement> rootNode);
     }
 
-    public applyBindingsToDescendants(ctx: IDataContext, node: Node): void {
+    public applyBindingsToDescendants(ctx: wx.IDataContext, node: Node): void {
         if (node.hasChildNodes()) {
             for(let i = 0; i < node.childNodes.length; i++) {
                 let child = node.childNodes[i];
@@ -78,7 +76,7 @@ export class DomManager implements IDomManager {
         }
     }
 
-    public getObjectLiteralTokens(value: string): Array<IObjectLiteralToken> {
+    public getObjectLiteralTokens(value: string): Array<wx.IObjectLiteralToken> {
         value = value.trim();
 
         if (value !== '' && this.isObjectLiteralString(value)) {
@@ -88,7 +86,7 @@ export class DomManager implements IDomManager {
         return [];
     }
 
-    public compileBindingOptions(value: string, module: IModule): Object {
+    public compileBindingOptions(value: string, module: wx.IModule): Object {
         value = value.trim();
         if (value === '') {
             return null;
@@ -97,7 +95,7 @@ export class DomManager implements IDomManager {
         if (this.isObjectLiteralString(value)) {
             let result = {};
             let tokens = this.compiler.parseObjectLiteral(value);
-            let token: IObjectLiteralToken;
+            let token: wx.IObjectLiteralToken;
 
             for(let i = 0; i < tokens.length; i++) {
                 token = tokens[i];
@@ -107,7 +105,7 @@ export class DomManager implements IDomManager {
             return result;
         } else {
             // build compiler options
-            let options = <IExpressionCompilerOptions> extend(this.parserOptions, {});
+            let options = <wx.IExpressionCompilerOptions> extend(this.parserOptions, {});
             options.filters = {};
 
             // enrich with app filters
@@ -122,8 +120,8 @@ export class DomManager implements IDomManager {
         }
     }
 
-    public getModuleContext(node: Node): IModule {
-        let state: INodeState;
+    public getModuleContext(node: Node): wx.IModule {
+        let state: wx.INodeState;
 
         // collect model hierarchy
         while (node) {
@@ -142,11 +140,11 @@ export class DomManager implements IDomManager {
         return this.app;
     }
 
-    public registerDataContextExtension(extension: (node: Node, ctx: IDataContext) => void) {
+    public registerDataContextExtension(extension: (node: Node, ctx: wx.IDataContext) => void) {
         this.dataContextExtensions.add(extension);
     }
 
-    public getDataContext(node: Node): IDataContext {
+    public getDataContext(node: Node): wx.IDataContext {
         let models = [];
         let state = this.getNodeState(node);
 
@@ -164,7 +162,7 @@ export class DomManager implements IDomManager {
             _node = _node.parentNode;
         }
 
-        let ctx: IDataContext;
+        let ctx: wx.IDataContext;
         
         if (models.length > 0) {
             ctx = {
@@ -188,7 +186,7 @@ export class DomManager implements IDomManager {
         return ctx;
     }
 
-    public createNodeState(model?: any, module?: any): INodeState {
+    public createNodeState(model?: any, module?: any): wx.INodeState {
         return {
             cleanup: new Rx.CompositeDisposable(),
             model: model,
@@ -202,11 +200,11 @@ export class DomManager implements IDomManager {
         return state && state.isBound;
     }
 
-    public setNodeState(node: Node, state: INodeState): void {
+    public setNodeState(node: Node, state: wx.INodeState): void {
         this.nodeState.set(node, state);
     }
 
-    public getNodeState(node: Node): INodeState {
+    public getNodeState(node: Node): wx.INodeState {
         return this.nodeState.get(node);
     }
 
@@ -234,13 +232,13 @@ export class DomManager implements IDomManager {
         env.cleanExternalData(node);
     }
 
-    public evaluateExpression(exp: ICompiledExpression, ctx: IDataContext): any {
+    public evaluateExpression(exp: wx.ICompiledExpression, ctx: wx.IDataContext): any {
         let locals = this.createLocals(undefined, ctx);
         let result = exp(ctx.$data, locals);
         return result;
     }
 
-    public expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
+    public expressionToObservable(exp: wx.ICompiledExpression, ctx: wx.IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any> {
         let captured = createSet<Rx.Observable<any>>();
         let locals;
         let result: any;
@@ -314,16 +312,16 @@ export class DomManager implements IDomManager {
 
     private static bindingAttributeName = "data-bind";
     private static paramsAttributename = "params";
-    private nodeState: IWeakMap<Node, INodeState>;
+    private nodeState: wx.IWeakMap<Node, wx.INodeState>;
     private expressionCache: { [exp: string]: (scope: any, locals: any) => any } = {};
-    private compiler: IExpressionCompiler;
-    private dataContextExtensions = createSet<(node: Node, ctx: IDataContext) => void>();
-    private app: IWebRxApp;
-    private parserOptions: IExpressionCompilerOptions = {
+    private compiler: wx.IExpressionCompiler;
+    private dataContextExtensions = createSet<(node: Node, ctx: wx.IDataContext) => void>();
+    private app: wx.IWebRxApp;
+    private parserOptions: wx.IExpressionCompilerOptions = {
         disallowFunctionCalls: true
     };
 
-    private applyBindingsInternal(ctx: IDataContext, el: HTMLElement, module: IModule): boolean {
+    private applyBindingsInternal(ctx: wx.IDataContext, el: HTMLElement, module: wx.IModule): boolean {
         let result = false;
 
         // get or create elment-state
@@ -421,7 +419,7 @@ export class DomManager implements IDomManager {
         return null;
     }
 
-    private applyBindingsRecursive(ctx: IDataContext, el: HTMLElement, module?: IModule): void {
+    private applyBindingsRecursive(ctx: wx.IDataContext, el: HTMLElement, module?: wx.IModule): void {
         // "module" binding receiving first-class treatment here because it is considered part of the core
         module = module || this.getModuleContext(el);
 
@@ -463,13 +461,13 @@ export class DomManager implements IDomManager {
         this.clearNodeState(node);
     }
 
-    private createLocals(captured: ISet<Rx.Observable<any>>, ctx: IDataContext) {
+    private createLocals(captured: wx.ISet<Rx.Observable<any>>, ctx: wx.IDataContext) {
         let locals = {};
-        let list: IObservableList<any>;
-        let prop: IObservableProperty<any>;
+        let list: wx.IObservableList<any>;
+        let prop: wx.IObservableProperty<any>;
         let result, target;
 
-        let hooks: ICompiledExpressionRuntimeHooks = {
+        let hooks: wx.ICompiledExpressionRuntimeHooks = {
             readFieldHook: (o: any, field: any): any => {
                 // handle "@propref" access-modifier
                 let noUnwrap = false;
@@ -483,7 +481,7 @@ export class DomManager implements IDomManager {
                 
                 // intercept access to observable properties
                 if (!noUnwrap && isProperty(result)) {
-                    let prop = <IObservableProperty<any>> result;
+                    let prop = <wx.IObservableProperty<any>> result;
 
                     // register observable
                     if (captured)
@@ -506,7 +504,7 @@ export class DomManager implements IDomManager {
 
                 // intercept access to observable properties
                 if (isProperty(target)) {
-                    let prop = <IObservableProperty<any>> target;
+                    let prop = <wx.IObservableProperty<any>> target;
 
                     // register observable
                     if (captured)
@@ -525,7 +523,7 @@ export class DomManager implements IDomManager {
                 // recognize observable lists
                 if (queryInterface(o, IID.IObservableList)) {
                     // translate indexer to list.get()
-                    list = <IObservableList<any>> o;
+                    list = <wx.IObservableList<any>> o;
                     result = list.get(index);
 
                     // add collectionChanged to monitored observables
@@ -537,7 +535,7 @@ export class DomManager implements IDomManager {
                 
                 // intercept access to observable properties
                 if (queryInterface(result, IID.IObservableProperty)) {
-                    let prop = <IObservableProperty<any>> result;
+                    let prop = <wx.IObservableProperty<any>> result;
 
                     // register observable
                     if (captured)
@@ -554,7 +552,7 @@ export class DomManager implements IDomManager {
                 // recognize observable lists
                 if (queryInterface(o, IID.IObservableList)) {
                     // translate indexer to list.get()
-                    list = <IObservableList<any>> o;
+                    list = <wx.IObservableList<any>> o;
                     target = list.get(index);
 
                     // add collectionChanged to monitored observables
@@ -563,7 +561,7 @@ export class DomManager implements IDomManager {
 
                     // intercept access to observable properties
                     if (isProperty(target)) {
-                        prop = <IObservableProperty<any>> target;
+                        prop = <wx.IObservableProperty<any>> target;
 
                         // register observable
                         if (captured)
@@ -578,7 +576,7 @@ export class DomManager implements IDomManager {
                 } else {
                     // intercept access to observable properties
                     if (isProperty(o[index])) {
-                        prop = <IObservableProperty<any>> target[index];
+                        prop = <wx.IObservableProperty<any>> target[index];
 
                         // register observable
                         if (captured)
@@ -616,12 +614,12 @@ export class DomManager implements IDomManager {
 * @param {Node} rootNode The node to be bound
 */
 export function applyBindings(model: any, node?: Node) {
-    injector.get<IDomManager>(res.domManager).applyBindings(model, node || window.document.documentElement);
+    injector.get<wx.IDomManager>(res.domManager).applyBindings(model, node || window.document.documentElement);
 }
 /**
 * Removes and cleans up any binding-related state from the specified node and its descendants.
 * @param {Node} rootNode The node to be cleaned
 */
 export function cleanNode(node: Node) {
-    injector.get<IDomManager>(res.domManager).cleanNode(node);
+    injector.get<wx.IDomManager>(res.domManager).cleanNode(node);
 }

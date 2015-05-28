@@ -1,27 +1,22 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
 
 "use strict";
 
-export interface IHasFocusBindingOptions {
-    property: any;
-    delay: number;
-}
-
-export default class HasFocusBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class HasFocusBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("hasFocus-binding only operates on elements!");
         
@@ -29,17 +24,17 @@ export default class HasFocusBinding implements IBindingHandler {
             throwError("invalid binding-options!");
 
         let el = <HTMLInputElement> node;
-        let prop: IObservableProperty<any>;
+        let prop: wx.IObservableProperty<any>;
         let cleanup: Rx.CompositeDisposable;
         let compiled = this.domManager.compileBindingOptions(options, module);
-        let exp: ICompiledExpression;
+        let exp: wx.ICompiledExpression;
         let delay = 0;
 
         if (typeof compiled === "object" && compiled.hasOwnProperty("property")) {
-            let opt = <IHasFocusBindingOptions> compiled;
+            let opt = <wx.IHasFocusBindingOptions> compiled;
             exp = opt.property;
 
-            delay = this.domManager.evaluateExpression(<ICompiledExpression> <any> opt.delay, ctx);
+            delay = this.domManager.evaluateExpression(<wx.ICompiledExpression> <any> opt.delay, ctx);
 
             // convert boolean to number
             if (typeof delay === "boolean")
@@ -57,7 +52,7 @@ export default class HasFocusBinding implements IBindingHandler {
         }
 
         function handleElementFocusChange(isFocused: boolean) {
-            // If possible, ignore which event was raised and determine focus state using activeElement,
+            // wx.If possible, ignore which event was raised and determine focus state using activeElement,
             // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
             let ownerDoc = el.ownerDocument;
 
@@ -66,7 +61,7 @@ export default class HasFocusBinding implements IBindingHandler {
                 try {
                     active = ownerDoc.activeElement;
                 } catch (e) {
-                    // IE9 throws if you access activeElement during page load (see issue #703)
+                    // wx.IE9 throws if you access activeElement during page load (see issue #703)
                     active = ownerDoc.body;
                 }
                 isFocused = (active === el);
@@ -77,7 +72,7 @@ export default class HasFocusBinding implements IBindingHandler {
 
         function updateElement(value: any) {
             if (value) {
-                // Note: If the element is currently hidden, we schedule the focus change
+                // Note: wx.If the element is currently hidden, we schedule the focus change
                 // to occur "soonish". Technically this is a hack because it hides the fact
                 // that we make tricky assumption about the presence of a "visible" binding 
                 // on the same element who's subscribe handler runs after us 
@@ -149,10 +144,10 @@ export default class HasFocusBinding implements IBindingHandler {
     public priority = -1;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
     protected getFocusEventObservables(el: HTMLInputElement): Array<Rx.Observable<boolean>> {
         let result: Array<Rx.Observable<boolean>> = [];

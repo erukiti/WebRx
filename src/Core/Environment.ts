@@ -5,18 +5,10 @@
 let _window = <any> window;
 let userAgent = _window.navigator.userAgent;
 
-export interface IBrowserProperties {
-    version: number;
-}
-
-export interface IIEBrowserProperties extends IBrowserProperties {
-    getSelectionChangeObservable(el: HTMLElement): Rx.Observable<Document>;
-}
-
-export var ie: IIEBrowserProperties;
-export var opera: IBrowserProperties;
-export var safari: IBrowserProperties;
-export var firefox: IBrowserProperties;
+export var ie: wx.IIEBrowserProperties;
+export var opera: wx.IBrowserProperties;
+export var safari: wx.IBrowserProperties;
+export var firefox: wx.IBrowserProperties;
 
 let parseVersion = matches => {
     if (matches) {
@@ -31,25 +23,25 @@ if (_window.opera && _window.opera.version) {
     opera = { version: parseInt(_window.opera.version()) };
 }
 
-// Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
-// Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
-// Currently this is by design, since IE 10+ behaves correctly when treated as a standard browser.
+// Detect wx.IE versions for bug workarounds (uses wx.IE conditionals, not UA string, for robustness)
+// Note that, since wx.IE 10 does not support conditional comments, the following logic only detects wx.IE < 10.
+// Currently this is by design, since wx.IE 10+ behaves correctly when treated as a standard browser.
 let version = document && (function () {
     let version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
 
     // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
     while (
-        div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
+        div.innerHTML = '<!--[if gt wx.IE ' + (++version) + ']><i></i><![endif]-->',
         iElems[0]
         ) { }
     return version > 4 ? version : undefined;
 }());
 
 if (version) {
-    ie = <IIEBrowserProperties> { version: version };
+    ie = <wx.IIEBrowserProperties> { version: version };
 
     if (version < 10) {
-        // for IE9 and lower, provide an accessor for document scoped
+        // for wx.IE9 and lower, provide an accessor for document scoped
         // observables which allow monitoring the selectionchange event
         let map = createWeakMap<Document, Rx.Observable<Document>>();
 

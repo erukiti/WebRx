@@ -1,22 +1,22 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
 
 "use strict";
 
-export class SingleOneWayChangeBindingBase implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
   ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("binding only operates on elements!");
 
@@ -59,10 +59,10 @@ export class SingleOneWayChangeBindingBase implements IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
     protected applyValue(el: HTMLElement, value: any): void {
         throwError("you need to override this method!");
@@ -73,7 +73,7 @@ export class SingleOneWayChangeBindingBase implements IBindingHandler {
 // Bindings
 
 export class TextBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
     } 
 
@@ -85,13 +85,8 @@ export class TextBinding extends SingleOneWayChangeBindingBase {
     }
 }
 
-export interface IVisibleBindingOptions {
-    useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css class rather than modifying the elements style property
-    hiddenClass: string;    // the css class to apply when the object is hidden
-}
-
 export class VisibleBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 
         this.inverse = false;
@@ -99,7 +94,7 @@ export class VisibleBinding extends SingleOneWayChangeBindingBase {
     }
 
     public configure(_options): void {
-        let options = <IVisibleBindingOptions> _options;
+        let options = <wx.IVisibleBindingOptions> _options;
 
         VisibleBinding.useCssClass = options.useCssClass;
         VisibleBinding.hiddenClass = options.hiddenClass;
@@ -128,7 +123,7 @@ export class VisibleBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class HiddenBinding extends VisibleBinding {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 
         this.inverse = true;
@@ -136,7 +131,7 @@ export class HiddenBinding extends VisibleBinding {
 }
 
 export class HtmlBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
     } 
 
@@ -149,7 +144,7 @@ export class HtmlBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class DisableBinding extends SingleOneWayChangeBindingBase {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 
         this.inverse = false;
@@ -170,7 +165,7 @@ export class DisableBinding extends SingleOneWayChangeBindingBase {
 }
 
 export class EnableBinding extends DisableBinding {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 
         this.inverse = true;

@@ -1,6 +1,4 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-
-import { ITemplateEngine } from "../Interfaces"
+﻿///<reference path="../Interfaces.ts" />
 
 "use strict";
 
@@ -140,7 +138,7 @@ function buildFragment(elems, context) {
     return fragment;
 }
 
-export default class HtmlTemplateEngine implements ITemplateEngine {
+export default class HtmlTemplateEngine implements wx.ITemplateEngine {
     public parse(data: string): Node[] {
         // document.implementation stops scripts or inline event handlers from being executed immediately
         let context = supportsCreateHTMLDocument ? document.implementation.createHTMLDocument("") : document;

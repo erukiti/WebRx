@@ -1,6 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty } from "../Core/Utils"
@@ -10,16 +10,16 @@ import { applyBindings, cleanNode } from "../Core/DomManager"
 
 "use strict";
 
-export default class WithBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class WithBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("with-binding only operates on elements!");
 
@@ -67,10 +67,10 @@ export default class WithBinding implements IBindingHandler {
     ////////////////////
     // implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
-    protected applyValue(el: HTMLElement, value: any, state: INodeState): void {
+    protected applyValue(el: HTMLElement, value: any, state: wx.INodeState): void {
         state.model = value;
         let ctx = this.domManager.getDataContext(el);
 

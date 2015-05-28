@@ -1,8 +1,5 @@
-﻿/// <reference path="../node_modules/rx/ts/rx.all.d.ts" />
+﻿///<reference path="./Interfaces.ts" />
 
-import { IModule, IHistory, ITemplateEngine, IComponentDescriptor, IComponent, IComponentRegistry, IAnimation, 
-    IAnimationRegistry, IObservableProperty, IBindingHandler, IBindingRegistry, IExpressionFilter, IExpressionFilterRegistry,
-    IComponentTemplateDescriptor, IComponentViewModelDescriptor, IModuleDescriptor, IWebRxApp, IRouter } from "./Interfaces"
 import { injector } from "./Core/Injector"
 import { isInUnitTest } from "./Core/Utils"
 import * as res from "./Core/Resources"
@@ -35,11 +32,11 @@ import RadioGroupComponent from "./Components/RadioGroup"
 import { Router } from "./Routing/Router"
 import MessageBus from "./Core/MessageBus"
 
-declare var createMockHistory: () => IHistory;
+declare var createMockHistory: () => wx.IHistory;
 
 "use strict";
 
-class App extends Module implements IWebRxApp {
+class App extends Module implements wx.IWebRxApp {
     constructor() {
         super("app");
 
@@ -82,40 +79,40 @@ class App extends Module implements IWebRxApp {
         }
     }
 
-    public get templateEngine(): ITemplateEngine {
+    public get templateEngine(): wx.ITemplateEngine {
         if (!this._templateEngine) {
-            this._templateEngine = injector.get<ITemplateEngine>(res.templateEngine);
+            this._templateEngine = injector.get<wx.ITemplateEngine>(res.templateEngine);
         }
 
         return this._templateEngine;
     }
 
-    public set templateEngine(newVal: ITemplateEngine) {
+    public set templateEngine(newVal: wx.ITemplateEngine) {
         this._templateEngine = newVal;
     }
 
-    public get router(): IRouter {
+    public get router(): wx.IRouter {
         if (!this._router) {
-            this._router = injector.get<IRouter>(res.router);
+            this._router = injector.get<wx.IRouter>(res.router);
         }
 
         return this._router;
     }
 
-    public history: IHistory;
-    public title: IObservableProperty<string> = property<string>(document.title);
+    public history: wx.IHistory;
+    public title: wx.IObservableProperty<string> = property<string>(document.title);
 
     ///////////////////////
     // Implementation
 
-    private _router: IRouter;
-    private _templateEngine: ITemplateEngine;
+    private _router: wx.IRouter;
+    private _templateEngine: wx.ITemplateEngine;
     private _mainThreadScheduler: Rx.IScheduler;
     private _unitTestMainThreadScheduler: Rx.IScheduler;
 
-    private createHistory(): IHistory {
+    private createHistory(): wx.IHistory {
         // inherit default implementation
-        let result = <IHistory> {
+        let result = <wx.IHistory> {
             back: window.history.back.bind(window.history),
             forward: window.history.forward.bind(window.history),
             //go: window.history.go,
@@ -244,10 +241,10 @@ class App extends Module implements IWebRxApp {
             .component("wx-select", { resolve: "components.select" });
             
         // register with module-registry
-        modules["app"] = <IModuleDescriptor> <any> { instance: this };
+        modules["app"] = <wx.IModuleDescriptor> <any> { instance: this };
     }
 }
 
 let _app = new App();
-export var app: IWebRxApp = _app;
+export var app: wx.IWebRxApp = _app;
 _app.register();

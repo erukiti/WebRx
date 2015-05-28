@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IViewAnimationDescriptor, 
-    IWebRxApp, IRouter, IViewConfig, IDomManager, ICompiledExpression  } from "../../Interfaces"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../../Core/Utils"
 import * as log from "../../Core/Log"
@@ -10,21 +9,21 @@ import { animation } from "../../Core/Animation"
 "use strict";
 
 // Binding contributions to data-context
-interface IViewDataContext extends IDataContext {
+interface IViewDataContext extends wx.IDataContext {
     $componentParams?: Object;
 }
 
-export default class ViewBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, router: IRouter, app: IWebRxApp) {
+export default class ViewBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, router: wx.IRouter, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.router = router;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("view-binding only operates on elements!");
 
@@ -34,7 +33,7 @@ export default class ViewBinding implements IBindingHandler {
         let el = <HTMLElement> node;
         let compiled = this.domManager.compileBindingOptions(options, module);
         let viewName = this.domManager.evaluateExpression(compiled, ctx);
-        let currentConfig: IViewConfig;
+        let currentConfig: wx.IViewConfig;
         let cleanup: Rx.CompositeDisposable;
 
         function doCleanup() {
@@ -91,14 +90,14 @@ export default class ViewBinding implements IBindingHandler {
     public controlsDescendants = true;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
-    protected router: IRouter;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
+    protected router: wx.IRouter;
 
     protected applyTemplate(componentName: string, componentParams: Object,
-        animations: IViewAnimationDescriptor, el: HTMLElement, ctx: IDataContext, module: IModule): Rx.IDisposable {
+        animations: wx.IViewAnimationDescriptor, el: HTMLElement, ctx: wx.IDataContext, module: wx.IModule): Rx.IDisposable {
         let self = this;
         let oldElements = nodeChildrenToArray<Node>(el);
         let combined: Array<Rx.Observable<any>> = [];
@@ -111,7 +110,7 @@ export default class ViewBinding implements IBindingHandler {
             });
         }
 
-        function instantiateComponent(animation: IAnimation) {
+        function instantiateComponent(animation: wx.IAnimation) {
             // extend the data-context
             (<IViewDataContext> ctx).$componentParams = componentParams;
 
@@ -133,13 +132,13 @@ export default class ViewBinding implements IBindingHandler {
 
         // construct leave-observable
         if (oldElements.length > 0) {
-            let leaveAnimation: IAnimation;
+            let leaveAnimation: wx.IAnimation;
 
             if (animations && animations.leave) {
                 if (typeof animations.leave === "string") {
                     leaveAnimation = module.animation(<string> animations.leave);
                 } else {
-                    leaveAnimation = <IAnimation> animations.leave;
+                    leaveAnimation = <wx.IAnimation> animations.leave;
                 }
             }
 
@@ -158,13 +157,13 @@ export default class ViewBinding implements IBindingHandler {
 
         // construct enter-observable
         if (componentName != null) {
-            let enterAnimation: IAnimation;
+            let enterAnimation: wx.IAnimation;
 
             if (animations && animations.enter) {
                 if (typeof animations.enter === "string") {
                     enterAnimation = module.animation(<string> animations.enter);
                 } else {
-                    enterAnimation = <IAnimation> animations.enter;
+                    enterAnimation = <wx.IAnimation> animations.enter;
                 }
             }
 

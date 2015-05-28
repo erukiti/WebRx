@@ -1,22 +1,22 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, IDomManager, ICompiledExpression, ICommand  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, elementCanBeDisabled } from "../Core/Utils"
 
 "use strict";
 
-export default class CheckedBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class CheckedBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("checked-binding only operates on elements!");
         
@@ -32,7 +32,7 @@ export default class CheckedBinding implements IBindingHandler {
             throwError("checked-binding only operates on checkboxes and radio-buttons");
 
         let exp = this.domManager.compileBindingOptions(options, module);
-        let prop: IObservableProperty<any>;
+        let prop: wx.IObservableProperty<any>;
         let cleanup: Rx.CompositeDisposable;
 
         function doCleanup() {
@@ -106,10 +106,10 @@ export default class CheckedBinding implements IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
     protected getCheckedEventObservables(el: HTMLInputElement): Array<Rx.Observable<Object>> {
         let result: Array<Rx.Observable<Object>> = [];

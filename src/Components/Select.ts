@@ -1,28 +1,13 @@
-﻿
-import { IComponentDescriptor, ITemplateEngine } from "../Interfaces"
+﻿///<reference path="../Interfaces.ts" />
+
 import {  formatString } from "../Core/Utils"
 
 "use strict";
 
-export interface ISelectComponentParams {
-    name?: string;
-    items: any;
-    itemText?: string;
-    itemValue?: string;
-    itemClass?: string;
-    multiple?: boolean;
-    required?: boolean;
-    autofocus?: boolean;
-    size?: number;
-    selectedValue?: any;
-    afterRender?(nodes: Node[], data: any): void;
-    noCache?: boolean;
-}
-
 let templateCache: { [key: string]: any } = {};
 
-export default class SelectComponent implements IComponentDescriptor {
-    constructor(htmlTemplateEngine: ITemplateEngine) {
+export default class SelectComponent implements wx.IComponentDescriptor {
+    constructor(htmlTemplateEngine: wx.ITemplateEngine) {
         this.htmlTemplateEngine = htmlTemplateEngine;
     }
 
@@ -31,7 +16,7 @@ export default class SelectComponent implements IComponentDescriptor {
     }
 
     public viewModel = (params: any): any => {
-        let opt = <ISelectComponentParams> params;
+        let opt = <wx.ISelectComponentParams> params;
 
         return {
             items: params.items,
@@ -43,9 +28,9 @@ export default class SelectComponent implements IComponentDescriptor {
     ////////////////////
     // Implementation
 
-    htmlTemplateEngine: ITemplateEngine;
+    htmlTemplateEngine: wx.ITemplateEngine;
 
-    protected buildTemplate(params: ISelectComponentParams): Node[] {
+    protected buildTemplate(params: wx.ISelectComponentParams): Node[] {
         let result: string;
         let key: string = undefined;
         let nodes: Node[];

@@ -1,4 +1,5 @@
 ﻿/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+///<reference path="../Interfaces.ts" />
 
 import { getOid } from "../Core/Utils"
 
@@ -8,7 +9,7 @@ import { getOid } from "../Core/Utils"
 * ES6 Map Shim
 * @class
 */
-class MapEmulated<TKey extends Object, T> implements IMap<TKey, T> {
+class MapEmulated<TKey extends Object, T> implements wx.IMap<TKey, T> {
     ////////////////////
     /// IMap
 
@@ -36,7 +37,7 @@ class MapEmulated<TKey extends Object, T> implements IMap<TKey, T> {
         return undefined;
     }
 
-    public set(key: any, value: any): IMap<any, any> {
+    public set(key: any, value: any): wx.IMap<any, any> {
         this.delete(key);
         this.keys.push(key);
         this.values.push(value);
@@ -61,7 +62,7 @@ class MapEmulated<TKey extends Object, T> implements IMap<TKey, T> {
         this.cache = this.cacheSentinel;
     }
 
-    public forEach(callback: (value: any, key: any, map: IMap<any, any>) => void, thisArg?: any): void {
+    public forEach(callback: (value: any, key: any, map: wx.IMap<any, any>) => void, thisArg?: any): void {
         var size = this.size;
         for (var i = 0; i < size; ++i) {
             var key = this.keys[i];
@@ -104,10 +105,10 @@ var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
 * @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
 */
-export function createMap<TKey, T>(disableNativeSupport?: boolean): IMap<TKey, T> {
+export function createMap<TKey, T>(disableNativeSupport?: boolean): wx.IMap<TKey, T> {
     if (disableNativeSupport || !hasNativeSupport) {
         return new MapEmulated<TKey, T>();
     }
 
-    return <IMap<TKey, T>> <any> new Map();
+    return <wx.IMap<TKey, T>> <any> new Map();
 }

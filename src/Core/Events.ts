@@ -1,9 +1,9 @@
-﻿import { IPropertyChangedEventArgs } from "../Interfaces"
+﻿///<reference path="../Interfaces.ts" />
 
 "use strict";
 
 export class PropertyChangedEventArgs implements
-    IPropertyChangedEventArgs {
+    wx.IPropertyChangedEventArgs {
     /// <summary>
     /// Initializes a new instance of the <see cref="ObservablePropertyChangedEventArgs{TSender}"/> class.
     /// </summary>

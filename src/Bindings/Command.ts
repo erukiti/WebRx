@@ -1,28 +1,22 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IAnimation, IWebRxApp, 
-    IDomManager, ICompiledExpression, ICommand  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, elementCanBeDisabled } from "../Core/Utils"
 
 "use strict";
 
-export interface ICommandBindingOptions {
-    command: ICommand<any>;
-    parameter?: any;
-}
-
-export default class CommandBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class CommandBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("command-binding only operates on elements!");
 
@@ -32,8 +26,8 @@ export default class CommandBinding implements IBindingHandler {
         let compiled = this.domManager.compileBindingOptions(options, module);
 
         let el = <HTMLElement> node;
-        let exp: ICompiledExpression;
-        let cmdObservable: Rx.Observable<ICommand<any>>;
+        let exp: wx.ICompiledExpression;
+        let cmdObservable: Rx.Observable<wx.ICommand<any>>;
         let paramObservable: Rx.Observable<any>;
         let cleanup: Rx.CompositeDisposable;
         let isAnchor = el.tagName.toLowerCase() === "a";
@@ -47,17 +41,17 @@ export default class CommandBinding implements IBindingHandler {
         }
 
         if (typeof compiled === "function") {
-            exp = <ICompiledExpression> compiled;
+            exp = <wx.ICompiledExpression> compiled;
 
             cmdObservable = <any> this.domManager.expressionToObservable(exp, ctx);
         } else {
-            let opt = <ICommandBindingOptions> compiled;
+            let opt = <wx.ICommandBindingOptions> compiled;
 
-            exp = <ICompiledExpression> <any> opt.command;
+            exp = <wx.ICompiledExpression> <any> opt.command;
             cmdObservable = <any> this.domManager.expressionToObservable(exp, ctx);
 
             if (opt.parameter) {
-                exp = <ICompiledExpression> <any> opt.parameter;
+                exp = <wx.ICompiledExpression> <any> opt.parameter;
                 paramObservable = this.domManager.expressionToObservable(exp, ctx);
             }
         }
@@ -130,8 +124,8 @@ export default class CommandBinding implements IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 }

@@ -1,6 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
@@ -8,16 +8,16 @@ import { Module, loadModule } from "../Core/Module"
 
 "use strict";
 
-export default class ModuleBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class ModuleBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("module-binding only operates on elements!");
 
@@ -61,11 +61,11 @@ export default class ModuleBinding implements IBindingHandler {
                     let observables = moduleNames.map(x => loadModule(x));
 
                     disp = Rx.Observable.combineLatest(observables,
-                        function(_) { return <IModule[]> args2Array(arguments) }).subscribe(modules => {
+                        function(_) { return <wx.IModule[]> args2Array(arguments) }).subscribe(modules => {
                         try {
                             // create intermediate module
                             let moduleName = (module || this.app).name + "+" + moduleNames.join("+");
-                            let merged: IModule = new Module(moduleName);
+                            let merged: wx.IModule = new Module(moduleName);
 
                             // merge modules into intermediate
                             merged.merge(module || this.app);
@@ -109,12 +109,12 @@ export default class ModuleBinding implements IBindingHandler {
     public controlsDescendants = true;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 
-    protected applyValue(el: HTMLElement, module: IModule, template: Array<Node>, ctx: IDataContext, state: INodeState, initialApply: boolean): void {
+    protected applyValue(el: HTMLElement, module: wx.IModule, template: Array<Node>, ctx: wx.IDataContext, state: wx.INodeState, initialApply: boolean): void {
         if (initialApply) {
             // clone to template
             for(let i= 0; i < el.childNodes.length; i++) {

@@ -1,6 +1,6 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+///<reference path="../Interfaces.ts" />
 
-import { IObservableProperty, IBindingHandler, IDataContext, INodeState, IModule, IWebRxApp, IDomManager, ICompiledExpression  } from "../Interfaces"
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, isList } from "../Core/Utils"
@@ -14,17 +14,17 @@ interface ISelectedValueBindingImpl {
     observeElement(el: HTMLElement): Rx.Observable<any>;
     observeModel(model: any): Rx.Observable<any>;
     updateElement(el: HTMLElement, model: any);
-    updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any);
+    updateModel(el: HTMLElement, model: wx.IObservableProperty<any>, e: any);
 }
 
 let impls = new Array<ISelectedValueBindingImpl>();
 
 class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: wx.IDomManager) {
         this.domManager = domManager;
     }
 
-    protected domManager: IDomManager;
+    protected domManager: wx.IDomManager;
 
     public supports(el: HTMLElement, model: any): boolean {
         return (el.tagName.toLowerCase() === 'input' &&
@@ -40,7 +40,7 @@ class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
 
     public observeModel(model: any): Rx.Observable<any> {
         if (isProperty(model)) {
-            let prop = <IObservableProperty<any>> model;
+            let prop = <wx.IObservableProperty<any>> model;
             return prop.changed;
         }
 
@@ -53,7 +53,7 @@ class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
         input.checked = getNodeValue(input, this.domManager) == unwrapProperty(model);
     }
 
-    public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
+    public updateModel(el: HTMLElement, model: wx.IObservableProperty<any>, e: any) {
         let input = <HTMLInputElement> el;
 
         if (input.checked) {
@@ -63,11 +63,11 @@ class RadioSingleSelectionImpl implements ISelectedValueBindingImpl {
 }
 
 class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
-    constructor(domManager: IDomManager) {
+    constructor(domManager: wx.IDomManager) {
         this.domManager = domManager;
     }
 
-    protected domManager: IDomManager;
+    protected domManager: wx.IDomManager;
 
     public supports(el: HTMLElement, model: any): boolean {
         return el.tagName.toLowerCase() === 'select' &&
@@ -80,7 +80,7 @@ class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
 
     public observeModel(model: any): Rx.Observable<any> {
         if (isProperty(model)) {
-            let prop = <IObservableProperty<any>> model;
+            let prop = <wx.IObservableProperty<any>> model;
             return prop.changed;
         }
 
@@ -105,7 +105,7 @@ class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
         }
     }
 
-    public updateModel(el: HTMLElement, model: IObservableProperty<any>, e: any) {
+    public updateModel(el: HTMLElement, model: wx.IObservableProperty<any>, e: any) {
         let select = <HTMLSelectElement> el;
 
         // selected-value comes from the option at selectedIndex
@@ -117,8 +117,8 @@ class OptionSingleSelectionImpl implements ISelectedValueBindingImpl {
     }
 }
 
-export default class SelectedValueBinding implements IBindingHandler {
-    constructor(domManager: IDomManager, app: IWebRxApp) {
+export default class SelectedValueBinding implements wx.IBindingHandler {
+    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
 
@@ -127,9 +127,9 @@ export default class SelectedValueBinding implements IBindingHandler {
     } 
 
     ////////////////////
-    // IBinding
+    // wx.IBinding
 
-    public applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void {
+    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("selectedValue-binding only operates on elements!");
         
@@ -217,8 +217,8 @@ export default class SelectedValueBinding implements IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // Implementation
+    // wx.Implementation
 
-    protected domManager: IDomManager;
-    protected app: IWebRxApp;
+    protected domManager: wx.IDomManager;
+    protected app: wx.IWebRxApp;
 }
