@@ -187,6 +187,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-saucelabs');
     grunt.loadNpmTasks('grunt-release');  
     grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-madge');
 
     grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
         var template = "module wx {\n\texport const version = '<%= pkg.version %>';\n}";

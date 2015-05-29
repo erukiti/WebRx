@@ -1,11 +1,12 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
-    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, isList } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
+    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled } from "../Core/Utils"
 import { applyBindings, cleanNode } from "../Core/DomManager"
 import { getNodeValue, setNodeValue } from "./Value"
+import { isList } from "../Collections/List"
 
 "use strict";
 

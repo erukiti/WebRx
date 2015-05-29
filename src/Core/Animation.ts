@@ -1,4 +1,4 @@
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { args2Array, throwError, getOid, nodeListToArray, toggleCssClass, noop } from "../Core/Utils"
 

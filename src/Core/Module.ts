@@ -1,8 +1,8 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { injector } from "./Injector"
-import { extend, observableRequire, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, isRxScheduler, throwError, using, getOid } from "../Core/Utils"
+import { extend, observableRequire, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, isRxScheduler, throwError, using, getOid } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"

@@ -1,4 +1,4 @@
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { createWeakMap } from "../Collections/WeakMap"
 import { createSet } from "../Collections/Set"

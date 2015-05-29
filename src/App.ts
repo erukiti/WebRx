@@ -1,4 +1,4 @@
-﻿///<reference path="./Interfaces.ts" />
+﻿/// <reference path="./Interfaces.ts" />
 
 import { injector } from "./Core/Injector"
 import { isInUnitTest } from "./Core/Utils"
@@ -31,6 +31,10 @@ import SelectComponent from "./Components/Select"
 import RadioGroupComponent from "./Components/RadioGroup"
 import { Router } from "./Routing/Router"
 import MessageBus from "./Core/MessageBus"
+
+// make sure RxExtensions get installed
+import { dummy } from "./RxExtensions" 
+dummy();    
 
 declare var createMockHistory: () => wx.IHistory;
 

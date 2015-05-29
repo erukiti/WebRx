@@ -1,4 +1,4 @@
-///<reference path="./Interfaces.ts" />
+/// <reference path="./Interfaces.ts" />
 
 declare module Rx {
     export interface Observable<T> extends IObservable<T> {

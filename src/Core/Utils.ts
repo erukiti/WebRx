@@ -1,4 +1,4 @@
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { command, Command } from "./Command"
 import { getMetadata, implementsMetaDataKey } from "./Reflect"
@@ -74,29 +74,6 @@ export function isProperty(target: any): boolean {
         return false;
 
     return queryInterface(target, IID.IObservableProperty);
-}
-
-/**
-* Determines if target is an instance of a ICommand
-* @param {any} target
-*/
-export function isCommand(target: any): boolean {
-    if (target == null)
-        return false;
-
-    return target instanceof Command ||
-        queryInterface(target, IID.ICommand);
-}
-
-/**
-* Determines if target is an instance of a IObservableList
-* @param {any} target
-*/
-export function isList(target: any): boolean {
-    if (target == null)
-        return false;
-
-    return target instanceof ObservableList;
 }
 
 /**

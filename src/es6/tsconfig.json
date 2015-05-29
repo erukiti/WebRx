@@ -8,5 +8,6 @@
         "emitDecoratorMetadata": true,
         "outDir": "../../build/es6",
         "sourceMap": true
-    }
+    },
+    "files": ["../App.ts"]
 }

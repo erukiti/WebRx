@@ -1,4 +1,4 @@
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { Implements } from "./Reflect"
 import IID from "../IID"

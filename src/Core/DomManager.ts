@@ -1,10 +1,10 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
 import { createWeakMap } from "../Collections/WeakMap"
 import { createSet, setToArray } from "../Collections/Set"
 import IID from "../IID"
 import { injector } from "./Injector"
-import { extend, observableRequire, isInUnitTest, queryInterface, args2Array, isFunction, isProperty, isCommand, isRxObservable, 
+import { extend, observableRequire, isInUnitTest, queryInterface, args2Array, isFunction, isProperty, isRxObservable, 
     isDisposable, isRxScheduler, throwError, using, getOid } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"

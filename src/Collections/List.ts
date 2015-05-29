@@ -1,6 +1,6 @@
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
-import { isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
+import { isInUnitTest, args2Array, isFunction, isRxObservable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
 import IID from "./../IID"
 import Lazy from "./../Core/Lazy"
 import { createScheduledSubject } from "./../Core/ScheduledSubject"
@@ -1277,3 +1277,13 @@ export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number
     return new ObservableList<T>(initialContents, resetChangeThreshold, scheduler);
 }
 
+/**
+* Determines if target is an instance of a IObservableList
+* @param {any} target
+*/
+export function isList(target: any): boolean {
+    if (target == null)
+        return false;
+
+    return target instanceof ObservableList;
+}

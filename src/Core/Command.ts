@@ -1,7 +1,7 @@
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "./../IID"
-import { isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isRxScheduler } from "././Utils"
+import { isInUnitTest, args2Array, isFunction, isRxObservable, isRxScheduler, queryInterface } from "././Utils"
 import Lazy from "./../Core/Lazy"
 import { Implements } from "././Reflect"
 import { injector } from "../Core/Injector"
@@ -331,4 +331,16 @@ export function combinedCommand<T>(): wx.ICommand<any> {
     }));
 
     return ret;
+}
+
+/**
+* Determines if target is an instance of a ICommand
+* @param {any} target
+*/
+export function isCommand(target: any): boolean {
+    if (target == null)
+        return false;
+
+    return target instanceof Command ||
+        queryInterface(target, IID.ICommand);
 }

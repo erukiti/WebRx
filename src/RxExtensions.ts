@@ -1,6 +1,6 @@
-///<reference path="./Interfaces.ts" />
+/// <reference path="./Interfaces.ts" />
 
-import { args2Array, isFunction, isCommand, isRxObservable, throwError } from "./Core/Utils"
+import { args2Array, isFunction, isRxObservable, throwError } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
 import { Implements } from "./Core/Reflect"
@@ -119,4 +119,8 @@ RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
             return Rx.Disposable.create(()=> cancelled = true);
         });
     });
+}
+
+export function dummy() {
+    // deliberately left blank    
 }

@@ -1,8 +1,8 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { injector } from "./Injector"
-import { noop, extend, isFunction, isCommand, throwError, getOid } from "../Core/Utils"
+import { noop, extend, isFunction, throwError, getOid } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"

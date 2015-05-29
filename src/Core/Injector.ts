@@ -1,4 +1,4 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, isRxScheduler, throwError, getOid } from "../Core/Utils"

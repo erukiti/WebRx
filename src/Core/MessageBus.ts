@@ -1,4 +1,4 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
 import { injector } from "./Injector"
 import { createScheduledSubject } from "./../Core/ScheduledSubject"

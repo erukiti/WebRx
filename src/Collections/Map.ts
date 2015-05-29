@@ -1,5 +1,5 @@
 ﻿/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { getOid } from "../Core/Utils"
 

@@ -1,8 +1,7 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-///<reference path="../../Interfaces.ts" />
+/// <reference path="../../Interfaces.ts" />
 
-import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
-    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../../Core/Utils"
+import { args2Array, isFunction, throwError, formatString, unwrapProperty, isEqual, noop, nodeChildrenToArray } from "../../Core/Utils"
 import * as log from "../../Core/Log"
 import { animation } from "../../Core/Animation"
 
@@ -11,6 +10,10 @@ import { animation } from "../../Core/Animation"
 // Binding contributions to data-context
 interface IViewDataContext extends wx.IDataContext {
     $componentParams?: Object;
+}
+
+interface IRouterInternal extends wx.IRouter {
+    viewTransitionsSubject:Rx.Subject<wx.IViewTransition>;
 }
 
 export default class ViewBinding implements wx.IBindingHandler {
@@ -56,12 +59,14 @@ export default class ViewBinding implements wx.IBindingHandler {
 
                 if (config != null) {
                     if (!isEqual(currentConfig, config)) {
-                        cleanup.add(this.applyTemplate(config.component, config.params, config.animations, el, ctx, module));
+                        cleanup.add(this.applyTemplate(viewName, config.component, currentConfig ? currentConfig.component : undefined, 
+                            config.params, config.animations, el, ctx, module));
 
                         currentConfig = config;
                     }
                 } else {
-                    cleanup.add(this.applyTemplate(null, null, currentConfig ? currentConfig.animations: {}, el, ctx, module));
+                    cleanup.add(this.applyTemplate(viewName, null, currentConfig ? currentConfig.component : undefined,
+                        null, currentConfig ? currentConfig.animations: {}, el, ctx, module));
 
                     currentConfig = <any> {};
                 }
@@ -96,7 +101,7 @@ export default class ViewBinding implements wx.IBindingHandler {
     protected app: wx.IWebRxApp;
     protected router: wx.IRouter;
 
-    protected applyTemplate(componentName: string, componentParams: Object,
+    protected applyTemplate(viewName: string, componentName: string, previousComponentName: string, componentParams: Object,
         animations: wx.IViewAnimationDescriptor, el: HTMLElement, ctx: wx.IDataContext, module: wx.IModule): Rx.IDisposable {
         let self = this;
         let oldElements = nodeChildrenToArray<Node>(el);
@@ -173,6 +178,19 @@ export default class ViewBinding implements wx.IBindingHandler {
                 obs = obs.continueWith(enterAnimation.run(el.childNodes))
                     .continueWith(() => enterAnimation.complete(el.childNodes));
             }
+            
+           // notify world
+            obs = obs.continueWith(() => {
+                var transition: wx.IViewTransition = {
+                    view: viewName,
+                    fromComponent: previousComponentName,
+                    toComponent: componentName 
+                }
+                
+                var ri = <IRouterInternal> this.router;
+                ri.viewTransitionsSubject.onNext(transition);
+            });
+
 
             combined.push(obs);
         }

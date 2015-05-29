@@ -1,7 +1,7 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
-import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
-    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
+    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
 import { createWeakMap } from "./../Collections/WeakMap"
 import { createSet } from "./../Collections/Set"
 import * as res from "../Core/Resources"

@@ -1,7 +1,7 @@
-﻿///<reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
-import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
-    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isList, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
+    throwError, formatString, unwrapProperty, isProperty, cloneNodeArray, isEqual, noop, nodeChildrenToArray } from "../Core/Utils"
 import { createWeakMap } from "./../Collections/WeakMap"
 import { createSet } from "./../Collections/Set"
 import * as res from "../Core/Resources"
@@ -23,6 +23,7 @@ export class Router implements wx.IRouter {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
+        this.viewTransitions = this.viewTransitionsSubject.asObservable();
 
         this.reset(false);
 
@@ -250,6 +251,7 @@ export class Router implements wx.IRouter {
     private parentPathDirective = "^";
     private rootStateName = "$";
     private validPathRegExp = /^[a-zA-Z]([\w-_]*$)/;
+    public viewTransitionsSubject = new Rx.Subject<wx.IViewTransition>();
 
     private registerStateInternal(state: wx.IRouterStateConfig) {
         let parts = state.name.split(this.pathSeparator);

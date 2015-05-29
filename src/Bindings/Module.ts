@@ -1,8 +1,8 @@
 ﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-///<reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isCommand, isRxObservable, isDisposable, 
+import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
     isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
 import { Module, loadModule } from "../Core/Module"
 
