@@ -180,7 +180,7 @@ module testutils {
             replaceState: replaceState,
             reset: reset,
             
-            createHistory: (query?:string)=> {
+            getSearchParameters: (query?:string)=> {
                 query = query || result.location.search.substr(1);
                 
                 if(query) {

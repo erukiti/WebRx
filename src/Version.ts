@@ -1,1 +1,3 @@
-export const version = '0.9.78';
+module wx {
+	export const version = '0.9.78';
+}

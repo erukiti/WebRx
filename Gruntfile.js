@@ -1,21 +1,68 @@
 module.exports = function (grunt) {
     "use strict";
 
-    var conf = { 
+    var conf = {
         shell: {
             tsc_src: {
-                command: 'node ../node_modules/typescript/bin/tsc.js -p es5',
-                options: {
-                    execOptions: {
-                        cwd: 'src'
-                    }
-                }
+                command: 'node node_modules/typescript/bin/tsc.js -p src',
             },
+
+            tsc_specs: {
+                command: 'node node_modules/typescript/bin/tsc.js -p test',
+            },
+
+            webpack_src: {
+                command: 'node node_modules/webpack/bin/webpack --output-library=wx --output-library-target=var build/App.js -d build/web.rx.js',
+            },
+
             gitadd: {
                 command: 'git add .'
             }
         },
-        
+
+        madge: {
+            options: {
+                format: 'amd'
+            },
+            src: ['build/App.js']
+        },
+
+        concat: {
+            dts: {
+                options: {
+                    separator: '\n\n',
+                    banner: '/// <reference path="../node_modules/rx/ts/rx.all.d.ts" />\n\ndeclare module wx {\n',
+                    footer: '\n}'
+                },
+                src: ['build/**/*.d.ts'],
+                dest: 'build/web.rx.d.ts',
+            },
+        },
+
+        webpack: {
+            src: {
+                entry: "build/App.js",
+                output: {
+                    path: "build",
+                    filename: "web.rx.js",
+                    // export itself to a global var
+                    libraryTarget: "var",
+                    // name of the global var: "Foo"
+                    library: "wx"
+                },
+                stats: {
+                    // Configure the console output
+                    colors: false,
+                    modules: true,
+                    reasons: true
+                },
+                progress: true, // Don't show progress
+                failOnError: true, // don't report error to grunt if webpack find errors
+                watch: false, // use webpacks watcher
+                keepalive: false, // don't finish the grunt task
+            },
+        },
+
         jasmine: {
             default: {
                 src: 'build/web.rx.js',
@@ -45,12 +92,12 @@ module.exports = function (grunt) {
 
         watch: {
             src: {
-                files: [ "src/**/*.ts"],
+                files: ["src/**/*.ts"],
                 tasks: ['shell:tsc_src']
             },
             specs: {
-                files: [ "test/**/*.ts", "!test/typings/*.ts"],
-                tasks: ['ts:specs']
+                files: ["test/**/*.ts", "!test/typings/*.ts"],
+                tasks: ['shell:tsc_specs']
             }
         },
 
@@ -70,8 +117,8 @@ module.exports = function (grunt) {
                     concurrency: 3,
                     build: process.env.CI_BUILD_NUMBER,
                     browsers: [
-                        { browserName: "firefox", platform: "WIN7" }, 
-                        { browserName: "firefox", version: "5", platform: "WIN7" }, 
+                        { browserName: "firefox", platform: "WIN7" },
+                        { browserName: "firefox", version: "5", platform: "WIN7" },
 
                         { browserName: "chrome", platform: "WIN7" },
                         { browserName: "chrome", platform: "OS X 10.10" },
@@ -109,7 +156,7 @@ module.exports = function (grunt) {
                     archive: 'dist/web.rx.zip'
                 },
                 files: [
-                    { expand: true, cwd : "dist/", src: ['web.rx.js', 'web.rx.min.js', 'web.rx.js.map', 'web.rx.d.ts'] }
+                    { expand: true, cwd: "dist/", src: ['web.rx.js', 'web.rx.min.js', 'web.rx.js.map', 'web.rx.d.ts'] }
                 ]
             }
         },
@@ -135,14 +182,14 @@ module.exports = function (grunt) {
                 src: ['src/Interfaces.ts']
             }
         },
-        
-        release: {  
+
+        release: {
             options: {
                 bump: false
             }
         },
 
-        bump: {  
+        bump: {
             options: {
                 updateConfigs: ['pkg'],
                 files: ['package.json', 'bower.json'],
@@ -170,7 +217,7 @@ module.exports = function (grunt) {
             }
         }
     };
-    
+
     conf.jasmine.dist.options = conf.jasmine.default.options;
 
     grunt.initConfig(conf);
@@ -181,28 +228,29 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-bump');  
-    grunt.loadNpmTasks('grunt-nuget');  
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-nuget');
     grunt.loadNpmTasks('grunt-typedoc');
     grunt.loadNpmTasks('grunt-saucelabs');
-    grunt.loadNpmTasks('grunt-release');  
+    grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-madge');
 
-    grunt.registerTask('gen-ver', 'Creates src/Version.ts', function() {
+    grunt.registerTask('gen-ver', 'Creates src/Version.ts', function () {
         var template = "module wx {\n\texport const version = '<%= pkg.version %>';\n}";
 
         grunt.file.write('src/Version.ts', grunt.template.process(template));
     });
 
-    grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default" ]);
-    grunt.registerTask("test", ["gen-ver", "shell:tsc_src", "ts:specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src", "ts:specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src", "ts:specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
-    grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src", "ts:specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
+    grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
+    grunt.registerTask("test", ["shell:tsc_specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src", "shell:tsc_specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
-    grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  
-    grunt.registerTask('publish:minor', ['bump:minor', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  
-    grunt.registerTask('publish:major', ['bump:major', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);  
-    grunt.registerTask('publish', ['publish:patch']);  
+    grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
+    grunt.registerTask('publish:minor', ['bump:minor', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
+    grunt.registerTask('publish:major', ['bump:major', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
+    grunt.registerTask('publish', ['publish:patch']);
 };

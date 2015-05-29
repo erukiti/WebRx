@@ -1,5 +1,6 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../build/web.rx.d.ts" />
+/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
 
 describe("ISet",() => {
     function crudSmokeTestImpl(forceEmulated: boolean) {

@@ -1,13 +1,13 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es5",
         "module": "amd",
         "noImplicitAny": false,
+        "declaration": true,
         "removeComments": false,
         "preserveConstEnums": true,
         "emitDecoratorMetadata": true,
-        "outDir": "../../build/es6",
+        "outDir": "../build",
         "sourceMap": true
-    },
-    "files": ["../App.ts"]
+    }
 }
