@@ -33,8 +33,8 @@ import { Router } from "./Routing/Router"
 import MessageBus from "./Core/MessageBus"
 
 // make sure RxExtensions get installed
-import { dummy } from "./RxExtensions" 
-dummy();    
+import { install } from "./RxExtensions" 
+install();    
 
 declare var createMockHistory: () => wx.IHistory;
 
