@@ -1,6 +1,6 @@
 /// <reference path="../Interfaces.ts" />
 
-import { args2Array, throwError, getOid, nodeListToArray, toggleCssClass, noop } from "../Core/Utils"
+import { args2Array, throwError, nodeListToArray, toggleCssClass, noop } from "../Core/Utils"
 
 "use strict";
 

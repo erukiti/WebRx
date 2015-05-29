@@ -2,8 +2,7 @@
 /// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
-    throwError, using, getOid, formatString, unwrapProperty, isProperty } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, isProperty, toggleCssClass } from "../Core/Utils"
 import * as res from "../Core/Resources"
 
 "use strict";

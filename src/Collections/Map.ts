@@ -1,7 +1,7 @@
 ﻿/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
 /// <reference path="../Interfaces.ts" />
 
-import { getOid } from "../Core/Utils"
+import { getOid } from "../Core/Oid"
 
 "use strict";
 

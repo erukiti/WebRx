@@ -1,7 +1,7 @@
 ﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../../Interfaces.ts" />
 
-import { args2Array, isFunction, throwError, formatString, unwrapProperty, isEqual, noop, nodeChildrenToArray } from "../../Core/Utils"
+import { extend, isInUnitTest, args2Array, unwrapProperty, throwError, noop, formatString, nodeChildrenToArray, isEqual } from "../../Core/Utils"
 import * as log from "../../Core/Log"
 import { animation } from "../../Core/Animation"
 

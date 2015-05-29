@@ -2,7 +2,7 @@
 
 import IID from "../IID"
 import { injector } from "./Injector"
-import { noop, extend, isFunction, throwError, getOid } from "../Core/Utils"
+import { noop, extend, isFunction, throwError } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"

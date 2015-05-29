@@ -2,8 +2,7 @@
 /// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
-    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, elementCanBeDisabled, toggleCssClass } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, elementCanBeDisabled, toggleCssClass, unwrapProperty } from "../Core/Utils"
 import { Module, loadModule } from "../Core/Module"
 
 "use strict";

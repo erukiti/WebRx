@@ -2,8 +2,7 @@
 /// <reference path="../RxExtensions.d.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
-    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty, isProperty, cloneNodeArray, noop } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, cloneNodeArray, noop } from "../Core/Utils"
 import VirtualChildNodes from "./../Core/VirtualChildNodes"
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper"
 import { injector } from "../Core/Injector"

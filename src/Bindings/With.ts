@@ -2,8 +2,7 @@
 /// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, 
-    isRxScheduler, throwError, using, getOid, formatString, unwrapProperty } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty } from "../Core/Utils"
 import * as log from "../Core/Log"
 import { property } from "../Core/Property"
 import { applyBindings, cleanNode } from "../Core/DomManager"

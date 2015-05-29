@@ -173,9 +173,6 @@ export function extend(src: Object, dst: Object, inherited?: boolean): Object {
     return dst;
 }
 
-let oid = 1;
-let oidPropertyName = "__rxui_oid__" + (new Date).getTime();
-
 export class PropertyInfo<T> {
     constructor(propertyName: string, property: T) {
         this.property = property;
@@ -185,27 +182,6 @@ export class PropertyInfo<T> {
     propertyName: string;
     property: T;
 }    
-
-/**
-* Returns the objects unique id or assigns it if unassigned
-* @param {any} o
-*/
-export function getOid(o: any): string {
-    if (o == null)
-        return undefined;
-
-    if (isPrimitive(o))
-        return (typeof o + ":" + o);
-
-    let result = o[oidPropertyName];
-
-    if (result === undefined) {
-        result = (++oid).toString();
-        o[oidPropertyName] = result;
-    }
-
-    return result;
-}
 
 /**
 * Toggles one ore more css classes on the specified DOM element

@@ -1,6 +1,6 @@
 /// <reference path="./Interfaces.ts" />
 
-import { args2Array, isFunction, isRxObservable, throwError } from "./Core/Utils"
+import { args2Array, isFunction, throwError, isRxObservable } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
 import { Implements } from "./Core/Reflect"

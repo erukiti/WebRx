@@ -1,6 +1,7 @@
 /// <reference path="../Interfaces.ts" />
 
-import { isInUnitTest, args2Array, isFunction, isRxObservable, isRxScheduler, throwError, using, observeObject, getOid } from "../Core/Utils"
+import { isInUnitTest, args2Array, isFunction, throwError, using, isRxObservable, isRxScheduler, observeObject } from "../Core/Utils"
+import { getOid } from "../Core/Oid"
 import IID from "./../IID"
 import Lazy from "./../Core/Lazy"
 import { createScheduledSubject } from "./../Core/ScheduledSubject"

@@ -1,7 +1,7 @@
 ﻿/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, isRxObservable, isDisposable, isRxScheduler, throwError, getOid } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, throwError } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"

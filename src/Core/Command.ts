@@ -1,7 +1,7 @@
 /// <reference path="../Interfaces.ts" />
 
 import IID from "./../IID"
-import { isInUnitTest, args2Array, isFunction, isRxObservable, isRxScheduler, queryInterface } from "././Utils"
+import { isInUnitTest, args2Array, isFunction, isRxScheduler, isRxObservable, queryInterface } from "././Utils"
 import Lazy from "./../Core/Lazy"
 import { Implements } from "././Reflect"
 import { injector } from "../Core/Injector"
