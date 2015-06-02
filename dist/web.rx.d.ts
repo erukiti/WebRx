@@ -227,7 +227,7 @@ declare module wx {
         postBindingInit?: string;
     }
     interface IComponentRegistry {
-        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
+        component(name: string, descriptor: IComponentDescriptor | Rx.Observable<IComponent>): IComponentRegistry;
         hasComponent(name: string): boolean;
         loadComponent(name: string, params?: Object): Rx.Observable<IComponent>;
     }

@@ -744,6 +744,9 @@ var wx;
             return this.components[name] != null;
         };
         Module.prototype.loadComponent = function (name, params) {
+            var _this = this;
+            if (wx.isRxObservable(this.components[name]))
+                return this.components[name].do(function (x) { return _this.components[name].instance = x; });
             return this.initializeComponent(this.instantiateComponent(name), params);
         };
         Module.prototype.binding = function () {

@@ -42,6 +42,9 @@ module wx {
         }
 
         public loadComponent(name: string, params?: Object): Rx.Observable<IComponent> {
+            if(isRxObservable(this.components[name]))
+                return (<Rx.Observable<IComponent>> <any> this.components[name]).do(x => this.components[name].instance = x);
+            
             return this.initializeComponent(this.instantiateComponent(name), params);
         }
 
