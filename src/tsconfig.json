@@ -6,8 +6,10 @@
         "declaration": true,
         "removeComments": false,
         "preserveConstEnums": true,
+        "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "outDir": "../build",
+        "rootDir": "../src",
+        "outDir": "../build/src",
         "sourceMap": true
     }
 }
