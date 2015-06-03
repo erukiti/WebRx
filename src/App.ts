@@ -31,6 +31,7 @@ import SelectComponent from "./Components/Select"
 import RadioGroupComponent from "./Components/RadioGroup"
 import { Router } from "./Routing/Router"
 import MessageBus from "./Core/MessageBus"
+import { version } from "./Version"
 
 // make sure RxExtensions get installed
 import { install } from "./RxExtensions" 
@@ -105,6 +106,7 @@ class App extends Module implements wx.IWebRxApp {
 
     public history: wx.IHistory;
     public title: wx.IObservableProperty<string> = property<string>(document.title);
+    public version = version;
 
     ///////////////////////
     // Implementation
@@ -179,7 +181,7 @@ class App extends Module implements wx.IWebRxApp {
         injector.register(res.app, this)    // register with injector
             .register(res.expressionCompiler, ExpressionCompiler)
             .register(res.templateEngine, [HtmlTemplateEngine], true)
-            .register(res.domManager, [res.expressionCompiler, DomManager], true)
+            .register(res.domManager, [res.expressionCompiler, res.app, DomManager], true)
             .register(res.router, [res.domManager, res.app, Router], true)
             .register(res.messageBus, [MessageBus], true);
 

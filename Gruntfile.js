@@ -22,9 +22,35 @@ module.exports = function (grunt) {
 
         madge: {
             options: {
-                format: 'amd'
+                format: 'cjs'
             },
-            src: ['build/App.js']
+            src: ['build/src/App.js']
+        },
+
+        webpack: {
+            webrx: {
+                entry: "./build/src/WebRx.js",
+
+                output: {
+                    path: "./build/",
+                    filename: "web.rx.js",
+                    libraryTarget: "umd",
+                    library: "wx"
+                },
+
+                stats: {
+                    colors: true,
+                    modules: true,
+                    reasons: true
+                },
+                
+                devtool: 'source-map',
+                storeStatsTo: false, // writes the status to a variable named xyz
+                progress: true, // Don't show progress
+                failOnError: true, // don't report error to grunt if webpack find errors
+                watch: false, // use webpacks watcher
+                keepalive: false, // don't finish the grunt task
+            }
         },
 
         concat: {
@@ -39,33 +65,8 @@ module.exports = function (grunt) {
             },
         },
 
-        webpack: {
-            src: {
-                entry: "build/App.js",
-                output: {
-                    path: "build",
-                    filename: "web.rx.js",
-                    // export itself to a global var
-                    libraryTarget: "var",
-                    // name of the global var: "Foo"
-                    library: "wx"
-                },
-                stats: {
-                    // Configure the console output
-                    colors: false,
-                    modules: true,
-                    reasons: true
-                },
-                progress: true, // Don't show progress
-                failOnError: true, // don't report error to grunt if webpack find errors
-                watch: false, // use webpacks watcher
-                keepalive: false, // don't finish the grunt task
-            },
-        },
-
         jasmine: {
             default: {
-                src: 'build/web.rx.js',
                 options: {
                     specs: 'build/test/**/*.js',
                     vendor: [
@@ -77,10 +78,11 @@ module.exports = function (grunt) {
                         "node_modules/ix/l2o.js",
                         "node_modules/ix/ix.js",
                         "node_modules/URIjs/src/URI.js",
+                        "build/test/TestUtils.js",
+                        'build/web.rx.js',  // must include this _before_ require.js or all hell breaks lose
                         "node_modules/requirejs/require.js",
                         "test/jasmine-jsreporter.js",
                         "test/test-setup.js",
-                        "build/test/TestUtils.js",
                         "build/test/TestModels.js"
                     ]
                 }
@@ -93,7 +95,7 @@ module.exports = function (grunt) {
         watch: {
             src: {
                 files: ["src/**/*.ts"],
-                tasks: ['shell:tsc_src']
+                tasks: ['shell:tsc_src', "madge:src", "webpack:webrx"]
             },
             specs: {
                 files: ["test/**/*.ts", "!test/typings/*.ts"],
@@ -220,6 +222,8 @@ module.exports = function (grunt) {
 
     conf.jasmine.dist.options = conf.jasmine.default.options;
 
+    var webpack = require("webpack");
+
     grunt.initConfig(conf);
 
     grunt.loadNpmTasks('grunt-contrib-jasmine');
@@ -236,17 +240,18 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-release');
     grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-madge');
+    grunt.loadNpmTasks('grunt-webpack');
 
     grunt.registerTask('gen-ver', 'Creates src/Version.ts', function () {
-        var template = "module wx {\n\texport const version = '<%= pkg.version %>';\n}";
+        var template = "export const version = '<%= pkg.version %>';\n";
 
         grunt.file.write('src/Version.ts', grunt.template.process(template));
     });
 
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
-    grunt.registerTask("test", ["shell:tsc_specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src", "shell:tsc_specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("test", ["gen-ver", "shell:tsc_src", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src", "madge:src", "webpack:webrx", "shell:tsc_specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
     grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);

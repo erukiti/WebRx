@@ -6,6 +6,7 @@
         "declaration": true,
         "removeComments": false,
         "preserveConstEnums": true,
+        "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "outDir": "../build/test",
         "sourceMap": true

@@ -669,6 +669,7 @@ module wx {
         templateEngine: ITemplateEngine;
         history: IHistory;
         title: IObservableProperty<string>;
+        version: string;
     }
 
     export interface IRoute {

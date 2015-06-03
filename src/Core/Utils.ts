@@ -424,12 +424,14 @@ declare function require(modules: string[], successCB: (any) => any, errCB: (err
 * @return {Rx.Observable<any>} An observable that yields a value and completes as soon as the module has been loaded
 */
 export function observableRequire<T>(module: string): Rx.Observable<T> {
-    if (!isFunction(require))
+    var requireFunc = window["require"];
+    
+    if (!isFunction(requireFunc))
         throwError("there's no AMD-module loader available (Hint: did you forget to include RequireJS in your project?)");
 
     return Rx.Observable.create<T>(observer => {
         try {
-            require([module],(m) => {
+            requireFunc([module],(m) => {
                 observer.onNext(m);
                 observer.onCompleted();
             },(err) => {

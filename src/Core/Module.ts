@@ -17,7 +17,6 @@ interface IComponentDescriptorEx extends wx.IComponentDescriptor {
 export class Module implements wx.IModule {
     constructor(name: string) {
         this.name = name;
-        this.app = injector.get<wx.IWebRxApp>(res.app);
     }
 
     //////////////////////////////////
@@ -141,6 +140,9 @@ export class Module implements wx.IModule {
     }
 
     public name: string;
+    private get app(): wx.IWebRxApp {
+        return injector.get<wx.IWebRxApp>(res.app);
+    }
 
     //////////////////////////////////
     // Implementation
@@ -149,7 +151,6 @@ export class Module implements wx.IModule {
     private components: { [name: string]: IComponentDescriptorEx } = {};
     private expressionFilters: { [index: string]: wx.IExpressionFilter; } = {};
     private animations: { [index: string]: wx.IAnimation; } = {};
-    private app: wx.IWebRxApp;
 
     private instantiateComponent(name: string): Rx.Observable<IComponentDescriptorEx> {
         let cd = this.components[name];
