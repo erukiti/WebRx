@@ -5,8 +5,10 @@
         "noImplicitAny": false,
         "removeComments": false,
         "preserveConstEnums": true,
+        "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "rootDir": "../src",
+        "outDir": "../build/src",
         "sourceMap": true
     }
 }
