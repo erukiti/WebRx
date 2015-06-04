@@ -111,7 +111,7 @@ export class DomManager implements wx.IDomManager {
             extend(this.app.filters(), options.filters);
 
             // enrich with module filters
-            if (module) {
+            if (module && module.name != "app") {
                 extend(module.filters(), options.filters);
             }
 
