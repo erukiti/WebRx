@@ -254,3 +254,6 @@ class App extends Module implements wx.IWebRxApp {
 let _app = new App();
 export var app: wx.IWebRxApp = _app;
 _app.register();
+
+export var router = injector.get<wx.IRouter>(res.router);
+export var messageBus = injector.get<wx.IMessageBus>(res.messageBus);

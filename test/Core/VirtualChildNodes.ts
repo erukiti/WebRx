@@ -14,7 +14,7 @@ describe("VirtualChildNodes",() => {
         loadFixtures('templates/Core/VirtualChildNodes.html');
 
         var el = <HTMLElement> document.querySelector("#empty-node");
-        var proxy = new wx.internal.VirtualChildNodes(el, false);
+        var proxy = new wx.VirtualChildNodes(el, false);
 
         expect(proxy.childNodes.length).toEqual(el.childNodes.length);
 
@@ -59,7 +59,7 @@ describe("VirtualChildNodes",() => {
         loadFixtures('templates/Core/VirtualChildNodes.html');
 
         var el = <HTMLElement> document.querySelector("#empty-node");
-        var proxy = new wx.internal.VirtualChildNodes(el, false);
+        var proxy = new wx.VirtualChildNodes(el, false);
         var aliens = [];
         var alien: Node;
 

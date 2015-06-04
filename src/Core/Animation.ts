@@ -4,7 +4,6 @@ import { args2Array, throwError, nodeListToArray, toggleCssClass, noop } from ".
 
 "use strict";
 
-
 function toElementList(element: Node|Array<Node>|HTMLElement|Array<HTMLElement>|NodeList): Array<HTMLElement> {
     let nodes: Array<Node>;
 

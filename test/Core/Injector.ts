@@ -4,7 +4,7 @@
 import IInjector = wx.IInjector;
 
 function getInjector() {
-    return wx.injector.get<IInjector>("wx.injector");
+    return wx.injector.get<IInjector>(wx.res.injector);
 }
 
 describe("Injector",() => {

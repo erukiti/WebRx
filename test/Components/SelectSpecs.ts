@@ -19,7 +19,7 @@ describe('Components', () => {
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLOptionElement)
-                .map(x => wx.internal.getNodeValue(x, domManager))).toEqual(items);
+                .map(x => wx.getNodeValue(x, domManager))).toEqual(items);
         });
 
         it('items with label',() => {

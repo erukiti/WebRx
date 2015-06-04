@@ -2,7 +2,7 @@
 
 import IID from "../IID"
 import { injector } from "./Injector"
-import { noop, extend, isFunction, throwError } from "../Core/Utils"
+import { noop, isFunction, throwError } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
@@ -38,6 +38,19 @@ const bindingToken = RegExp(stringDouble + '|' + stringSingle + '|' + stringRege
 // Match end of previous token to determine whether a slash is a division or regex.
 const divisionLookBehind = /[\])"'A-Za-z0-9_$]+$/;
 const keywordRegexLookBehind = { 'in': 1, 'return': 1, 'typeof': 1 };
+
+// Simplified extend() for our use-case
+function extend(dst, obj) {
+    var key;
+
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            dst[key] = obj[key];
+        }
+    }
+
+    return dst;
+}
 
 /**
 * Split an object-literal string into tokens (borrowed from the KnockoutJS project)
@@ -628,7 +641,7 @@ class Parser {
             return fn(self, locals, right);
         }, {
             constant: right.constant
-        }, true);
+        });
     }
 
     private ternaryFn(left, middle, right): wx.ICompiledExpression {
@@ -636,7 +649,7 @@ class Parser {
             return left(self, locals) ? middle(self, locals) : right(self, locals);
         }, {
             constant: left.constant && middle.constant && right.constant
-        }, true);
+        });
     }
 
     private binaryFn(left, fn, right): wx.ICompiledExpression {
@@ -644,7 +657,7 @@ class Parser {
             return fn(self, locals, left, right);
         }, {
             constant: left.constant && right.constant
-        }, true);
+        });
     }
 
     private statements(): wx.ICompiledExpression {
@@ -823,7 +836,7 @@ class Parser {
             assign(scope, value, locals) {
                 return setter(object(scope, locals), field, value, parser.text, parser.options, locals);
             }
-        }, true);
+        });
     }
 
     private objectIndex(obj): wx.ICompiledExpression {
@@ -860,7 +873,7 @@ class Parser {
 
                 return safe[key] = value;
             }
-        }, true);
+        });
     }
 
     private functionCall(fn, contextGetter): wx.ICompiledExpression {
@@ -926,7 +939,7 @@ class Parser {
         }, {
             literal: true,
             constant: allConstant
-        }, true);
+        });
     }
 
     private object(): wx.ICompiledExpression {
@@ -960,7 +973,7 @@ class Parser {
         }, {
             literal: true,
             constant: allConstant
-        }, true);
+        });
     }
 }
 

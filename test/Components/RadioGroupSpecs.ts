@@ -18,7 +18,7 @@ describe('Components', () => {
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
-                .map(x => wx.internal.getNodeValue(x, domManager))).toEqual(items);
+                .map(x => wx.getNodeValue(x, domManager))).toEqual(items);
 
             // should automatically assign groupname
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x => x instanceof HTMLInputElement)
@@ -42,7 +42,7 @@ describe('Components', () => {
 
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
-                .map(x => wx.internal.getNodeValue(x, domManager))).toEqual(items);
+                .map(x => wx.getNodeValue(x, domManager))).toEqual(items);
 
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLInputElement)
                 .map(x => x.getAttribute("name"))).toEqual(["foo", "foo", "foo"]);
