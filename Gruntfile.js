@@ -11,10 +11,6 @@ module.exports = function (grunt) {
                 command: 'node node_modules/typescript/bin/tsc.js -p test',
             },
 
-            webpack_src: {
-                command: 'node node_modules/webpack/bin/webpack --output-library=wx --output-library-target=var build/App.js -d build/web.rx.js',
-            },
-
             gitadd: {
                 command: 'git add .'
             }

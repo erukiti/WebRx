@@ -196,7 +196,8 @@ export class DomManager implements wx.IDomManager {
 
     public isNodeBound(node: Node): boolean {
         let state = this.nodeState.get(node);
-        return state && state.isBound;
+        
+        return state != null && !!state.isBound;
     }
 
     public setNodeState(node: Node, state: wx.INodeState): void {

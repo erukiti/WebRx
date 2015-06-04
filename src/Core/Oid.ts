@@ -24,7 +24,14 @@ export function getOid(o: any): string {
 
     if (result === undefined) {
         result = (++oid).toString();
-        o[oidPropertyName] = result;
+        
+        // store as non-enumerable property to avoid confusing other libraries
+        Object.defineProperty(o, oidPropertyName, {
+            enumerable: false,
+            configurable: false,
+            writable: false,
+            value: result
+        });
     }
 
     return result;
