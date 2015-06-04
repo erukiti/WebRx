@@ -3,8 +3,12 @@ module.exports = function (grunt) {
 
     var conf = {
         shell: {
-            tsc_src: {
-                command: 'node node_modules/typescript/bin/tsc.js --rootDir src -p src',
+            tsc_src_es5: {
+                command: 'node node_modules/typescript/bin/tsc.js -t es5 -m commonjs --rootDir src -p src --outDir build/src/es5',
+            },
+
+            tsc_src_es6: {
+                command: 'node node_modules/typescript/bin/tsc.js -t es6 --rootDir src -p src --outDir build/src/es6',
             },
 
             tsc_specs: {
@@ -25,7 +29,7 @@ module.exports = function (grunt) {
 
         webpack: {
             webrx: {
-                entry: "./build/src/WebRx.js",
+                entry: "./build/src/es5/WebRx.js",
 
                 output: {
                     path: "./build/",
@@ -91,7 +95,7 @@ module.exports = function (grunt) {
         watch: {
             src: {
                 files: ["src/**/*.ts"],
-                tasks: ['shell:tsc_src', "madge:src", "webpack:webrx"]
+                tasks: ['shell:tsc_src_es5', "madge:src", "webpack:webrx"]
             },
             specs: {
                 files: ["test/**/*.ts", "!test/typings/*.ts"],
@@ -245,10 +249,10 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
-    grunt.registerTask("test", ["gen-ver", "shell:tsc_src", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src", "madge:src", "webpack:webrx", "shell:tsc_specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
-    grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
+    grunt.registerTask("test", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "clean:dist", "ts:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src_es5", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
     grunt.registerTask('publish:minor', ['bump:minor', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
