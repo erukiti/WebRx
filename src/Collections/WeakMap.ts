@@ -46,6 +46,7 @@ class WeakMapEmulated<TKey extends Object, T> implements wx.IWeakMap<TKey, T> {
 }
 
 let hasNativeSupport = typeof WeakMap === "function";
+//let hasNativeSupport = false;
 
 /**
 * Creates a new WeakMap instance

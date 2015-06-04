@@ -20,19 +20,20 @@ export function getOid(o: any): string {
     if (isPrimitive(o))
         return (typeof o + ":" + o);
 
-    let result = o[oidPropertyName];
-
-    if (result === undefined) {
-        result = (++oid).toString();
-        
-        // store as non-enumerable property to avoid confusing other libraries
-        Object.defineProperty(o, oidPropertyName, {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: result
-        });
-    }
+    // already set?
+    if (o.hasOwnProperty(oidPropertyName))
+        return o[oidPropertyName];
+    
+    // assign new one
+    let result = (++oid).toString();
+    
+    // store as non-enumerable property to avoid confusing other libraries
+    Object.defineProperty(o, oidPropertyName, {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: result
+    });
 
     return result;
 }
