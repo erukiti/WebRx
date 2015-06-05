@@ -136,6 +136,7 @@ module.exports = function (grunt) {
             dist: {
                 files: [
                     { expand: true, cwd: 'build/', src: ['web.rx.js*'], dest: 'dist/' },
+                    { expand: true, cwd: 'build/src/es6', src: ['**'], dest: 'dist/es6_modules' },
                     { expand: true, cwd: 'src/', src: ['web.rx.d.ts'], dest: 'dist/' },
                 ],
             },
@@ -152,7 +153,7 @@ module.exports = function (grunt) {
                     archive: 'dist/web.rx.zip'
                 },
                 files: [
-                    { expand: true, cwd: "dist/", src: ['web.rx.js', 'web.rx.js.map', 'web.rx.min.js', 'web.rx.min.js.map', 'web.rx.d.ts'] }
+                    { expand: true, cwd: "dist/", src: ['web.rx.js', 'web.rx.js.map', 'web.rx.min.js', 'web.rx.min.js.map', 'web.rx.d.ts', "es6_modules/**"] }
                 ]
             }
         },
@@ -253,7 +254,7 @@ module.exports = function (grunt) {
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
     grunt.registerTask("test", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
     grunt.registerTask("debug", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "clean:dist", "copy:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src_es5", "shell:tsc_src_es6", "madge:src", "webpack:webrx", "shell:tsc_specs", "clean:dist", "copy:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
     grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src_es5", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['bump:patch', 'dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
