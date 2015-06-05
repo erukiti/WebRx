@@ -18,6 +18,7 @@
   <files>
     <file src="..\dist\web.rx.js" target="content\Scripts\web.rx.js" />
     <file src="..\dist\web.rx.min.js" target="content\Scripts\web.rx.min.js" />
+    <file src="..\dist\es6_modules" target="content\Scripts\es6_modules" />
     <file src="..\dist\web.rx.d.ts" target="content\Scripts\typings\web.rx.d.ts" />
   </files>
 </package>
