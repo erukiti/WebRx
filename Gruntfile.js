@@ -221,7 +221,7 @@ module.exports = function (grunt) {
         }
     };
 
-    var webpack = require("webpack");
+    //var webpack = require("webpack");
     var _ = require("lodash");
 
     conf.jasmine["dist"] = _.cloneDeep(conf.jasmine.default);
