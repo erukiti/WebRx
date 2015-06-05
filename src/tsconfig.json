@@ -8,5 +8,9 @@
         "emitDecoratorMetadata": true,
         "rootDir": "../src",
         "sourceMap": true
-    }
+    },
+    
+    "exclude": [
+        "web.rx.d.ts"
+    ]
 }

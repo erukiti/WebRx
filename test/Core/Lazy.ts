@@ -1,5 +1,5 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
-/// <reference path="../../build/web.rx.d.ts" />
+/// <reference path="../../src/web.rx.d.ts" />
 
 import Lazy = wx.Lazy;
 

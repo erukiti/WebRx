@@ -36,7 +36,7 @@
     "requirejs-text": "^2.0.12",
     "rsvp": "^3.0.17",
     "rx": "~2.5.2",
-    "typescript": "git+https://github.com/Microsoft/TypeScript.git#release-1.5",
+    "typescript": "git+https://github.com/Microsoft/TypeScript.git#master",
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"
   },

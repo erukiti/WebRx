@@ -3,7 +3,7 @@
 module wx {
     "use strict";
 
-   /**
+    /**
     * Dependency Injector and service locator
     * @interface 
     **/
@@ -16,7 +16,7 @@ module wx {
         resolve<T>(iaa: Array<any>, args?: any): T;
     }
 
-   /**
+    /**
     * The WeakMap object is a collection of key/value pairs in which the keys are objects and the values can be arbitrary values. The keys are held using weak references.
     * @interface 
     **/
@@ -28,7 +28,7 @@ module wx {
         isEmulated: boolean;
     }
 
-   /**
+    /**
     * The Set object lets you store unique values of any type, whether primitive values or object references.
     * @interface 
     **/
@@ -42,7 +42,7 @@ module wx {
         isEmulated: boolean;
     }
 
-   /**
+    /**
     * The Map object is a simple key/value map. Any value (both objects and primitive values) may be used as either a key or a value.
     * @interface 
     **/
@@ -231,7 +231,7 @@ module wx {
         * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
         * @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
         * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
-        */
+        **/
         project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
             selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
 
@@ -240,7 +240,7 @@ module wx {
         * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
         * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
-        */
+        **/
         project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
             refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
@@ -248,14 +248,14 @@ module wx {
         * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
         * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
-        */
+        **/
         project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
             scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
 
         /**
         * Creates a live-projection of itself that can be filtered, re-ordered and mapped. 
         * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
-        */
+        **/
         project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
     }
 
@@ -439,7 +439,7 @@ module wx {
         * Applies bindings to the specified node and all of its children using the specified data context 
         * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
-        */
+        **/
         applyBindings(model: any, rootNode: Node): void;
 
         /**
@@ -447,82 +447,82 @@ module wx {
         * You generally want to use this method if you are authoring a new binding handler that handles children.
         * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
-        */
+        **/
         applyBindingsToDescendants(ctx: IDataContext, rootNode: Node): void;
 
         /**
         * Removes and cleans up any binding-related state from the specified node and its descendants.
         * @param {Node} rootNode The node to be cleaned
-        */
+        **/
         cleanNode(rootNode: Node): void;
 
         /**
         * Removes and cleans up any binding-related state from all the children of the specified node but not the node itself.
         * @param {Node} rootNode The node to be cleaned
-        */
+        **/
         cleanDescendants(rootNode: Node): void;
 
         /**
         * Stores updated state for the specified node
         * @param {Node} node The target node
         * @param {IBindingState} state The updated node state
-        */
+        **/
         setNodeState(node: Node, state: INodeState): void;
 
         /**
         * Computes the actual data context starting at the specified node
         * @param {Node} node The node to be bound
         * @return {IDataContext} The data context to evaluate the expression against
-        */
+        **/
         getDataContext(node: Node): IDataContext;
 
         /**
         * Retrieves the current node state for the specified node
         * @param {Node} node The target node
-        */
+        **/
         getNodeState(node: Node): INodeState;
 
         /**
         * Initializes a new node state
         * @param {any} model The model 
-        */
+        **/
         createNodeState(model?: any): INodeState;
 
         /**
         * Returns true if the node is currently bound by one or more binding-handlers
         * @param {Node} node The node to check
-        */
+        **/
         isNodeBound(node: Node): boolean;
 
         /**
         * Removes any binding-related state from the specified node. Use with care! In most cases you would want to use cleanNode!
         * @param {Node} node The node to clear
-        */
+        **/
         clearNodeState(node: Node);
 
         /**
         * Compiles a simple string expression or multiple expressions within an object-literal recursively into an expression tree
         * @param {string} value The expression(s) to compile
-        */
+        **/
         compileBindingOptions(value: string, module: IModule): any;
 
         /**
         * Tokenizes an object-literal into an array of key-value pairs
         * @param {string} value The object literal tokenize
-        */
+        **/
         getObjectLiteralTokens(value: string): Array<IObjectLiteralToken>;
 
         /**
         * Returns data-binding expressions for a DOM-Node
         * @param {Node} node The node
-        */
+        **/
         getBindingDefinitions(node: Node): Array<{ key: string; value: string }>;
 
         /**
         * Registers hook that gets invoked whenever a new data-context gets assembled
         * @param {Node} node The node for which the data-context gets assembled
         * @param {IDataContext} ctx The current data-context
-        */
+        **/
         registerDataContextExtension(extension:(node: Node, ctx:IDataContext)=> void);
 
         /**
@@ -531,7 +531,7 @@ module wx {
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
         * @param {IDataContext} The data context to evaluate the expression against
         * @return {any} A value representing the result of the expression-evaluation
-        */
+        **/
         evaluateExpression(exp: ICompiledExpression, ctx: IDataContext): any;
 
         /**
@@ -542,7 +542,7 @@ module wx {
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
         * @param {IDataContext} The data context to evaluate the expression against
         * @return {Rx.Observable<any>} A sequence of values representing the result of the last evaluation of the expression
-        */
+        **/
         expressionToObservable(exp: ICompiledExpression, ctx: IDataContext, evalObs?: Rx.Observer<any>): Rx.Observable<any>;
     }
 
@@ -560,13 +560,13 @@ module wx {
         * @param {IDataContext} ctx The curent data context
         * @param {IDomElementState} state State of the target element
         * @param {IModule} module The module bound to the current binding scope
-        */
+        **/
         applyBinding(node: Node, options: string, ctx: IDataContext, state: INodeState, module: IModule): void;
 
         /**
         * Configures the handler using a handler-specific options object
         * @param {any} options The handler-specific options 
-        */
+        **/
         configure(options: any): void;
 
         /**
@@ -579,7 +579,7 @@ module wx {
         * If set to true then bindings won't be applied to children
         * of the element such binding is encountered on. Instead
         * the handler will be responsible for that.
-        */
+        **/
         controlsDescendants?: boolean;
     }
 
@@ -931,7 +931,7 @@ module wx {
         * array later
         **/
         afterRender?(nodes: Node[], data: any): void;
-    
+        
         /** 
         * wx.Is like afterRender, except it is invoked only when new entries are added to your array 
         * (and not when foreach first iterates over your array’s initial contents).
@@ -939,7 +939,7 @@ module wx {
         * so that you get animated transitions whenever items are added
         **/
         afterAdd? (nodes: Node[], data: any, index: number): void;
-    
+        
         /** 
         * wx.Is invoked when an array item has been removed, but before the corresponding 
         * DOM nodes have been removed. wx.If you specify a beforeRemove callback, then it 
@@ -950,7 +950,7 @@ module wx {
         * animation will take?)
         **/
         beforeRemove? (nodes: Node[], data: any, index: number): void;
-    
+        
         /** 
         * wx.Is invoked when an array item has changed position in the array, but before 
         * the corresponding DOM nodes have been moved. You could use beforeMove 
@@ -958,7 +958,7 @@ module wx {
         * can animate their movements in the afterMove callback.
         **/
         beforeMove? (nodes: Node[], data: any, index: number): void;
-    
+        
         /** 
         * wx.Is invoked after an array item has changed position in the array, and after 
         * foreach has updated the DOM to match.

@@ -37,8 +37,6 @@ import { version } from "./Version"
 import { install } from "./RxExtensions" 
 install();    
 
-declare var createMockHistory: () => wx.IHistory;
-
 "use strict";
 
 class App extends Module implements wx.IWebRxApp {
@@ -48,7 +46,7 @@ class App extends Module implements wx.IWebRxApp {
         if (!isInUnitTest()) {
             this.history = this.createHistory();
         } else {
-            this.history = createMockHistory();
+            this.history = <wx.IHistory> window["createMockHistory"]();
         }
     }
 

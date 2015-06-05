@@ -219,7 +219,7 @@ module.exports = function (grunt) {
             }
         }
     };
-
+    
     conf.jasmine.dist.options = conf.jasmine.default.options;
 
     var webpack = require("webpack");
