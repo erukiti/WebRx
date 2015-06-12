@@ -84,10 +84,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.isList = List_1.isList;
 	var Map_1 = __webpack_require__(8);
 	exports.createMap = Map_1.createMap;
-	var Set_1 = __webpack_require__(1);
+	var Set_1 = __webpack_require__(7);
 	exports.createSet = Set_1.createSet;
 	exports.setToArray = Set_1.setToArray;
-	var WeakMap_1 = __webpack_require__(7);
+	var WeakMap_1 = __webpack_require__(1);
 	exports.createWeakMap = WeakMap_1.createWeakMap;
 	var Lazy_1 = __webpack_require__(29);
 	exports.Lazy = Lazy_1.default;
@@ -102,6 +102,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.injector = Injector_1.injector;
 	var IID_1 = __webpack_require__(10);
 	exports.IID = IID_1.default;
+	var SingleOneWay_1 = __webpack_require__(24);
+	exports.SingleOneWayBindingBase = SingleOneWay_1.SingleOneWayBindingBase;
+	var MultiOneWay_1 = __webpack_require__(23);
+	exports.MultiOneWayBindingBase = MultiOneWay_1.MultiOneWayBindingBase;
 	// re-exports
 	var res = __webpack_require__(11);
 	exports.res = res;
@@ -118,88 +122,59 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Oid_1 = __webpack_require__(2);
 	"use strict";
 	/**
-	* ES6 Set Shim
+	* This class emulates the semantics of a WeakMap.
+	* Even though this implementation is indeed "weak", it has the drawback of
+	* requiring manual housekeeping of entries otherwise they are kept forever.
 	* @class
 	*/
-	var SetEmulated = (function () {
-	    function SetEmulated() {
+	var WeakMapEmulated = (function () {
+	    function WeakMapEmulated() {
 	        ////////////////////
 	        /// Implementation
-	        this.values = [];
-	        this.keys = {};
+	        this.inner = {};
 	    }
 	    ////////////////////
-	    /// ISet
-	    SetEmulated.prototype.add = function (value) {
-	        var key = Oid_1.getOid(value);
-	        if (!this.keys[key]) {
-	            this.values.push(value);
-	            this.keys[key] = true;
-	        }
-	        return this;
+	    /// IWeakMap
+	    WeakMapEmulated.prototype.set = function (key, value) {
+	        var oid = Oid_1.getOid(key);
+	        this.inner[oid] = value;
 	    };
-	    SetEmulated.prototype.delete = function (value) {
-	        var key = Oid_1.getOid(value);
-	        if (this.keys[key]) {
-	            var index = this.values.indexOf(value);
-	            this.values.splice(index, 1);
-	            delete this.keys[key];
-	            return true;
-	        }
-	        return false;
+	    WeakMapEmulated.prototype.get = function (key) {
+	        var oid = Oid_1.getOid(key);
+	        return this.inner[oid];
 	    };
-	    SetEmulated.prototype.has = function (value) {
-	        var key = Oid_1.getOid(value);
-	        return this.keys.hasOwnProperty(key);
+	    WeakMapEmulated.prototype.has = function (key) {
+	        var oid = Oid_1.getOid(key);
+	        return this.inner.hasOwnProperty(oid);
 	    };
-	    SetEmulated.prototype.clear = function () {
-	        this.keys = {};
-	        this.values.length = 0;
+	    WeakMapEmulated.prototype.delete = function (key) {
+	        var oid = Oid_1.getOid(key);
+	        return delete this.inner[oid];
 	    };
-	    SetEmulated.prototype.forEach = function (callback, thisArg) {
-	        this.values.forEach(callback, thisArg);
-	    };
-	    Object.defineProperty(SetEmulated.prototype, "size", {
-	        get: function () {
-	            return this.values.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(SetEmulated.prototype, "isEmulated", {
+	    Object.defineProperty(WeakMapEmulated.prototype, "isEmulated", {
 	        get: function () {
 	            return true;
 	        },
 	        enumerable: true,
 	        configurable: true
 	    });
-	    return SetEmulated;
+	    return WeakMapEmulated;
 	})();
-	var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
-	    && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
-	    && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
+	var hasNativeSupport = typeof WeakMap === "function";
+	//let hasNativeSupport = false;
 	/**
-	* Creates a new Set instance
+	* Creates a new WeakMap instance
 	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
-	* @return {ISet<T>} A new instance of a suitable ISet implementation
+	* @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
 	*/
-	function createSet(disableNativeSupport) {
+	function createWeakMap(disableNativeSupport) {
 	    if (disableNativeSupport || !hasNativeSupport) {
-	        return new SetEmulated();
+	        return new WeakMapEmulated();
 	    }
-	    return new Set();
+	    return new WeakMap();
 	}
-	exports.createSet = createSet;
-	/**
-	* Extracts the values of a Set by invoking its forEach method and capturing the output
-	*/
-	function setToArray(src) {
-	    var result = new Array();
-	    src.forEach(function (x) { return result.push(x); });
-	    return result;
-	}
-	exports.setToArray = setToArray;
-	//# sourceMappingURL=Set.js.map
+	exports.createWeakMap = createWeakMap;
+	//# sourceMappingURL=WeakMap.js.map
 
 /***/ },
 /* 2 */
@@ -262,7 +237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Module_2 = __webpack_require__(21);
 	var If_1 = __webpack_require__(22);
 	var MultiOneWay_1 = __webpack_require__(23);
-	var SimpleOneWay_1 = __webpack_require__(24);
+	var SingleOneWay_1 = __webpack_require__(24);
 	var ForEach_1 = __webpack_require__(25);
 	var Event_1 = __webpack_require__(31);
 	var Value_1 = __webpack_require__(32);
@@ -419,12 +394,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .register("bindings.css", [res.domManager, MultiOneWay_1.CssBinding], true)
 	            .register("bindings.attr", [res.domManager, MultiOneWay_1.AttrBinding], true)
 	            .register("bindings.style", [res.domManager, MultiOneWay_1.StyleBinding], true)
-	            .register("bindings.text", [res.domManager, SimpleOneWay_1.TextBinding], true)
-	            .register("bindings.html", [res.domManager, SimpleOneWay_1.HtmlBinding], true)
-	            .register("bindings.visible", [res.domManager, SimpleOneWay_1.VisibleBinding], true)
-	            .register("bindings.hidden", [res.domManager, SimpleOneWay_1.HiddenBinding], true)
-	            .register("bindings.enabled", [res.domManager, SimpleOneWay_1.EnableBinding], true)
-	            .register("bindings.disabled", [res.domManager, SimpleOneWay_1.DisableBinding], true)
+	            .register("bindings.text", [res.domManager, SingleOneWay_1.TextBinding], true)
+	            .register("bindings.html", [res.domManager, SingleOneWay_1.HtmlBinding], true)
+	            .register("bindings.visible", [res.domManager, SingleOneWay_1.VisibleBinding], true)
+	            .register("bindings.hidden", [res.domManager, SingleOneWay_1.HiddenBinding], true)
+	            .register("bindings.enabled", [res.domManager, SingleOneWay_1.EnableBinding], true)
+	            .register("bindings.disabled", [res.domManager, SingleOneWay_1.DisableBinding], true)
 	            .register("bindings.foreach", [res.domManager, ForEach_1.default], true)
 	            .register("bindings.event", [res.domManager, Event_1.default], true)
 	            .register("bindings.keyPress", [res.domManager, KeyPress_1.default], true)
@@ -1075,8 +1050,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var WeakMap_1 = __webpack_require__(7);
-	var Set_1 = __webpack_require__(1);
+	var WeakMap_1 = __webpack_require__(1);
+	var Set_1 = __webpack_require__(7);
 	var Map_1 = __webpack_require__(8);
 	/*! *****************************************************************************
 	Copyright (C) Microsoft. All rights reserved.
@@ -1831,59 +1806,88 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Oid_1 = __webpack_require__(2);
 	"use strict";
 	/**
-	* This class emulates the semantics of a WeakMap.
-	* Even though this implementation is indeed "weak", it has the drawback of
-	* requiring manual housekeeping of entries otherwise they are kept forever.
+	* ES6 Set Shim
 	* @class
 	*/
-	var WeakMapEmulated = (function () {
-	    function WeakMapEmulated() {
+	var SetEmulated = (function () {
+	    function SetEmulated() {
 	        ////////////////////
 	        /// Implementation
-	        this.inner = {};
+	        this.values = [];
+	        this.keys = {};
 	    }
 	    ////////////////////
-	    /// IWeakMap
-	    WeakMapEmulated.prototype.set = function (key, value) {
-	        var oid = Oid_1.getOid(key);
-	        this.inner[oid] = value;
+	    /// ISet
+	    SetEmulated.prototype.add = function (value) {
+	        var key = Oid_1.getOid(value);
+	        if (!this.keys[key]) {
+	            this.values.push(value);
+	            this.keys[key] = true;
+	        }
+	        return this;
 	    };
-	    WeakMapEmulated.prototype.get = function (key) {
-	        var oid = Oid_1.getOid(key);
-	        return this.inner[oid];
+	    SetEmulated.prototype.delete = function (value) {
+	        var key = Oid_1.getOid(value);
+	        if (this.keys[key]) {
+	            var index = this.values.indexOf(value);
+	            this.values.splice(index, 1);
+	            delete this.keys[key];
+	            return true;
+	        }
+	        return false;
 	    };
-	    WeakMapEmulated.prototype.has = function (key) {
-	        var oid = Oid_1.getOid(key);
-	        return this.inner.hasOwnProperty(oid);
+	    SetEmulated.prototype.has = function (value) {
+	        var key = Oid_1.getOid(value);
+	        return this.keys.hasOwnProperty(key);
 	    };
-	    WeakMapEmulated.prototype.delete = function (key) {
-	        var oid = Oid_1.getOid(key);
-	        return delete this.inner[oid];
+	    SetEmulated.prototype.clear = function () {
+	        this.keys = {};
+	        this.values.length = 0;
 	    };
-	    Object.defineProperty(WeakMapEmulated.prototype, "isEmulated", {
+	    SetEmulated.prototype.forEach = function (callback, thisArg) {
+	        this.values.forEach(callback, thisArg);
+	    };
+	    Object.defineProperty(SetEmulated.prototype, "size", {
+	        get: function () {
+	            return this.values.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(SetEmulated.prototype, "isEmulated", {
 	        get: function () {
 	            return true;
 	        },
 	        enumerable: true,
 	        configurable: true
 	    });
-	    return WeakMapEmulated;
+	    return SetEmulated;
 	})();
-	var hasNativeSupport = typeof WeakMap === "function";
-	//let hasNativeSupport = false;
+	var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
+	    && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
+	    && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
 	/**
-	* Creates a new WeakMap instance
+	* Creates a new Set instance
 	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
-	* @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
+	* @return {ISet<T>} A new instance of a suitable ISet implementation
 	*/
-	function createWeakMap(disableNativeSupport) {
+	function createSet(disableNativeSupport) {
 	    if (disableNativeSupport || !hasNativeSupport) {
-	        return new WeakMapEmulated();
+	        return new SetEmulated();
 	    }
-	    return new WeakMap();
+	    return new Set();
 	}
-	exports.createWeakMap = createWeakMap;
-	//# sourceMappingURL=WeakMap.js.map
+	exports.createSet = createSet;
+	/**
+	* Extracts the values of a Set by invoking its forEach method and capturing the output
+	*/
+	function setToArray(src) {
+	    var result = new Array();
+	    src.forEach(function (x) { return result.push(x); });
+	    return result;
+	}
+	exports.setToArray = setToArray;
+	//# sourceMappingURL=Set.js.map
 
 /***/ },
 /* 8 */
@@ -3619,14 +3623,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var WeakMap_1 = __webpack_require__(7);
-	var Set_1 = __webpack_require__(1);
+	var WeakMap_1 = __webpack_require__(1);
+	var Set_1 = __webpack_require__(7);
 	var IID_1 = __webpack_require__(10);
 	var Injector_1 = __webpack_require__(4);
 	var Utils_1 = __webpack_require__(5);
 	var res = __webpack_require__(11);
 	var env = __webpack_require__(17);
 	"use strict";
+	/**
+	* The heart of WebRx's binding-system
+	* @class
+	*/
 	var DomManager = (function () {
 	    function DomManager(compiler, app) {
 	        this.expressionCache = {};
@@ -4131,7 +4139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var WeakMap_1 = __webpack_require__(7);
+	var WeakMap_1 = __webpack_require__(1);
 	"use strict";
 	var _window = window;
 	var userAgent = _window.navigator.userAgent;
@@ -4972,8 +4980,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var Utils_1 = __webpack_require__(5);
 	"use strict";
-	var MultiOneWayChangeBindingBase = (function () {
-	    function MultiOneWayChangeBindingBase(domManager, app, supportsDynamicValues) {
+	/**
+	* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
+	* @class
+	*/
+	var MultiOneWayBindingBase = (function () {
+	    function MultiOneWayBindingBase(domManager, app, supportsDynamicValues) {
 	        if (supportsDynamicValues === void 0) { supportsDynamicValues = false; }
 	        this.priority = 0;
 	        this.supportsDynamicValues = false;
@@ -4983,7 +4995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    ////////////////////
 	    // wx.IBinding
-	    MultiOneWayChangeBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
+	    MultiOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
 	        if (node.nodeType !== 1)
 	            Utils_1.throwError("binding only operates on elements!");
 	        var compiled = this.domManager.compileBindingOptions(options, module);
@@ -5029,10 +5041,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            observables = null;
 	        }));
 	    };
-	    MultiOneWayChangeBindingBase.prototype.configure = function (options) {
+	    MultiOneWayBindingBase.prototype.configure = function (options) {
 	        // intentionally left blank
 	    };
-	    MultiOneWayChangeBindingBase.prototype.subscribe = function (el, obs, key, state) {
+	    MultiOneWayBindingBase.prototype.subscribe = function (el, obs, key, state) {
 	        var _this = this;
 	        state.cleanup.add(obs.subscribe(function (x) {
 	            try {
@@ -5043,12 +5055,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }));
 	    };
-	    MultiOneWayChangeBindingBase.prototype.applyValue = function (el, key, value) {
+	    MultiOneWayBindingBase.prototype.applyValue = function (el, key, value) {
 	        Utils_1.throwError("you need to override this method!");
 	    };
-	    return MultiOneWayChangeBindingBase;
+	    return MultiOneWayBindingBase;
 	})();
-	exports.MultiOneWayChangeBindingBase = MultiOneWayChangeBindingBase;
+	exports.MultiOneWayBindingBase = MultiOneWayBindingBase;
 	var CssBinding = (function (_super) {
 	    __extends(CssBinding, _super);
 	    function CssBinding(domManager, app) {
@@ -5079,7 +5091,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return CssBinding;
-	})(MultiOneWayChangeBindingBase);
+	})(MultiOneWayBindingBase);
 	exports.CssBinding = CssBinding;
 	var AttrBinding = (function (_super) {
 	    __extends(AttrBinding, _super);
@@ -5099,7 +5111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return AttrBinding;
-	})(MultiOneWayChangeBindingBase);
+	})(MultiOneWayBindingBase);
 	exports.AttrBinding = AttrBinding;
 	var StyleBinding = (function (_super) {
 	    __extends(StyleBinding, _super);
@@ -5114,7 +5126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        el.style[key] = value;
 	    };
 	    return StyleBinding;
-	})(MultiOneWayChangeBindingBase);
+	})(MultiOneWayBindingBase);
 	exports.StyleBinding = StyleBinding;
 	//# sourceMappingURL=MultiOneWay.js.map
 
@@ -5132,15 +5144,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var Utils_1 = __webpack_require__(5);
 	"use strict";
-	var SingleOneWayChangeBindingBase = (function () {
-	    function SingleOneWayChangeBindingBase(domManager, app) {
+	/**
+	* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
+	* @class
+	*/
+	var SingleOneWayBindingBase = (function () {
+	    function SingleOneWayBindingBase(domManager, app) {
 	        this.priority = 0;
 	        this.domManager = domManager;
 	        this.app = app;
 	    }
 	    ////////////////////
 	    // wx.IBinding
-	    SingleOneWayChangeBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
+	    SingleOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
 	        var _this = this;
 	        if (node.nodeType !== 1)
 	            Utils_1.throwError("binding only operates on elements!");
@@ -5172,15 +5188,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            self = null;
 	        }));
 	    };
-	    SingleOneWayChangeBindingBase.prototype.configure = function (options) {
+	    SingleOneWayBindingBase.prototype.configure = function (options) {
 	        // intentionally left blank
 	    };
-	    SingleOneWayChangeBindingBase.prototype.applyValue = function (el, value) {
+	    SingleOneWayBindingBase.prototype.applyValue = function (el, value) {
 	        Utils_1.throwError("you need to override this method!");
 	    };
-	    return SingleOneWayChangeBindingBase;
+	    return SingleOneWayBindingBase;
 	})();
-	exports.SingleOneWayChangeBindingBase = SingleOneWayChangeBindingBase;
+	exports.SingleOneWayBindingBase = SingleOneWayBindingBase;
 	////////////////////
 	// Bindings
 	var TextBinding = (function (_super) {
@@ -5194,7 +5210,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        el.textContent = value;
 	    };
 	    return TextBinding;
-	})(SingleOneWayChangeBindingBase);
+	})(SingleOneWayBindingBase);
 	exports.TextBinding = TextBinding;
 	var VisibleBinding = (function (_super) {
 	    __extends(VisibleBinding, _super);
@@ -5226,7 +5242,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return VisibleBinding;
-	})(SingleOneWayChangeBindingBase);
+	})(SingleOneWayBindingBase);
 	exports.VisibleBinding = VisibleBinding;
 	var HiddenBinding = (function (_super) {
 	    __extends(HiddenBinding, _super);
@@ -5248,7 +5264,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        el.innerHTML = value;
 	    };
 	    return HtmlBinding;
-	})(SingleOneWayChangeBindingBase);
+	})(SingleOneWayBindingBase);
 	exports.HtmlBinding = HtmlBinding;
 	var DisableBinding = (function (_super) {
 	    __extends(DisableBinding, _super);
@@ -5266,7 +5282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return DisableBinding;
-	})(SingleOneWayChangeBindingBase);
+	})(SingleOneWayBindingBase);
 	exports.DisableBinding = DisableBinding;
 	var EnableBinding = (function (_super) {
 	    __extends(EnableBinding, _super);
@@ -5277,7 +5293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return EnableBinding;
 	})(DisableBinding);
 	exports.EnableBinding = EnableBinding;
-	//# sourceMappingURL=SimpleOneWay.js.map
+	//# sourceMappingURL=SingleOneWay.js.map
 
 /***/ },
 /* 25 */

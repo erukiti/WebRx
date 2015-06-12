@@ -6,7 +6,11 @@ import { extend, isInUnitTest, args2Array, isFunction, throwError, using, format
 
 "use strict";
 
-export class MultiOneWayChangeBindingBase implements wx.IBindingHandler {
+/**
+* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements 
+* @class
+*/
+export class MultiOneWayBindingBase implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp, supportsDynamicValues: boolean = false) {
         this.domManager = domManager;
         this.app = app;
@@ -107,7 +111,7 @@ interface ICssNodeState extends wx.INodeState {
     cssBindingPreviousDynamicClasses: any;
 }
 
-export class CssBinding extends MultiOneWayChangeBindingBase {
+export class CssBinding extends MultiOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app, true);
     }
@@ -144,7 +148,7 @@ export class CssBinding extends MultiOneWayChangeBindingBase {
     }
 }
 
-export class AttrBinding extends MultiOneWayChangeBindingBase {
+export class AttrBinding extends MultiOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 
@@ -164,7 +168,7 @@ export class AttrBinding extends MultiOneWayChangeBindingBase {
     }
 }
 
-export class StyleBinding extends MultiOneWayChangeBindingBase {
+export class StyleBinding extends MultiOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
     }

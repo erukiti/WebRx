@@ -17,6 +17,8 @@ export { route } from "./Routing/RouteMatcher";
 export { getNodeValue, setNodeValue } from "./Bindings/Value";
 export { injector } from "./Core/Injector";
 export { default as IID } from "./IID";
+export { SingleOneWayBindingBase } from "./Bindings/SingleOneWay";
+export { MultiOneWayBindingBase } from "./Bindings/MultiOneWay";
 import * as res from "./Core/Resources";
 import * as env from "./Core/Environment";
 export { env, res };

@@ -7,6 +7,10 @@ import { extend, throwError, isRxObservable, queryInterface, isProperty } from "
 import * as res from "./Resources";
 import * as env from "./Environment";
 "use strict";
+/**
+* The heart of WebRx's binding-system
+* @class
+*/
 export class DomManager {
     constructor(compiler, app) {
         this.expressionCache = {};

@@ -2,7 +2,11 @@
 /// <reference path="../Interfaces.ts" />
 import { throwError, unwrapProperty, toggleCssClass, elementCanBeDisabled } from "../Core/Utils";
 "use strict";
-export class SingleOneWayChangeBindingBase {
+/**
+* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
+* @class
+*/
+export class SingleOneWayBindingBase {
     constructor(domManager, app) {
         this.priority = 0;
         this.domManager = domManager;
@@ -50,7 +54,7 @@ export class SingleOneWayChangeBindingBase {
 }
 ////////////////////
 // Bindings
-export class TextBinding extends SingleOneWayChangeBindingBase {
+export class TextBinding extends SingleOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app);
     }
@@ -60,7 +64,7 @@ export class TextBinding extends SingleOneWayChangeBindingBase {
         el.textContent = value;
     }
 }
-export class VisibleBinding extends SingleOneWayChangeBindingBase {
+export class VisibleBinding extends SingleOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app);
         this.inverse = false;
@@ -95,7 +99,7 @@ export class HiddenBinding extends VisibleBinding {
         this.inverse = true;
     }
 }
-export class HtmlBinding extends SingleOneWayChangeBindingBase {
+export class HtmlBinding extends SingleOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app);
     }
@@ -105,7 +109,7 @@ export class HtmlBinding extends SingleOneWayChangeBindingBase {
         el.innerHTML = value;
     }
 }
-export class DisableBinding extends SingleOneWayChangeBindingBase {
+export class DisableBinding extends SingleOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app);
         this.inverse = false;
@@ -126,4 +130,4 @@ export class EnableBinding extends DisableBinding {
         this.inverse = true;
     }
 }
-//# sourceMappingURL=SimpleOneWay.js.map
+//# sourceMappingURL=SingleOneWay.js.map

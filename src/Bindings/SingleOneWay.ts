@@ -6,7 +6,11 @@ import { extend, isInUnitTest, args2Array, throwError, unwrapProperty, toggleCss
 
 "use strict";
 
-export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
+/**
+* Base class for one-way bindings that take a single expression and apply the result to one or more target elements 
+* @class
+*/
+export class SingleOneWayBindingBase implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
@@ -71,7 +75,7 @@ export class SingleOneWayChangeBindingBase implements wx.IBindingHandler {
 ////////////////////
 // Bindings
 
-export class TextBinding extends SingleOneWayChangeBindingBase {
+export class TextBinding extends SingleOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
     } 
@@ -84,7 +88,7 @@ export class TextBinding extends SingleOneWayChangeBindingBase {
     }
 }
 
-export class VisibleBinding extends SingleOneWayChangeBindingBase {
+export class VisibleBinding extends SingleOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 
@@ -129,7 +133,7 @@ export class HiddenBinding extends VisibleBinding {
     } 
 }
 
-export class HtmlBinding extends SingleOneWayChangeBindingBase {
+export class HtmlBinding extends SingleOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
     } 
@@ -142,7 +146,7 @@ export class HtmlBinding extends SingleOneWayChangeBindingBase {
     }
 }
 
-export class DisableBinding extends SingleOneWayChangeBindingBase {
+export class DisableBinding extends SingleOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
 

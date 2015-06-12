@@ -12,6 +12,10 @@ import * as env from "./Environment"
 
 "use strict";
 
+/**
+* The heart of WebRx's binding-system
+* @class
+*/
 export class DomManager implements wx.IDomManager {
     constructor(compiler: wx.IExpressionCompiler, app: wx.IWebRxApp) {
         this.nodeState = createWeakMap<Node, wx.INodeState>();

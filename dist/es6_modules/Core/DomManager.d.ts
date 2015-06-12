@@ -1,4 +1,8 @@
 /// <reference path="../Interfaces.d.ts" />
+/**
+* The heart of WebRx's binding-system
+* @class
+*/
 export declare class DomManager implements wx.IDomManager {
     constructor(compiler: wx.IExpressionCompiler, app: wx.IWebRxApp);
     applyBindings(model: any, rootNode: Node): void;

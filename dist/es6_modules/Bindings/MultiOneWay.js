@@ -2,7 +2,11 @@
 /// <reference path="../Interfaces.ts" />
 import { throwError, toggleCssClass, unwrapProperty } from "../Core/Utils";
 "use strict";
-export class MultiOneWayChangeBindingBase {
+/**
+* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
+* @class
+*/
+export class MultiOneWayBindingBase {
     constructor(domManager, app, supportsDynamicValues = false) {
         this.priority = 0;
         this.supportsDynamicValues = false;
@@ -75,7 +79,7 @@ export class MultiOneWayChangeBindingBase {
         throwError("you need to override this method!");
     }
 }
-export class CssBinding extends MultiOneWayChangeBindingBase {
+export class CssBinding extends MultiOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app, true);
     }
@@ -104,7 +108,7 @@ export class CssBinding extends MultiOneWayChangeBindingBase {
         }
     }
 }
-export class AttrBinding extends MultiOneWayChangeBindingBase {
+export class AttrBinding extends MultiOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app);
         this.priority = 5;
@@ -121,7 +125,7 @@ export class AttrBinding extends MultiOneWayChangeBindingBase {
         }
     }
 }
-export class StyleBinding extends MultiOneWayChangeBindingBase {
+export class StyleBinding extends MultiOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app);
     }
