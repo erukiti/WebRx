@@ -3,74 +3,9 @@
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, throwError, unwrapProperty, toggleCssClass, elementCanBeDisabled } from "../Core/Utils"
+import { SingleOneWayBindingBase } from "./BindingBase"
 
 "use strict";
-
-/**
-* Base class for one-way bindings that take a single expression and apply the result to one or more target elements 
-* @class
-*/
-export class SingleOneWayBindingBase implements wx.IBindingHandler {
-    constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
-        this.domManager = domManager;
-        this.app = app;
-    } 
-
-  ////////////////////
-    // wx.IBinding
-
-    public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
-        if (node.nodeType !== 1)
-            throwError("binding only operates on elements!");
-
-        if (options == null)
-            throwError("invalid binding-options!");
-
-        let el = <HTMLElement> node;
-        let self = this;
-        let exp = this.domManager.compileBindingOptions(options, module);
-        let obs = this.domManager.expressionToObservable(exp, ctx);
-
-        // subscribe
-        state.cleanup.add(obs.subscribe(x => {
-            try {
-                self.applyValue(el, unwrapProperty(x));
-            } catch (e) {
-                this.app.defaultExceptionHandler.onNext(e);
-            } 
-        }));
-
-        // release closure references to GC 
-        state.cleanup.add(Rx.Disposable.create(() => {
-            // nullify args
-            node = null;
-            options = null;
-            ctx = null;
-            state = null;
-
-            // nullify common locals
-            el = null;
-            obs = null;
-            self = null;
-        }));
-    }
-
-    public configure(options): void {
-        // intentionally left blank
-    }
-
-    public priority = 0;
-
-    ////////////////////
-    // wx.Implementation
-
-    protected domManager: wx.IDomManager;
-    protected app: wx.IWebRxApp;
-
-    protected applyValue(el: HTMLElement, value: any): void {
-        throwError("you need to override this method!");
-    }
-}
 
 ////////////////////
 // Bindings

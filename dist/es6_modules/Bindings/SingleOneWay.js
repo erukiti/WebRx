@@ -1,57 +1,8 @@
 /// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
-import { throwError, unwrapProperty, toggleCssClass, elementCanBeDisabled } from "../Core/Utils";
+import { toggleCssClass, elementCanBeDisabled } from "../Core/Utils";
+import { SingleOneWayBindingBase } from "./BindingBase";
 "use strict";
-/**
-* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
-* @class
-*/
-export class SingleOneWayBindingBase {
-    constructor(domManager, app) {
-        this.priority = 0;
-        this.domManager = domManager;
-        this.app = app;
-    }
-    ////////////////////
-    // wx.IBinding
-    applyBinding(node, options, ctx, state, module) {
-        if (node.nodeType !== 1)
-            throwError("binding only operates on elements!");
-        if (options == null)
-            throwError("invalid binding-options!");
-        let el = node;
-        let self = this;
-        let exp = this.domManager.compileBindingOptions(options, module);
-        let obs = this.domManager.expressionToObservable(exp, ctx);
-        // subscribe
-        state.cleanup.add(obs.subscribe(x => {
-            try {
-                self.applyValue(el, unwrapProperty(x));
-            }
-            catch (e) {
-                this.app.defaultExceptionHandler.onNext(e);
-            }
-        }));
-        // release closure references to GC 
-        state.cleanup.add(Rx.Disposable.create(() => {
-            // nullify args
-            node = null;
-            options = null;
-            ctx = null;
-            state = null;
-            // nullify common locals
-            el = null;
-            obs = null;
-            self = null;
-        }));
-    }
-    configure(options) {
-        // intentionally left blank
-    }
-    applyValue(el, value) {
-        throwError("you need to override this method!");
-    }
-}
 ////////////////////
 // Bindings
 export class TextBinding extends SingleOneWayBindingBase {

@@ -75,11 +75,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.asyncCommand = Command_1.asyncCommand;
 	exports.combinedCommand = Command_1.combinedCommand;
 	exports.isCommand = Command_1.isCommand;
-	var Animation_1 = __webpack_require__(50);
+	var Animation_1 = __webpack_require__(51);
 	exports.animation = Animation_1.animation;
 	var Oid_1 = __webpack_require__(2);
 	exports.getOid = Oid_1.getOid;
-	var List_1 = __webpack_require__(28);
+	var List_1 = __webpack_require__(29);
 	exports.list = List_1.list;
 	exports.isList = List_1.isList;
 	var Map_1 = __webpack_require__(8);
@@ -89,23 +89,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.setToArray = Set_1.setToArray;
 	var WeakMap_1 = __webpack_require__(1);
 	exports.createWeakMap = WeakMap_1.createWeakMap;
-	var Lazy_1 = __webpack_require__(29);
+	var Lazy_1 = __webpack_require__(30);
 	exports.Lazy = Lazy_1.default;
-	var VirtualChildNodes_1 = __webpack_require__(26);
+	var VirtualChildNodes_1 = __webpack_require__(27);
 	exports.VirtualChildNodes = VirtualChildNodes_1.default;
-	var RouteMatcher_1 = __webpack_require__(46);
+	var RouteMatcher_1 = __webpack_require__(47);
 	exports.route = RouteMatcher_1.route;
-	var Value_1 = __webpack_require__(32);
+	var Value_1 = __webpack_require__(33);
 	exports.getNodeValue = Value_1.getNodeValue;
 	exports.setNodeValue = Value_1.setNodeValue;
 	var Injector_1 = __webpack_require__(4);
 	exports.injector = Injector_1.injector;
 	var IID_1 = __webpack_require__(10);
 	exports.IID = IID_1.default;
-	var SingleOneWay_1 = __webpack_require__(24);
-	exports.SingleOneWayBindingBase = SingleOneWay_1.SingleOneWayBindingBase;
-	var MultiOneWay_1 = __webpack_require__(23);
-	exports.MultiOneWayBindingBase = MultiOneWay_1.MultiOneWayBindingBase;
+	var BindingBase_1 = __webpack_require__(24);
+	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
+	var BindingBase_2 = __webpack_require__(24);
+	exports.MultiOneWayBindingBase = BindingBase_2.MultiOneWayBindingBase;
 	// re-exports
 	var res = __webpack_require__(11);
 	exports.res = res;
@@ -237,27 +237,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Module_2 = __webpack_require__(21);
 	var If_1 = __webpack_require__(22);
 	var MultiOneWay_1 = __webpack_require__(23);
-	var SingleOneWay_1 = __webpack_require__(24);
-	var ForEach_1 = __webpack_require__(25);
-	var Event_1 = __webpack_require__(31);
-	var Value_1 = __webpack_require__(32);
-	var HasFocus_1 = __webpack_require__(33);
-	var With_1 = __webpack_require__(34);
-	var Checked_1 = __webpack_require__(35);
-	var KeyPress_1 = __webpack_require__(36);
-	var TextInput_1 = __webpack_require__(37);
-	var SelectedValue_1 = __webpack_require__(38);
-	var Component_1 = __webpack_require__(39);
-	var StateActive_1 = __webpack_require__(40);
-	var View_1 = __webpack_require__(41);
-	var StateRef_1 = __webpack_require__(42);
-	var Select_1 = __webpack_require__(43);
-	var RadioGroup_1 = __webpack_require__(44);
-	var Router_1 = __webpack_require__(45);
-	var MessageBus_1 = __webpack_require__(47);
-	var Version_1 = __webpack_require__(48);
+	var SingleOneWay_1 = __webpack_require__(25);
+	var ForEach_1 = __webpack_require__(26);
+	var Event_1 = __webpack_require__(32);
+	var Value_1 = __webpack_require__(33);
+	var HasFocus_1 = __webpack_require__(34);
+	var With_1 = __webpack_require__(35);
+	var Checked_1 = __webpack_require__(36);
+	var KeyPress_1 = __webpack_require__(37);
+	var TextInput_1 = __webpack_require__(38);
+	var SelectedValue_1 = __webpack_require__(39);
+	var Component_1 = __webpack_require__(40);
+	var StateActive_1 = __webpack_require__(41);
+	var View_1 = __webpack_require__(42);
+	var StateRef_1 = __webpack_require__(43);
+	var Select_1 = __webpack_require__(44);
+	var RadioGroup_1 = __webpack_require__(45);
+	var Router_1 = __webpack_require__(46);
+	var MessageBus_1 = __webpack_require__(48);
+	var Version_1 = __webpack_require__(49);
 	// make sure RxExtensions get installed
-	var RxExtensions_1 = __webpack_require__(49);
+	var RxExtensions_1 = __webpack_require__(50);
 	RxExtensions_1.install();
 	"use strict";
 	var App = (function (_super) {
@@ -4979,7 +4979,138 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = new __();
 	};
 	var Utils_1 = __webpack_require__(5);
+	var BindingBase_1 = __webpack_require__(24);
 	"use strict";
+	var CssBinding = (function (_super) {
+	    __extends(CssBinding, _super);
+	    function CssBinding(domManager, app) {
+	        _super.call(this, domManager, app, true);
+	    }
+	    CssBinding.prototype.applyValue = function (el, value, key) {
+	        var classes;
+	        if (key !== "") {
+	            classes = key.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+	            if (classes.length) {
+	                Utils_1.toggleCssClass.apply(null, [el, !!value].concat(classes));
+	            }
+	        }
+	        else {
+	            var state = this.domManager.getNodeState(el);
+	            // if we have previously added classes, remove them
+	            if (state.cssBindingPreviousDynamicClasses != null) {
+	                Utils_1.toggleCssClass.apply(null, [el, false].concat(state.cssBindingPreviousDynamicClasses));
+	                state.cssBindingPreviousDynamicClasses = null;
+	            }
+	            if (value) {
+	                classes = value.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+	                if (classes.length) {
+	                    Utils_1.toggleCssClass.apply(null, [el, true].concat(classes));
+	                    state.cssBindingPreviousDynamicClasses = classes;
+	                }
+	            }
+	        }
+	    };
+	    return CssBinding;
+	})(BindingBase_1.MultiOneWayBindingBase);
+	exports.CssBinding = CssBinding;
+	var AttrBinding = (function (_super) {
+	    __extends(AttrBinding, _super);
+	    function AttrBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.priority = 5;
+	    }
+	    AttrBinding.prototype.applyValue = function (el, value, key) {
+	        // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
+	        // when someProp is a "no value"-like value (strictly null, false, or undefined)
+	        // (because the absence of the "checked" attr is how to mark an element as not checked, etc.)
+	        var toRemove = (value === false) || (value === null) || (value === undefined);
+	        if (toRemove)
+	            el.removeAttribute(key);
+	        else {
+	            el.setAttribute(key, value.toString());
+	        }
+	    };
+	    return AttrBinding;
+	})(BindingBase_1.MultiOneWayBindingBase);
+	exports.AttrBinding = AttrBinding;
+	var StyleBinding = (function (_super) {
+	    __extends(StyleBinding, _super);
+	    function StyleBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	    }
+	    StyleBinding.prototype.applyValue = function (el, value, key) {
+	        if (value === null || value === undefined || value === false) {
+	            // Empty string removes the value, whereas null/undefined have no effect
+	            value = "";
+	        }
+	        el.style[key] = value;
+	    };
+	    return StyleBinding;
+	})(BindingBase_1.MultiOneWayBindingBase);
+	exports.StyleBinding = StyleBinding;
+	//# sourceMappingURL=MultiOneWay.js.map
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
+	/// <reference path="../Interfaces.ts" />
+	var Utils_1 = __webpack_require__(5);
+	"use strict";
+	/**
+	* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
+	* @class
+	*/
+	var SingleOneWayBindingBase = (function () {
+	    function SingleOneWayBindingBase(domManager, app) {
+	        this.priority = 0;
+	        this.domManager = domManager;
+	        this.app = app;
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    SingleOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("invalid binding-options!");
+	        var el = node;
+	        var self = this;
+	        var exp = this.domManager.compileBindingOptions(options, module);
+	        var obs = this.domManager.expressionToObservable(exp, ctx);
+	        // subscribe
+	        state.cleanup.add(obs.subscribe(function (x) {
+	            try {
+	                self.applyValue(el, Utils_1.unwrapProperty(x));
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            el = null;
+	            obs = null;
+	            self = null;
+	        }));
+	    };
+	    SingleOneWayBindingBase.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    SingleOneWayBindingBase.prototype.applyValue = function (el, value) {
+	        Utils_1.throwError("you need to override this method!");
+	    };
+	    return SingleOneWayBindingBase;
+	})();
+	exports.SingleOneWayBindingBase = SingleOneWayBindingBase;
 	/**
 	* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
 	* @class
@@ -5061,77 +5192,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return MultiOneWayBindingBase;
 	})();
 	exports.MultiOneWayBindingBase = MultiOneWayBindingBase;
-	var CssBinding = (function (_super) {
-	    __extends(CssBinding, _super);
-	    function CssBinding(domManager, app) {
-	        _super.call(this, domManager, app, true);
-	    }
-	    CssBinding.prototype.applyValue = function (el, value, key) {
-	        var classes;
-	        if (key !== "") {
-	            classes = key.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
-	            if (classes.length) {
-	                Utils_1.toggleCssClass.apply(null, [el, !!value].concat(classes));
-	            }
-	        }
-	        else {
-	            var state = this.domManager.getNodeState(el);
-	            // if we have previously added classes, remove them
-	            if (state.cssBindingPreviousDynamicClasses != null) {
-	                Utils_1.toggleCssClass.apply(null, [el, false].concat(state.cssBindingPreviousDynamicClasses));
-	                state.cssBindingPreviousDynamicClasses = null;
-	            }
-	            if (value) {
-	                classes = value.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
-	                if (classes.length) {
-	                    Utils_1.toggleCssClass.apply(null, [el, true].concat(classes));
-	                    state.cssBindingPreviousDynamicClasses = classes;
-	                }
-	            }
-	        }
-	    };
-	    return CssBinding;
-	})(MultiOneWayBindingBase);
-	exports.CssBinding = CssBinding;
-	var AttrBinding = (function (_super) {
-	    __extends(AttrBinding, _super);
-	    function AttrBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.priority = 5;
-	    }
-	    AttrBinding.prototype.applyValue = function (el, value, key) {
-	        // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
-	        // when someProp is a "no value"-like value (strictly null, false, or undefined)
-	        // (because the absence of the "checked" attr is how to mark an element as not checked, etc.)
-	        var toRemove = (value === false) || (value === null) || (value === undefined);
-	        if (toRemove)
-	            el.removeAttribute(key);
-	        else {
-	            el.setAttribute(key, value.toString());
-	        }
-	    };
-	    return AttrBinding;
-	})(MultiOneWayBindingBase);
-	exports.AttrBinding = AttrBinding;
-	var StyleBinding = (function (_super) {
-	    __extends(StyleBinding, _super);
-	    function StyleBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	    }
-	    StyleBinding.prototype.applyValue = function (el, value, key) {
-	        if (value === null || value === undefined || value === false) {
-	            // Empty string removes the value, whereas null/undefined have no effect
-	            value = "";
-	        }
-	        el.style[key] = value;
-	    };
-	    return StyleBinding;
-	})(MultiOneWayBindingBase);
-	exports.StyleBinding = StyleBinding;
-	//# sourceMappingURL=MultiOneWay.js.map
+	//# sourceMappingURL=BindingBase.js.map
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -5143,60 +5207,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = new __();
 	};
 	var Utils_1 = __webpack_require__(5);
+	var BindingBase_1 = __webpack_require__(24);
 	"use strict";
-	/**
-	* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
-	* @class
-	*/
-	var SingleOneWayBindingBase = (function () {
-	    function SingleOneWayBindingBase(domManager, app) {
-	        this.priority = 0;
-	        this.domManager = domManager;
-	        this.app = app;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    SingleOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("invalid binding-options!");
-	        var el = node;
-	        var self = this;
-	        var exp = this.domManager.compileBindingOptions(options, module);
-	        var obs = this.domManager.expressionToObservable(exp, ctx);
-	        // subscribe
-	        state.cleanup.add(obs.subscribe(function (x) {
-	            try {
-	                self.applyValue(el, Utils_1.unwrapProperty(x));
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            el = null;
-	            obs = null;
-	            self = null;
-	        }));
-	    };
-	    SingleOneWayBindingBase.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    SingleOneWayBindingBase.prototype.applyValue = function (el, value) {
-	        Utils_1.throwError("you need to override this method!");
-	    };
-	    return SingleOneWayBindingBase;
-	})();
-	exports.SingleOneWayBindingBase = SingleOneWayBindingBase;
 	////////////////////
 	// Bindings
 	var TextBinding = (function (_super) {
@@ -5210,7 +5222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        el.textContent = value;
 	    };
 	    return TextBinding;
-	})(SingleOneWayBindingBase);
+	})(BindingBase_1.SingleOneWayBindingBase);
 	exports.TextBinding = TextBinding;
 	var VisibleBinding = (function (_super) {
 	    __extends(VisibleBinding, _super);
@@ -5242,7 +5254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return VisibleBinding;
-	})(SingleOneWayBindingBase);
+	})(BindingBase_1.SingleOneWayBindingBase);
 	exports.VisibleBinding = VisibleBinding;
 	var HiddenBinding = (function (_super) {
 	    __extends(HiddenBinding, _super);
@@ -5264,7 +5276,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        el.innerHTML = value;
 	    };
 	    return HtmlBinding;
-	})(SingleOneWayBindingBase);
+	})(BindingBase_1.SingleOneWayBindingBase);
 	exports.HtmlBinding = HtmlBinding;
 	var DisableBinding = (function (_super) {
 	    __extends(DisableBinding, _super);
@@ -5282,7 +5294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    return DisableBinding;
-	})(SingleOneWayBindingBase);
+	})(BindingBase_1.SingleOneWayBindingBase);
 	exports.DisableBinding = DisableBinding;
 	var EnableBinding = (function (_super) {
 	    __extends(EnableBinding, _super);
@@ -5296,16 +5308,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SingleOneWay.js.map
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../RxExtensions.d.ts" />
 	var Utils_1 = __webpack_require__(5);
-	var VirtualChildNodes_1 = __webpack_require__(26);
-	var RefCountDisposeWrapper_1 = __webpack_require__(27);
+	var VirtualChildNodes_1 = __webpack_require__(27);
+	var RefCountDisposeWrapper_1 = __webpack_require__(28);
 	var Injector_1 = __webpack_require__(4);
-	var List_1 = __webpack_require__(28);
+	var List_1 = __webpack_require__(29);
 	"use strict";
 	var ForEachBinding = (function () {
 	    function ForEachBinding(domManager, app) {
@@ -5702,7 +5714,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ForEach.js.map
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -5801,7 +5813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=VirtualChildNodes.js.map
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5831,7 +5843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RefCountDisposeWrapper.js.map
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5855,10 +5867,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Utils_1 = __webpack_require__(5);
 	var Oid_1 = __webpack_require__(2);
 	var IID_1 = __webpack_require__(10);
-	var Lazy_1 = __webpack_require__(29);
-	var ScheduledSubject_1 = __webpack_require__(30);
+	var Lazy_1 = __webpack_require__(30);
+	var ScheduledSubject_1 = __webpack_require__(31);
 	var Events_1 = __webpack_require__(9);
-	var RefCountDisposeWrapper_1 = __webpack_require__(27);
+	var RefCountDisposeWrapper_1 = __webpack_require__(28);
 	var log = __webpack_require__(12);
 	var Reflect_1 = __webpack_require__(6);
 	var Injector_1 = __webpack_require__(4);
@@ -6899,7 +6911,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=List.js.map
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6928,7 +6940,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Lazy.js.map
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Utils_1 = __webpack_require__(5);
@@ -6982,7 +6994,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ScheduledSubject.js.map
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7079,7 +7091,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Event.js.map
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7233,7 +7245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Value.js.map
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7372,7 +7384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HasFocus.js.map
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7436,7 +7448,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=With.js.map
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7538,7 +7550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Checked.js.map
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7699,7 +7711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=KeyPress.js.map
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -7852,14 +7864,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=TextInput.js.map
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(5);
-	var Value_1 = __webpack_require__(32);
-	var List_1 = __webpack_require__(28);
+	var Value_1 = __webpack_require__(33);
+	var List_1 = __webpack_require__(29);
 	"use strict";
 	var impls = new Array();
 	var RadioSingleSelectionImpl = (function () {
@@ -8028,7 +8040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SelectedValue.js.map
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
@@ -8172,7 +8184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Component.js.map
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
@@ -8269,7 +8281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateActive.js.map
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
@@ -8432,7 +8444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=View.js.map
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
@@ -8528,7 +8540,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateRef.js.map
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8636,7 +8648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Select.js.map
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8730,13 +8742,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RadioGroup.js.map
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(5);
 	var Property_1 = __webpack_require__(13);
-	var RouteMatcher_1 = __webpack_require__(46);
+	var RouteMatcher_1 = __webpack_require__(47);
 	"use strict";
 	var Router = (function () {
 	    function Router(domManager, app) {
@@ -9136,7 +9148,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Router.js.map
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -9293,11 +9305,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RouteMatcher.js.map
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var ScheduledSubject_1 = __webpack_require__(30);
+	var ScheduledSubject_1 = __webpack_require__(31);
 	// ReactiveUI's MessageBus
 	"use strict";
 	var MessageBus = (function () {
@@ -9342,20 +9354,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=MessageBus.js.map
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	exports.version = '0.9.87';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="./Interfaces.ts" />
 	var Utils_1 = __webpack_require__(5);
 	var IID_1 = __webpack_require__(10);
-	var ScheduledSubject_1 = __webpack_require__(30);
+	var ScheduledSubject_1 = __webpack_require__(31);
 	var Reflect_1 = __webpack_require__(6);
 	var Injector_1 = __webpack_require__(4);
 	var res = __webpack_require__(11);
@@ -9453,7 +9465,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RxExtensions.js.map
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />

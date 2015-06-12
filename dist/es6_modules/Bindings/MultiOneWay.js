@@ -1,84 +1,8 @@
 /// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
-import { throwError, toggleCssClass, unwrapProperty } from "../Core/Utils";
+import { toggleCssClass } from "../Core/Utils";
+import { MultiOneWayBindingBase } from "./BindingBase";
 "use strict";
-/**
-* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
-* @class
-*/
-export class MultiOneWayBindingBase {
-    constructor(domManager, app, supportsDynamicValues = false) {
-        this.priority = 0;
-        this.supportsDynamicValues = false;
-        this.domManager = domManager;
-        this.app = app;
-        this.supportsDynamicValues = supportsDynamicValues;
-    }
-    ////////////////////
-    // wx.IBinding
-    applyBinding(node, options, ctx, state, module) {
-        if (node.nodeType !== 1)
-            throwError("binding only operates on elements!");
-        let compiled = this.domManager.compileBindingOptions(options, module);
-        if (compiled == null || (typeof compiled !== "object" && !this.supportsDynamicValues))
-            throwError("invalid binding-options!");
-        let el = node;
-        let observables = new Array();
-        let obs;
-        let exp;
-        let keys = Object.keys(compiled);
-        let key;
-        if (typeof compiled === "function") {
-            exp = compiled;
-            obs = this.domManager.expressionToObservable(exp, ctx);
-            observables.push(["", obs]);
-        }
-        else {
-            for (let i = 0; i < keys.length; i++) {
-                key = keys[i];
-                let value = compiled[key];
-                exp = value;
-                obs = this.domManager.expressionToObservable(exp, ctx);
-                observables.push([key, obs]);
-            }
-        }
-        // subscribe
-        for (let i = 0; i < observables.length; i++) {
-            key = observables[i][0];
-            obs = observables[i][1];
-            this.subscribe(el, obs, key, state);
-        }
-        // release closure references to GC 
-        state.cleanup.add(Rx.Disposable.create(() => {
-            // nullify args
-            node = null;
-            options = null;
-            ctx = null;
-            state = null;
-            // nullify common locals
-            el = null;
-            keys = null;
-            // nullify locals
-            observables = null;
-        }));
-    }
-    configure(options) {
-        // intentionally left blank
-    }
-    subscribe(el, obs, key, state) {
-        state.cleanup.add(obs.subscribe(x => {
-            try {
-                this.applyValue(el, unwrapProperty(x), key);
-            }
-            catch (e) {
-                this.app.defaultExceptionHandler.onNext(e);
-            }
-        }));
-    }
-    applyValue(el, key, value) {
-        throwError("you need to override this method!");
-    }
-}
 export class CssBinding extends MultiOneWayBindingBase {
     constructor(domManager, app) {
         super(domManager, app, true);
