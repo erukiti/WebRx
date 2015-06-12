@@ -1131,7 +1131,7 @@ declare module wx {
     /* as soon as the animation has ended.
     /* @returns {Rx.Observable<any>} An observable that signals that the animation is complete
     **/
-    function animation(prepareTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>, startTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>, completeTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>): IAnimation;
+    function animation(prepareTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>, startTransitionClass: string | Array<string> | Array<IAnimationCssClassInstruction>, completeTransitionClass?: string | Array<string> | Array<IAnimationCssClassInstruction>): IAnimation;
     /**        
     /* Registers a scripted animation
     /* @param {(element: HTMLElement, params?: any)=> Rx.Observable<any>} run The function that carries out the animation

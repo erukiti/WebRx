@@ -9,7 +9,7 @@
  * as soon as the animation has ended.
  * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
  */
-export declare function animation(prepareTransitionClass: string | Array<string> | Array<wx.IAnimationCssClassInstruction>, startTransitionClass: string | Array<string> | Array<wx.IAnimationCssClassInstruction>, completeTransitionClass: string | Array<string> | Array<wx.IAnimationCssClassInstruction>): wx.IAnimation;
+export declare function animation(prepareTransitionClass: string | Array<string> | Array<wx.IAnimationCssClassInstruction>, startTransitionClass: string | Array<string> | Array<wx.IAnimationCssClassInstruction>, completeTransitionClass?: string | Array<string> | Array<wx.IAnimationCssClassInstruction>): wx.IAnimation;
 /**
  * Registers a scripted animation
  * @param {(element: HTMLElement, params?: any)=> Rx.Observable<any>} run The function that carries out the animation

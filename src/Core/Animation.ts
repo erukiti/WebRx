@@ -233,7 +233,7 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
  */
 export function animation(prepareTransitionClass: string|Array<string>|Array<wx.IAnimationCssClassInstruction>,
     startTransitionClass: string|Array<string>|Array<wx.IAnimationCssClassInstruction>,
-    completeTransitionClass: string|Array<string>|Array<wx.IAnimationCssClassInstruction>): wx.IAnimation;
+    completeTransitionClass?: string|Array<string>|Array<wx.IAnimationCssClassInstruction>): wx.IAnimation;
  
 /**
  * Registers a scripted animation
