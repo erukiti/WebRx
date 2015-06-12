@@ -108,7 +108,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Component.html');
 
             wx.app.component("test1", {
-                template: { element: '#template1' }
+                template: { select: '#template1' }
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
@@ -121,7 +121,7 @@ describe('Bindings', () => {
             loadFixtures('templates/Bindings/Component.html');
 
             wx.app.component("test1", {
-                template: { element: document.querySelector("#template1") }
+                template: [document.querySelector("#template1").childNodes[0]]
             });
 
             var el = <HTMLElement> document.querySelector("#fixture2");
@@ -247,6 +247,40 @@ describe('Bindings', () => {
             wx.app.component("test1", {
                 template: template,
                 viewModel: { instance: { foo: 'bar' } } 
+            });
+
+
+            var el = <HTMLElement> document.querySelector("#fixture2");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
+        });
+
+        it("Loads a view-model from an observable returning an object",() => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = "<span data-bind='text: foo'>invalid</span>";
+
+            wx.app.component("test1", {
+                template: template,
+                viewModel: { observable: Rx.Observable.return<any>({ foo: 'bar' }) } 
+            });
+
+
+            var el = <HTMLElement> document.querySelector("#fixture2");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
+        });
+
+        it("Loads a view-model from an observable returning a constructor",() => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = "<span data-bind='text: foo'>invalid</span>";
+
+            wx.app.component("test1", {
+                template: template,
+                viewModel: { observable: Rx.Observable.return<any>(function(arg: any) { this.foo = 'bar'; }) } 
             });
 
 

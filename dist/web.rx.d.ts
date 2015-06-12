@@ -520,20 +520,22 @@ declare module wx {
     interface IComponentTemplateDescriptor {
         require?: string;
         promise?: Rx.IPromise<Node[]>;
+        observable?: Rx.Observable<Node[]>;
         resolve?: string;
         element?: string | Node;
     }
     interface IComponentViewModelDescriptor {
         require?: string;
-        promise?: Rx.IPromise<string>;
+        promise?: Rx.IPromise<any>;
+        observable?: Rx.Observable<any>;
         resolve?: string;
         instance?: any;
     }
     interface IComponentDescriptor {
         require?: string;
         resolve?: string;
-        template?: string | Node[] | IComponentTemplateDescriptor | ((params?: any) => string | Node[]);
-        viewModel?: Array<any> | IComponentViewModelDescriptor | ((params: any) => any);
+        template?: string|Node[]|IComponentTemplateDescriptor|((params?: any)=> string|Node[]|Rx.Observable<Node[]>);
+        viewModel?: Array<any>|IComponentViewModelDescriptor|((params: any)=> any|Rx.Observable<any>);
         preBindingInit?: string;
         postBindingInit?: string;
     }

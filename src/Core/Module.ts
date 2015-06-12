@@ -2,7 +2,7 @@
 
 import IID from "../IID"
 import { injector } from "./Injector"
-import { extend, observableRequire, isInUnitTest, args2Array, isFunction, throwError, using } from "../Core/Utils"
+import { extend, observableRequire, isInUnitTest, args2Array, isFunction, throwError, using, isRxObservable, isPromise } from "../Core/Utils"
 import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
@@ -148,65 +148,62 @@ export class Module implements wx.IModule {
     // Implementation
 
     private bindings: { [name: string]: any } = {};
-    private components: { [name: string]: IComponentDescriptorEx } = {};
+    private components: { [name: string]: IComponentDescriptorEx|Rx.Observable<wx.IComponentDescriptor>|Rx.IPromise<wx.IComponentDescriptor> } = {};
     private expressionFilters: { [index: string]: wx.IExpressionFilter; } = {};
     private animations: { [index: string]: wx.IAnimation; } = {};
 
-    private instantiateComponent(name: string): Rx.Observable<IComponentDescriptorEx> {
-        let cd = this.components[name];
-        let result: Rx.Observable<IComponentDescriptorEx> = undefined;
+    private instantiateComponent(name: string): Rx.Observable<wx.IComponentDescriptor> {
+        let _cd = this.components[name];
+        let result: Rx.Observable<wx.IComponentDescriptor> = undefined;
 
-        if (cd != null) {
-            // if the component has been registered as resource, resolve it now and update registry
-            if (cd.instance) {
-                result = Rx.Observable.return<IComponentDescriptorEx>(cd.instance);
-            } else if (cd.template) {
-                result = Rx.Observable.return<IComponentDescriptorEx>(cd);
-            } else if (cd.resolve) {
-                let resolved = injector.get<IComponentDescriptorEx>(cd.resolve);
-                result = Rx.Observable.return<IComponentDescriptorEx>(resolved);
-            } else if (cd.require) {
-                result = observableRequire<IComponentDescriptorEx>(cd.require);
+        if (_cd != null) {
+            if(isRxObservable(_cd))
+                result = <Rx.Observable<IComponentDescriptorEx>> <any> _cd;
+            else if(isPromise(_cd))
+                return Rx.Observable.fromPromise(<Rx.IPromise<any>> <any> _cd);
+            else {
+                // if the component has been registered as resource, resolve it now and update registry
+                let cd = <IComponentDescriptorEx> _cd;
+    
+                if (cd.instance) {
+                    result = Rx.Observable.return<wx.IComponentDescriptor>(cd.instance);
+                } else if (cd.template) {
+                    result = Rx.Observable.return<wx.IComponentDescriptor>(cd);
+                } else if (cd.resolve) {
+                    let resolved = injector.get<wx.IComponentDescriptor>(cd.resolve);
+                    result = Rx.Observable.return<wx.IComponentDescriptor>(resolved);
+                } else if (cd.require) {
+                    result = observableRequire<wx.IComponentDescriptor>(cd.require);
+                }
             }
         } else {
-            result = Rx.Observable.return<IComponentDescriptorEx>(undefined);
+            result = Rx.Observable.return<wx.IComponentDescriptor>(undefined);
         }
 
-        return result.do(x => this.components[name].instance = x); // cache instantiated component
+        return result.do(x => this.components[name] = { instance: x }); // cache descriptor
     }
 
-    private initializeComponent(obs: Rx.Observable<IComponentDescriptorEx>, params?: Object): Rx.Observable<wx.IComponent> {
+    private initializeComponent(obs: Rx.Observable<wx.IComponentDescriptor>, params?: Object): Rx.Observable<wx.IComponent> {
         return obs.take(1).selectMany(component => {
                 if (component == null) {
                     return Rx.Observable.return<wx.IComponent>(undefined);
                 }
 
-                if (component.viewModel) {
-                    // component with view-model & template
-                    return Rx.Observable.combineLatest(
-                        this.loadComponentTemplate(component.template, params),
-                        this.loadComponentViewModel(component.viewModel, params),
-                        (t, vm) => {
-                            // if view-model factory yields a function, use it as constructor
-                            if (isFunction(vm)) {
-                                vm = new vm(params);
-                            }
+                return Rx.Observable.combineLatest(
+                    this.loadComponentTemplate(component.template, params),
+                    component.viewModel ? this.loadComponentViewModel(component.viewModel, params) : Rx.Observable.return<any>(undefined),
+                    (t, vm) => {
+                        // if view-model factory yields a function, use it as constructor
+                        if (isFunction(vm)) {
+                            vm = new vm(params);
+                        }
 
-                            return <wx.IComponent> {
-                                template: t,
-                                viewModel: vm,
-                                preBindingInit: component.preBindingInit,
-                                postBindingInit: component.postBindingInit
-                            }
-                        });
-                }
-
-                // template-only component
-                return this.loadComponentTemplate(component.template, params)
-                    .select(template => <wx.IComponent> {
-                        template: template,
-                        preBindingInit: component.preBindingInit,
-                        postBindingInit: component.postBindingInit
+                        return <wx.IComponent> {
+                            template: t,
+                            viewModel: vm,
+                            preBindingInit: component.preBindingInit,
+                            postBindingInit: component.postBindingInit
+                        }
                     });
             })
             .take(1);
@@ -218,6 +215,9 @@ export class Module implements wx.IModule {
 
         if (isFunction(template)) {
             syncResult = template(params);
+            
+            if(isRxObservable(template))
+                return template;
 
             if (typeof syncResult === "string") {
                 syncResult = this.app.templateEngine.parse(<string> template(params));
@@ -238,35 +238,23 @@ export class Module implements wx.IModule {
             } else if (options.promise) {
                 let promise = <Rx.IPromise<Node[]>> <any> options.promise;
                 return Rx.Observable.fromPromise(promise);
+            } else if (options.observable) {
+                return options.observable;
             } else if (options.require) {
                 return observableRequire<string>(options.require).select(x => this.app.templateEngine.parse(x));
-            } else if (options.element) {
-                if (typeof options.element === "string") {
-                    // try both getElementById & querySelector
-                    el = document.getElementById(<string> options.element) ||
-                        document.querySelector(<string> options.element);
+            } else if (options.select) {
+                // try both getElementById & querySelector
+                el = document.getElementById(<string> options.select) ||
+                    document.querySelector(<string> options.select);
 
-                    if (el != null) {
-                        // only the nodes inside the specified element will be cloned for use as the component’s template
-                        syncResult = this.app.templateEngine.parse((<HTMLElement> el).innerHTML);
-                    } else {
-                        syncResult = [];
-                    }
-
-                    return Rx.Observable.return(syncResult);
+                if (el != null) {
+                    // only the nodes inside the specified element will be cloned for use as the component’s template
+                    syncResult = this.app.templateEngine.parse((<HTMLElement> el).innerHTML);
                 } else {
-                    el = <Element> <any> options.element;
-
-                    // unwrap text/html script nodes
-                    if (el != null) {
-                        // only the nodes inside the specified element will be cloned for use as the component’s template
-                        syncResult = this.app.templateEngine.parse((<HTMLElement> el).innerHTML);
-                    } else {
-                        syncResult = [];
-                    }
-
-                    return Rx.Observable.return(syncResult);
+                    syncResult = [];
                 }
+
+                return Rx.Observable.return(syncResult);
             }
         }
 
@@ -288,6 +276,8 @@ export class Module implements wx.IModule {
             if (options.resolve) {
                 syncResult = injector.get<any>(options.resolve, componentParams);
                 return Rx.Observable.return(syncResult);
+            } else if (options.observable) {
+                return options.observable;
             } else if (options.promise) {
                 let promise = <Rx.IPromise<any>> <any> options.promise;
                 return Rx.Observable.fromPromise(promise);

@@ -1,6 +1,6 @@
 /// <reference path="../Interfaces.ts" />
 import { injector } from "./Injector";
-import { extend, observableRequire, args2Array, isFunction, throwError } from "../Core/Utils";
+import { extend, observableRequire, args2Array, isFunction, throwError, isRxObservable, isPromise } from "../Core/Utils";
 import * as res from "./Resources";
 "use strict";
 export class Module {
@@ -102,56 +102,53 @@ export class Module {
         return injector.get(res.app);
     }
     instantiateComponent(name) {
-        let cd = this.components[name];
+        let _cd = this.components[name];
         let result = undefined;
-        if (cd != null) {
-            // if the component has been registered as resource, resolve it now and update registry
-            if (cd.instance) {
-                result = Rx.Observable.return(cd.instance);
-            }
-            else if (cd.template) {
-                result = Rx.Observable.return(cd);
-            }
-            else if (cd.resolve) {
-                let resolved = injector.get(cd.resolve);
-                result = Rx.Observable.return(resolved);
-            }
-            else if (cd.require) {
-                result = observableRequire(cd.require);
+        if (_cd != null) {
+            if (isRxObservable(_cd))
+                result = _cd;
+            else if (isPromise(_cd))
+                return Rx.Observable.fromPromise(_cd);
+            else {
+                // if the component has been registered as resource, resolve it now and update registry
+                let cd = _cd;
+                if (cd.instance) {
+                    result = Rx.Observable.return(cd.instance);
+                }
+                else if (cd.template) {
+                    result = Rx.Observable.return(cd);
+                }
+                else if (cd.resolve) {
+                    let resolved = injector.get(cd.resolve);
+                    result = Rx.Observable.return(resolved);
+                }
+                else if (cd.require) {
+                    result = observableRequire(cd.require);
+                }
             }
         }
         else {
             result = Rx.Observable.return(undefined);
         }
-        return result.do(x => this.components[name].instance = x); // cache instantiated component
+        return result.do(x => this.components[name] = { instance: x }); // cache descriptor
     }
     initializeComponent(obs, params) {
         return obs.take(1).selectMany(component => {
             if (component == null) {
                 return Rx.Observable.return(undefined);
             }
-            if (component.viewModel) {
-                // component with view-model & template
-                return Rx.Observable.combineLatest(this.loadComponentTemplate(component.template, params), this.loadComponentViewModel(component.viewModel, params), (t, vm) => {
-                    // if view-model factory yields a function, use it as constructor
-                    if (isFunction(vm)) {
-                        vm = new vm(params);
-                    }
-                    return {
-                        template: t,
-                        viewModel: vm,
-                        preBindingInit: component.preBindingInit,
-                        postBindingInit: component.postBindingInit
-                    };
-                });
-            }
-            // template-only component
-            return this.loadComponentTemplate(component.template, params)
-                .select(template => ({
-                template: template,
-                preBindingInit: component.preBindingInit,
-                postBindingInit: component.postBindingInit
-            }));
+            return Rx.Observable.combineLatest(this.loadComponentTemplate(component.template, params), component.viewModel ? this.loadComponentViewModel(component.viewModel, params) : Rx.Observable.return(undefined), (t, vm) => {
+                // if view-model factory yields a function, use it as constructor
+                if (isFunction(vm)) {
+                    vm = new vm(params);
+                }
+                return {
+                    template: t,
+                    viewModel: vm,
+                    preBindingInit: component.preBindingInit,
+                    postBindingInit: component.postBindingInit
+                };
+            });
         })
             .take(1);
     }
@@ -160,6 +157,8 @@ export class Module {
         let el;
         if (isFunction(template)) {
             syncResult = template(params);
+            if (isRxObservable(template))
+                return template;
             if (typeof syncResult === "string") {
                 syncResult = this.app.templateEngine.parse(template(params));
             }
@@ -182,35 +181,24 @@ export class Module {
                 let promise = options.promise;
                 return Rx.Observable.fromPromise(promise);
             }
+            else if (options.observable) {
+                return options.observable;
+            }
             else if (options.require) {
                 return observableRequire(options.require).select(x => this.app.templateEngine.parse(x));
             }
-            else if (options.element) {
-                if (typeof options.element === "string") {
-                    // try both getElementById & querySelector
-                    el = document.getElementById(options.element) ||
-                        document.querySelector(options.element);
-                    if (el != null) {
-                        // only the nodes inside the specified element will be cloned for use as the component’s template
-                        syncResult = this.app.templateEngine.parse(el.innerHTML);
-                    }
-                    else {
-                        syncResult = [];
-                    }
-                    return Rx.Observable.return(syncResult);
+            else if (options.select) {
+                // try both getElementById & querySelector
+                el = document.getElementById(options.select) ||
+                    document.querySelector(options.select);
+                if (el != null) {
+                    // only the nodes inside the specified element will be cloned for use as the component’s template
+                    syncResult = this.app.templateEngine.parse(el.innerHTML);
                 }
                 else {
-                    el = options.element;
-                    // unwrap text/html script nodes
-                    if (el != null) {
-                        // only the nodes inside the specified element will be cloned for use as the component’s template
-                        syncResult = this.app.templateEngine.parse(el.innerHTML);
-                    }
-                    else {
-                        syncResult = [];
-                    }
-                    return Rx.Observable.return(syncResult);
+                    syncResult = [];
                 }
+                return Rx.Observable.return(syncResult);
             }
         }
         throwError("invalid template descriptor");
@@ -230,6 +218,9 @@ export class Module {
             if (options.resolve) {
                 syncResult = injector.get(options.resolve, componentParams);
                 return Rx.Observable.return(syncResult);
+            }
+            else if (options.observable) {
+                return options.observable;
             }
             else if (options.promise) {
                 let promise = options.promise;

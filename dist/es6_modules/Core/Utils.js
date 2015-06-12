@@ -76,6 +76,15 @@ export function isRxObservable(target) {
     return target instanceof RxObsConstructor;
 }
 /**
+* Determines if target is an instance of a promise
+* @param {any} target
+*/
+export function isPromise(target) {
+    if (target == null)
+        return false;
+    return Rx.helpers.isPromise(target);
+}
+/**
 * If the prop is an observable property return its value
 * @param {any} prop
 */

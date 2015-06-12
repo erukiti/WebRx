@@ -594,13 +594,15 @@ module wx {
     export interface IComponentTemplateDescriptor {
         require?: string;       // Async AMD
         promise?: Rx.IPromise<Node[]>;  // Async Promise
+        observable?: Rx.Observable<Node[]>;  // Observable
         resolve?: string;       // DI
-        element?: string|Node;  // Selector or Node instance
+        select?: string;  // Selector
     }
 
     export interface IComponentViewModelDescriptor {
         require?: string;       // Async AMD loading
-        promise?: Rx.IPromise<string>;  // Async Promise
+        promise?: Rx.IPromise<any>;  // Async Promise
+        observable?: Rx.Observable<any>;  // Observable
         resolve?: string;       // DI
         instance?: any;         // pre-constructed instance
     }
@@ -626,7 +628,7 @@ module wx {
     }
 
     export interface IComponentRegistry {
-        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
+        component(name: string, descriptor: IComponentDescriptor|Rx.Observable<IComponentDescriptor>|Rx.IPromise<wx.IComponentDescriptor>): IComponentRegistry;
         hasComponent(name: string): boolean;
         loadComponent(name: string, params?: Object): Rx.Observable<IComponent>;
     }

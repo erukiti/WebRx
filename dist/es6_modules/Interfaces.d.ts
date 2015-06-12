@@ -519,12 +519,14 @@ declare module wx {
     interface IComponentTemplateDescriptor {
         require?: string;
         promise?: Rx.IPromise<Node[]>;
+        observable?: Rx.Observable<Node[]>;
         resolve?: string;
-        element?: string | Node;
+        select?: string;
     }
     interface IComponentViewModelDescriptor {
         require?: string;
-        promise?: Rx.IPromise<string>;
+        promise?: Rx.IPromise<any>;
+        observable?: Rx.Observable<any>;
         resolve?: string;
         instance?: any;
     }
@@ -543,7 +545,7 @@ declare module wx {
         postBindingInit?: string;
     }
     interface IComponentRegistry {
-        component(name: string, descriptor: IComponentDescriptor): IComponentRegistry;
+        component(name: string, descriptor: IComponentDescriptor | Rx.Observable<IComponentDescriptor> | Rx.IPromise<wx.IComponentDescriptor>): IComponentRegistry;
         hasComponent(name: string): boolean;
         loadComponent(name: string, params?: Object): Rx.Observable<IComponent>;
     }

@@ -36,6 +36,11 @@ export declare function isRxScheduler(target: any): boolean;
 */
 export declare function isRxObservable(target: any): boolean;
 /**
+* Determines if target is an instance of a promise
+* @param {any} target
+*/
+export declare function isPromise(target: any): boolean;
+/**
 * If the prop is an observable property return its value
 * @param {any} prop
 */
