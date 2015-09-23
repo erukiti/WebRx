@@ -2,7 +2,7 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define(factory);
+		define([], factory);
 	else if(typeof exports === 'object')
 		exports["wx"] = factory();
 	else
@@ -1770,7 +1770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 	var oid = 1;
@@ -1899,7 +1899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
@@ -2013,7 +2013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -2034,7 +2034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 	/// <summary>
@@ -2056,7 +2056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 	exports.app = "app";
@@ -4222,7 +4222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -4341,7 +4341,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Command_1 = __webpack_require__(20);
@@ -4691,7 +4690,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Module_1 = __webpack_require__(14);
@@ -4810,7 +4808,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -4972,7 +4969,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5055,7 +5051,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -5199,7 +5194,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -5311,7 +5305,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../RxExtensions.d.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var VirtualChildNodes_1 = __webpack_require__(27);
@@ -5716,7 +5709,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 27 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 	/**
@@ -5816,7 +5809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 28 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -6914,7 +6907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 30 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
 	/**
@@ -7000,7 +6993,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Command_1 = __webpack_require__(20);
@@ -7098,7 +7090,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var res = __webpack_require__(11);
@@ -7253,7 +7244,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -7393,7 +7383,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -7458,7 +7447,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -7561,7 +7549,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Command_1 = __webpack_require__(20);
@@ -7723,7 +7710,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var env = __webpack_require__(17);
@@ -7877,7 +7863,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Value_1 = __webpack_require__(33);
@@ -8054,7 +8039,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -8199,7 +8183,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -8297,7 +8280,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -8461,7 +8443,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 	/// <reference path="../../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -9373,9 +9354,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 49 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	exports.version = '0.9.87';
+	exports.version = '0.9.88';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },

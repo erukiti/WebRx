@@ -1,4 +1,3 @@
-/// <reference path="../../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.d.ts" />
 /**
 * Base class for one-way bindings that take a single expression and apply the result to one or more target elements

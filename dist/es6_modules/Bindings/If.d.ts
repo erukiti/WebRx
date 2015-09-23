@@ -1,4 +1,3 @@
-/// <reference path="../../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.d.ts" />
 export declare class IfBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp);

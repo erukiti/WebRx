@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../RxExtensions.d.ts" />
 import { throwError, cloneNodeArray, noop } from "../Core/Utils";
 import VirtualChildNodes from "./../Core/VirtualChildNodes";

@@ -1,4 +1,3 @@
-/// <reference path="../../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.d.ts" />
 export default class ModuleBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp);

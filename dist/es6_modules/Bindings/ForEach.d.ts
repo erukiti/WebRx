@@ -1,4 +1,3 @@
-/// <reference path="../../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../../../../src/RxExtensions.d.ts" />
 import VirtualChildNodes from "./../Core/VirtualChildNodes";
 export default class ForEachBinding implements wx.IBindingHandler {

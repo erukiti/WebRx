@@ -1,4 +1,3 @@
-/// <reference path="../../../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.d.ts" />
 import { MultiOneWayBindingBase } from "./BindingBase";
 export declare class CssBinding extends MultiOneWayBindingBase {

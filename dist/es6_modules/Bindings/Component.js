@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
 import { isFunction, throwError, isDisposable } from "../Core/Utils";
 "use strict";

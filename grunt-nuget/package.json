@@ -1,0 +1,56 @@
+{
+  "name": "grunt-nuget",
+  "description": "Grunt NuGet interface - Prepare, package and publish your application in NuGet gallery using Grunt JS",
+  "version": "0.1.4",
+  "homepage": "https://github.com/spatools/grunt-nuget.git",
+  "license": "MIT",
+  "author": {
+    "name": "SPA Tools",
+    "url": "http://github.com/spatools/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/spatools/grunt-nuget.git"
+  },
+  "bugs": {
+    "url": "https://github.com/spatools/grunt-nuget/issues"
+  },
+  "devDependencies": {
+    "grunt": "0.4.x",
+    "grunt-contrib-clean": "~0.5.0"
+  },
+  "dependencies": {
+    "grunt": "0.4.x"
+  },
+  "keywords": [
+    "gruntplugin",
+    "grunt",
+    "nuget",
+    "package",
+    "pack",
+    "spec",
+    "publish",
+    "gallery"
+  ],
+  "_id": "grunt-nuget@0.1.4",
+  "dist": {
+    "shasum": "f8a81d124fc5e1385e05a17ff8507c25c60f8627",
+    "tarball": "http://registry.npmjs.org/grunt-nuget/-/grunt-nuget-0.1.4.tgz"
+  },
+  "_from": "grunt-nuget@>=0.1.4 <0.2.0",
+  "_npmVersion": "1.4.3",
+  "_npmUser": {
+    "name": "spatools",
+    "email": "spa@somatic.fr"
+  },
+  "maintainers": [
+    {
+      "name": "spatools",
+      "email": "spa@somatic.fr"
+    }
+  ],
+  "directories": {},
+  "_shasum": "f8a81d124fc5e1385e05a17ff8507c25c60f8627",
+  "_resolved": "https://registry.npmjs.org/grunt-nuget/-/grunt-nuget-0.1.4.tgz",
+  "readme": "ERROR: No README data found!"
+}

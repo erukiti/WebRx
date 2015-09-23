@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
 /// <reference path="../Interfaces.ts" />
 import { throwError, unwrapProperty, isProperty } from "../Core/Utils";
 import { getNodeValue } from "./Value";
