@@ -9,7 +9,7 @@
     <description>WebRx is a Javascript MVVM-Framework built on ReactiveX for Javascript (RxJs) that combines functional-reactive programming with observable-powered declarative Data-Binding, Templating and client-side Routing.</description>
     <projectUrl>http://webrxjs.org</projectUrl>
     <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
-    <iconUrl>http://webrxjs.org/images/Logo.png<iconUrl>
+    <iconUrl>http://webrxjs.org/images/Logo.png</iconUrl>
     <language>en-US</language>
     <tags>Rx RxJS Reactive Extensions Observable Data-Binding Web UI SPA</tags>
     <dependencies>
