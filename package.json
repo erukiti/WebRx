@@ -1,6 +1,7 @@
 {
   "name": "webrx",
   "version": "0.9.88",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/WebRxJS/WebRx.git"
@@ -8,7 +9,7 @@
   "bugs": "https://github.com/WebRxJS/WebRx/issues",
   "browser": "dist/web.rx.js",
   "devDependencies": {
-    "URIjs": "^1.14.2",
+    "urijs": "^1.14.2",
     "bower": "^1.3.12",
     "browser-jquery": "^1.10.2",
     "grunt": "^0.4.5",
@@ -36,7 +37,7 @@
     "requirejs": "^2.1.16",
     "requirejs-text": "^2.0.12",
     "rsvp": "^3.0.17",
-    "rx": "~2.5.2",
+    "rx": "^3.0.0",
     "typescript": "~1.6.2",
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"

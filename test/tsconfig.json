@@ -1,9 +1,8 @@
 {
     "compilerOptions": {
         "target": "es5",
-        "module": "amd",
         "noImplicitAny": false,
-        "declaration": true,
+        "declaration": false,
         "removeComments": false,
         "preserveConstEnums": true,
         "experimentalDecorators": true,

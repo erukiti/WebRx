@@ -1,7 +1,6 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
-/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../src/web.rx.d.ts" />
 /// <reference path="../TestUtils.ts" />
+/// <reference path="../../node_modules/rx/ts/rx.testing.d.ts" />
 
 describe("Command", () => {
     it("implements ICommand", () => {

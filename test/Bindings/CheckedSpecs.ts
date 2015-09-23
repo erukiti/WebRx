@@ -1,7 +1,6 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../TestUtils.ts" />
-/// <reference path="../../src/web.rx.d.ts" />
 
 describe('Bindings', () => {
     describe('Checked', () => {

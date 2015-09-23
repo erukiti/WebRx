@@ -1,5 +1,4 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../RxExtensions.d.ts" />
+﻿/// <reference path="../RxExtensions.d.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, cloneNodeArray, noop } from "../Core/Utils"

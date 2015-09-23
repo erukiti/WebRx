@@ -1,5 +1,4 @@
-﻿/// <reference path="../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../Interfaces.ts" />
+﻿/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, throwError, unwrapProperty, toggleCssClass, elementCanBeDisabled } from "../Core/Utils"

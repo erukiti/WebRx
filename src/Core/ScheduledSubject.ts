@@ -3,7 +3,7 @@
 "use strict";
 
 class ScheduledSubject<T> implements Rx.IDisposable {
-    constructor(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>) {
+    constructor(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.Subject<T>) {
         this._scheduler = scheduler;
         this._defaultObserver = defaultObserver;
         this._subject = defaultSubject || new Rx.Subject<T>();
@@ -54,12 +54,12 @@ class ScheduledSubject<T> implements Rx.IDisposable {
 
     private _defaultObserver: Rx.Observer<T>;
     private _scheduler: Rx.IScheduler;
-    private _subject: Rx.ISubject<T>;
+    private _subject: Rx.Subject<T>;
     private _observerRefCount = 0;
     private _defaultObserverSub = Rx.Disposable.empty;
 }
 
-export function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.ISubject<T>): Rx.Subject<T> {
+export function createScheduledSubject<T>(scheduler: Rx.IScheduler, defaultObserver?: Rx.Observer<T>, defaultSubject?: Rx.Subject<T>): Rx.Subject<T> {
     let scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
     let result = extend(scheduled, new Rx.Subject<T>(), true);
 

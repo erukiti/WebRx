@@ -1,5 +1,6 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
+/// <reference path="../../node_modules/rx/ts/rx.testing.d.ts" />
 
 describe("MessageBus", () => {
     it("Smoke-Test", () => {

@@ -1,5 +1,4 @@
-﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Interfaces.ts" />
+﻿/// <reference path="../../Interfaces.ts" />
 
 import { extend, isInUnitTest, args2Array, unwrapProperty, throwError, noop, formatString, nodeChildrenToArray, isEqual } from "../../Core/Utils"
 import * as log from "../../Core/Log"

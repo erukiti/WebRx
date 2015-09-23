@@ -1,5 +1,4 @@
-﻿/// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
-/// <reference path="../../Interfaces.ts" />
+﻿/// <reference path="../../Interfaces.ts" />
 
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, toggleCssClass } from "../../Core/Utils"
 

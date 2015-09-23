@@ -522,10 +522,10 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable 
         this.resetSubject = new Rx.Subject<any>();
         this.beforeResetSubject = new Rx.Subject<any>();
 
-        this.itemChangingSubject = new Lazy<Rx.ISubject<wx.IPropertyChangedEventArgs>>(() =>
+        this.itemChangingSubject = new Lazy<Rx.Subject<wx.IPropertyChangedEventArgs>>(() =>
             <any> createScheduledSubject<wx.IPropertyChangedEventArgs>(scheduler));
 
-        this.itemChangedSubject = new Lazy<Rx.ISubject<wx.IPropertyChangedEventArgs>>(() =>
+        this.itemChangedSubject = new Lazy<Rx.Subject<wx.IPropertyChangedEventArgs>>(() =>
             <any> createScheduledSubject<wx.IPropertyChangedEventArgs>(scheduler));
 
         this.beforeItemsMovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
