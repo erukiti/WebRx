@@ -4,15 +4,15 @@ module.exports = function (grunt) {
     var conf = {
         shell: {
             tsc_src_es5: {
-                command: 'node node_modules/typescript/bin/tsc.js -t es5 -m commonjs --rootDir src -p src --outDir build/src/es5',
+                command: 'node node_modules/typescript/bin/tsc -t es5 -m commonjs --rootDir src -p src --outDir build/src/es5',
             },
 
             tsc_src_es6: {
-                command: 'node node_modules/typescript/bin/tsc.js -t es6 --rootDir src -p src --outDir build/src/es6',
+                command: 'node node_modules/typescript/bin/tsc -t es6 --rootDir src -p src --outDir build/src/es6',
             },
 
             tsc_specs: {
-                command: 'node node_modules/typescript/bin/tsc.js -p test',
+                command: 'node node_modules/typescript/bin/tsc -p test',
             },
 
             gitadd: {

@@ -233,8 +233,7 @@ module testutils {
             $data: models[0],
             $root: models[models.length - 1],
             $parent: models.length > 1 ? models[1] : null,
-            $parents: models.slice(1),
-            $index: undefined
+            $parents: models.slice(1)
         };
 
         return ctx;
