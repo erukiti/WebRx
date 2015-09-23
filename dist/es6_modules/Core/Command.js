@@ -115,7 +115,7 @@ export let Command = class {
 Command = __decorate([
     Implements(IID.ICommand),
     Implements(IID.IDisposable), 
-    __metadata('design:paramtypes', [Rx.Observable, Function, Object])
+    __metadata('design:paramtypes', [Object, Function, Object])
 ], Command);
 export var internal;
 (function (internal) {

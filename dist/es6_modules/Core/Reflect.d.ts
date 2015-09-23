@@ -473,4 +473,4 @@ export declare const implementsMetaDataKey: string;
 * Interface decorator
 * @param {string} interfaceName Name of an interface
 */
-export declare function Implements(value: string | Array<string>): (target: Object | Function) => void;
+export declare function Implements(value: string | Array<string>): (target: Function | Object) => void;

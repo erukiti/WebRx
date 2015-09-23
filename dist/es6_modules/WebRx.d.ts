@@ -17,4 +17,6 @@ export { getNodeValue, setNodeValue } from "./Bindings/Value";
 export { injector } from "./Core/Injector";
 export { default as IID } from "./IID";
 export { SingleOneWayBindingBase, MultiOneWayBindingBase } from "./Bindings/BindingBase";
+import * as res from "./Core/Resources";
+import * as env from "./Core/Environment";
 export { env, res };

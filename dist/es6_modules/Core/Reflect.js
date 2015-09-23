@@ -149,7 +149,7 @@ export function metadata(metadataKey, metadataValue) {
             if (!IsConstructor(target)) {
                 throw new TypeError();
             }
-            OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, undefined);
+            OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, /*targetKey*/ undefined);
         }
     }
     return decorator;
@@ -500,7 +500,7 @@ export function deleteMetadata(metadataKey, target, targetKey) {
         targetKey = ToPropertyKey(targetKey);
     }
     // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#deletemetadata-metadatakey-p-
-    let metadataMap = GetOrCreateMetadataMap(target, targetKey, false);
+    let metadataMap = GetOrCreateMetadataMap(target, targetKey, /*create*/ false);
     if (IsUndefined(metadataMap)) {
         return false;
     }
@@ -584,7 +584,7 @@ function OrdinaryHasMetadata(MetadataKey, O, P) {
 }
 // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryhasownmetadata--metadatakey-o-p-
 function OrdinaryHasOwnMetadata(MetadataKey, O, P) {
-    let metadataMap = GetOrCreateMetadataMap(O, P, false);
+    let metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ false);
     if (metadataMap === undefined) {
         return false;
     }
@@ -604,7 +604,7 @@ function OrdinaryGetMetadata(MetadataKey, O, P) {
 }
 // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarygetownmetadata--metadatakey-o-p-
 function OrdinaryGetOwnMetadata(MetadataKey, O, P) {
-    let metadataMap = GetOrCreateMetadataMap(O, P, false);
+    let metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ false);
     if (metadataMap === undefined) {
         return undefined;
     }
@@ -612,7 +612,7 @@ function OrdinaryGetOwnMetadata(MetadataKey, O, P) {
 }
 // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarydefineownmetadata--metadatakey-metadatavalue-o-p-
 function OrdinaryDefineOwnMetadata(MetadataKey, MetadataValue, O, P) {
-    let metadataMap = GetOrCreateMetadataMap(O, P, true);
+    let metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ true);
     metadataMap.set(MetadataKey, MetadataValue);
 }
 // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarymetadatakeys--o-p-
@@ -649,7 +649,7 @@ function OrdinaryMetadataKeys(O, P) {
 }
 // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryownmetadatakeys--o-p-
 function OrdinaryOwnMetadataKeys(target, targetKey) {
-    let metadataMap = GetOrCreateMetadataMap(target, targetKey, false);
+    let metadataMap = GetOrCreateMetadataMap(target, targetKey, /*create*/ false);
     let keys = [];
     if (metadataMap) {
         metadataMap.forEach((_, key) => keys.push(key));

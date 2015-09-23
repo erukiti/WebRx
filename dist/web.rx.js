@@ -120,8 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
-	    __.prototype = b.prototype;
-	    d.prototype = new __();
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Injector_1 = __webpack_require__(2);
 	var Utils_1 = __webpack_require__(3);
@@ -1110,7 +1109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (!IsConstructor(target)) {
 	                throw new TypeError();
 	            }
-	            OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, undefined);
+	            OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, /*targetKey*/ undefined);
 	        }
 	    }
 	    return decorator;
@@ -1469,7 +1468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        targetKey = ToPropertyKey(targetKey);
 	    }
 	    // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#deletemetadata-metadatakey-p-
-	    var metadataMap = GetOrCreateMetadataMap(target, targetKey, false);
+	    var metadataMap = GetOrCreateMetadataMap(target, targetKey, /*create*/ false);
 	    if (IsUndefined(metadataMap)) {
 	        return false;
 	    }
@@ -1554,7 +1553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryhasownmetadata--metadatakey-o-p-
 	function OrdinaryHasOwnMetadata(MetadataKey, O, P) {
-	    var metadataMap = GetOrCreateMetadataMap(O, P, false);
+	    var metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ false);
 	    if (metadataMap === undefined) {
 	        return false;
 	    }
@@ -1574,7 +1573,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarygetownmetadata--metadatakey-o-p-
 	function OrdinaryGetOwnMetadata(MetadataKey, O, P) {
-	    var metadataMap = GetOrCreateMetadataMap(O, P, false);
+	    var metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ false);
 	    if (metadataMap === undefined) {
 	        return undefined;
 	    }
@@ -1582,7 +1581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarydefineownmetadata--metadatakey-metadatavalue-o-p-
 	function OrdinaryDefineOwnMetadata(MetadataKey, MetadataValue, O, P) {
-	    var metadataMap = GetOrCreateMetadataMap(O, P, true);
+	    var metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ true);
 	    metadataMap.set(MetadataKey, MetadataValue);
 	}
 	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarymetadatakeys--o-p-
@@ -1621,7 +1620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryownmetadatakeys--o-p-
 	function OrdinaryOwnMetadataKeys(target, targetKey) {
-	    var metadataMap = GetOrCreateMetadataMap(target, targetKey, false);
+	    var metadataMap = GetOrCreateMetadataMap(target, targetKey, /*create*/ false);
 	    var keys = [];
 	    if (metadataMap) {
 	        metadataMap.forEach(function (_, key) { return keys.push(key); });
@@ -1710,7 +1709,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Oid_1 = __webpack_require__(6);
 	"use strict";
@@ -1810,7 +1809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	var Oid_1 = __webpack_require__(6);
 	"use strict";
@@ -1902,7 +1901,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/// <reference path="../../node_modules/typescript/bin/lib.es6.d.ts" />
+	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
 	/**
@@ -2051,6 +2050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    IID.IHandleObservableErrors = "IHandleObservableErrors";
 	    return IID;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = IID;
 	//# sourceMappingURL=IID.js.map
 
@@ -4333,6 +4333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return HtmlTemplateEngine;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = HtmlTemplateEngine;
 	//# sourceMappingURL=HtmlTemplateEngine.js.map
 
@@ -4443,6 +4444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return CommandBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = CommandBinding;
 	//# sourceMappingURL=Command.js.map
 
@@ -4580,7 +4582,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Command = __decorate([
 	        Reflect_1.Implements(IID_1.default.ICommand),
 	        Reflect_1.Implements(IID_1.default.IDisposable), 
-	        __metadata('design:paramtypes', [Rx.Observable, Function, Object])
+	        __metadata('design:paramtypes', [Object, Function, Object])
 	    ], Command);
 	    return Command;
 	})();
@@ -4800,6 +4802,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return ModuleBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ModuleBinding;
 	//# sourceMappingURL=Module.js.map
 
@@ -4812,8 +4815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
-	    __.prototype = b.prototype;
-	    d.prototype = new __();
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
@@ -4975,8 +4977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
-	    __.prototype = b.prototype;
-	    d.prototype = new __();
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
 	var BindingBase_1 = __webpack_require__(24);
@@ -5203,8 +5204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
-	    __.prototype = b.prototype;
-	    d.prototype = new __();
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
 	var BindingBase_1 = __webpack_require__(24);
@@ -5710,6 +5710,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return ForEachBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ForEachBinding;
 	//# sourceMappingURL=ForEach.js.map
 
@@ -5809,6 +5810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return VirtualChildNodes;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = VirtualChildNodes;
 	//# sourceMappingURL=VirtualChildNodes.js.map
 
@@ -5839,6 +5841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return RefCountDisposeWrapper;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = RefCountDisposeWrapper;
 	//# sourceMappingURL=RefCountDisposeWrapper.js.map
 
@@ -5850,8 +5853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
-	    __.prototype = b.prototype;
-	    d.prototype = new __();
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
 	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
@@ -6936,6 +6938,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    return Lazy;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = Lazy;
 	//# sourceMappingURL=Lazy.js.map
 
@@ -7087,6 +7090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return EventBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = EventBinding;
 	//# sourceMappingURL=Event.js.map
 
@@ -7191,6 +7195,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return ValueBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ValueBinding;
 	/**
 	 * For certain elements such as select and input type=radio we store
@@ -7380,6 +7385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return HasFocusBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = HasFocusBinding;
 	//# sourceMappingURL=HasFocus.js.map
 
@@ -7444,6 +7450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return WithBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = WithBinding;
 	//# sourceMappingURL=With.js.map
 
@@ -7546,6 +7553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return CheckedBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = CheckedBinding;
 	//# sourceMappingURL=Checked.js.map
 
@@ -7707,6 +7715,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return KeyPressBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = KeyPressBinding;
 	//# sourceMappingURL=KeyPress.js.map
 
@@ -7860,6 +7869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return TextInputBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = TextInputBinding;
 	//# sourceMappingURL=TextInput.js.map
 
@@ -8036,6 +8046,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return SelectedValueBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = SelectedValueBinding;
 	//# sourceMappingURL=SelectedValue.js.map
 
@@ -8180,6 +8191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return ComponentBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ComponentBinding;
 	//# sourceMappingURL=Component.js.map
 
@@ -8277,6 +8289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return StateActiveBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = StateActiveBinding;
 	//# sourceMappingURL=StateActive.js.map
 
@@ -8440,6 +8453,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return ViewBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = ViewBinding;
 	//# sourceMappingURL=View.js.map
 
@@ -8536,6 +8550,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return StateRefBinding;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = StateRefBinding;
 	//# sourceMappingURL=StateRef.js.map
 
@@ -8644,6 +8659,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return SelectComponent;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = SelectComponent;
 	//# sourceMappingURL=Select.js.map
 
@@ -8738,6 +8754,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return RadioGroupComponent;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = RadioGroupComponent;
 	//# sourceMappingURL=RadioGroup.js.map
 
@@ -9350,6 +9367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return MessageBus;
 	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = MessageBus;
 	//# sourceMappingURL=MessageBus.js.map
 
