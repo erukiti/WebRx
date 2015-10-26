@@ -34,7 +34,8 @@ bower install WebRx
 ```
 - NPM Installation
 ```bash
-npm install webrx
+npm install rx@">=4.0.0 <5.0.0" --save-dev
+npm install webrx --save-dev
 ```
 - or download the [latest release as zip](http://webrxjs.org/downloads/web.rx.zip)
 
