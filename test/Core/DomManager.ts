@@ -1,5 +1,6 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
+/// <reference path="../../node_modules/rx/ts/rx.lite.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../typings/l2o.d.ts" />
