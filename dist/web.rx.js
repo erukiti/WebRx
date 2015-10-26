@@ -9354,7 +9354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports.version = '1.0.1';
+	exports.version = '1.1.0';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
