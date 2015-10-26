@@ -2,7 +2,7 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define([], factory);
+		define(factory);
 	else if(typeof exports === 'object')
 		exports["wx"] = factory();
 	else
@@ -1770,7 +1770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var oid = 1;
@@ -1899,7 +1899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 8 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
@@ -2013,7 +2013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -2034,7 +2034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 10 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/// <summary>
@@ -2056,7 +2056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 11 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	exports.app = "app";
@@ -4222,7 +4222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 18 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -4493,9 +4493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.canExecuteLatest = x;
 	        })
 	            .publish();
-	        if (Utils_1.isInUnitTest()) {
-	            this.canExecuteObs.connect();
-	        }
+	        this.canExecuteObs.connect();
 	        // setup thrownExceptions
 	        this.exceptionsSubject = new Rx.Subject();
 	        this.thrownExceptions = this.exceptionsSubject.asObservable();
@@ -5709,7 +5707,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 27 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/**
@@ -5809,7 +5807,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 28 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -6907,7 +6905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 30 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/**
@@ -9354,9 +9352,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 49 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	exports.version = '0.9.88';
+	exports.version = '1.0.0';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },

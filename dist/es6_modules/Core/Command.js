@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import IID from "./../IID";
-import { isInUnitTest, args2Array, isFunction, isRxScheduler, isRxObservable, queryInterface } from "././Utils";
+import { args2Array, isFunction, isRxScheduler, isRxObservable, queryInterface } from "././Utils";
 import { Implements } from "././Reflect";
 import { injector } from "../Core/Injector";
 import * as res from "../Core/Resources";
@@ -39,9 +39,7 @@ export let Command = class {
             this.canExecuteLatest = x;
         })
             .publish();
-        if (isInUnitTest()) {
-            this.canExecuteObs.connect();
-        }
+        this.canExecuteObs.connect();
         // setup thrownExceptions
         this.exceptionsSubject = new Rx.Subject();
         this.thrownExceptions = this.exceptionsSubject.asObservable();
