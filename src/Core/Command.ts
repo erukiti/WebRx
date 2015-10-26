@@ -31,9 +31,7 @@ export class Command<T> implements wx.ICommand<T> {
             })
             .publish();
 
-        if (isInUnitTest()) {
-            this.canExecuteObs.connect();
-        }
+        this.canExecuteObs.connect();
 
         // setup thrownExceptions
         this.exceptionsSubject = new Rx.Subject<Error>();
