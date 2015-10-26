@@ -1,5 +1,6 @@
 ﻿/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../TestUtils.ts" />
+/// <reference path="../../node_modules/rx/ts/rx.virtualtime.d.ts" />
 /// <reference path="../../node_modules/rx/ts/rx.testing.d.ts" />
 
 describe("Command", () => {
@@ -97,8 +98,7 @@ describe("Command", () => {
 
         expect(range).toEqual(executed_params.filter(x => typeof x === "number"));
 
-        Rx.Observable.fromArray(range)
-            .zip(observed_params, (expected, actual) => [expected, actual])
+        Rx.Observable.zip(Rx.Observable.fromArray(range), observed_params, (expected, actual) => [expected, actual])
             .subscribe(x => expect(x[0]).toEqual(x[1]));
     });
 
