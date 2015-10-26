@@ -1,5 +1,3 @@
-/// <reference path="../node_modules/rx/ts/rx.lite.d.ts" />
-
 declare module wx {
     /**        
     /* Dependency Injector and service locator
