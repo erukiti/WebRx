@@ -42,5 +42,7 @@
     "webpack": "^1.9.10",
     "webpack-dev-server": "^1.9.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "rx": "^3.0.0"
+  }
 }
