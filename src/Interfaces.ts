@@ -1036,4 +1036,85 @@ module wx {
         name: string;
         params?: Object;
     }
+
+    export interface IHttpClientOptions {
+        url?: string;
+        method?: string;
+        params?: Object;
+        data?: any;
+        headers?: Object;
+        raw?: boolean;  // do not deserialize response text
+        dump?: (any)=> string;
+        load?: (string)=> Object;
+        xmlHttpRequest?: ()=> XMLHttpRequest;
+        promise?: (fn)=> Promise<any>;
+    }
+    
+    export interface IHttpClient {
+        /**
+        * Performs a http-get-request
+        * 
+        * @param {string} url The request url 
+        * @param {Object} params Query string parameters to be appended to the request url. Values will be uri-encoded 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        get<T>(url: string, params?: Object, options?: wx.IHttpClientOptions): Promise<T>;
+
+        /**
+        * Performs a http-put-request
+        * 
+        * @param {string} url The request url 
+        * @param {any} data The data to be sent to the server 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        put<T>(url: string, data: T, options?: wx.IHttpClientOptions): Promise<any>;
+
+        /**
+        * Performs a http-post-request
+        * 
+        * @param {string} url The request url 
+        * @param {any} data The data to be sent to the server 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        post<T>(url: string, data: T, options?: wx.IHttpClientOptions): Promise<any>;
+
+        /**
+        * Performs a http-patch-request
+        * 
+        * @param {string} url The request url 
+        * @param {any} data The data to be sent to the server 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        patch<T>(url: string, data: T, options?: wx.IHttpClientOptions): Promise<any>;
+
+        /**
+        * Performs a http-delete-request
+        * 
+        * @param {string} url The request url 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        delete(url: string, options?: wx.IHttpClientOptions): Promise<any>;
+
+        /**
+        * Performs a http-options-request
+        * 
+        * @param {string} url The request url 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        options(url: string, options?: wx.IHttpClientOptions): Promise<any>;
+
+        /**
+        * Performs a http-request according to the specified options
+        * 
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        **/
+        request<T>(options: wx.IHttpClientOptions): Promise<T>;
+
+        /**
+        * Configures this HttpClient instance
+        * 
+        * @param {wx.IHttpClientOptions} opts The configuration object
+        **/
+        configure(opts: wx.IHttpClientOptions): void;
+    }
 }

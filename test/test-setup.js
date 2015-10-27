@@ -20,6 +20,10 @@ if (window._phantom) {
       this.dispatchEvent(ev);
     };
   }
+  
+  // setup promises support using RSVP
+  if(typeof window.Promise === 'undefined')
+    window.Promise = RSVP.Promise
 }
 
 requirejs.config({

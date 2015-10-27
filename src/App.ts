@@ -31,6 +31,7 @@ import SelectComponent from "./Components/Select"
 import RadioGroupComponent from "./Components/RadioGroup"
 import { Router } from "./Routing/Router"
 import MessageBus from "./Core/MessageBus"
+import HttpClient from "./Core/HttpClient"
 import { version } from "./Version"
 
 // make sure RxExtensions get installed
@@ -181,7 +182,8 @@ class App extends Module implements wx.IWebRxApp {
             .register(res.templateEngine, [HtmlTemplateEngine], true)
             .register(res.domManager, [res.expressionCompiler, res.app, DomManager], true)
             .register(res.router, [res.domManager, res.app, Router], true)
-            .register(res.messageBus, [MessageBus], true);
+            .register(res.messageBus, [MessageBus], true)
+            .register(res.httpClient, [HttpClient], false);
 
         injector.register("bindings.module", [res.domManager, res.app, ModuleBinding], true)
             .register("bindings.command", [res.domManager, res.app, CommandBinding], true)
