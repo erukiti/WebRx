@@ -2,6 +2,8 @@
 [![Bower version](https://img.shields.io/bower/v/WebRx.svg)](https://github.com/WebRxJS/WebRx)
 [![NPM version](https://img.shields.io/npm/v/webrx.svg)](https://www.npmjs.com/package/webrx)
 [![NuGet version](https://img.shields.io/nuget/v/WebRx.svg)](https://www.nuget.org/packages/WebRx/)
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/WebRxJS/WebRxJS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 # <img src="http://webrxjs.org/images/Logo.png" height="32" /> WebRx
@@ -45,7 +47,7 @@ Make sure to include script-references to rx.all.js **before** web.rx.js when in
 
 WebRx's documentation can be found on [here](http://webrxjs.org/docs).
 
-#### Support 
+#### Support
 
 Post your questions to [Stackoverflow](https://stackoverflow.com/questions/tagged/webrx) tagged with <code>webrx</code>.
 
@@ -55,7 +57,7 @@ There are many ways to [contribute](https://github.com/oliverw/WebRx/blob/master
 
 * [Submit bugs](https://github.com/oliverw/WebRx/issues) and help us verify fixes as they are checked in.
 * Review the [source code changes](https://github.com/oliverw/WebRx/pulls).
-* Engage with other WebRx users and developers on [StackOverflow](http://stackoverflow.com/questions/tagged/webrx). 
+* Engage with other WebRx users and developers on [StackOverflow](http://stackoverflow.com/questions/tagged/webrx).
 * Join the [#webrx](http://twitter.com/#!/search/realtime/%23webrx) discussion on Twitter.
 * [Contribute bug fixes](https://github.com/oliverw/WebRx/blob/master/CONTRIBUTING.md).
 * Cast your vote at [AlternativeTo](http://alternativeto.net/software/webrx/)
