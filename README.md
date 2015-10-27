@@ -4,8 +4,6 @@
 [![NuGet version](https://img.shields.io/nuget/v/WebRx.svg)](https://www.nuget.org/packages/WebRx/)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/WebRxJS/WebRxJS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
-
 # <img src="http://webrxjs.org/images/Logo.png" height="32" /> WebRx
 
 WebRx is a browser-based MVVM-Framework that combines functional-reactive programming with declarative Data-Binding, Templating and Client-Side Routing.
