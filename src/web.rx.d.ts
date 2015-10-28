@@ -1437,6 +1437,11 @@ declare module wx {
         **/
         configure(opts: wx.IHttpClientOptions): void;
     }
+
+    /**
+    * Provides editable configuration defaults for all newly created HttpClient instances.
+    **/
+    function getHttpClientDefaultConfig(): wx.IHttpClientOptions;
 }
 
 declare module Rx {

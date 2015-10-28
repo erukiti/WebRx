@@ -24,7 +24,7 @@ export default class HttpClient implements wx.IHttpClient {
     LOAD_END: 'loadend'
   };
 
-  private static defaults: wx.IHttpClientOptions = {
+  public static defaults: wx.IHttpClientOptions = {
     method: HttpClient.Methods.GET,
     data: undefined,
     headers: {
@@ -174,4 +174,11 @@ export default class HttpClient implements wx.IHttpClient {
     let opts: wx.IHttpClientOptions = { url: url, method: HttpClient.Methods.OPTIONS };
     return this.request(this.assign(opts, options));
   }
+}
+
+/**
+* Provides editable configuration defaults for all newly created HttpClient instances.
+**/
+export function getHttpClientDefaultConfig(): wx.IHttpClientOptions {
+  return HttpClient.defaults;
 }

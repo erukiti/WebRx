@@ -238,7 +238,7 @@ describe("HttpClient", () => {
         });
     });
 
-    it("utilizes configured dump() function", () => {
+    it("utilizes locally configured dump() function", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var requestData = { 'foo': 'bar'};
@@ -257,7 +257,7 @@ describe("HttpClient", () => {
         expect(jasmine.Ajax.requests.mostRecent().data().foo).toEqual(requestData.foo);
     });
 
-    it("utilizes configured load() function", (done) => {
+    it("utilizes locally configured load() function", (done) => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var responseData = 'bar';
@@ -269,6 +269,51 @@ describe("HttpClient", () => {
         };
         
         client.configure(options);
+        
+        client.get(requestUrl).then(response=> {
+            expect(response).toEqual("foo_bar");
+            done();
+        }, (reason)=> {
+            fail(reason);
+            done();
+        });
+
+        expect(jasmine.Ajax.requests.mostRecent().url).toBe(requestUrl);
+
+        jasmine.Ajax.requests.mostRecent().respondWith({
+            "status": 200,
+            "contentType": 'text/plain',
+            "responseText": responseData
+        });
+    });
+
+    it("utilizes globally configured dump() function", () => {
+        var requestUrl = '/some/cool/url';
+        var requestData = { 'foo': 'bar'};
+
+        var options = wx.getHttpClientDefaultConfig();
+        options.dump = (data: any)=> {
+            return JSON.stringify(requestData);
+        };
+        
+        var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
+        
+        client.post(requestUrl, { 'foo': 'baz'})
+
+        expect(jasmine.Ajax.requests.mostRecent().url).toBe(requestUrl);
+        expect(jasmine.Ajax.requests.mostRecent().data().foo).toEqual(requestData.foo);
+    });
+
+    it("utilizes globally configured load() function", (done) => {
+        var requestUrl = '/some/cool/url';
+        var responseData = 'bar';
+
+        var options = wx.getHttpClientDefaultConfig();
+        options.load = (data: string)=> {
+            return "foo_" + data;
+        };
+
+        var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         
         client.get(requestUrl).then(response=> {
             expect(response).toEqual("foo_bar");
