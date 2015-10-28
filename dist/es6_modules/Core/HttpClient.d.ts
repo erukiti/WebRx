@@ -4,7 +4,7 @@
 export default class HttpClient implements wx.IHttpClient {
     private static Methods;
     private static Events;
-    private static defaults;
+    static defaults: wx.IHttpClientOptions;
     private res(xhr);
     private assign(l, ...rs);
     private config;
@@ -18,3 +18,7 @@ export default class HttpClient implements wx.IHttpClient {
     delete(url: string, options?: wx.IHttpClientOptions): Promise<any>;
     options(url: string, options?: wx.IHttpClientOptions): Promise<any>;
 }
+/**
+* Provides editable configuration defaults for all newly created HttpClient instances.
+**/
+export declare function getHttpClientDefaultConfig(): wx.IHttpClientOptions;

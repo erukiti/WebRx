@@ -102,7 +102,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.injector = Injector_1.injector;
 	var IID_1 = __webpack_require__(10);
 	exports.IID = IID_1.default;
-	__export(__webpack_require__(49));
+	var HttpClient_1 = __webpack_require__(49);
+	exports.getHttpClientDefaultConfig = HttpClient_1.getHttpClientDefaultConfig;
 	var BindingBase_1 = __webpack_require__(25);
 	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
 	exports.MultiOneWayBindingBase = BindingBase_1.MultiOneWayBindingBase;
@@ -9509,13 +9510,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = HttpClient;
+	/**
+	* Provides editable configuration defaults for all newly created HttpClient instances.
+	**/
+	function getHttpClientDefaultConfig() {
+	    return HttpClient.defaults;
+	}
+	exports.getHttpClientDefaultConfig = getHttpClientDefaultConfig;
 	//# sourceMappingURL=HttpClient.js.map
 
 /***/ },
 /* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports.version = '1.2.0';
+	exports.version = '1.2.1';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },

@@ -141,4 +141,10 @@ HttpClient.defaults = {
     xmlHttpRequest: () => new XMLHttpRequest(),
     promise: fn => new Promise(fn)
 };
+/**
+* Provides editable configuration defaults for all newly created HttpClient instances.
+**/
+export function getHttpClientDefaultConfig() {
+    return HttpClient.defaults;
+}
 //# sourceMappingURL=HttpClient.js.map
