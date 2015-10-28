@@ -255,11 +255,12 @@ module.exports = function (grunt) {
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
     grunt.registerTask("test", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
     grunt.registerTask("debug", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("dist", ["gen-ver", "clean:build", "shell:tsc_src_es5", "shell:tsc_src_es6", "madge:src", "webpack:webrx", "shell:tsc_specs", "clean:dist", "copy:dist", "uglify:dist", "jasmine:dist", "compress:dist"]);
+    grunt.registerTask("build-dist", ["gen-ver", "clean:build", "shell:tsc_src_es5", "shell:tsc_src_es6", "madge:src", "webpack:webrx", "clean:dist", "copy:dist", "uglify:dist", "compress:dist"]);
+    grunt.registerTask("dist", ["gen-ver", "build-dist", "shell:tsc_specs", "jasmine:dist"]);
     grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src_es5", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
-    grunt.registerTask('publish:patch', ['dist', 'bump:patch', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
-    grunt.registerTask('publish:minor', ['dist', 'bump:minor', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
-    grunt.registerTask('publish:major', ['dist', 'bump:major', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
+    grunt.registerTask('publish:patch', ['dist', 'bump:patch', 'build-dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
+    grunt.registerTask('publish:minor', ['dist', 'bump:minor', 'build-dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
+    grunt.registerTask('publish:major', ['dist', 'bump:major', 'build-dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
     grunt.registerTask('publish', ['publish:patch']);
 };
