@@ -29,9 +29,10 @@ export function isPrimitive(target) {
 export function queryInterface(target, iid) {
     if (target == null || isPrimitive(target))
         return false;
-    if (!isFunction(target["queryInterface"]))
+    var unk = target;
+    if (!isFunction(unk.queryInterface))
         return false;
-    return target.queryInterface(iid);
+    return unk.queryInterface(iid);
 }
 /**
 * Returns all own properties of target implementing interface iid

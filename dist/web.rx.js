@@ -500,9 +500,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	function queryInterface(target, iid) {
 	    if (target == null || isPrimitive(target))
 	        return false;
-	    if (!isFunction(target["queryInterface"]))
+	    var unk = target;
+	    if (!isFunction(unk.queryInterface))
 	        return false;
-	    return target.queryInterface(iid);
+	    return unk.queryInterface(iid);
 	}
 	exports.queryInterface = queryInterface;
 	/**
@@ -8648,7 +8649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 48 */
 /***/ function(module, exports) {
 
-	exports.version = '1.2.1';
+	exports.version = '1.3.0';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
