@@ -42,10 +42,11 @@ export function queryInterface(target: any, iid: string): boolean {
     if(target == null || isPrimitive(target))
         return false;
     
-    if(!isFunction(target["queryInterface"]))
+    var unk = <wx.IUnknown> target;
+    if(!isFunction(unk.queryInterface))
         return false;
     
-    return (<wx.IUnknown> target).queryInterface(iid);
+    return unk.queryInterface(iid);
 }
 
 /**
