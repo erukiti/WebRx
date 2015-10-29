@@ -797,6 +797,10 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     public reset(): void {
         using(super.suppressChangeNotifications(),() => {
             super.clear();
+
+            this.indexToSourceIndexMap = [];
+            this.sourceCopy = [];
+
             this.addAllItemsFromSourceCollection();
         });
     }

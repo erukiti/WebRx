@@ -549,6 +549,8 @@ class ObservableListProjection extends ObservableList {
     reset() {
         using(super.suppressChangeNotifications(), () => {
             super.clear();
+            this.indexToSourceIndexMap = [];
+            this.sourceCopy = [];
             this.addAllItemsFromSourceCollection();
         });
     }

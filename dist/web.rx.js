@@ -5612,6 +5612,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = this;
 	        Utils_1.using(_super.prototype.suppressChangeNotifications.call(this), function () {
 	            _super.prototype.clear.call(_this);
+	            _this.indexToSourceIndexMap = [];
+	            _this.sourceCopy = [];
 	            _this.addAllItemsFromSourceCollection();
 	        });
 	    };
