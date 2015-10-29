@@ -716,7 +716,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
         this.beforeResetSubject.onNext(true);
     }
 
-    private isLengthAboveResetThreshold(toChangeLength: number): boolean {
+    protected isLengthAboveResetThreshold(toChangeLength: number): boolean {
         return toChangeLength / this.inner.length > this.resetChangeThreshold && toChangeLength > 10;
     }
 }
@@ -850,9 +850,10 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
 
     private refresh(): void {
         let length = this.sourceCopy.length;
+        const sourceCopyIds = this.sourceCopy.map(x=> getOid(x));
 
         for(let i = 0; i < length; i++) {
-            this.onItemChanged(this.sourceCopy[i]);
+            this.onItemChanged(this.sourceCopy[i], sourceCopyIds);
         }
     }
 
@@ -877,7 +878,9 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
             this.reset();
         }));
 
-        this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribe(x => this.onItemChanged(x)));
+        this.disp.add(this.source.itemChanged.select(x => x.sender)
+            .observeOn(this.scheduler)
+            .subscribe(x => this.onItemChanged(x)));
 
         if (this.refreshTrigger != null) {
             this.disp.add(this.refreshTrigger.observeOn(this.scheduler).subscribe(_ => this.refresh()));
@@ -962,16 +965,20 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     private onItemsReplaced(e: wx.IListChangeInfo<T>) {
+        const sourceCopyOids = this.isLengthAboveResetThreshold(e.items.length) ? 
+            this.sourceCopy.map(x=> getOid(x)) : 
+            null;
+        
         for(let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
 
-            this.onItemChanged(sourceItem);
+            this.onItemChanged(sourceItem, sourceCopyOids);
         }
     }
 
-    private onItemChanged(changedItem: T): void {
-        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
+    private onItemChanged(changedItem: T, sourceCopyIds?: Array<string>): void {
+        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceCopyIds);
         let shouldBeIncluded = !this._filter || this._filter(changedItem);
         const sourceIndicesLength = sourceIndices.length;
 
@@ -1070,22 +1077,35 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     /// <summary>
-    /// Returns one or more positions in the source collection where the given item is found super. on the
-    /// provided equality comparer.
+    /// Returns one or more positions in the source collection where the given item is found in source collection
     /// </summary>
-    private indexOfAll(source, item: T): Array<number> {
+    private indexOfAll(source: Array<T>, item: T, sourceOids?: Array<string>): Array<number> {
         let indices = [];
         let sourceIndex = 0;
         const sourceLength = source.length;
 
-        for(let i=0;i<sourceLength;i++) {
-            const x = source[i];
+        if(sourceOids) {
+            const itemOid = getOid(item);
             
-            if (this.referenceEquals(x, item)) {
-                indices.push(sourceIndex);
+            for(let i=0;i<sourceLength;i++) {
+                const oid = sourceOids[i];
+                
+                if (itemOid === oid) {
+                    indices.push(sourceIndex);
+                }
+    
+                sourceIndex++;
             }
-
-            sourceIndex++;
+        } else {
+            for(let i=0;i<sourceLength;i++) {
+                const x = source[i];
+                
+                if (this.referenceEquals(x, item)) {
+                    indices.push(sourceIndex);
+                }
+    
+                sourceIndex++;
+            }
         }
 
         return indices;

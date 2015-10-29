@@ -565,8 +565,9 @@ class ObservableListProjection extends ObservableList {
     }
     refresh() {
         let length = this.sourceCopy.length;
+        const sourceCopyIds = this.sourceCopy.map(x => getOid(x));
         for (let i = 0; i < length; i++) {
-            this.onItemChanged(this.sourceCopy[i]);
+            this.onItemChanged(this.sourceCopy[i], sourceCopyIds);
         }
     }
     wireUpChangeNotifications() {
@@ -585,7 +586,9 @@ class ObservableListProjection extends ObservableList {
         this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe((e) => {
             this.reset();
         }));
-        this.disp.add(this.source.itemChanged.select(x => x.sender).observeOn(this.scheduler).subscribe(x => this.onItemChanged(x)));
+        this.disp.add(this.source.itemChanged.select(x => x.sender)
+            .observeOn(this.scheduler)
+            .subscribe(x => this.onItemChanged(x)));
         if (this.refreshTrigger != null) {
             this.disp.add(this.refreshTrigger.observeOn(this.scheduler).subscribe(_ => this.refresh()));
         }
@@ -652,14 +655,17 @@ class ObservableListProjection extends ObservableList {
         }
     }
     onItemsReplaced(e) {
+        const sourceCopyOids = this.isLengthAboveResetThreshold(e.items.length) ?
+            this.sourceCopy.map(x => getOid(x)) :
+            null;
         for (let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
-            this.onItemChanged(sourceItem);
+            this.onItemChanged(sourceItem, sourceCopyOids);
         }
     }
-    onItemChanged(changedItem) {
-        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
+    onItemChanged(changedItem, sourceCopyIds) {
+        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceCopyIds);
         let shouldBeIncluded = !this._filter || this._filter(changedItem);
         const sourceIndicesLength = sourceIndices.length;
         for (let i = 0; i < sourceIndicesLength; i++) {
@@ -745,19 +751,30 @@ class ObservableListProjection extends ObservableList {
         return this.indexToSourceIndexMap.indexOf(sourceIndex);
     }
     /// <summary>
-    /// Returns one or more positions in the source collection where the given item is found super. on the
-    /// provided equality comparer.
+    /// Returns one or more positions in the source collection where the given item is found in source collection
     /// </summary>
-    indexOfAll(source, item) {
+    indexOfAll(source, item, sourceOids) {
         let indices = [];
         let sourceIndex = 0;
         const sourceLength = source.length;
-        for (let i = 0; i < sourceLength; i++) {
-            const x = source[i];
-            if (this.referenceEquals(x, item)) {
-                indices.push(sourceIndex);
+        if (sourceOids) {
+            const itemOid = getOid(item);
+            for (let i = 0; i < sourceLength; i++) {
+                const oid = sourceOids[i];
+                if (itemOid === oid) {
+                    indices.push(sourceIndex);
+                }
+                sourceIndex++;
             }
-            sourceIndex++;
+        }
+        else {
+            for (let i = 0; i < sourceLength; i++) {
+                const x = source[i];
+                if (this.referenceEquals(x, item)) {
+                    indices.push(sourceIndex);
+                }
+                sourceIndex++;
+            }
         }
         return indices;
     }

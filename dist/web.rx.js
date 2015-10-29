@@ -5627,8 +5627,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ObservableListProjection.prototype.refresh = function () {
 	        var length = this.sourceCopy.length;
+	        var sourceCopyIds = this.sourceCopy.map(function (x) { return Oid_1.getOid(x); });
 	        for (var i = 0; i < length; i++) {
-	            this.onItemChanged(this.sourceCopy[i]);
+	            this.onItemChanged(this.sourceCopy[i], sourceCopyIds);
 	        }
 	    };
 	    ObservableListProjection.prototype.wireUpChangeNotifications = function () {
@@ -5648,7 +5649,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe(function (e) {
 	            _this.reset();
 	        }));
-	        this.disp.add(this.source.itemChanged.select(function (x) { return x.sender; }).observeOn(this.scheduler).subscribe(function (x) { return _this.onItemChanged(x); }));
+	        this.disp.add(this.source.itemChanged.select(function (x) { return x.sender; })
+	            .observeOn(this.scheduler)
+	            .subscribe(function (x) { return _this.onItemChanged(x); }));
 	        if (this.refreshTrigger != null) {
 	            this.disp.add(this.refreshTrigger.observeOn(this.scheduler).subscribe(function (_) { return _this.refresh(); }));
 	        }
@@ -5715,14 +5718,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    ObservableListProjection.prototype.onItemsReplaced = function (e) {
+	        var sourceCopyOids = this.isLengthAboveResetThreshold(e.items.length) ?
+	            this.sourceCopy.map(function (x) { return Oid_1.getOid(x); }) :
+	            null;
 	        for (var i = 0; i < e.items.length; i++) {
 	            var sourceItem = e.items[i];
 	            this.sourceCopy[e.from + i] = sourceItem;
-	            this.onItemChanged(sourceItem);
+	            this.onItemChanged(sourceItem, sourceCopyOids);
 	        }
 	    };
-	    ObservableListProjection.prototype.onItemChanged = function (changedItem) {
-	        var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
+	    ObservableListProjection.prototype.onItemChanged = function (changedItem, sourceCopyIds) {
+	        var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceCopyIds);
 	        var shouldBeIncluded = !this._filter || this._filter(changedItem);
 	        var sourceIndicesLength = sourceIndices.length;
 	        for (var i = 0; i < sourceIndicesLength; i++) {
@@ -5808,19 +5814,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.indexToSourceIndexMap.indexOf(sourceIndex);
 	    };
 	    /// <summary>
-	    /// Returns one or more positions in the source collection where the given item is found super. on the
-	    /// provided equality comparer.
+	    /// Returns one or more positions in the source collection where the given item is found in source collection
 	    /// </summary>
-	    ObservableListProjection.prototype.indexOfAll = function (source, item) {
+	    ObservableListProjection.prototype.indexOfAll = function (source, item, sourceOids) {
 	        var indices = [];
 	        var sourceIndex = 0;
 	        var sourceLength = source.length;
-	        for (var i = 0; i < sourceLength; i++) {
-	            var x = source[i];
-	            if (this.referenceEquals(x, item)) {
-	                indices.push(sourceIndex);
+	        if (sourceOids) {
+	            var itemOid = Oid_1.getOid(item);
+	            for (var i = 0; i < sourceLength; i++) {
+	                var oid = sourceOids[i];
+	                if (itemOid === oid) {
+	                    indices.push(sourceIndex);
+	                }
+	                sourceIndex++;
 	            }
-	            sourceIndex++;
+	        }
+	        else {
+	            for (var i = 0; i < sourceLength; i++) {
+	                var x = source[i];
+	                if (this.referenceEquals(x, item)) {
+	                    indices.push(sourceIndex);
+	                }
+	                sourceIndex++;
+	            }
 	        }
 	        return indices;
 	    };

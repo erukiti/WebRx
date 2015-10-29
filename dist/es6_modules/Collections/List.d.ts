@@ -98,7 +98,7 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     private refcountSubscribers<TObs>(input, block);
     private publishResetNotification();
     private publishBeforeResetNotification();
-    private isLengthAboveResetThreshold(toChangeLength);
+    protected isLengthAboveResetThreshold(toChangeLength: number): boolean;
 }
 /**
 * Creates a new observable list with optional default contents
