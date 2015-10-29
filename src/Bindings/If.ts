@@ -140,33 +140,53 @@ export class IfBinding implements wx.IBindingHandler {
             });
         }
 
-        if (!value) {
-            if (oldElements.length > 0) {
-                if (leaveAnimation) {
-                    leaveAnimation.prepare(oldElements);
+        if (oldElements.length > 0) {
+            if (leaveAnimation) {
+                leaveAnimation.prepare(oldElements);
 
-                    obs = leaveAnimation.run(oldElements)
-                        .continueWith(() => leaveAnimation.complete(oldElements))
-                        .continueWith(removeOldElements);
-                } else {
-                    removeOldElements();
-                }
+                obs = leaveAnimation.run(oldElements)
+                    .continueWith(() => leaveAnimation.complete(oldElements))
+                    .continueWith(removeOldElements);
+            } else {
+                removeOldElements();
             }
-        } else {
+        }
+        
+        if(value) {
             let nodes = template.map(x => x.cloneNode(true));
 
-            if (enterAnimation)
-                enterAnimation.prepare(nodes);
+            if(obs) {
+                obs = obs.continueWith(()=> {                    
+                    if (enterAnimation)
+                        enterAnimation.prepare(nodes);
+        
+                    for(let i= 0; i < template.length; i++) {
+                        el.appendChild(nodes[i]);
+                    }
+        
+                    this.domManager.applyBindingsToDescendants(ctx, el);
+                });
 
-            for(let i= 0; i < template.length; i++) {
-                el.appendChild(nodes[i]);
+                if (enterAnimation) {
+                    obs = enterAnimation.run(nodes)
+                        .continueWith(() => enterAnimation.complete(nodes));
+                }
             }
 
-            this.domManager.applyBindingsToDescendants(ctx, el);
-
-            if (enterAnimation) {
-                obs = enterAnimation.run(nodes)
-                    .continueWith(() => enterAnimation.complete(nodes));
+            else {            
+                if (enterAnimation)
+                    enterAnimation.prepare(nodes);
+    
+                for(let i= 0; i < template.length; i++) {
+                    el.appendChild(nodes[i]);
+                }
+    
+                this.domManager.applyBindingsToDescendants(ctx, el);
+    
+                if (enterAnimation) {
+                    obs = enterAnimation.run(nodes)
+                        .continueWith(() => enterAnimation.complete(nodes));
+                }
             }
         }
 

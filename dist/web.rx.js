@@ -4025,6 +4025,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // intentionally left blank
 	    };
 	    IfBinding.prototype.applyValue = function (el, value, template, ctx, animations, initialApply) {
+	        var _this = this;
 	        var leaveAnimation = animations.leave;
 	        var enterAnimation = animations.enter;
 	        var self = this;
@@ -4047,30 +4048,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	                el.removeChild(x);
 	            });
 	        }
-	        if (!value) {
-	            if (oldElements.length > 0) {
-	                if (leaveAnimation) {
-	                    leaveAnimation.prepare(oldElements);
-	                    obs = leaveAnimation.run(oldElements)
-	                        .continueWith(function () { return leaveAnimation.complete(oldElements); })
-	                        .continueWith(removeOldElements);
-	                }
-	                else {
-	                    removeOldElements();
-	                }
+	        if (oldElements.length > 0) {
+	            if (leaveAnimation) {
+	                leaveAnimation.prepare(oldElements);
+	                obs = leaveAnimation.run(oldElements)
+	                    .continueWith(function () { return leaveAnimation.complete(oldElements); })
+	                    .continueWith(removeOldElements);
+	            }
+	            else {
+	                removeOldElements();
 	            }
 	        }
-	        else {
+	        if (value) {
 	            var nodes = template.map(function (x) { return x.cloneNode(true); });
-	            if (enterAnimation)
-	                enterAnimation.prepare(nodes);
-	            for (var i = 0; i < template.length; i++) {
-	                el.appendChild(nodes[i]);
+	            if (obs) {
+	                obs = obs.continueWith(function () {
+	                    if (enterAnimation)
+	                        enterAnimation.prepare(nodes);
+	                    for (var i = 0; i < template.length; i++) {
+	                        el.appendChild(nodes[i]);
+	                    }
+	                    _this.domManager.applyBindingsToDescendants(ctx, el);
+	                });
+	                if (enterAnimation) {
+	                    obs = enterAnimation.run(nodes)
+	                        .continueWith(function () { return enterAnimation.complete(nodes); });
+	                }
 	            }
-	            this.domManager.applyBindingsToDescendants(ctx, el);
-	            if (enterAnimation) {
-	                obs = enterAnimation.run(nodes)
-	                    .continueWith(function () { return enterAnimation.complete(nodes); });
+	            else {
+	                if (enterAnimation)
+	                    enterAnimation.prepare(nodes);
+	                for (var i = 0; i < template.length; i++) {
+	                    el.appendChild(nodes[i]);
+	                }
+	                this.domManager.applyBindingsToDescendants(ctx, el);
+	                if (enterAnimation) {
+	                    obs = enterAnimation.run(nodes)
+	                        .continueWith(function () { return enterAnimation.complete(nodes); });
+	                }
 	            }
 	        }
 	        return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
