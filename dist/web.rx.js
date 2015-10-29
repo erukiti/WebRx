@@ -5718,17 +5718,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    ObservableListProjection.prototype.onItemsReplaced = function (e) {
-	        var sourceCopyOids = this.isLengthAboveResetThreshold(e.items.length) ?
+	        var sourceOids = this.isLengthAboveResetThreshold(e.items.length) ?
 	            this.sourceCopy.map(function (x) { return Oid_1.getOid(x); }) :
 	            null;
 	        for (var i = 0; i < e.items.length; i++) {
 	            var sourceItem = e.items[i];
 	            this.sourceCopy[e.from + i] = sourceItem;
-	            this.onItemChanged(sourceItem, sourceCopyOids);
+	            this.onItemChanged(sourceItem, sourceOids);
 	        }
 	    };
-	    ObservableListProjection.prototype.onItemChanged = function (changedItem, sourceCopyIds) {
-	        var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceCopyIds);
+	    ObservableListProjection.prototype.onItemChanged = function (changedItem, sourceOids) {
+	        var sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceOids);
 	        var shouldBeIncluded = !this._filter || this._filter(changedItem);
 	        var sourceIndicesLength = sourceIndices.length;
 	        for (var i = 0; i < sourceIndicesLength; i++) {

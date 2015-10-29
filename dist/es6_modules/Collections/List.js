@@ -655,17 +655,17 @@ class ObservableListProjection extends ObservableList {
         }
     }
     onItemsReplaced(e) {
-        const sourceCopyOids = this.isLengthAboveResetThreshold(e.items.length) ?
+        const sourceOids = this.isLengthAboveResetThreshold(e.items.length) ?
             this.sourceCopy.map(x => getOid(x)) :
             null;
         for (let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
-            this.onItemChanged(sourceItem, sourceCopyOids);
+            this.onItemChanged(sourceItem, sourceOids);
         }
     }
-    onItemChanged(changedItem, sourceCopyIds) {
-        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceCopyIds);
+    onItemChanged(changedItem, sourceOids) {
+        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceOids);
         let shouldBeIncluded = !this._filter || this._filter(changedItem);
         const sourceIndicesLength = sourceIndices.length;
         for (let i = 0; i < sourceIndicesLength; i++) {

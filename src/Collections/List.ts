@@ -965,7 +965,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     private onItemsReplaced(e: wx.IListChangeInfo<T>) {
-        const sourceCopyOids = this.isLengthAboveResetThreshold(e.items.length) ? 
+        const sourceOids = this.isLengthAboveResetThreshold(e.items.length) ? 
             this.sourceCopy.map(x=> getOid(x)) : 
             null;
         
@@ -973,12 +973,12 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
 
-            this.onItemChanged(sourceItem, sourceCopyOids);
+            this.onItemChanged(sourceItem, sourceOids);
         }
     }
 
-    private onItemChanged(changedItem: T, sourceCopyIds?: Array<string>): void {
-        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceCopyIds);
+    private onItemChanged(changedItem: T, sourceOids?: Array<string>): void {
+        let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem, sourceOids);
         let shouldBeIncluded = !this._filter || this._filter(changedItem);
         const sourceIndicesLength = sourceIndices.length;
 
