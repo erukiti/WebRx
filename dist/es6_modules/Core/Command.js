@@ -1,22 +1,10 @@
 /// <reference path="../Interfaces.ts" />
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
-    switch (arguments.length) {
-        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
-        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
-        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
-    }
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 import IID from "./../IID";
 import { args2Array, isFunction, isRxScheduler, isRxObservable, queryInterface } from "././Utils";
-import { Implements } from "././Reflect";
 import { injector } from "../Core/Injector";
 import * as res from "../Core/Resources";
 "use strict";
-export let Command = class {
+export class Command {
     /// <summary>
     /// Don't use this directly, use commandXYZ instead
     /// </summary>
@@ -46,6 +34,11 @@ export let Command = class {
         this.exceptionsSubject
             .observeOn(this.scheduler)
             .subscribe(injector.get(res.app).defaultExceptionHandler);
+    }
+    //////////////////////////////////
+    // wx.IUnknown implementation
+    queryInterface(iid) {
+        return iid === IID.ICommand || iid === IID.IDisposable;
     }
     //////////////////////////////////
     // IDisposable implementation
@@ -109,12 +102,7 @@ export let Command = class {
             .publish()
             .refCount();
     }
-};
-Command = __decorate([
-    Implements(IID.ICommand),
-    Implements(IID.IDisposable), 
-    __metadata('design:paramtypes', [Object, Function, Object])
-], Command);
+}
 export var internal;
 (function (internal) {
     internal.commandConstructor = Command;

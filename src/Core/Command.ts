@@ -3,15 +3,12 @@
 import IID from "./../IID"
 import { isInUnitTest, args2Array, isFunction, isRxScheduler, isRxObservable, queryInterface } from "././Utils"
 import Lazy from "./../Core/Lazy"
-import { Implements } from "././Reflect"
 import { injector } from "../Core/Injector"
 import * as res from "../Core/Resources"
 
 "use strict";
 
-@Implements(IID.ICommand)
-@Implements(IID.IDisposable)
-export class Command<T> implements wx.ICommand<T> {
+export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     /// <summary>
     /// Don't use this directly, use commandXYZ instead
     /// </summary>
@@ -39,6 +36,13 @@ export class Command<T> implements wx.ICommand<T> {
         this.exceptionsSubject
             .observeOn(this.scheduler)
             .subscribe(injector.get<wx.IWebRxApp>(res.app).defaultExceptionHandler);
+    }
+
+    //////////////////////////////////
+    // wx.IUnknown implementation
+
+    public queryInterface(iid: string): boolean {
+       return iid === IID.ICommand || iid === IID.IDisposable;
     }
 
     //////////////////////////////////

@@ -1,5 +1,4 @@
 /// <reference path="../Interfaces.ts" />
-import { Implements } from "./Reflect";
 import IID from "../IID";
 // NOTE: The factory method approach is necessary because it is  
 // currently impossible to implement a Typescript interface 
@@ -25,8 +24,11 @@ export function property(initialValue) {
             return accessor.value;
         }
     };
-    Implements(IID.IObservableProperty)(accessor);
-    Implements(IID.IDisposable)(accessor);
+    //////////////////////////////////
+    // wx.IUnknown implementation
+    accessor.queryInterface = (iid) => {
+        return iid === IID.IObservableProperty || iid === IID.IDisposable;
+    };
     //////////////////////////////////
     // IDisposable implementation
     accessor.dispose = () => {

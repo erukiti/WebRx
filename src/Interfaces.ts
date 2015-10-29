@@ -4,6 +4,14 @@ module wx {
     "use strict";
 
     /**
+    * IUnknown
+    * @interface 
+    **/
+    export interface IUnknown {
+        queryInterface(iid: string): boolean;
+    }
+
+    /**
     * Dependency Injector and service locator
     * @interface 
     **/

@@ -62,55 +62,55 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.app = App_1.app;
 	exports.router = App_1.router;
 	exports.messageBus = App_1.messageBus;
-	var Module_1 = __webpack_require__(14);
+	var Module_1 = __webpack_require__(9);
 	exports.module = Module_1.module;
 	__export(__webpack_require__(3));
-	var Property_1 = __webpack_require__(13);
+	var Property_1 = __webpack_require__(8);
 	exports.property = Property_1.property;
-	var DomManager_1 = __webpack_require__(16);
+	var DomManager_1 = __webpack_require__(11);
 	exports.applyBindings = DomManager_1.applyBindings;
 	exports.cleanNode = DomManager_1.cleanNode;
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(18);
 	exports.command = Command_1.command;
 	exports.asyncCommand = Command_1.asyncCommand;
 	exports.combinedCommand = Command_1.combinedCommand;
 	exports.isCommand = Command_1.isCommand;
-	var Animation_1 = __webpack_require__(52);
+	var Animation_1 = __webpack_require__(50);
 	exports.animation = Animation_1.animation;
-	var Oid_1 = __webpack_require__(6);
+	var Oid_1 = __webpack_require__(13);
 	exports.getOid = Oid_1.getOid;
-	var List_1 = __webpack_require__(29);
+	var List_1 = __webpack_require__(27);
 	exports.list = List_1.list;
 	exports.isList = List_1.isList;
-	var Map_1 = __webpack_require__(8);
+	var Map_1 = __webpack_require__(51);
 	exports.createMap = Map_1.createMap;
-	var Set_1 = __webpack_require__(7);
+	var Set_1 = __webpack_require__(14);
 	exports.createSet = Set_1.createSet;
 	exports.setToArray = Set_1.setToArray;
-	var WeakMap_1 = __webpack_require__(5);
+	var WeakMap_1 = __webpack_require__(12);
 	exports.createWeakMap = WeakMap_1.createWeakMap;
-	var Lazy_1 = __webpack_require__(30);
+	var Lazy_1 = __webpack_require__(28);
 	exports.Lazy = Lazy_1.default;
-	var VirtualChildNodes_1 = __webpack_require__(27);
+	var VirtualChildNodes_1 = __webpack_require__(25);
 	exports.VirtualChildNodes = VirtualChildNodes_1.default;
-	var RouteMatcher_1 = __webpack_require__(47);
+	var RouteMatcher_1 = __webpack_require__(45);
 	exports.route = RouteMatcher_1.route;
-	var Value_1 = __webpack_require__(33);
+	var Value_1 = __webpack_require__(31);
 	exports.getNodeValue = Value_1.getNodeValue;
 	exports.setNodeValue = Value_1.setNodeValue;
 	var Injector_1 = __webpack_require__(2);
 	exports.injector = Injector_1.injector;
-	var IID_1 = __webpack_require__(10);
+	var IID_1 = __webpack_require__(5);
 	exports.IID = IID_1.default;
-	var HttpClient_1 = __webpack_require__(49);
+	var HttpClient_1 = __webpack_require__(47);
 	exports.getHttpClientDefaultConfig = HttpClient_1.getHttpClientDefaultConfig;
-	var BindingBase_1 = __webpack_require__(24);
+	var BindingBase_1 = __webpack_require__(22);
 	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
 	exports.MultiOneWayBindingBase = BindingBase_1.MultiOneWayBindingBase;
 	// re-exports
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	exports.res = res;
-	var env = __webpack_require__(17);
+	var env = __webpack_require__(15);
 	exports.env = env;
 	//# sourceMappingURL=WebRx.js.map
 
@@ -126,39 +126,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	var Injector_1 = __webpack_require__(2);
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(11);
-	var log = __webpack_require__(12);
-	var Property_1 = __webpack_require__(13);
-	var Module_1 = __webpack_require__(14);
-	var ExpressionCompiler = __webpack_require__(15);
-	var DomManager_1 = __webpack_require__(16);
-	var HtmlTemplateEngine_1 = __webpack_require__(18);
-	var Command_1 = __webpack_require__(19);
-	var Module_2 = __webpack_require__(21);
-	var If_1 = __webpack_require__(22);
-	var MultiOneWay_1 = __webpack_require__(23);
-	var SingleOneWay_1 = __webpack_require__(25);
-	var ForEach_1 = __webpack_require__(26);
-	var Event_1 = __webpack_require__(32);
-	var Value_1 = __webpack_require__(33);
-	var HasFocus_1 = __webpack_require__(34);
-	var With_1 = __webpack_require__(35);
-	var Checked_1 = __webpack_require__(36);
-	var KeyPress_1 = __webpack_require__(37);
-	var TextInput_1 = __webpack_require__(38);
-	var SelectedValue_1 = __webpack_require__(39);
-	var Component_1 = __webpack_require__(40);
-	var StateActive_1 = __webpack_require__(41);
-	var View_1 = __webpack_require__(42);
-	var StateRef_1 = __webpack_require__(43);
-	var Select_1 = __webpack_require__(44);
-	var RadioGroup_1 = __webpack_require__(45);
-	var Router_1 = __webpack_require__(46);
-	var MessageBus_1 = __webpack_require__(48);
-	var HttpClient_1 = __webpack_require__(49);
-	var Version_1 = __webpack_require__(50);
+	var res = __webpack_require__(6);
+	var log = __webpack_require__(7);
+	var Property_1 = __webpack_require__(8);
+	var Module_1 = __webpack_require__(9);
+	var ExpressionCompiler = __webpack_require__(10);
+	var DomManager_1 = __webpack_require__(11);
+	var HtmlTemplateEngine_1 = __webpack_require__(16);
+	var Command_1 = __webpack_require__(17);
+	var Module_2 = __webpack_require__(19);
+	var If_1 = __webpack_require__(20);
+	var MultiOneWay_1 = __webpack_require__(21);
+	var SingleOneWay_1 = __webpack_require__(23);
+	var ForEach_1 = __webpack_require__(24);
+	var Event_1 = __webpack_require__(30);
+	var Value_1 = __webpack_require__(31);
+	var HasFocus_1 = __webpack_require__(32);
+	var With_1 = __webpack_require__(33);
+	var Checked_1 = __webpack_require__(34);
+	var KeyPress_1 = __webpack_require__(35);
+	var TextInput_1 = __webpack_require__(36);
+	var SelectedValue_1 = __webpack_require__(37);
+	var Component_1 = __webpack_require__(38);
+	var StateActive_1 = __webpack_require__(39);
+	var View_1 = __webpack_require__(40);
+	var StateRef_1 = __webpack_require__(41);
+	var Select_1 = __webpack_require__(42);
+	var RadioGroup_1 = __webpack_require__(43);
+	var Router_1 = __webpack_require__(44);
+	var MessageBus_1 = __webpack_require__(46);
+	var HttpClient_1 = __webpack_require__(47);
+	var Version_1 = __webpack_require__(48);
 	// make sure RxExtensions get installed
-	var RxExtensions_1 = __webpack_require__(51);
+	var RxExtensions_1 = __webpack_require__(49);
 	RxExtensions_1.install();
 	"use strict";
 	var App = (function (_super) {
@@ -363,7 +363,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	"use strict";
 	/**
 	* Simple IoC & Service Locator
@@ -468,9 +468,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var Reflect_1 = __webpack_require__(4);
-	var Events_1 = __webpack_require__(9);
-	var IID_1 = __webpack_require__(10);
+	var Events_1 = __webpack_require__(4);
+	var IID_1 = __webpack_require__(5);
 	/*
 	* Global helpers
 	*/
@@ -501,10 +500,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	function queryInterface(target, iid) {
 	    if (target == null || isPrimitive(target))
 	        return false;
-	    if (typeof target === "object")
-	        target = target.constructor;
-	    var interfaces = Reflect_1.getMetadata(Reflect_1.implementsMetaDataKey, target);
-	    return interfaces != null && interfaces[iid];
+	    if (!isFunction(target["queryInterface"]))
+	        return false;
+	    return target.queryInterface(iid);
 	}
 	exports.queryInterface = queryInterface;
 	/**
@@ -959,1061 +957,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var WeakMap_1 = __webpack_require__(5);
-	var Set_1 = __webpack_require__(7);
-	var Map_1 = __webpack_require__(8);
-	/*! *****************************************************************************
-	Copyright (C) Microsoft. All rights reserved.
-	Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-	this file except in compliance with the License. You may obtain a copy of the
-	License at http://www.apache.org/licenses/LICENSE-2.0
-	
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	
-	See the License for the specific language governing permissions and
-	limitations under the License.
-	***************************************************************************** */
-	"use strict";
-	// Load global or shim versions of Map, Set, and WeakMap
-	var functionPrototype = Object.getPrototypeOf(Function);
-	// [[Metadata]] internal slot
-	var __Metadata__ = WeakMap_1.createWeakMap();
-	/**
-	  * Applies a set of decorators to a property of a target object.
-	  * @param decorators An array of decorators.
-	  * @param target The target object.
-	  * @param targetKey (Optional) The property key to decorate.
-	  * @param targetDescriptor (Optional) The property descriptor for the target key
-	  * @remarks Decorators are applied in reverse order.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     C = Reflect.decorate(decoratorsArray, C);
-	  *
-	  *     // property (on constructor)
-	  *     Reflect.decorate(decoratorsArray, C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     Reflect.decorate(decoratorsArray, C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     Object.defineProperty(C, "staticMethod",
-	  *         Reflect.decorate(decoratorsArray, C, "staticMethod",
-	  *             Object.getOwnPropertyDescriptor(C, "staticMethod")));
-	  *
-	  *     // method (on prototype)
-	  *     Object.defineProperty(C.prototype, "method",
-	  *         Reflect.decorate(decoratorsArray, C.prototype, "method",
-	  *             Object.getOwnPropertyDescriptor(C.prototype, "method")));
-	  *
-	  */
-	function decorate(decorators, target, targetKey, targetDescriptor) {
-	    if (!IsUndefined(targetDescriptor)) {
-	        if (!IsArray(decorators)) {
-	            throw new TypeError();
-	        }
-	        else if (!IsObject(target)) {
-	            throw new TypeError();
-	        }
-	        else if (IsUndefined(targetKey)) {
-	            throw new TypeError();
-	        }
-	        else if (!IsObject(targetDescriptor)) {
-	            throw new TypeError();
-	        }
-	        targetKey = ToPropertyKey(targetKey);
-	        return DecoratePropertyWithDescriptor(decorators, target, targetKey, targetDescriptor);
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        if (!IsArray(decorators)) {
-	            throw new TypeError();
-	        }
-	        else if (!IsObject(target)) {
-	            throw new TypeError();
-	        }
-	        targetKey = ToPropertyKey(targetKey);
-	        return DecoratePropertyWithoutDescriptor(decorators, target, targetKey);
-	    }
-	    else {
-	        if (!IsArray(decorators)) {
-	            throw new TypeError();
-	        }
-	        else if (!IsConstructor(target)) {
-	            throw new TypeError();
-	        }
-	        return DecorateConstructor(decorators, target);
-	    }
-	}
-	exports.decorate = decorate;
-	/**
-	  * A default metadata decorator factory that can be used on a class, class member, or parameter.
-	  * @param metadataKey The key for the metadata entry.
-	  * @param metadataValue The value for the metadata entry.
-	  * @returns A decorator function.
-	  * @remarks
-	  * If `metadataKey` is already defined for the target and target key, the
-	  * metadataValue for that key will be overwritten.
-	  * @example
-	  *
-	  *     // constructor
-	  *     @Reflect.metadata(key, value)
-	  *     class C {
-	  *     }
-	  *
-	  *     // property (on constructor, TypeScript only)
-	  *     class C {
-	  *         @Reflect.metadata(key, value)
-	  *         static staticProperty;
-	  *     }
-	  *
-	  *     // property (on prototype, TypeScript only)
-	  *     class C {
-	  *         @Reflect.metadata(key, value)
-	  *         property;
-	  *     }
-	  *
-	  *     // method (on constructor)
-	  *     class C {
-	  *         @Reflect.metadata(key, value)
-	  *         static staticMethod() { }
-	  *     }
-	  *
-	  *     // method (on prototype)
-	  *     class C {
-	  *         @Reflect.metadata(key, value)
-	  *         method() { }
-	  *     }
-	  *
-	  */
-	function metadata(metadataKey, metadataValue) {
-	    function decorator(target, targetKey) {
-	        if (!IsUndefined(targetKey)) {
-	            if (!IsObject(target)) {
-	                throw new TypeError();
-	            }
-	            targetKey = ToPropertyKey(targetKey);
-	            OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, targetKey);
-	        }
-	        else {
-	            if (!IsConstructor(target)) {
-	                throw new TypeError();
-	            }
-	            OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, /*targetKey*/ undefined);
-	        }
-	    }
-	    return decorator;
-	}
-	exports.metadata = metadata;
-	/**
-	  * Define a unique metadata entry on the target.
-	  * @param metadataKey A key used to store and retrieve metadata.
-	  * @param metadataValue A value that contains attached metadata.
-	  * @param target The target object on which to define metadata.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     Reflect.defineMetadata("custom:annotation", options, C);
-	  *
-	  *     // property (on constructor)
-	  *     Reflect.defineMetadata("custom:annotation", options, C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     Reflect.defineMetadata("custom:annotation", options, C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     Reflect.defineMetadata("custom:annotation", options, C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     Reflect.defineMetadata("custom:annotation", options, C.prototype, "method");
-	  *
-	  *     // decorator factory as metadata-producing annotation.
-	  *     function MyAnnotation(options): Decorator {
-	  *         return (target, key?) => Reflect.defineMetadata("custom:annotation", options, target, key);
-	  *     }
-	  *
-	  */
-	function defineMetadata(metadataKey, metadataValue, target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryDefineOwnMetadata(metadataKey, metadataValue, target, targetKey);
-	}
-	exports.defineMetadata = defineMetadata;
-	/**
-	  * Gets a value indicating whether the target object or its prototype chain has the provided metadata key defined.
-	  * @param metadataKey A key used to store and retrieve metadata.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns `true` if the metadata key was defined on the target object or its prototype chain; otherwise, `false`.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.hasMetadata("custom:annotation", C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.hasMetadata("custom:annotation", C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.hasMetadata("custom:annotation", C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.hasMetadata("custom:annotation", C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.hasMetadata("custom:annotation", C.prototype, "method");
-	  *
-	  */
-	function hasMetadata(metadataKey, target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryHasMetadata(metadataKey, target, targetKey);
-	}
-	exports.hasMetadata = hasMetadata;
-	/**
-	  * Gets a value indicating whether the target object has the provided metadata key defined.
-	  * @param metadataKey A key used to store and retrieve metadata.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns `true` if the metadata key was defined on the target object; otherwise, `false`.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.hasOwnMetadata("custom:annotation", C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.hasOwnMetadata("custom:annotation", C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.hasOwnMetadata("custom:annotation", C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.hasOwnMetadata("custom:annotation", C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.hasOwnMetadata("custom:annotation", C.prototype, "method");
-	  *
-	  */
-	function hasOwnMetadata(metadataKey, target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryHasOwnMetadata(metadataKey, target, targetKey);
-	}
-	exports.hasOwnMetadata = hasOwnMetadata;
-	/**
-	  * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
-	  * @param metadataKey A key used to store and retrieve metadata.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.getMetadata("custom:annotation", C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.getMetadata("custom:annotation", C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.getMetadata("custom:annotation", C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.getMetadata("custom:annotation", C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.getMetadata("custom:annotation", C.prototype, "method");
-	  *
-	  */
-	function getMetadata(metadataKey, target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryGetMetadata(metadataKey, target, targetKey);
-	}
-	exports.getMetadata = getMetadata;
-	/**
-	  * Gets the metadata value for the provided metadata key on the target object.
-	  * @param metadataKey A key used to store and retrieve metadata.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.getOwnMetadata("custom:annotation", C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.getOwnMetadata("custom:annotation", C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.getOwnMetadata("custom:annotation", C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.getOwnMetadata("custom:annotation", C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.getOwnMetadata("custom:annotation", C.prototype, "method");
-	  *
-	  */
-	function getOwnMetadata(metadataKey, target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryGetOwnMetadata(metadataKey, target, targetKey);
-	}
-	exports.getOwnMetadata = getOwnMetadata;
-	/**
-	  * Gets the metadata keys defined on the target object or its prototype chain.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns An array of unique metadata keys.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.getMetadataKeys(C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.getMetadataKeys(C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.getMetadataKeys(C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.getMetadataKeys(C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.getMetadataKeys(C.prototype, "method");
-	  *
-	  */
-	function getMetadataKeys(target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryMetadataKeys(target, targetKey);
-	}
-	exports.getMetadataKeys = getMetadataKeys;
-	/**
-	  * Gets the unique metadata keys defined on the target object.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns An array of unique metadata keys.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.getOwnMetadataKeys(C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.getOwnMetadataKeys(C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.getOwnMetadataKeys(C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.getOwnMetadataKeys(C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.getOwnMetadataKeys(C.prototype, "method");
-	  *
-	  */
-	function getOwnMetadataKeys(target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    return OrdinaryOwnMetadataKeys(target, targetKey);
-	}
-	exports.getOwnMetadataKeys = getOwnMetadataKeys;
-	/**
-	  * Deletes the metadata entry from the target object with the provided key.
-	  * @param metadataKey A key used to store and retrieve metadata.
-	  * @param target The target object on which the metadata is defined.
-	  * @param targetKey (Optional) The property key for the target.
-	  * @returns `true` if the metadata entry was found and deleted; otherwise, false.
-	  * @example
-	  *
-	  *     class C {
-	  *         // property declarations are not part of ES6, though they are valid in TypeScript:
-	  *         // static staticProperty;
-	  *         // property;
-	  *
-	  *         constructor(p) { }
-	  *         static staticMethod(p) { }
-	  *         method(p) { }
-	  *     }
-	  *
-	  *     // constructor
-	  *     result = Reflect.deleteMetadata("custom:annotation", C);
-	  *
-	  *     // property (on constructor)
-	  *     result = Reflect.deleteMetadata("custom:annotation", C, "staticProperty");
-	  *
-	  *     // property (on prototype)
-	  *     result = Reflect.deleteMetadata("custom:annotation", C.prototype, "property");
-	  *
-	  *     // method (on constructor)
-	  *     result = Reflect.deleteMetadata("custom:annotation", C, "staticMethod");
-	  *
-	  *     // method (on prototype)
-	  *     result = Reflect.deleteMetadata("custom:annotation", C.prototype, "method");
-	  *
-	  */
-	function deleteMetadata(metadataKey, target, targetKey) {
-	    if (!IsObject(target)) {
-	        throw new TypeError();
-	    }
-	    else if (!IsUndefined(targetKey)) {
-	        targetKey = ToPropertyKey(targetKey);
-	    }
-	    // https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#deletemetadata-metadatakey-p-
-	    var metadataMap = GetOrCreateMetadataMap(target, targetKey, /*create*/ false);
-	    if (IsUndefined(metadataMap)) {
-	        return false;
-	    }
-	    if (!metadataMap.delete(metadataKey)) {
-	        return false;
-	    }
-	    if (metadataMap.size > 0) {
-	        return true;
-	    }
-	    var targetMetadata = __Metadata__.get(target);
-	    targetMetadata.delete(targetKey);
-	    if (targetMetadata.size > 0) {
-	        return true;
-	    }
-	    __Metadata__.delete(target);
-	    return true;
-	}
-	exports.deleteMetadata = deleteMetadata;
-	function DecorateConstructor(decorators, target) {
-	    for (var i = decorators.length - 1; i >= 0; --i) {
-	        var decorator = decorators[i];
-	        var decorated = decorator(target);
-	        if (!IsUndefined(decorated)) {
-	            if (!IsConstructor(decorated)) {
-	                throw new TypeError();
-	            }
-	            target = decorated;
-	        }
-	    }
-	    return target;
-	}
-	function DecoratePropertyWithDescriptor(decorators, target, propertyKey, descriptor) {
-	    for (var i = decorators.length - 1; i >= 0; --i) {
-	        var decorator = decorators[i];
-	        var decorated = decorator(target, propertyKey, descriptor);
-	        if (!IsUndefined(decorated)) {
-	            if (!IsObject(decorated)) {
-	                throw new TypeError();
-	            }
-	            descriptor = decorated;
-	        }
-	    }
-	    return descriptor;
-	}
-	function DecoratePropertyWithoutDescriptor(decorators, target, propertyKey) {
-	    for (var i = decorators.length - 1; i >= 0; --i) {
-	        var decorator = decorators[i];
-	        decorator(target, propertyKey);
-	    }
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#getorcreatemetadatamap--o-p-create-
-	function GetOrCreateMetadataMap(target, targetKey, create) {
-	    var targetMetadata = __Metadata__.get(target);
-	    if (!targetMetadata) {
-	        if (!create) {
-	            return undefined;
-	        }
-	        targetMetadata = Map_1.createMap();
-	        __Metadata__.set(target, targetMetadata);
-	    }
-	    var keyMetadata = targetMetadata.get(targetKey);
-	    if (!keyMetadata) {
-	        if (!create) {
-	            return undefined;
-	        }
-	        keyMetadata = Map_1.createMap();
-	        targetMetadata.set(targetKey, keyMetadata);
-	    }
-	    return keyMetadata;
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryhasmetadata--metadatakey-o-p-
-	function OrdinaryHasMetadata(MetadataKey, O, P) {
-	    var hasOwn = OrdinaryHasOwnMetadata(MetadataKey, O, P);
-	    if (hasOwn) {
-	        return true;
-	    }
-	    var parent = GetPrototypeOf(O);
-	    if (parent !== null) {
-	        return OrdinaryHasMetadata(MetadataKey, parent, P);
-	    }
-	    return false;
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryhasownmetadata--metadatakey-o-p-
-	function OrdinaryHasOwnMetadata(MetadataKey, O, P) {
-	    var metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ false);
-	    if (metadataMap === undefined) {
-	        return false;
-	    }
-	    return Boolean(metadataMap.has(MetadataKey));
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarygetmetadata--metadatakey-o-p-
-	function OrdinaryGetMetadata(MetadataKey, O, P) {
-	    var hasOwn = OrdinaryHasOwnMetadata(MetadataKey, O, P);
-	    if (hasOwn) {
-	        return OrdinaryGetOwnMetadata(MetadataKey, O, P);
-	    }
-	    var parent = GetPrototypeOf(O);
-	    if (parent !== null) {
-	        return OrdinaryGetMetadata(MetadataKey, parent, P);
-	    }
-	    return undefined;
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarygetownmetadata--metadatakey-o-p-
-	function OrdinaryGetOwnMetadata(MetadataKey, O, P) {
-	    var metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ false);
-	    if (metadataMap === undefined) {
-	        return undefined;
-	    }
-	    return metadataMap.get(MetadataKey);
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarydefineownmetadata--metadatakey-metadatavalue-o-p-
-	function OrdinaryDefineOwnMetadata(MetadataKey, MetadataValue, O, P) {
-	    var metadataMap = GetOrCreateMetadataMap(O, P, /*create*/ true);
-	    metadataMap.set(MetadataKey, MetadataValue);
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinarymetadatakeys--o-p-
-	function OrdinaryMetadataKeys(O, P) {
-	    var ownKeys = OrdinaryOwnMetadataKeys(O, P);
-	    var parent = GetPrototypeOf(O);
-	    if (parent === null) {
-	        return ownKeys;
-	    }
-	    var parentKeys = OrdinaryMetadataKeys(parent, P);
-	    if (parentKeys.length <= 0) {
-	        return ownKeys;
-	    }
-	    if (ownKeys.length <= 0) {
-	        return parentKeys;
-	    }
-	    var set = Set_1.createSet();
-	    var keys = [];
-	    for (var _i = 0; _i < ownKeys.length; _i++) {
-	        var key = ownKeys[_i];
-	        var hasKey = set.has(key);
-	        if (!hasKey) {
-	            set.add(key);
-	            keys.push(key);
-	        }
-	    }
-	    for (var _a = 0; _a < parentKeys.length; _a++) {
-	        var key = parentKeys[_a];
-	        var hasKey = set.has(key);
-	        if (!hasKey) {
-	            set.add(key);
-	            keys.push(key);
-	        }
-	    }
-	    return keys;
-	}
-	// https://github.com/jonathandturner/decorators/blob/master/specs/metadata.md#ordinaryownmetadatakeys--o-p-
-	function OrdinaryOwnMetadataKeys(target, targetKey) {
-	    var metadataMap = GetOrCreateMetadataMap(target, targetKey, /*create*/ false);
-	    var keys = [];
-	    if (metadataMap) {
-	        metadataMap.forEach(function (_, key) { return keys.push(key); });
-	    }
-	    return keys;
-	}
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-language-types-undefined-type
-	function IsUndefined(x) {
-	    return x === undefined;
-	}
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-isarray
-	function IsArray(x) {
-	    return Array.isArray(x);
-	}
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-object-type
-	function IsObject(x) {
-	    return typeof x === "object" ? x !== null : typeof x === "function";
-	}
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-isconstructor
-	function IsConstructor(x) {
-	    return typeof x === "function";
-	}
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-language-types-symbol-type
-	function IsSymbol(x) {
-	    return typeof x === "symbol";
-	}
-	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-topropertykey
-	function ToPropertyKey(value) {
-	    if (IsSymbol(value)) {
-	        return value;
-	    }
-	    return String(value);
-	}
-	function GetPrototypeOf(O) {
-	    var proto = Object.getPrototypeOf(O);
-	    if (typeof O !== "function" || O === functionPrototype) {
-	        return proto;
-	    }
-	    // TypeScript doesn't set __proto__ in ES5, as it's non-standard. 
-	    // Try to determine the superclass constructor. Compatible implementations
-	    // must either set __proto__ on a subclass constructor to the superclass constructor,
-	    // or ensure each class has a valid `constructor` property on its prototype that
-	    // points back to the constructor.
-	    // If this is not the same as Function.[[Prototype]], then this is definately inherited.
-	    // This is the case when in ES6 or when using __proto__ in a compatible browser.
-	    if (proto !== functionPrototype) {
-	        return proto;
-	    }
-	    // If the super prototype is Object.prototype, null, or undefined, then we cannot determine the heritage.
-	    var prototype = O.prototype;
-	    var prototypeProto = Object.getPrototypeOf(prototype);
-	    if (prototypeProto == null || prototypeProto === Object.prototype) {
-	        return proto;
-	    }
-	    // if the constructor was not a function, then we cannot determine the heritage.
-	    var constructor = prototypeProto.constructor;
-	    if (typeof constructor !== "function") {
-	        return proto;
-	    }
-	    // if we have some kind of self-reference, then we cannot determine the heritage.
-	    if (constructor === O) {
-	        return proto;
-	    }
-	    // we have a pretty good guess at the heritage.
-	    return constructor;
-	}
-	exports.implementsMetaDataKey = "wx:interfaceImpl";
-	/**
-	* Interface decorator
-	* @param {string} interfaceName Name of an interface
-	*/
-	function Implements(value) {
-	    return function (target) {
-	        var interfaces = getMetadata(exports.implementsMetaDataKey, target) || {};
-	        if (typeof (value) === "string")
-	            value = value.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
-	        for (var i = 0; i < value.length; i++)
-	            interfaces[value[i]] = true;
-	        defineMetadata(exports.implementsMetaDataKey, interfaces, target);
-	    };
-	}
-	exports.Implements = Implements;
-	//# sourceMappingURL=Reflect.js.map
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
-	/// <reference path="../Interfaces.ts" />
-	var Oid_1 = __webpack_require__(6);
-	"use strict";
-	/**
-	* This class emulates the semantics of a WeakMap.
-	* Even though this implementation is indeed "weak", it has the drawback of
-	* requiring manual housekeeping of entries otherwise they are kept forever.
-	* @class
-	*/
-	var WeakMapEmulated = (function () {
-	    function WeakMapEmulated() {
-	        ////////////////////
-	        /// Implementation
-	        this.inner = {};
-	    }
-	    ////////////////////
-	    /// IWeakMap
-	    WeakMapEmulated.prototype.set = function (key, value) {
-	        var oid = Oid_1.getOid(key);
-	        this.inner[oid] = value;
-	    };
-	    WeakMapEmulated.prototype.get = function (key) {
-	        var oid = Oid_1.getOid(key);
-	        return this.inner[oid];
-	    };
-	    WeakMapEmulated.prototype.has = function (key) {
-	        var oid = Oid_1.getOid(key);
-	        return this.inner.hasOwnProperty(oid);
-	    };
-	    WeakMapEmulated.prototype.delete = function (key) {
-	        var oid = Oid_1.getOid(key);
-	        return delete this.inner[oid];
-	    };
-	    Object.defineProperty(WeakMapEmulated.prototype, "isEmulated", {
-	        get: function () {
-	            return true;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    return WeakMapEmulated;
-	})();
-	var hasNativeSupport = typeof WeakMap === "function";
-	//let hasNativeSupport = false;
-	/**
-	* Creates a new WeakMap instance
-	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
-	* @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
-	*/
-	function createWeakMap(disableNativeSupport) {
-	    if (disableNativeSupport || !hasNativeSupport) {
-	        return new WeakMapEmulated();
-	    }
-	    return new WeakMap();
-	}
-	exports.createWeakMap = createWeakMap;
-	//# sourceMappingURL=WeakMap.js.map
-
-/***/ },
-/* 6 */
-/***/ function(module, exports) {
-
-	"use strict";
-	var oid = 1;
-	var oidPropertyName = "__wx_oid__" + (new Date).getTime();
-	/**
-	* Returns the objects unique id or assigns it if unassigned
-	* @param {any} o
-	*/
-	function getOid(o) {
-	    if (o == null)
-	        return undefined;
-	    var t = typeof o;
-	    if (t === "boolean" || t === "number" || t === "string")
-	        return (t + ":" + o);
-	    // already set?
-	    if (o.hasOwnProperty(oidPropertyName))
-	        return o[oidPropertyName];
-	    // assign new one
-	    var result = (oid++).toString();
-	    // store as non-enumerable property to avoid confusing other libraries
-	    Object.defineProperty(o, oidPropertyName, {
-	        enumerable: false,
-	        configurable: false,
-	        writable: false,
-	        value: result
-	    });
-	    return result;
-	}
-	exports.getOid = getOid;
-	//# sourceMappingURL=Oid.js.map
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
-	/// <reference path="../Interfaces.ts" />
-	var Oid_1 = __webpack_require__(6);
-	"use strict";
-	/**
-	* ES6 Set Shim
-	* @class
-	*/
-	var SetEmulated = (function () {
-	    function SetEmulated() {
-	        ////////////////////
-	        /// Implementation
-	        this.values = [];
-	        this.keys = {};
-	    }
-	    ////////////////////
-	    /// ISet
-	    SetEmulated.prototype.add = function (value) {
-	        var key = Oid_1.getOid(value);
-	        if (!this.keys[key]) {
-	            this.values.push(value);
-	            this.keys[key] = true;
-	        }
-	        return this;
-	    };
-	    SetEmulated.prototype.delete = function (value) {
-	        var key = Oid_1.getOid(value);
-	        if (this.keys[key]) {
-	            var index = this.values.indexOf(value);
-	            this.values.splice(index, 1);
-	            delete this.keys[key];
-	            return true;
-	        }
-	        return false;
-	    };
-	    SetEmulated.prototype.has = function (value) {
-	        var key = Oid_1.getOid(value);
-	        return this.keys.hasOwnProperty(key);
-	    };
-	    SetEmulated.prototype.clear = function () {
-	        this.keys = {};
-	        this.values.length = 0;
-	    };
-	    SetEmulated.prototype.forEach = function (callback, thisArg) {
-	        this.values.forEach(callback, thisArg);
-	    };
-	    Object.defineProperty(SetEmulated.prototype, "size", {
-	        get: function () {
-	            return this.values.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(SetEmulated.prototype, "isEmulated", {
-	        get: function () {
-	            return true;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    return SetEmulated;
-	})();
-	var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
-	    && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
-	    && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
-	/**
-	* Creates a new Set instance
-	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
-	* @return {ISet<T>} A new instance of a suitable ISet implementation
-	*/
-	function createSet(disableNativeSupport) {
-	    if (disableNativeSupport || !hasNativeSupport) {
-	        return new SetEmulated();
-	    }
-	    return new Set();
-	}
-	exports.createSet = createSet;
-	/**
-	* Extracts the values of a Set by invoking its forEach method and capturing the output
-	*/
-	function setToArray(src) {
-	    var result = new Array();
-	    src.forEach(function (x) { return result.push(x); });
-	    return result;
-	}
-	exports.setToArray = setToArray;
-	//# sourceMappingURL=Set.js.map
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
-	/// <reference path="../Interfaces.ts" />
-	"use strict";
-	/**
-	* ES6 Map Shim
-	* @class
-	*/
-	var MapEmulated = (function () {
-	    function MapEmulated() {
-	        ////////////////////
-	        /// Implementation
-	        this.cacheSentinel = {};
-	        this.keys = [];
-	        this.values = [];
-	        this.cache = this.cacheSentinel;
-	    }
-	    Object.defineProperty(MapEmulated.prototype, "size", {
-	        ////////////////////
-	        /// IMap
-	        get: function () {
-	            return this.keys.length;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    MapEmulated.prototype.has = function (key) {
-	        if (key === this.cache) {
-	            return true;
-	        }
-	        if (this.find(key) >= 0) {
-	            this.cache = key;
-	            return true;
-	        }
-	        return false;
-	    };
-	    MapEmulated.prototype.get = function (key) {
-	        var index = this.find(key);
-	        if (index >= 0) {
-	            this.cache = key;
-	            return this.values[index];
-	        }
-	        return undefined;
-	    };
-	    MapEmulated.prototype.set = function (key, value) {
-	        this.delete(key);
-	        this.keys.push(key);
-	        this.values.push(value);
-	        this.cache = key;
-	        return this;
-	    };
-	    MapEmulated.prototype.delete = function (key) {
-	        var index = this.find(key);
-	        if (index >= 0) {
-	            this.keys.splice(index, 1);
-	            this.values.splice(index, 1);
-	            this.cache = this.cacheSentinel;
-	            return true;
-	        }
-	        return false;
-	    };
-	    MapEmulated.prototype.clear = function () {
-	        this.keys.length = 0;
-	        this.values.length = 0;
-	        this.cache = this.cacheSentinel;
-	    };
-	    MapEmulated.prototype.forEach = function (callback, thisArg) {
-	        var size = this.size;
-	        for (var i = 0; i < size; ++i) {
-	            var key = this.keys[i];
-	            var value = this.values[i];
-	            this.cache = key;
-	            callback.call(this, value, key, this);
-	        }
-	    };
-	    Object.defineProperty(MapEmulated.prototype, "isEmulated", {
-	        get: function () {
-	            return true;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    MapEmulated.prototype.find = function (key) {
-	        var keys = this.keys;
-	        var size = keys.length;
-	        for (var i = 0; i < size; ++i) {
-	            if (keys[i] === key) {
-	                return i;
-	            }
-	        }
-	        return -1;
-	    };
-	    return MapEmulated;
-	})();
-	var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty("forEach")
-	    && Map.prototype.hasOwnProperty("add") && Map.prototype.hasOwnProperty("clear")
-	    && Map.prototype.hasOwnProperty("devare") && Map.prototype.hasOwnProperty("has");
-	/**
-	* Creates a new WeakMap instance
-	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
-	* @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
-	*/
-	function createMap(disableNativeSupport) {
-	    if (disableNativeSupport || !hasNativeSupport) {
-	        return new MapEmulated();
-	    }
-	    return new Map();
-	}
-	exports.createMap = createMap;
-	//# sourceMappingURL=Map.js.map
-
-/***/ },
-/* 9 */
 /***/ function(module, exports) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -2034,7 +977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Events.js.map
 
 /***/ },
-/* 10 */
+/* 5 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2056,7 +999,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=IID.js.map
 
 /***/ },
-/* 11 */
+/* 6 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -2073,7 +1016,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Resources.js.map
 
 /***/ },
-/* 12 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Utils_1 = __webpack_require__(3);
@@ -2131,12 +1074,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Log.js.map
 
 /***/ },
-/* 13 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var Reflect_1 = __webpack_require__(4);
-	var IID_1 = __webpack_require__(10);
+	var IID_1 = __webpack_require__(5);
 	// NOTE: The factory method approach is necessary because it is  
 	// currently impossible to implement a Typescript interface 
 	// with a function signature in a Typescript class.
@@ -2161,8 +1103,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return accessor.value;
 	        }
 	    };
-	    Reflect_1.Implements(IID_1.default.IObservableProperty)(accessor);
-	    Reflect_1.Implements(IID_1.default.IDisposable)(accessor);
+	    //////////////////////////////////
+	    // wx.IUnknown implementation
+	    accessor.queryInterface = function (iid) {
+	        return iid === IID_1.default.IObservableProperty || iid === IID_1.default.IDisposable;
+	    };
 	    //////////////////////////////////
 	    // IDisposable implementation
 	    accessor.dispose = function () {
@@ -2186,13 +1131,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Property.js.map
 
 /***/ },
-/* 14 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Injector_1 = __webpack_require__(2);
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	"use strict";
 	var Module = (function () {
 	    function Module(name) {
@@ -2501,7 +1446,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Module.js.map
 
 /***/ },
-/* 15 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -3621,17 +2566,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ExpressionCompiler.js.map
 
 /***/ },
-/* 16 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var WeakMap_1 = __webpack_require__(5);
-	var Set_1 = __webpack_require__(7);
-	var IID_1 = __webpack_require__(10);
+	var WeakMap_1 = __webpack_require__(12);
+	var Set_1 = __webpack_require__(14);
+	var IID_1 = __webpack_require__(5);
 	var Injector_1 = __webpack_require__(2);
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(11);
-	var env = __webpack_require__(17);
+	var res = __webpack_require__(6);
+	var env = __webpack_require__(15);
 	"use strict";
 	/**
 	* The heart of WebRx's binding-system
@@ -4138,10 +3083,200 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=DomManager.js.map
 
 /***/ },
-/* 17 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var WeakMap_1 = __webpack_require__(5);
+	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
+	/// <reference path="../Interfaces.ts" />
+	var Oid_1 = __webpack_require__(13);
+	"use strict";
+	/**
+	* This class emulates the semantics of a WeakMap.
+	* Even though this implementation is indeed "weak", it has the drawback of
+	* requiring manual housekeeping of entries otherwise they are kept forever.
+	* @class
+	*/
+	var WeakMapEmulated = (function () {
+	    function WeakMapEmulated() {
+	        ////////////////////
+	        /// Implementation
+	        this.inner = {};
+	    }
+	    ////////////////////
+	    /// IWeakMap
+	    WeakMapEmulated.prototype.set = function (key, value) {
+	        var oid = Oid_1.getOid(key);
+	        this.inner[oid] = value;
+	    };
+	    WeakMapEmulated.prototype.get = function (key) {
+	        var oid = Oid_1.getOid(key);
+	        return this.inner[oid];
+	    };
+	    WeakMapEmulated.prototype.has = function (key) {
+	        var oid = Oid_1.getOid(key);
+	        return this.inner.hasOwnProperty(oid);
+	    };
+	    WeakMapEmulated.prototype.delete = function (key) {
+	        var oid = Oid_1.getOid(key);
+	        return delete this.inner[oid];
+	    };
+	    Object.defineProperty(WeakMapEmulated.prototype, "isEmulated", {
+	        get: function () {
+	            return true;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    return WeakMapEmulated;
+	})();
+	var hasNativeSupport = typeof WeakMap === "function";
+	//let hasNativeSupport = false;
+	/**
+	* Creates a new WeakMap instance
+	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
+	* @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
+	*/
+	function createWeakMap(disableNativeSupport) {
+	    if (disableNativeSupport || !hasNativeSupport) {
+	        return new WeakMapEmulated();
+	    }
+	    return new WeakMap();
+	}
+	exports.createWeakMap = createWeakMap;
+	//# sourceMappingURL=WeakMap.js.map
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var oid = 1;
+	var oidPropertyName = "__wx_oid__" + (new Date).getTime();
+	/**
+	* Returns the objects unique id or assigns it if unassigned
+	* @param {any} o
+	*/
+	function getOid(o) {
+	    if (o == null)
+	        return undefined;
+	    var t = typeof o;
+	    if (t === "boolean" || t === "number" || t === "string")
+	        return (t + ":" + o);
+	    // already set?
+	    var result = o[oidPropertyName];
+	    if (result !== undefined)
+	        return result;
+	    // assign new one
+	    result = (oid++).toString();
+	    // store as non-enumerable property to avoid confusing other libraries
+	    Object.defineProperty(o, oidPropertyName, {
+	        enumerable: false,
+	        configurable: false,
+	        writable: false,
+	        value: result
+	    });
+	    return result;
+	}
+	exports.getOid = getOid;
+	//# sourceMappingURL=Oid.js.map
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
+	/// <reference path="../Interfaces.ts" />
+	var Oid_1 = __webpack_require__(13);
+	"use strict";
+	/**
+	* ES6 Set Shim
+	* @class
+	*/
+	var SetEmulated = (function () {
+	    function SetEmulated() {
+	        ////////////////////
+	        /// Implementation
+	        this.values = [];
+	        this.keys = {};
+	    }
+	    ////////////////////
+	    /// ISet
+	    SetEmulated.prototype.add = function (value) {
+	        var key = Oid_1.getOid(value);
+	        if (!this.keys[key]) {
+	            this.values.push(value);
+	            this.keys[key] = true;
+	        }
+	        return this;
+	    };
+	    SetEmulated.prototype.delete = function (value) {
+	        var key = Oid_1.getOid(value);
+	        if (this.keys[key]) {
+	            var index = this.values.indexOf(value);
+	            this.values.splice(index, 1);
+	            delete this.keys[key];
+	            return true;
+	        }
+	        return false;
+	    };
+	    SetEmulated.prototype.has = function (value) {
+	        var key = Oid_1.getOid(value);
+	        return this.keys.hasOwnProperty(key);
+	    };
+	    SetEmulated.prototype.clear = function () {
+	        this.keys = {};
+	        this.values.length = 0;
+	    };
+	    SetEmulated.prototype.forEach = function (callback, thisArg) {
+	        this.values.forEach(callback, thisArg);
+	    };
+	    Object.defineProperty(SetEmulated.prototype, "size", {
+	        get: function () {
+	            return this.values.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(SetEmulated.prototype, "isEmulated", {
+	        get: function () {
+	            return true;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    return SetEmulated;
+	})();
+	var hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
+	    && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
+	    && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
+	/**
+	* Creates a new Set instance
+	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
+	* @return {ISet<T>} A new instance of a suitable ISet implementation
+	*/
+	function createSet(disableNativeSupport) {
+	    if (disableNativeSupport || !hasNativeSupport) {
+	        return new SetEmulated();
+	    }
+	    return new Set();
+	}
+	exports.createSet = createSet;
+	/**
+	* Extracts the values of a Set by invoking its forEach method and capturing the output
+	*/
+	function setToArray(src) {
+	    var result = new Array();
+	    src.forEach(function (x) { return result.push(x); });
+	    return result;
+	}
+	exports.setToArray = setToArray;
+	//# sourceMappingURL=Set.js.map
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var WeakMap_1 = __webpack_require__(12);
 	"use strict";
 	var _window = window;
 	var userAgent = _window.navigator.userAgent;
@@ -4223,7 +3358,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Environment.js.map
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4340,12 +3475,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HtmlTemplateEngine.js.map
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(18);
 	"use strict";
 	var CommandBinding = (function () {
 	    function CommandBinding(domManager, app) {
@@ -4450,26 +3585,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Command.js.map
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
-	    switch (arguments.length) {
-	        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
-	        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
-	        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
-	    }
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
-	var IID_1 = __webpack_require__(10);
+	var IID_1 = __webpack_require__(5);
 	var Utils_1 = __webpack_require__(3);
-	var Reflect_1 = __webpack_require__(4);
 	var Injector_1 = __webpack_require__(2);
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	"use strict";
 	var Command = (function () {
 	    /// <summary>
@@ -4503,6 +3626,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .observeOn(this.scheduler)
 	            .subscribe(Injector_1.injector.get(res.app).defaultExceptionHandler);
 	    }
+	    //////////////////////////////////
+	    // wx.IUnknown implementation
+	    Command.prototype.queryInterface = function (iid) {
+	        return iid === IID_1.default.ICommand || iid === IID_1.default.IDisposable;
+	    };
 	    //////////////////////////////////
 	    // IDisposable implementation
 	    Command.prototype.dispose = function () {
@@ -4578,11 +3706,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .publish()
 	            .refCount();
 	    };
-	    Command = __decorate([
-	        Reflect_1.Implements(IID_1.default.ICommand),
-	        Reflect_1.Implements(IID_1.default.IDisposable), 
-	        __metadata('design:paramtypes', [Object, Function, Object])
-	    ], Command);
 	    return Command;
 	})();
 	exports.Command = Command;
@@ -4687,12 +3810,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Command.js.map
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Module_1 = __webpack_require__(14);
+	var Module_1 = __webpack_require__(9);
 	"use strict";
 	var ModuleBinding = (function () {
 	    function ModuleBinding(domManager, app) {
@@ -4805,7 +3928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Module.js.map
 
 /***/ },
-/* 22 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4966,7 +4089,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=If.js.map
 
 /***/ },
-/* 23 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4976,7 +4099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
-	var BindingBase_1 = __webpack_require__(24);
+	var BindingBase_1 = __webpack_require__(22);
 	"use strict";
 	var CssBinding = (function (_super) {
 	    __extends(CssBinding, _super);
@@ -5048,7 +4171,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=MultiOneWay.js.map
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5191,7 +4314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=BindingBase.js.map
 
 /***/ },
-/* 25 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5201,7 +4324,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
-	var BindingBase_1 = __webpack_require__(24);
+	var BindingBase_1 = __webpack_require__(22);
 	"use strict";
 	////////////////////
 	// Bindings
@@ -5302,15 +4425,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SingleOneWay.js.map
 
 /***/ },
-/* 26 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../RxExtensions.d.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var VirtualChildNodes_1 = __webpack_require__(27);
-	var RefCountDisposeWrapper_1 = __webpack_require__(28);
+	var VirtualChildNodes_1 = __webpack_require__(25);
+	var RefCountDisposeWrapper_1 = __webpack_require__(26);
 	var Injector_1 = __webpack_require__(2);
-	var List_1 = __webpack_require__(29);
+	var List_1 = __webpack_require__(27);
 	"use strict";
 	var ForEachBinding = (function () {
 	    function ForEachBinding(domManager, app) {
@@ -5708,7 +4831,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ForEach.js.map
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -5808,7 +4931,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=VirtualChildNodes.js.map
 
 /***/ },
-/* 28 */
+/* 26 */
 /***/ function(module, exports) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5839,7 +4962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RefCountDisposeWrapper.js.map
 
 /***/ },
-/* 29 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5848,28 +4971,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-	    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
-	    switch (arguments.length) {
-	        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
-	        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
-	        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
-	    }
-	};
-	var __metadata = (this && this.__metadata) || function (k, v) {
-	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-	};
 	var Utils_1 = __webpack_require__(3);
-	var Oid_1 = __webpack_require__(6);
-	var IID_1 = __webpack_require__(10);
-	var Lazy_1 = __webpack_require__(30);
-	var ScheduledSubject_1 = __webpack_require__(31);
-	var Events_1 = __webpack_require__(9);
-	var RefCountDisposeWrapper_1 = __webpack_require__(28);
-	var log = __webpack_require__(12);
-	var Reflect_1 = __webpack_require__(4);
+	var Oid_1 = __webpack_require__(13);
+	var IID_1 = __webpack_require__(5);
+	var Lazy_1 = __webpack_require__(28);
+	var ScheduledSubject_1 = __webpack_require__(29);
+	var Events_1 = __webpack_require__(4);
+	var RefCountDisposeWrapper_1 = __webpack_require__(26);
+	var log = __webpack_require__(7);
 	var Injector_1 = __webpack_require__(2);
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	"use strict";
 	/**
 	* ReactiveUI's awesome ReactiveList ported to Typescript
@@ -5890,6 +5001,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.app = Injector_1.injector.get(res.app);
 	        this.setupRx(initialContents, resetChangeThreshold, scheduler);
 	    }
+	    //////////////////////////////////
+	    // wx.IUnknown implementation
+	    ObservableList.prototype.queryInterface = function (iid) {
+	        return iid === IID_1.default.IObservableList || iid === IID_1.default.IDisposable;
+	    };
 	    //////////////////////////////////
 	    // wx.IDisposable implementation
 	    ObservableList.prototype.dispose = function () {
@@ -6422,11 +5538,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableList.prototype.isLengthAboveResetThreshold = function (toChangeLength) {
 	        return toChangeLength / this.inner.length > this.resetChangeThreshold && toChangeLength > 10;
 	    };
-	    ObservableList = __decorate([
-	        Reflect_1.Implements(IID_1.default.IObservableList),
-	        Reflect_1.Implements(IID_1.default.IDisposable), 
-	        __metadata('design:paramtypes', [Array, Number, Object])
-	    ], ObservableList);
 	    return ObservableList;
 	})();
 	exports.ObservableList = ObservableList;
@@ -6906,7 +6017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=List.js.map
 
 /***/ },
-/* 30 */
+/* 28 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6936,7 +6047,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Lazy.js.map
 
 /***/ },
-/* 31 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Utils_1 = __webpack_require__(3);
@@ -6990,12 +6101,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ScheduledSubject.js.map
 
 /***/ },
-/* 32 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(18);
 	"use strict";
 	var EventBinding = (function () {
 	    function EventBinding(domManager, app) {
@@ -7087,12 +6198,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Event.js.map
 
 /***/ },
-/* 33 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	"use strict";
 	var ValueBinding = (function () {
 	    function ValueBinding(domManager, app) {
@@ -7241,7 +6352,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Value.js.map
 
 /***/ },
-/* 34 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7380,7 +6491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HasFocus.js.map
 
 /***/ },
-/* 35 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7444,7 +6555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=With.js.map
 
 /***/ },
-/* 36 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7546,12 +6657,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Checked.js.map
 
 /***/ },
-/* 37 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(18);
 	"use strict";
 	var keysByCode = {
 	    8: 'backspace',
@@ -7707,12 +6818,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=KeyPress.js.map
 
 /***/ },
-/* 38 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var env = __webpack_require__(17);
+	var env = __webpack_require__(15);
 	"use strict";
 	var TextInputBinding = (function () {
 	    function TextInputBinding(domManager, app) {
@@ -7860,13 +6971,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=TextInput.js.map
 
 /***/ },
-/* 39 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Value_1 = __webpack_require__(33);
-	var List_1 = __webpack_require__(29);
+	var Value_1 = __webpack_require__(31);
+	var List_1 = __webpack_require__(27);
 	"use strict";
 	var impls = new Array();
 	var RadioSingleSelectionImpl = (function () {
@@ -8036,7 +7147,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SelectedValue.js.map
 
 /***/ },
-/* 40 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8180,7 +7291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Component.js.map
 
 /***/ },
-/* 41 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -8277,7 +7388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateActive.js.map
 
 /***/ },
-/* 42 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -8440,7 +7551,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=View.js.map
 
 /***/ },
-/* 43 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -8536,7 +7647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateRef.js.map
 
 /***/ },
-/* 44 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8645,7 +7756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Select.js.map
 
 /***/ },
-/* 45 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8740,13 +7851,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RadioGroup.js.map
 
 /***/ },
-/* 46 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Property_1 = __webpack_require__(13);
-	var RouteMatcher_1 = __webpack_require__(47);
+	var Property_1 = __webpack_require__(8);
+	var RouteMatcher_1 = __webpack_require__(45);
 	"use strict";
 	var Router = (function () {
 	    function Router(domManager, app) {
@@ -9146,7 +8257,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Router.js.map
 
 /***/ },
-/* 47 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -9303,11 +8414,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RouteMatcher.js.map
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var ScheduledSubject_1 = __webpack_require__(31);
+	var ScheduledSubject_1 = __webpack_require__(29);
 	// ReactiveUI's MessageBus
 	"use strict";
 	var MessageBus = (function () {
@@ -9353,7 +8464,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=MessageBus.js.map
 
 /***/ },
-/* 49 */
+/* 47 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9517,23 +8628,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HttpClient.js.map
 
 /***/ },
-/* 50 */
+/* 48 */
 /***/ function(module, exports) {
 
 	exports.version = '1.2.1';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
-/* 51 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="./Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var IID_1 = __webpack_require__(10);
-	var ScheduledSubject_1 = __webpack_require__(31);
-	var Reflect_1 = __webpack_require__(4);
+	var IID_1 = __webpack_require__(5);
+	var ScheduledSubject_1 = __webpack_require__(29);
 	var Injector_1 = __webpack_require__(2);
-	var res = __webpack_require__(11);
+	var res = __webpack_require__(6);
 	"use strict";
 	var RxObsConstructor = Rx.Observable; // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 	/**
@@ -9553,8 +8663,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        return accessor.value;
 	    };
-	    Reflect_1.Implements(IID_1.default.IObservableProperty)(accessor);
-	    Reflect_1.Implements(IID_1.default.IDisposable)(accessor);
+	    //////////////////////////////////
+	    // wx.IUnknown implementation
+	    accessor.queryInterface = function (iid) {
+	        return iid === IID_1.default.IObservableProperty || iid === IID_1.default.IDisposable;
+	    };
 	    //////////////////////////////////
 	    // IDisposable implementation
 	    accessor.dispose = function () {
@@ -9628,7 +8741,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RxExtensions.js.map
 
 /***/ },
-/* 52 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -9817,6 +8930,120 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.animation = animation;
 	//# sourceMappingURL=Animation.js.map
+
+/***/ },
+/* 51 */
+/***/ function(module, exports) {
+
+	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
+	/// <reference path="../Interfaces.ts" />
+	"use strict";
+	/**
+	* ES6 Map Shim
+	* @class
+	*/
+	var MapEmulated = (function () {
+	    function MapEmulated() {
+	        ////////////////////
+	        /// Implementation
+	        this.cacheSentinel = {};
+	        this.keys = [];
+	        this.values = [];
+	        this.cache = this.cacheSentinel;
+	    }
+	    Object.defineProperty(MapEmulated.prototype, "size", {
+	        ////////////////////
+	        /// IMap
+	        get: function () {
+	            return this.keys.length;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    MapEmulated.prototype.has = function (key) {
+	        if (key === this.cache) {
+	            return true;
+	        }
+	        if (this.find(key) >= 0) {
+	            this.cache = key;
+	            return true;
+	        }
+	        return false;
+	    };
+	    MapEmulated.prototype.get = function (key) {
+	        var index = this.find(key);
+	        if (index >= 0) {
+	            this.cache = key;
+	            return this.values[index];
+	        }
+	        return undefined;
+	    };
+	    MapEmulated.prototype.set = function (key, value) {
+	        this.delete(key);
+	        this.keys.push(key);
+	        this.values.push(value);
+	        this.cache = key;
+	        return this;
+	    };
+	    MapEmulated.prototype.delete = function (key) {
+	        var index = this.find(key);
+	        if (index >= 0) {
+	            this.keys.splice(index, 1);
+	            this.values.splice(index, 1);
+	            this.cache = this.cacheSentinel;
+	            return true;
+	        }
+	        return false;
+	    };
+	    MapEmulated.prototype.clear = function () {
+	        this.keys.length = 0;
+	        this.values.length = 0;
+	        this.cache = this.cacheSentinel;
+	    };
+	    MapEmulated.prototype.forEach = function (callback, thisArg) {
+	        var size = this.size;
+	        for (var i = 0; i < size; ++i) {
+	            var key = this.keys[i];
+	            var value = this.values[i];
+	            this.cache = key;
+	            callback.call(this, value, key, this);
+	        }
+	    };
+	    Object.defineProperty(MapEmulated.prototype, "isEmulated", {
+	        get: function () {
+	            return true;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    MapEmulated.prototype.find = function (key) {
+	        var keys = this.keys;
+	        var size = keys.length;
+	        for (var i = 0; i < size; ++i) {
+	            if (keys[i] === key) {
+	                return i;
+	            }
+	        }
+	        return -1;
+	    };
+	    return MapEmulated;
+	})();
+	var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty("forEach")
+	    && Map.prototype.hasOwnProperty("add") && Map.prototype.hasOwnProperty("clear")
+	    && Map.prototype.hasOwnProperty("devare") && Map.prototype.hasOwnProperty("has");
+	/**
+	* Creates a new WeakMap instance
+	* @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
+	* @return {IWeakMap<TKey, T>} A new instance of a suitable IWeakMap implementation
+	*/
+	function createMap(disableNativeSupport) {
+	    if (disableNativeSupport || !hasNativeSupport) {
+	        return new MapEmulated();
+	    }
+	    return new Map();
+	}
+	exports.createMap = createMap;
+	//# sourceMappingURL=Map.js.map
 
 /***/ }
 /******/ ])

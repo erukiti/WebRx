@@ -1,5 +1,4 @@
 /// <reference path="../Interfaces.ts" />
-import { getMetadata, implementsMetaDataKey } from "./Reflect";
 import { PropertyChangedEventArgs } from "./Events";
 import IID from "../IID";
 /*
@@ -30,10 +29,9 @@ export function isPrimitive(target) {
 export function queryInterface(target, iid) {
     if (target == null || isPrimitive(target))
         return false;
-    if (typeof target === "object")
-        target = target.constructor;
-    let interfaces = getMetadata(implementsMetaDataKey, target);
-    return interfaces != null && interfaces[iid];
+    if (!isFunction(target["queryInterface"]))
+        return false;
+    return target.queryInterface(iid);
 }
 /**
 * Returns all own properties of target implementing interface iid

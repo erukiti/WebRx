@@ -1,15 +1,4 @@
 /// <reference path="../Interfaces.ts" />
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") return Reflect.decorate(decorators, target, key, desc);
-    switch (arguments.length) {
-        case 2: return decorators.reduceRight(function(o, d) { return (d && d(o)) || o; }, target);
-        case 3: return decorators.reduceRight(function(o, d) { return (d && d(target, key)), void 0; }, void 0);
-        case 4: return decorators.reduceRight(function(o, d) { return (d && d(target, key, o)) || o; }, desc);
-    }
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 import { isInUnitTest, args2Array, throwError, using, isRxObservable, observeObject } from "../Core/Utils";
 import { getOid } from "../Core/Oid";
 import IID from "./../IID";
@@ -18,7 +7,6 @@ import { createScheduledSubject } from "./../Core/ScheduledSubject";
 import { PropertyChangedEventArgs } from "../Core/Events";
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper";
 import * as log from "./../Core/Log";
-import { Implements } from "./../Core/Reflect";
 import { injector } from "../Core/Injector";
 import * as res from "../Core/Resources";
 "use strict";
@@ -26,7 +14,7 @@ import * as res from "../Core/Resources";
 * ReactiveUI's awesome ReactiveList ported to Typescript
 * @class
 */
-export let ObservableList = class {
+export class ObservableList {
     constructor(initialContents, resetChangeThreshold = 0.3, scheduler = null) {
         //////////////////////////
         // Some array convenience members
@@ -38,6 +26,11 @@ export let ObservableList = class {
         this.hasWhinedAboutNoResetSub = false;
         this.app = injector.get(res.app);
         this.setupRx(initialContents, resetChangeThreshold, scheduler);
+    }
+    //////////////////////////////////
+    // wx.IUnknown implementation
+    queryInterface(iid) {
+        return iid === IID.IObservableList || iid === IID.IDisposable;
     }
     //////////////////////////////////
     // wx.IDisposable implementation
@@ -491,12 +484,7 @@ export let ObservableList = class {
     isLengthAboveResetThreshold(toChangeLength) {
         return toChangeLength / this.inner.length > this.resetChangeThreshold && toChangeLength > 10;
     }
-};
-ObservableList = __decorate([
-    Implements(IID.IObservableList),
-    Implements(IID.IDisposable), 
-    __metadata('design:paramtypes', [Array, Number, Object])
-], ObservableList);
+}
 class ObservableListProjection extends ObservableList {
     constructor(source, filter, orderer, selector, refreshTrigger, scheduler) {
         super();

@@ -16,11 +16,13 @@ export function getOid(o: any): string {
         return (t + ":" + o);
 
     // already set?
-    if(o.hasOwnProperty(oidPropertyName))
-        return o[oidPropertyName];
+    let result = o[oidPropertyName];
+    
+    if(result !== undefined)
+        return result;
     
     // assign new one
-    const result = (oid++).toString();
+    result = (oid++).toString();
     
     // store as non-enumerable property to avoid confusing other libraries
     Object.defineProperty(o, oidPropertyName, {

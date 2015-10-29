@@ -8,7 +8,6 @@ import { createScheduledSubject } from "./../Core/ScheduledSubject"
 import {PropertyChangedEventArgs } from "../Core/Events"
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper"
 import * as log from "./../Core/Log"
-import { Implements } from "./../Core/Reflect"
 import { injector } from "../Core/Injector"
 import * as res from "../Core/Resources"
 
@@ -18,12 +17,17 @@ import * as res from "../Core/Resources"
 * ReactiveUI's awesome ReactiveList ported to Typescript
 * @class
 */
-@Implements(IID.IObservableList)
-@Implements(IID.IDisposable)
-export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable {
+export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable, wx.IUnknown {
     constructor(initialContents?: Array<T>, resetChangeThreshold: number = 0.3, scheduler: Rx.IScheduler = null) {
         this.app = injector.get<wx.IWebRxApp>(res.app);
         this.setupRx(initialContents, resetChangeThreshold, scheduler);
+    }
+
+    //////////////////////////////////
+    // wx.IUnknown implementation
+
+    public queryInterface(iid: string): boolean {
+       return iid === IID.IObservableList || iid === IID.IDisposable;
     }
 
     //////////////////////////////////

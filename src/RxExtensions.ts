@@ -3,7 +3,6 @@
 import { args2Array, isFunction, throwError, isRxObservable } from "./Core/Utils"
 import IID from "./IID"
 import { createScheduledSubject } from "./Core/ScheduledSubject"
-import { Implements } from "./Core/Reflect"
 import { injector } from "./Core/Injector"
 import * as res from "./Core/Resources"
 
@@ -32,8 +31,12 @@ function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
         return accessor.value;
     };
 
-    Implements(IID.IObservableProperty)(accessor);
-    Implements(IID.IDisposable)(accessor);
+    //////////////////////////////////
+    // wx.IUnknown implementation
+
+    accessor.queryInterface = (iid: string)=> {
+       return iid === IID.IObservableProperty || iid === IID.IDisposable;
+    }
 
     //////////////////////////////////
     // IDisposable implementation

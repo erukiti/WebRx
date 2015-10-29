@@ -1,6 +1,7 @@
 /// <reference path="../Interfaces.d.ts" />
-export declare class Command<T> implements wx.ICommand<T> {
+export declare class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     constructor(canExecute: Rx.Observable<boolean>, executeAsync: (any) => Rx.Observable<T>, scheduler?: Rx.IScheduler);
+    queryInterface(iid: string): boolean;
     dispose(): void;
     canExecuteObservable: Rx.Observable<boolean>;
     isExecuting: Rx.Observable<boolean>;

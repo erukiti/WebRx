@@ -1,6 +1,13 @@
 /// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 declare module wx {
     /**
+    * IUnknown
+    * @interface
+    **/
+    interface IUnknown {
+        queryInterface(iid: string): boolean;
+    }
+    /**
     * Dependency Injector and service locator
     * @interface
     **/

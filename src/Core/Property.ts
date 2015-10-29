@@ -1,6 +1,5 @@
 /// <reference path="../Interfaces.ts" />
 
-import { Implements } from "./Reflect"
 import IID from "../IID"
 
 // NOTE: The factory method approach is necessary because it is  
@@ -28,10 +27,14 @@ export function property<T>(initialValue?: T): wx.IObservableProperty<T> {
             return accessor.value;
         }
     };
-    
-    Implements(IID.IObservableProperty)(accessor);
-    Implements(IID.IDisposable)(accessor);
 
+    //////////////////////////////////
+    // wx.IUnknown implementation
+
+    accessor.queryInterface = (iid: string)=> {
+       return iid === IID.IObservableProperty || iid === IID.IDisposable;
+    }
+    
     //////////////////////////////////
     // IDisposable implementation
 

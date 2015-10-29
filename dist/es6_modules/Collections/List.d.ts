@@ -3,8 +3,9 @@
 * ReactiveUI's awesome ReactiveList ported to Typescript
 * @class
 */
-export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable {
+export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable, wx.IUnknown {
     constructor(initialContents?: Array<T>, resetChangeThreshold?: number, scheduler?: Rx.IScheduler);
+    queryInterface(iid: string): boolean;
     dispose(): void;
     isReadOnly: boolean;
     itemsAdded: Rx.Observable<wx.IListChangeInfo<T>>;
