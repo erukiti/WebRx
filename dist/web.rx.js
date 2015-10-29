@@ -5590,9 +5590,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Utils_1.throwError(this.readonlyExceptionMessage);
 	    };
 	    ObservableListProjection.prototype.clear = function () {
-	        this.indexToSourceIndexMap = [];
-	        this.sourceCopy = [];
-	        _super.prototype.clear.call(this);
+	        Utils_1.throwError(this.readonlyExceptionMessage);
 	    };
 	    ObservableListProjection.prototype.remove = function (item) {
 	        Utils_1.throwError(this.readonlyExceptionMessage);
@@ -5674,7 +5672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0; i < e.items.length; i++) {
 	            var destinationIndex = this.getIndexFromSourceIndex(e.from + i);
 	            if (destinationIndex !== -1) {
-	                this.emoveAt(destinationIndex);
+	                this.removeAtInternal(destinationIndex);
 	            }
 	        }
 	        var removedCount = e.items.length;
@@ -5725,6 +5723,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        for (var i = 0; i < e.items.length; i++) {
 	            var sourceItem = e.items[i];
 	            this.sourceCopy[e.from + i] = sourceItem;
+	            if (sourceOids)
+	                sourceOids[e.from + i] = Oid_1.getOid(sourceItem);
 	            this.onItemChanged(sourceItem, sourceOids);
 	        }
 	    };
@@ -5737,7 +5737,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
 	            var isIncluded = currentDestinationIndex >= 0;
 	            if (isIncluded && !shouldBeIncluded) {
-	                this.emoveAt(currentDestinationIndex);
+	                this.removeAtInternal(currentDestinationIndex);
 	            }
 	            else if (!isIncluded && shouldBeIncluded) {
 	                this.insertAndMap(sourceIndex, this.selector(changedItem));
@@ -5778,7 +5778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            _super.prototype.move.call(this, currentDestinationIndex, newDestinationIndex);
 	                        }
 	                        else {
-	                            this.emoveAt(currentDestinationIndex);
+	                            this.removeAtInternal(currentDestinationIndex);
 	                            this.insertAndMap(sourceIndex, newItem);
 	                        }
 	                    }
@@ -5900,7 +5900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.indexToSourceIndexMap.splice(destinationIndex, 0, sourceIndex);
 	        _super.prototype.insert.call(this, destinationIndex, value);
 	    };
-	    ObservableListProjection.prototype.emoveAt = function (destinationIndex) {
+	    ObservableListProjection.prototype.removeAtInternal = function (destinationIndex) {
 	        this.indexToSourceIndexMap.splice(destinationIndex, 1);
 	        _super.prototype.removeAt.call(this, destinationIndex);
 	    };
@@ -7676,6 +7676,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function SelectComponent(htmlTemplateEngine) {
 	        var _this = this;
 	        this.template = function (params) {
+	            //console.log(JSON.stringify(params));
 	            return _this.buildTemplate(params);
 	        };
 	        this.viewModel = function (params) {
@@ -7698,6 +7699,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                (params.itemText != null ? params.itemText : "") + "-" +
 	                (params.itemValue != null ? params.itemValue : "") + "-" +
 	                (params.itemClass != null ? params.itemClass : "") + "-" +
+	                (params.cssClass != null ? params.cssClass : "") + "-" +
 	                (params.selectedValue != null ? "true" : "false") + "-" +
 	                (params.multiple ? "true" : "false") + "-" +
 	                (params.required ? "true" : "false") + "-" +
@@ -7710,12 +7712,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        // base-template
-	        result = '<select class="wx-select" data-bind="{0}"><option data-bind="{1}"></option></select>';
+	        result = '<select class="wx-select{2}" data-bind="{0}"><option data-bind="{1}"></option></select>';
 	        var bindings = [];
 	        var attrs = [];
 	        var itemBindings = [];
 	        var itemAttrs = [];
 	        bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
+	        // cssClass
+	        if (params.cssClass !== undefined)
+	            params.cssClass = ' ' + params.cssClass;
+	        else
+	            params.cssClass = '';
 	        // selection (two-way)
 	        if (params.selectedValue)
 	            bindings.push({ key: "selectedValue", value: "@selectedValue" });
@@ -7757,7 +7764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var bindingString = bindings.map(function (x) { return x.key + ": " + x.value; }).join(", ");
 	        var itemBindingString = itemBindings.map(function (x) { return x.key + ": " + x.value; }).join(", ");
 	        // assemble template
-	        result = Utils_1.formatString(result, bindingString, itemBindingString);
+	        result = Utils_1.formatString(result, bindingString, itemBindingString, params.cssClass);
 	        //console.log(result);
 	        // store
 	        if (!params.noCache) {

@@ -897,6 +897,7 @@ declare module wx {
         itemText?: string;
         itemValue?: string;
         itemClass?: string;
+        cssClass?: string;
         multiple?: boolean;
         required?: boolean;
         autofocus?: boolean;

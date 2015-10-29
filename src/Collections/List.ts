@@ -770,10 +770,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     public clear(): void {
-        this.indexToSourceIndexMap = [];
-        this.sourceCopy = [];
-
-        super.clear();
+        throwError(this.readonlyExceptionMessage);
     }
 
     public remove(item: TValue): boolean {
@@ -909,7 +906,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         for(let i = 0; i < e.items.length; i++) {
             let destinationIndex = this.getIndexFromSourceIndex(e.from + i);
             if (destinationIndex !== -1) {
-                this.emoveAt(destinationIndex);
+                this.removeAtInternal(destinationIndex);
             }
         }
 
@@ -972,6 +969,9 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         for(let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
+            
+            if(sourceOids)
+                sourceOids[e.from + i] = getOid(sourceItem);
 
             this.onItemChanged(sourceItem, sourceOids);
         }
@@ -989,7 +989,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
             let isIncluded = currentDestinationIndex >= 0;
 
             if (isIncluded && !shouldBeIncluded) {
-                this.emoveAt(currentDestinationIndex);
+                this.removeAtInternal(currentDestinationIndex);
             } else if (!isIncluded && shouldBeIncluded) {
                 this.insertAndMap(sourceIndex, this.selector(changedItem));
             } else if (isIncluded && shouldBeIncluded) {
@@ -1031,9 +1031,8 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
                             this.indexToSourceIndexMap.splice(newDestinationIndex, 0, sourceIndex);
 
                             super.move(currentDestinationIndex, newDestinationIndex);
-
                         } else {
-                            this.emoveAt(currentDestinationIndex);
+                            this.removeAtInternal(currentDestinationIndex);
                             this.insertAndMap(sourceIndex, newItem);
                         }
                     }
@@ -1177,7 +1176,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         super.insert(destinationIndex, value);
     }
 
-    protected emoveAt(destinationIndex: number): void {
+    protected removeAtInternal(destinationIndex: number): void {
         this.indexToSourceIndexMap.splice(destinationIndex, 1);
         super.removeAt(destinationIndex);
     }

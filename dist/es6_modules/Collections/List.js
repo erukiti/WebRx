@@ -528,9 +528,7 @@ class ObservableListProjection extends ObservableList {
         throwError(this.readonlyExceptionMessage);
     }
     clear() {
-        this.indexToSourceIndexMap = [];
-        this.sourceCopy = [];
-        super.clear();
+        throwError(this.readonlyExceptionMessage);
     }
     remove(item) {
         throwError(this.readonlyExceptionMessage);
@@ -610,7 +608,7 @@ class ObservableListProjection extends ObservableList {
         for (let i = 0; i < e.items.length; i++) {
             let destinationIndex = this.getIndexFromSourceIndex(e.from + i);
             if (destinationIndex !== -1) {
-                this.emoveAt(destinationIndex);
+                this.removeAtInternal(destinationIndex);
             }
         }
         let removedCount = e.items.length;
@@ -661,6 +659,8 @@ class ObservableListProjection extends ObservableList {
         for (let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
+            if (sourceOids)
+                sourceOids[e.from + i] = getOid(sourceItem);
             this.onItemChanged(sourceItem, sourceOids);
         }
     }
@@ -673,7 +673,7 @@ class ObservableListProjection extends ObservableList {
             let currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
             let isIncluded = currentDestinationIndex >= 0;
             if (isIncluded && !shouldBeIncluded) {
-                this.emoveAt(currentDestinationIndex);
+                this.removeAtInternal(currentDestinationIndex);
             }
             else if (!isIncluded && shouldBeIncluded) {
                 this.insertAndMap(sourceIndex, this.selector(changedItem));
@@ -714,7 +714,7 @@ class ObservableListProjection extends ObservableList {
                             super.move(currentDestinationIndex, newDestinationIndex);
                         }
                         else {
-                            this.emoveAt(currentDestinationIndex);
+                            this.removeAtInternal(currentDestinationIndex);
                             this.insertAndMap(sourceIndex, newItem);
                         }
                     }
@@ -836,7 +836,7 @@ class ObservableListProjection extends ObservableList {
         this.indexToSourceIndexMap.splice(destinationIndex, 0, sourceIndex);
         super.insert(destinationIndex, value);
     }
-    emoveAt(destinationIndex) {
+    removeAtInternal(destinationIndex) {
         this.indexToSourceIndexMap.splice(destinationIndex, 1);
         super.removeAt(destinationIndex);
     }

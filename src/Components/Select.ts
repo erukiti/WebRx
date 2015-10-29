@@ -12,6 +12,7 @@ export default class SelectComponent implements wx.IComponentDescriptor {
     }
 
     public template = (params: any): Node[]=> {
+        //console.log(JSON.stringify(params));
         return this.buildTemplate(params);
     }
 
@@ -41,6 +42,7 @@ export default class SelectComponent implements wx.IComponentDescriptor {
                 (params.itemText != null ? params.itemText : "") + "-" +
                 (params.itemValue != null ? params.itemValue : "") + "-" +
                 (params.itemClass != null ? params.itemClass : "") + "-" +
+                (params.cssClass != null ? params.cssClass : "") + "-" +
                 (params.selectedValue != null ? "true" : "false") + "-" +
                 (params.multiple ? "true" : "false") + "-" +
                 (params.required ? "true" : "false") + "-" +
@@ -56,13 +58,19 @@ export default class SelectComponent implements wx.IComponentDescriptor {
         }
 
         // base-template
-        result = '<select class="wx-select" data-bind="{0}"><option data-bind="{1}"></option></select>';
+        result = '<select class="wx-select{2}" data-bind="{0}"><option data-bind="{1}"></option></select>';
         let bindings: Array<{ key: string; value: string }> = [];
         let attrs: Array<{ key: string; value: string }> = [];
         let itemBindings: Array<{ key: string; value: string }> = [];
         let itemAttrs: Array<{ key: string; value: string }> = [];
 
         bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
+        
+        // cssClass
+        if(params.cssClass !== undefined)
+            params.cssClass = ' ' + params.cssClass;
+        else
+            params.cssClass = '';
 
         // selection (two-way)
         if (params.selectedValue)
@@ -117,7 +125,7 @@ export default class SelectComponent implements wx.IComponentDescriptor {
         let itemBindingString = itemBindings.map(x => x.key + ": " + x.value).join(", ");
 
         // assemble template
-        result = formatString(result, bindingString, itemBindingString);
+        result = formatString(result, bindingString, itemBindingString, params.cssClass);
         //console.log(result);
 
         // store

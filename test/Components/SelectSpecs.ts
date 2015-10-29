@@ -22,6 +22,19 @@ describe('Components', () => {
                 .map(x => wx.getNodeValue(x, domManager))).toEqual(items);
         });
 
+        it('custom css class for select element',() => {
+            loadFixtures('templates/Components/Select.html');
+
+            var el = <HTMLElement> document.querySelector("#fixture6");
+            var items = [3, 2, 1];
+            var model = { items: items };
+
+            expect(() => wx.applyBindings(model, el)).not.toThrowError();
+
+            expect(el.childNodes[0]).toHaveClass('wx-select');
+            expect(el.childNodes[0]).toHaveClass('foo');
+        });
+
         it('items with label',() => {
             loadFixtures('templates/Components/Select.html');
 

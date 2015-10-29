@@ -5,6 +5,7 @@ let templateCache = {};
 export default class SelectComponent {
     constructor(htmlTemplateEngine) {
         this.template = (params) => {
+            //console.log(JSON.stringify(params));
             return this.buildTemplate(params);
         };
         this.viewModel = (params) => {
@@ -27,6 +28,7 @@ export default class SelectComponent {
                 (params.itemText != null ? params.itemText : "") + "-" +
                 (params.itemValue != null ? params.itemValue : "") + "-" +
                 (params.itemClass != null ? params.itemClass : "") + "-" +
+                (params.cssClass != null ? params.cssClass : "") + "-" +
                 (params.selectedValue != null ? "true" : "false") + "-" +
                 (params.multiple ? "true" : "false") + "-" +
                 (params.required ? "true" : "false") + "-" +
@@ -39,12 +41,17 @@ export default class SelectComponent {
             }
         }
         // base-template
-        result = '<select class="wx-select" data-bind="{0}"><option data-bind="{1}"></option></select>';
+        result = '<select class="wx-select{2}" data-bind="{0}"><option data-bind="{1}"></option></select>';
         let bindings = [];
         let attrs = [];
         let itemBindings = [];
         let itemAttrs = [];
         bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
+        // cssClass
+        if (params.cssClass !== undefined)
+            params.cssClass = ' ' + params.cssClass;
+        else
+            params.cssClass = '';
         // selection (two-way)
         if (params.selectedValue)
             bindings.push({ key: "selectedValue", value: "@selectedValue" });
@@ -86,7 +93,7 @@ export default class SelectComponent {
         let bindingString = bindings.map(x => x.key + ": " + x.value).join(", ");
         let itemBindingString = itemBindings.map(x => x.key + ": " + x.value).join(", ");
         // assemble template
-        result = formatString(result, bindingString, itemBindingString);
+        result = formatString(result, bindingString, itemBindingString, params.cssClass);
         //console.log(result);
         // store
         if (!params.noCache) {
