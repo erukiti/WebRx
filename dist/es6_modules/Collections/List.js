@@ -540,7 +540,9 @@ class ObservableListProjection extends ObservableList {
         throwError(this.readonlyExceptionMessage);
     }
     clear() {
-        throwError(this.readonlyExceptionMessage);
+        this.indexToSourceIndexMap = [];
+        this.sourceCopy = [];
+        super.clear();
     }
     remove(item) {
         throwError(this.readonlyExceptionMessage);
@@ -609,7 +611,7 @@ class ObservableListProjection extends ObservableList {
                 continue;
             }
             let destinationItem = this.selector(sourceItem);
-            this.nsertAndMap(e.from + i, destinationItem);
+            this.insertAndMap(e.from + i, destinationItem);
         }
     }
     onItemsRemoved(e) {
@@ -671,14 +673,16 @@ class ObservableListProjection extends ObservableList {
     onItemChanged(changedItem) {
         let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
         let shouldBeIncluded = !this._filter || this._filter(changedItem);
-        sourceIndices.forEach((sourceIndex) => {
+        const sourceIndicesLength = sourceIndices.length;
+        for (let i = 0; i < sourceIndicesLength; i++) {
+            const sourceIndex = sourceIndices[i];
             let currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
             let isIncluded = currentDestinationIndex >= 0;
             if (isIncluded && !shouldBeIncluded) {
                 this.emoveAt(currentDestinationIndex);
             }
             else if (!isIncluded && shouldBeIncluded) {
-                this.nsertAndMap(sourceIndex, this.selector(changedItem));
+                this.insertAndMap(sourceIndex, this.selector(changedItem));
             }
             else if (isIncluded && shouldBeIncluded) {
                 // The item is already included and it should stay there but it's possible that the change that
@@ -717,12 +721,12 @@ class ObservableListProjection extends ObservableList {
                         }
                         else {
                             this.emoveAt(currentDestinationIndex);
-                            this.nsertAndMap(sourceIndex, newItem);
+                            this.insertAndMap(sourceIndex, newItem);
                         }
                     }
                 }
             }
-        });
+        }
     }
     /// <summary>
     /// Gets a value indicating whether or not the item fits (sort-wise) at the provided index. The determination
@@ -759,12 +763,14 @@ class ObservableListProjection extends ObservableList {
     indexOfAll(source, item) {
         let indices = [];
         let sourceIndex = 0;
-        source.forEach((x) => {
+        const sourceLength = source.length;
+        for (let i = 0; i < sourceLength; i++) {
+            const x = source[i];
             if (this.referenceEquals(x, item)) {
                 indices.push(sourceIndex);
             }
             sourceIndex++;
-        });
+        }
         return indices;
     }
     /// <summary>
@@ -809,21 +815,18 @@ class ObservableListProjection extends ObservableList {
     addAllItemsFromSourceCollection() {
         // Debug.Assert(sourceCopy.length == 0, "Expected source copy to be empty");
         let sourceIndex = 0;
-        this.source.forEach(sourceItem => {
+        const length = this.source.length();
+        for (let i = 0; i < length; i++) {
+            const sourceItem = this.source.get(i);
             this.sourceCopy.push(sourceItem);
             if (!this._filter || this._filter(sourceItem)) {
                 let destinationItem = this.selector(sourceItem);
-                this.nsertAndMap(sourceIndex, destinationItem);
+                this.insertAndMap(sourceIndex, destinationItem);
             }
             sourceIndex++;
-        });
+        }
     }
-    lear() {
-        this.indexToSourceIndexMap = [];
-        this.sourceCopy = [];
-        super.clear();
-    }
-    nsertAndMap(sourceIndex, value) {
+    insertAndMap(sourceIndex, value) {
         let destinationIndex = this.positionForNewItem(sourceIndex, value);
         this.indexToSourceIndexMap.splice(destinationIndex, 0, sourceIndex);
         super.insert(destinationIndex, value);

@@ -766,7 +766,10 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     public clear(): void {
-        throwError(this.readonlyExceptionMessage);
+        this.indexToSourceIndexMap = [];
+        this.sourceCopy = [];
+
+        super.clear();
     }
 
     public remove(item: TValue): boolean {
@@ -889,7 +892,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
             }
 
             let destinationItem = this.selector(sourceItem);
-            this.nsertAndMap(e.from + i, destinationItem);
+            this.insertAndMap(e.from + i, destinationItem);
         }
     }
 
@@ -966,15 +969,18 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     private onItemChanged(changedItem: T): void {
         let sourceIndices = this.indexOfAll(this.sourceCopy, changedItem);
         let shouldBeIncluded = !this._filter || this._filter(changedItem);
+        const sourceIndicesLength = sourceIndices.length;
 
-        sourceIndices.forEach((sourceIndex: number) => {
+        for(let i=0;i<sourceIndicesLength;i++) {
+            const sourceIndex = sourceIndices[i];
+            
             let currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
             let isIncluded = currentDestinationIndex >= 0;
 
             if (isIncluded && !shouldBeIncluded) {
                 this.emoveAt(currentDestinationIndex);
             } else if (!isIncluded && shouldBeIncluded) {
-                this.nsertAndMap(sourceIndex, this.selector(changedItem));
+                this.insertAndMap(sourceIndex, this.selector(changedItem));
             } else if (isIncluded && shouldBeIncluded) {
                 // The item is already included and it should stay there but it's possible that the change that
                 // caused this event affects the ordering. This gets a little tricky so let's be verbose.
@@ -1017,12 +1023,12 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
 
                         } else {
                             this.emoveAt(currentDestinationIndex);
-                            this.nsertAndMap(sourceIndex, newItem);
+                            this.insertAndMap(sourceIndex, newItem);
                         }
                     }
                 }
             }
-        });
+        }
     }
 
     /// <summary>
@@ -1066,14 +1072,17 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     private indexOfAll(source, item: T): Array<number> {
         let indices = [];
         let sourceIndex = 0;
+        const sourceLength = source.length;
 
-        source.forEach((x) => {
+        for(let i=0;i<sourceLength;i++) {
+            const x = source[i];
+            
             if (this.referenceEquals(x, item)) {
                 indices.push(sourceIndex);
             }
 
             sourceIndex++;
-        });
+        }
 
         return indices;
     }
@@ -1122,27 +1131,22 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     private addAllItemsFromSourceCollection(): void {
         // Debug.Assert(sourceCopy.length == 0, "Expected source copy to be empty");
         let sourceIndex = 0;
+        const length = this.source.length();
 
-        this.source.forEach(sourceItem => {
+        for(let i=0;i<length;i++) {
+            const sourceItem = this.source.get(i);            
             this.sourceCopy.push(sourceItem);
 
             if (!this._filter || this._filter(sourceItem)) {
                 let destinationItem = this.selector(sourceItem);
-                this.nsertAndMap(sourceIndex, destinationItem);
+                this.insertAndMap(sourceIndex, destinationItem);
             }
 
             sourceIndex++;
-        });
+        }
     }
 
-    protected lear(): void {
-        this.indexToSourceIndexMap = [];
-        this.sourceCopy = [];
-
-        super.clear();
-    }
-
-    private nsertAndMap(sourceIndex: number, value: TValue): void {
+    private insertAndMap(sourceIndex: number, value: TValue): void {
         let destinationIndex = this.positionForNewItem(sourceIndex, value);
 
         this.indexToSourceIndexMap.splice(destinationIndex, 0, sourceIndex);

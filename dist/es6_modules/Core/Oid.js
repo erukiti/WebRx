@@ -1,10 +1,6 @@
 "use strict";
 let oid = 1;
-let oidPropertyName = "__wx_oid__" + (new Date).getTime();
-function isPrimitive(target) {
-    let t = typeof target;
-    return t === "boolean" || t === "number" || t === "string";
-}
+const oidPropertyName = "__wx_oid__" + (new Date).getTime();
 /**
 * Returns the objects unique id or assigns it if unassigned
 * @param {any} o
@@ -12,13 +8,14 @@ function isPrimitive(target) {
 export function getOid(o) {
     if (o == null)
         return undefined;
-    if (isPrimitive(o))
-        return (typeof o + ":" + o);
+    let t = typeof o;
+    if (t === "boolean" || t === "number" || t === "string")
+        return (t + ":" + o);
     // already set?
     if (o.hasOwnProperty(oidPropertyName))
         return o[oidPropertyName];
     // assign new one
-    let result = (++oid).toString();
+    const result = (oid++).toString();
     // store as non-enumerable property to avoid confusing other libraries
     Object.defineProperty(o, oidPropertyName, {
         enumerable: false,
