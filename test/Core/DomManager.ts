@@ -110,13 +110,6 @@ describe('DomManager',() => {
             expect(typeof compiled.visible === "function").toBeTruthy();
             expect(compiled.visible(scope)).toEqual(32);
         });
-
-        it('throws when using function calls in expressions',() => {
-            var def = "{ text: $scope.foo() }";
-            var compiled: any;
-
-            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).toThrowError();
-        });
     });
 
     describe('expressionToObservable',() => {

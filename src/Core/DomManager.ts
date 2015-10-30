@@ -322,7 +322,7 @@ export class DomManager implements wx.IDomManager {
     private dataContextExtensions = createSet<(node: Node, ctx: wx.IDataContext) => void>();
     private app: wx.IWebRxApp;
     private parserOptions: wx.IExpressionCompilerOptions = {
-        disallowFunctionCalls: true
+        disallowFunctionCalls: false
     };
 
     private applyBindingsInternal(ctx: wx.IDataContext, el: HTMLElement, module: wx.IModule): boolean {

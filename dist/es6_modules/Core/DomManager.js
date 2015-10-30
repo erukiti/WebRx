@@ -16,7 +16,7 @@ export class DomManager {
         this.expressionCache = {};
         this.dataContextExtensions = createSet();
         this.parserOptions = {
-            disallowFunctionCalls: true
+            disallowFunctionCalls: false
         };
         this.nodeState = createWeakMap();
         this.compiler = compiler;

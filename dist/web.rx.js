@@ -2588,7 +2588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.expressionCache = {};
 	        this.dataContextExtensions = Set_1.createSet();
 	        this.parserOptions = {
-	            disallowFunctionCalls: true
+	            disallowFunctionCalls: false
 	        };
 	        this.nodeState = WeakMap_1.createWeakMap();
 	        this.compiler = compiler;
