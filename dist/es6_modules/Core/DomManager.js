@@ -61,8 +61,9 @@ export class DomManager {
             for (let i = 0; i < node.childNodes.length; i++) {
                 let child = node.childNodes[i];
                 // only elements
-                if (node.nodeType !== 1)
+                if (child.nodeType !== 1)
                     continue;
+                this.cleanNodeRecursive(child);
                 this.clearNodeState(child);
             }
         }
@@ -176,19 +177,16 @@ export class DomManager {
     }
     clearNodeState(node) {
         let state = this.nodeState.get(node);
-        if (state) {
+        if (state != null) {
             if (state.cleanup != null) {
                 state.cleanup.dispose();
                 state.cleanup = undefined;
             }
-            if (state.model != null) {
-                state.model = undefined;
-            }
-            if (state.module != null) {
-                state.module = undefined;
-            }
+            state.model = undefined;
+            state.module = undefined;
+            // delete state itself
+            this.nodeState.delete(node);
         }
-        this.nodeState.delete(node);
         // support external per-node cleanup
         env.cleanExternalData(node);
     }

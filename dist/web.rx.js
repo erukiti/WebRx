@@ -2633,8 +2633,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var i = 0; i < node.childNodes.length; i++) {
 	                var child = node.childNodes[i];
 	                // only elements
-	                if (node.nodeType !== 1)
+	                if (child.nodeType !== 1)
 	                    continue;
+	                this.cleanNodeRecursive(child);
 	                this.clearNodeState(child);
 	            }
 	        }
@@ -2748,19 +2749,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    DomManager.prototype.clearNodeState = function (node) {
 	        var state = this.nodeState.get(node);
-	        if (state) {
+	        if (state != null) {
 	            if (state.cleanup != null) {
 	                state.cleanup.dispose();
 	                state.cleanup = undefined;
 	            }
-	            if (state.model != null) {
-	                state.model = undefined;
-	            }
-	            if (state.module != null) {
-	                state.module = undefined;
-	            }
+	            state.model = undefined;
+	            state.module = undefined;
+	            // delete state itself
+	            this.nodeState.delete(node);
 	        }
-	        this.nodeState.delete(node);
 	        // support external per-node cleanup
 	        env.cleanExternalData(node);
 	    };
