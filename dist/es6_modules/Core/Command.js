@@ -81,7 +81,7 @@ export class Command {
     }
     executeAsync(parameter) {
         let self = this;
-        let ret = Rx.Observable.create(subj => {
+        let ret = this.canExecute(parameter) ? Rx.Observable.create(subj => {
             if (++self.inflightCount === 1) {
                 self.isExecutingSubject.onNext(true);
             }
@@ -97,7 +97,7 @@ export class Command {
                 .do(x => self.resultsSubject.onNext(x), x => self.exceptionsSubject.onNext(x))
                 .subscribe(subj);
             return new Rx.CompositeDisposable(disp, decrement);
-        });
+        }) : Rx.Observable.throw(new Error("canExecute currently forbids execution"));
         return ret
             .publish()
             .refCount();

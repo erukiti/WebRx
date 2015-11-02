@@ -102,7 +102,7 @@ describe("Command", () => {
             .subscribe(x => expect(x[0]).toEqual(x[1]));
     });
 
-    it("observable can execute is not null after canExecute called", () => {
+    it("canExecuteObservable is not null after canExecute called", () => {
         var fixture = wx.command(null);
 
         fixture.canExecute(null);
@@ -110,10 +110,23 @@ describe("Command", () => {
         expect(fixture.canExecuteObservable).not.toBeNull();
     });
 
+    it("no results are emitted when attempting to execute a command that is not allowed to execute", () => {
+        var fixture = wx.command(()=> {}, Rx.Observable.return(false));
+
+        var resultsCount = 0, executingCount = 0;
+        fixture.results.subscribe(x=> resultsCount++);
+        fixture.isExecuting.subscribe(x=> executingCount += (x ? 1 : 0));
+
+        fixture.execute(null);
+        fixture.execute(null);
+
+        expect(resultsCount).toEqual(0);
+        expect(executingCount).toEqual(0);
+    });
+
     it("multiple subscribes shouldn't result in multiple notifications", () => {
         var input = [1, 2, 1, 2];
-        var sched = new Rx.TestScheduler();
-        var fixture = wx.command(null, sched);
+        var fixture = wx.command(null);
 
         var odd_list = new Array<number>();
         var even_list = new Array<number>();
@@ -121,7 +134,6 @@ describe("Command", () => {
         fixture.results.where(x => x % 2 === 0).subscribe(x => even_list.push(x));
 
         testutils.run(input, x => fixture.execute(x));
-        sched.advanceTo(1000);
 
         expect([1, 1]).toEqual(odd_list);
         expect([2, 2]).toEqual(even_list);

@@ -3684,7 +3684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Command.prototype.executeAsync = function (parameter) {
 	        var self = this;
-	        var ret = Rx.Observable.create(function (subj) {
+	        var ret = this.canExecute(parameter) ? Rx.Observable.create(function (subj) {
 	            if (++self.inflightCount === 1) {
 	                self.isExecutingSubject.onNext(true);
 	            }
@@ -3700,7 +3700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                .do(function (x) { return self.resultsSubject.onNext(x); }, function (x) { return self.exceptionsSubject.onNext(x); })
 	                .subscribe(subj);
 	            return new Rx.CompositeDisposable(disp, decrement);
-	        });
+	        }) : Rx.Observable.throw(new Error("canExecute currently forbids execution"));
 	        return ret
 	            .publish()
 	            .refCount();

@@ -102,7 +102,7 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     public executeAsync(parameter?: any): Rx.Observable<T> {
         let self = this;
 
-        let ret = Rx.Observable.create<T>(subj => {
+        let ret = this.canExecute(parameter) ? Rx.Observable.create<T>(subj => {
             if (++self.inflightCount === 1) {
                 self.isExecutingSubject.onNext(true);
             }
@@ -117,14 +117,14 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
             let disp = self.func(parameter)
                 .observeOn(self.scheduler)
                 .do(
-                _ => { },
-                e => decrement.setDisposable(Rx.Disposable.empty),
-                () => decrement.setDisposable(Rx.Disposable.empty))
+                    _ => { },
+                    e => decrement.setDisposable(Rx.Disposable.empty),
+                    () => decrement.setDisposable(Rx.Disposable.empty))
                 .do(x=> self.resultsSubject.onNext(x), x=> self.exceptionsSubject.onNext(x))
                 .subscribe(subj);
 
             return new Rx.CompositeDisposable(disp, decrement);
-        });
+        }) : Rx.Observable.throw<T>(new Error("canExecute currently forbids execution"));
 
         return ret
             .publish()
