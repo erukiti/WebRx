@@ -490,48 +490,60 @@ export function observeObject(target: any, defaultExceptionHandler: Rx.Observer<
         .refCount();
 }
 
+function toObservable<T>(o: any): Rx.Observable<T> {            
+    if(isProperty(o)) {
+        let prop = <wx.IObservableProperty<T>> o;
+        return prop.changed.startWith(prop());
+    }
+    
+    if(isRxObservable(o))
+        return o;
+
+    throwError("toObservable: argument is neither observable property nor observable");
+}
+
 export function whenAny<TRet, T1>(
-    property1: wx.IObservableProperty<T1>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>,
     selector: (T1) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
-    property3: wx.IObservableProperty<T3>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
+    arg3: wx.IObservableProperty<T3> | Rx.IObservable<T3>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
-    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
+    arg3: wx.IObservableProperty<T3> | Rx.IObservable<T3>, arg4: wx.IObservableProperty<T4> | Rx.IObservable<T4>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
-    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
-    property5: wx.IObservableProperty<T5>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
+    arg3: wx.IObservableProperty<T3> | Rx.IObservable<T3>, arg4: wx.IObservableProperty<T4> | Rx.IObservable<T4>,
+    arg5: wx.IObservableProperty<T5> | Rx.IObservable<T5>,
     selector: (T1, T2, T3, T4, T5) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5, T6>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
-    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
-    property5: wx.IObservableProperty<T5>, property6: wx.IObservableProperty<T6>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
+    arg3: wx.IObservableProperty<T3> | Rx.IObservable<T3>, arg4: wx.IObservableProperty<T4> | Rx.IObservable<T4>,
+    arg5: wx.IObservableProperty<T5> | Rx.IObservable<T5>, arg6: wx.IObservableProperty<T6> | Rx.IObservable<T6>,
     selector: (T1, T2, T3, T4, T5, T6) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
-    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
-    property5: wx.IObservableProperty<T5>, property6: wx.IObservableProperty<T6>,
-    property7: wx.IObservableProperty<T7>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
+    arg3: wx.IObservableProperty<T3> | Rx.IObservable<T3>, arg4: wx.IObservableProperty<T4> | Rx.IObservable<T4>,
+    arg5: wx.IObservableProperty<T5> | Rx.IObservable<T5>, arg6: wx.IObservableProperty<T6> | Rx.IObservable<T6>,
+    arg7: wx.IObservableProperty<T7> | Rx.IObservable<T7>,
     selector: (T1, T2, T3, T4, T5, T6, T7) => TRet): Rx.Observable<TRet>;
 
 export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
-    property1: wx.IObservableProperty<T1>, property2: wx.IObservableProperty<T2>,
-    property3: wx.IObservableProperty<T3>, property4: wx.IObservableProperty<T4>,
-    property5: wx.IObservableProperty<T5>, property6: wx.IObservableProperty<T6>,
-    property7: wx.IObservableProperty<T7>, property8: wx.IObservableProperty<T8>,
+    arg1: wx.IObservableProperty<T1> | Rx.IObservable<T1>, arg2: wx.IObservableProperty<T2> | Rx.IObservable<T2>,
+    arg3: wx.IObservableProperty<T3> | Rx.IObservable<T3>, arg4: wx.IObservableProperty<T4> | Rx.IObservable<T4>,
+    arg5: wx.IObservableProperty<T5> | Rx.IObservable<T5>, arg6: wx.IObservableProperty<T6> | Rx.IObservable<T6>,
+    arg7: wx.IObservableProperty<T7> | Rx.IObservable<T7>, arg8: wx.IObservableProperty<T8> | Rx.IObservable<T8>,
     selector: (T1, T2, T3, T4, T5, T6, T7, T8) => TRet): Rx.Observable<TRet>;
 
 /**
@@ -541,7 +553,7 @@ export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
 export function whenAny<TRet>(): Rx.Observable<TRet> {
     // no need to invoke combineLatest for the simplest case
     if (arguments.length === 2) {
-        return arguments[0].changed.startWith(arguments[0]()).select(arguments[1]);
+        return toObservable<TRet>(arguments[0]).select<TRet>(arguments[1]);
     }
 
     let args = args2Array(arguments);
@@ -550,7 +562,7 @@ export function whenAny<TRet>(): Rx.Observable<TRet> {
     let selector = args.pop();
 
     // prepend sequence with current values to satisfy combineLatest
-    args = args.map(x => x.changed.startWith(x()));
+    args = args.map(x => toObservable(x));
 
     // finally append the selector
     args.push(selector);

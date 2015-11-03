@@ -417,6 +417,15 @@ export function observeObject(target, defaultExceptionHandler, onChanging = fals
         .publish()
         .refCount();
 }
+function toObservable(o) {
+    if (isProperty(o)) {
+        let prop = o;
+        return prop.changed.startWith(prop());
+    }
+    if (isRxObservable(o))
+        return o;
+    throwError("toObservable: argument is neither observable property nor observable");
+}
 /**
  * whenAny allows you to observe whenever the value of one or more properties
  * on an object have changed, providing an initial value when the Observable is set up.
@@ -424,13 +433,13 @@ export function observeObject(target, defaultExceptionHandler, onChanging = fals
 export function whenAny() {
     // no need to invoke combineLatest for the simplest case
     if (arguments.length === 2) {
-        return arguments[0].changed.startWith(arguments[0]()).select(arguments[1]);
+        return toObservable(arguments[0]).select(arguments[1]);
     }
     let args = args2Array(arguments);
     // extract selector
     let selector = args.pop();
     // prepend sequence with current values to satisfy combineLatest
-    args = args.map(x => x.changed.startWith(x()));
+    args = args.map(x => toObservable(x));
     // finally append the selector
     args.push(selector);
     return Rx.Observable.combineLatest.apply(this, args);

@@ -122,7 +122,7 @@ describe("Utils",() => {
         expect($(el)).toHaveClass("foo bar");
     });
 
-    it("whenAny smoke-test",() => {
+    it("whenAny using observable properties",() => {
         function ViewModel() {
             this.prop1 = wx.property('Homer');
             this.prop2 = wx.property('Bart');
@@ -145,6 +145,23 @@ describe("Utils",() => {
 
         var combined3 = wx.whenAny(vm.prop1, vm.prop2, vm.prop3,(prop1, prop2, prop3) => {
             return prop1 + prop2 + prop3;
+        }).toProperty();
+
+        expect(combined3()).toEqual(vm.prop1() + vm.prop2() + vm.prop3());
+    });
+
+    it("whenAny using observable properties and plain observables",() => {
+        function ViewModel() {
+            this.prop1 = wx.property('Homer');
+            this.prop2 = wx.property('Bart');
+            this.prop3 = wx.property('Apu');
+            this.obs4 = Rx.Observable.return(this.prop3());
+        }
+
+        var vm = new ViewModel();
+
+        var combined3 = wx.whenAny(vm.prop1, vm.prop2, vm.obs4,(prop1, prop2, obs4) => {
+            return prop1 + prop2 + obs4;
         }).toProperty();
 
         expect(combined3()).toEqual(vm.prop1() + vm.prop2() + vm.prop3());

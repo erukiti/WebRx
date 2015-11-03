@@ -922,6 +922,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        .refCount();
 	}
 	exports.observeObject = observeObject;
+	function toObservable(o) {
+	    if (isProperty(o)) {
+	        var prop = o;
+	        return prop.changed.startWith(prop());
+	    }
+	    if (isRxObservable(o))
+	        return o;
+	    throwError("toObservable: argument is neither observable property nor observable");
+	}
 	/**
 	 * whenAny allows you to observe whenever the value of one or more properties
 	 * on an object have changed, providing an initial value when the Observable is set up.
@@ -929,13 +938,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function whenAny() {
 	    // no need to invoke combineLatest for the simplest case
 	    if (arguments.length === 2) {
-	        return arguments[0].changed.startWith(arguments[0]()).select(arguments[1]);
+	        return toObservable(arguments[0]).select(arguments[1]);
 	    }
 	    var args = args2Array(arguments);
 	    // extract selector
 	    var selector = args.pop();
 	    // prepend sequence with current values to satisfy combineLatest
-	    args = args.map(function (x) { return x.changed.startWith(x()); });
+	    args = args.map(function (x) { return toObservable(x); });
 	    // finally append the selector
 	    args.push(selector);
 	    return Rx.Observable.combineLatest.apply(this, args);
