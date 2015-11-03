@@ -2,6 +2,7 @@
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, isProperty } from "../Core/Utils"
+import { emitPropRefHint } from "./BindingSupport"
 
 "use strict";
 
@@ -91,6 +92,8 @@ export default class HasFocusBinding implements wx.IBindingHandler {
         state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
             try {
                 if (!isProperty(model)) {
+                    emitPropRefHint("HasFocus", options);
+
                     // initial and final update
                     updateElement(model);
                 } else {

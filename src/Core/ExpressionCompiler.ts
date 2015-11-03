@@ -1099,7 +1099,8 @@ function simpleGetterFn1(key0, fullExp): wx.ICompiledExpression {
 
     return (scope: any, locals: any) => {
         scope = ((locals && locals.hasOwnProperty(key0)) ? locals : scope);
-        if (scope == null) return undefined;
+        if (scope == null) 
+            return undefined;
 
         let hooks = getRuntimeHooks(locals);
         if (hooks && hooks.readFieldHook)
@@ -1117,7 +1118,8 @@ function simpleGetterFn2(key0, key1, fullExp): wx.ICompiledExpression {
         let hooks = getRuntimeHooks(locals);
         if (hooks && hooks.readFieldHook) {
             scope = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
-            if (scope == null) return undefined;
+            if (scope == null) 
+                return undefined;
 
             scope = hooks.readFieldHook(scope, key0);
             return scope == null ? undefined : hooks.readFieldHook(scope, key1);

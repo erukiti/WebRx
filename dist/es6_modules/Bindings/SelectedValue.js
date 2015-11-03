@@ -2,6 +2,7 @@
 import { throwError, unwrapProperty, isProperty } from "../Core/Utils";
 import { getNodeValue } from "./Value";
 import { isList } from "../Collections/List";
+import { emitPropRefHint } from "./BindingSupport";
 "use strict";
 let impls = new Array();
 class RadioSingleSelectionImpl {
@@ -139,6 +140,9 @@ export default class SelectedValueBinding {
                             this.app.defaultExceptionHandler.onNext(e);
                         }
                     }));
+                }
+                else {
+                    emitPropRefHint("SelectedValue", options);
                 }
             }
             catch (e) {

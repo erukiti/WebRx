@@ -1,5 +1,6 @@
 import { formatString } from "../Core/Utils";
 "use strict";
+export var hintEnable = false;
 function log(...args) {
     try {
         console.log.apply(console, arguments);
@@ -30,5 +31,13 @@ export function info(fmt, ...args) {
         fmt = formatString.apply(null, [fmt].concat(args));
     }
     log("* WebRx Info: " + fmt);
+}
+export function hint(fmt, ...args) {
+    if (!hintEnable)
+        return;
+    if (args.length) {
+        fmt = formatString.apply(null, [fmt].concat(args));
+    }
+    log("* WebRx Hint: " + fmt);
 }
 //# sourceMappingURL=Log.js.map

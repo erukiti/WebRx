@@ -1,5 +1,6 @@
 /// <reference path="../Interfaces.ts" />
 import { throwError, isProperty } from "../Core/Utils";
+import { emitPropRefHint } from "./BindingSupport";
 "use strict";
 export default class CheckedBinding {
     constructor(domManager, app) {
@@ -35,6 +36,7 @@ export default class CheckedBinding {
         state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
             try {
                 if (!isProperty(model)) {
+                    emitPropRefHint("Checked", options);
                     // initial and final update
                     updateElement(model);
                 }

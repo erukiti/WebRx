@@ -5,6 +5,7 @@ import { extend, isInUnitTest, args2Array, isFunction, throwError, using, format
 import { applyBindings, cleanNode } from "../Core/DomManager"
 import { getNodeValue, setNodeValue } from "./Value"
 import { isList } from "../Collections/List"
+import { emitPropRefHint } from "./BindingSupport"
 
 "use strict";
 
@@ -187,6 +188,8 @@ export default class SelectedValueBinding implements wx.IBindingHandler {
                             this.app.defaultExceptionHandler.onNext(e);
                         } 
                     }));
+                } else {
+                    emitPropRefHint("SelectedValue", options);
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);

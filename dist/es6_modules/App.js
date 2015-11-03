@@ -41,13 +41,9 @@ class App extends Module {
         /// <summary>
         /// This Observer is signalled whenever an object that has a
         /// ThrownExceptions property doesn't Subscribe to that Observable. Use
-        /// Observer.Create to set up what will happen - the default is to crash
-        /// the application with an error message.
+        /// Observer.create to set up what will happen.
         /// </summary>
         this.defaultExceptionHandler = Rx.Observer.create(ex => {
-            if (!isInUnitTest()) {
-                log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
-            }
         });
         this.title = property(document.title);
         this.version = version;
@@ -91,6 +87,14 @@ class App extends Module {
             this._router = injector.get(res.router);
         }
         return this._router;
+    }
+    devModeEnable() {
+        // configure logging
+        log.hintEnable = true;
+        // wire exception logging
+        this.defaultExceptionHandler = Rx.Observer.create(ex => {
+            log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
+        });
     }
     createHistory() {
         // inherit default implementation

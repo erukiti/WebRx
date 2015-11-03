@@ -75,14 +75,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.asyncCommand = Command_1.asyncCommand;
 	exports.combinedCommand = Command_1.combinedCommand;
 	exports.isCommand = Command_1.isCommand;
-	var Animation_1 = __webpack_require__(50);
+	var Animation_1 = __webpack_require__(51);
 	exports.animation = Animation_1.animation;
 	var Oid_1 = __webpack_require__(13);
 	exports.getOid = Oid_1.getOid;
 	var List_1 = __webpack_require__(27);
 	exports.list = List_1.list;
 	exports.isList = List_1.isList;
-	var Map_1 = __webpack_require__(51);
+	var Map_1 = __webpack_require__(52);
 	exports.createMap = Map_1.createMap;
 	var Set_1 = __webpack_require__(14);
 	exports.createSet = Set_1.createSet;
@@ -93,7 +93,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Lazy = Lazy_1.default;
 	var VirtualChildNodes_1 = __webpack_require__(25);
 	exports.VirtualChildNodes = VirtualChildNodes_1.default;
-	var RouteMatcher_1 = __webpack_require__(45);
+	var RouteMatcher_1 = __webpack_require__(46);
 	exports.route = RouteMatcher_1.route;
 	var Value_1 = __webpack_require__(31);
 	exports.getNodeValue = Value_1.getNodeValue;
@@ -102,7 +102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.injector = Injector_1.injector;
 	var IID_1 = __webpack_require__(5);
 	exports.IID = IID_1.default;
-	var HttpClient_1 = __webpack_require__(47);
+	var HttpClient_1 = __webpack_require__(48);
 	exports.getHttpClientDefaultConfig = HttpClient_1.getHttpClientDefaultConfig;
 	var BindingBase_1 = __webpack_require__(22);
 	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
@@ -142,23 +142,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Event_1 = __webpack_require__(30);
 	var Value_1 = __webpack_require__(31);
 	var HasFocus_1 = __webpack_require__(32);
-	var With_1 = __webpack_require__(33);
-	var Checked_1 = __webpack_require__(34);
-	var KeyPress_1 = __webpack_require__(35);
-	var TextInput_1 = __webpack_require__(36);
-	var SelectedValue_1 = __webpack_require__(37);
-	var Component_1 = __webpack_require__(38);
-	var StateActive_1 = __webpack_require__(39);
-	var View_1 = __webpack_require__(40);
-	var StateRef_1 = __webpack_require__(41);
-	var Select_1 = __webpack_require__(42);
-	var RadioGroup_1 = __webpack_require__(43);
-	var Router_1 = __webpack_require__(44);
-	var MessageBus_1 = __webpack_require__(46);
-	var HttpClient_1 = __webpack_require__(47);
-	var Version_1 = __webpack_require__(48);
+	var With_1 = __webpack_require__(34);
+	var Checked_1 = __webpack_require__(35);
+	var KeyPress_1 = __webpack_require__(36);
+	var TextInput_1 = __webpack_require__(37);
+	var SelectedValue_1 = __webpack_require__(38);
+	var Component_1 = __webpack_require__(39);
+	var StateActive_1 = __webpack_require__(40);
+	var View_1 = __webpack_require__(41);
+	var StateRef_1 = __webpack_require__(42);
+	var Select_1 = __webpack_require__(43);
+	var RadioGroup_1 = __webpack_require__(44);
+	var Router_1 = __webpack_require__(45);
+	var MessageBus_1 = __webpack_require__(47);
+	var HttpClient_1 = __webpack_require__(48);
+	var Version_1 = __webpack_require__(49);
 	// make sure RxExtensions get installed
-	var RxExtensions_1 = __webpack_require__(49);
+	var RxExtensions_1 = __webpack_require__(50);
 	RxExtensions_1.install();
 	"use strict";
 	var App = (function (_super) {
@@ -168,13 +168,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /// <summary>
 	        /// This Observer is signalled whenever an object that has a
 	        /// ThrownExceptions property doesn't Subscribe to that Observable. Use
-	        /// Observer.Create to set up what will happen - the default is to crash
-	        /// the application with an error message.
+	        /// Observer.create to set up what will happen.
 	        /// </summary>
 	        this.defaultExceptionHandler = Rx.Observer.create(function (ex) {
-	            if (!Utils_1.isInUnitTest()) {
-	                log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
-	            }
 	        });
 	        this.title = Property_1.property(document.title);
 	        this.version = Version_1.version;
@@ -231,6 +227,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
+	    App.prototype.devModeEnable = function () {
+	        // configure logging
+	        log.hintEnable = true;
+	        // wire exception logging
+	        this.defaultExceptionHandler = Rx.Observer.create(function (ex) {
+	            log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
+	        });
+	    };
 	    App.prototype.createHistory = function () {
 	        // inherit default implementation
 	        var result = {
@@ -1031,6 +1035,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Utils_1 = __webpack_require__(3);
 	"use strict";
+	exports.hintEnable = false;
 	function log() {
 	    var args = [];
 	    for (var _i = 0; _i < arguments.length; _i++) {
@@ -1081,6 +1086,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    log("* WebRx Info: " + fmt);
 	}
 	exports.info = info;
+	function hint(fmt) {
+	    var args = [];
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	        args[_i - 1] = arguments[_i];
+	    }
+	    if (!exports.hintEnable)
+	        return;
+	    if (args.length) {
+	        fmt = Utils_1.formatString.apply(null, [fmt].concat(args));
+	    }
+	    log("* WebRx Hint: " + fmt);
+	}
+	exports.hint = hint;
 	//# sourceMappingURL=Log.js.map
 
 /***/ },
@@ -5362,7 +5380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = this;
 	        this.changeNotificationsSuppressed++;
 	        if (!this.hasWhinedAboutNoResetSub && this.resetSubCount === 0 && !Utils_1.isInUnitTest()) {
-	            log.info("suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
+	            log.hint("suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
 	            this.hasWhinedAboutNoResetSub = true;
 	        }
 	        return Rx.Disposable.create(function () {
@@ -6265,7 +6283,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var tag = el.tagName.toLowerCase();
 	        if (tag !== 'input' && tag !== 'option' && tag !== 'select' && tag !== 'textarea')
 	            Utils_1.throwError("value-binding only operates on checkboxes and radio-buttons");
-	        var useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
+	        var storeValueInNodeState = (tag === 'input' && el.type === 'radio') || tag === 'option';
 	        var prop;
 	        var cleanup;
 	        var exp = this.domManager.compileBindingOptions(options, module);
@@ -6276,7 +6294,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        function updateElement(domManager, value) {
-	            if (useDomManagerForValueUpdates)
+	            if (storeValueInNodeState)
 	                setNodeValue(el, value, domManager);
 	            else {
 	                if ((value === null) || (value === undefined))
@@ -6305,7 +6323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (!prop.source) {
 	                        cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(function (e) {
 	                            try {
-	                                if (useDomManagerForValueUpdates)
+	                                if (storeValueInNodeState)
 	                                    prop(getNodeValue(el, _this.domManager));
 	                                else
 	                                    prop(el.value);
@@ -6399,6 +6417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
+	var BindingSupport_1 = __webpack_require__(33);
 	"use strict";
 	var HasFocusBinding = (function () {
 	    function HasFocusBinding(domManager, app) {
@@ -6477,6 +6496,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
 	            try {
 	                if (!Utils_1.isProperty(model)) {
+	                    BindingSupport_1.emitPropRefHint("HasFocus", options);
 	                    // initial and final update
 	                    updateElement(model);
 	                }
@@ -6534,6 +6554,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var log = __webpack_require__(7);
+	"use strict";
+	function emitPropRefHint(bindingName, bindingString) {
+	    var msg = bindingName + "-Binding: You have passed a property instead of a propRef to a Two-Way binding. This is most likely not what you want because the binding won't be able to update your model when your view changes - Solution: Prefix your property with an @-symbol - Binding-Expression [\"" + bindingString + "\"]";
+	    log.hint(msg);
+	}
+	exports.emitPropRefHint = emitPropRefHint;
+	//# sourceMappingURL=BindingSupport.js.map
+
+/***/ },
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -6597,11 +6631,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=With.js.map
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
+	var BindingSupport_1 = __webpack_require__(33);
 	"use strict";
 	var CheckedBinding = (function () {
 	    function CheckedBinding(domManager, app) {
@@ -6638,6 +6673,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
 	            try {
 	                if (!Utils_1.isProperty(model)) {
+	                    BindingSupport_1.emitPropRefHint("Checked", options);
 	                    // initial and final update
 	                    updateElement(model);
 	                }
@@ -6699,7 +6735,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Checked.js.map
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -6860,12 +6896,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=KeyPress.js.map
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var env = __webpack_require__(15);
+	var BindingSupport_1 = __webpack_require__(33);
 	"use strict";
 	var TextInputBinding = (function () {
 	    function TextInputBinding(domManager, app) {
@@ -6915,6 +6952,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (src) {
 	            try {
 	                if (!Utils_1.isProperty(src)) {
+	                    BindingSupport_1.emitPropRefHint("TextInput", options);
 	                    // initial and final update
 	                    updateElement(src);
 	                }
@@ -7013,13 +7051,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=TextInput.js.map
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Value_1 = __webpack_require__(31);
 	var List_1 = __webpack_require__(27);
+	var BindingSupport_1 = __webpack_require__(33);
 	"use strict";
 	var impls = new Array();
 	var RadioSingleSelectionImpl = (function () {
@@ -7161,6 +7200,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	                    }));
 	                }
+	                else {
+	                    BindingSupport_1.emitPropRefHint("SelectedValue", options);
+	                }
 	            }
 	            catch (e) {
 	                _this.app.defaultExceptionHandler.onNext(e);
@@ -7189,7 +7231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SelectedValue.js.map
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7333,7 +7375,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Component.js.map
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -7430,7 +7472,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateActive.js.map
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -7593,7 +7635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=View.js.map
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -7689,7 +7731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateRef.js.map
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7805,7 +7847,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Select.js.map
 
 /***/ },
-/* 43 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7900,13 +7942,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RadioGroup.js.map
 
 /***/ },
-/* 44 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Property_1 = __webpack_require__(8);
-	var RouteMatcher_1 = __webpack_require__(45);
+	var RouteMatcher_1 = __webpack_require__(46);
 	"use strict";
 	var Router = (function () {
 	    function Router(domManager, app) {
@@ -8306,7 +8348,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Router.js.map
 
 /***/ },
-/* 45 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8463,7 +8505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RouteMatcher.js.map
 
 /***/ },
-/* 46 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8513,7 +8555,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=MessageBus.js.map
 
 /***/ },
-/* 47 */
+/* 48 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -8677,14 +8719,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HttpClient.js.map
 
 /***/ },
-/* 48 */
+/* 49 */
 /***/ function(module, exports) {
 
 	exports.version = '1.3.2';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
-/* 49 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="./Interfaces.ts" />
@@ -8790,7 +8832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RxExtensions.js.map
 
 /***/ },
-/* 50 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8981,7 +9023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Animation.js.map
 
 /***/ },
-/* 51 */
+/* 52 */
 /***/ function(module, exports) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />

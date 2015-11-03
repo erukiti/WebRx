@@ -3,6 +3,7 @@
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, isProperty, toggleCssClass } from "../Core/Utils"
 import * as res from "../Core/Resources"
+import { emitPropRefHint } from "./BindingSupport"
 
 "use strict";
 
@@ -28,7 +29,7 @@ export default class ValueBinding implements wx.IBindingHandler {
         if (tag !== 'input' && tag !== 'option' && tag !== 'select' && tag !== 'textarea')
             throwError("value-binding only operates on checkboxes and radio-buttons");
 
-        let useDomManagerForValueUpdates = (tag === 'input' && el.type === 'radio') || tag === 'option';
+        const storeValueInNodeState = (tag === 'input' && el.type === 'radio') || tag === 'option';
         let prop: wx.IObservableProperty<any>;
         let cleanup: Rx.CompositeDisposable;
         let exp = this.domManager.compileBindingOptions(options, module);
@@ -41,7 +42,7 @@ export default class ValueBinding implements wx.IBindingHandler {
         }
 
         function updateElement(domManager: wx.IDomManager, value: any) {
-            if (useDomManagerForValueUpdates)
+            if (storeValueInNodeState)
                 setNodeValue(el, value, domManager);
             else {
                 if ((value === null) || (value === undefined))
@@ -75,7 +76,7 @@ export default class ValueBinding implements wx.IBindingHandler {
                     if (!prop.source) {
                         cleanup.add(Rx.Observable.fromEvent(el, 'change').subscribe(e => {
                             try {
-                                if (useDomManagerForValueUpdates)
+                                if (storeValueInNodeState)
                                     prop(getNodeValue(el, this.domManager));
                                 else
                                     prop(el.value);

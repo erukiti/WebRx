@@ -2,6 +2,8 @@
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, formatString, cloneNodeArray, elementCanBeDisabled, isProperty } from "../Core/Utils"
+import * as log from "../Core/Log"
+import { emitPropRefHint } from "./BindingSupport"
 
 "use strict";
 
@@ -47,6 +49,8 @@ export default class CheckedBinding implements wx.IBindingHandler {
         state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(model => {
             try {
                 if (!isProperty(model)) {
+                    emitPropRefHint("Checked", options);
+                    
                     // initial and final update
                     updateElement(model);
                 } else {

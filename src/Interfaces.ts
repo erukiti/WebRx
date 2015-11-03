@@ -680,6 +680,7 @@ module wx {
         history: IHistory;
         title: IObservableProperty<string>;
         version: string;
+        devModeEnable(): void;
     }
 
     export interface IRoute {

@@ -292,7 +292,7 @@ export class ObservableList {
     suppressChangeNotifications() {
         this.changeNotificationsSuppressed++;
         if (!this.hasWhinedAboutNoResetSub && this.resetSubCount === 0 && !isInUnitTest()) {
-            log.info("suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
+            log.hint("suppressChangeNotifications was called (perhaps via addRange), yet you do not have a subscription to shouldReset. This probably isn't what you want, as itemsAdded and friends will appear to 'miss' items");
             this.hasWhinedAboutNoResetSub = true;
         }
         return Rx.Disposable.create(() => {

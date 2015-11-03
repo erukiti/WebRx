@@ -592,6 +592,7 @@ declare module wx {
         history: IHistory;
         title: IObservableProperty<string>;
         version: string;
+        devModeEnable(): void;
     }
     interface IRoute {
         parse(url: any): Object;

@@ -2,6 +2,8 @@ import { formatString } from "../Core/Utils"
 
 "use strict";
 
+export var hintEnable = false;
+
 function log(...args:any[]) {
     try {
         console.log.apply(console, arguments);
@@ -36,4 +38,15 @@ export function info(fmt: string, ...args: any[]) {
     }
 
     log("* WebRx Info: " + fmt);
+}
+
+export function hint(fmt: string, ...args: any[]) {
+    if(!hintEnable)
+        return;
+    
+    if (args.length) {
+        fmt = formatString.apply(null, [fmt].concat(args));
+    }
+
+    log("* WebRx Hint: " + fmt);
 }

@@ -54,13 +54,9 @@ class App extends Module implements wx.IWebRxApp {
     /// <summary>
     /// This Observer is signalled whenever an object that has a
     /// ThrownExceptions property doesn't Subscribe to that Observable. Use
-    /// Observer.Create to set up what will happen - the default is to crash
-    /// the application with an error message.
+    /// Observer.create to set up what will happen.
     /// </summary>
     public defaultExceptionHandler: Rx.Observer<Error> = Rx.Observer.create<Error>(ex => {
-        if (!isInUnitTest()) {
-            log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
-        }
     });
 
     /// <summary>
@@ -101,6 +97,16 @@ class App extends Module implements wx.IWebRxApp {
         }
 
         return this._router;
+    }
+
+    public devModeEnable(): void {
+        // configure logging
+        log.hintEnable = true;
+        
+        // wire exception logging
+        this.defaultExceptionHandler = Rx.Observer.create<Error>(ex => {
+            log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
+        });    
     }
 
     public history: wx.IHistory;

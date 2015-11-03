@@ -6,6 +6,7 @@ import VirtualChildNodes from "./../Core/VirtualChildNodes"
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper"
 import { injector } from "../Core/Injector"
 import { isList } from "../Collections/List"
+import * as log from "../Core/Log"
 
 "use strict";
 

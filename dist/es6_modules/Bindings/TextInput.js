@@ -1,6 +1,7 @@
 /// <reference path="../Interfaces.ts" />
 import { throwError, isProperty } from "../Core/Utils";
 import * as env from "../Core/Environment";
+import { emitPropRefHint } from "./BindingSupport";
 "use strict";
 export default class TextInputBinding {
     constructor(domManager, app) {
@@ -49,6 +50,7 @@ export default class TextInputBinding {
         state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(src => {
             try {
                 if (!isProperty(src)) {
+                    emitPropRefHint("TextInput", options);
                     // initial and final update
                     updateElement(src);
                 }

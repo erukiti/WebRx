@@ -3,6 +3,7 @@
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, isProperty, toggleCssClass } from "../Core/Utils"
 import * as env from "../Core/Environment"
+import { emitPropRefHint } from "./BindingSupport"
 
 "use strict";
 
@@ -63,6 +64,8 @@ export default class TextInputBinding implements wx.IBindingHandler {
         state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(src => {
             try {
                 if (!isProperty(src)) {
+                    emitPropRefHint("TextInput", options);
+
                     // initial and final update
                     updateElement(src);
                 } else {
