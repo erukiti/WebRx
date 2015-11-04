@@ -1042,6 +1042,12 @@ declare module wx {
     /* Copies own properties from src to dst
     **/
     function extend(src: Object, dst: Object, inherited?: boolean): Object;
+    /**
+    * Determines if the specified DOM element has the specified CSS-Class
+    * @param {Node} node The target element
+    * @param {string} className The classe to check
+    */
+    function hasCssClass(node: HTMLElement, className: string): boolean;
     /**        
     /* Toggles one ore more css classes on the specified DOM element
     /* @param {Node} node The target element

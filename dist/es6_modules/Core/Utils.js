@@ -156,7 +156,7 @@ export class PropertyInfo {
 * Toggles one ore more css classes on the specified DOM element
 * @param {Node} node The target element
 * @param {boolean} shouldHaveClass True if the classes should be added to the element, false if they should be removed
-* @param {string[} classNames The list of classes to process
+* @param {string[]} classNames The list of classes to process
 */
 export function toggleCssClass(node, shouldHaveClass, ...classNames) {
     if (classNames) {
@@ -181,6 +181,15 @@ export function toggleCssClass(node, shouldHaveClass, ...classNames) {
         }
         node.className = currentClassNames.join(" ");
     }
+}
+/**
+* Determines if the specified DOM element has the specified CSS-Class
+* @param {Node} node The target element
+* @param {string} className The classe to check
+*/
+export function hasCssClass(node, className) {
+    let currentClassNames = node.className.match(regexCssClassName) || [];
+    return currentClassNames.indexOf(className) !== -1;
 }
 /**
  * Trigger a reflow on the target element

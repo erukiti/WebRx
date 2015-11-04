@@ -197,7 +197,7 @@ export class PropertyInfo<T> {
 * Toggles one ore more css classes on the specified DOM element
 * @param {Node} node The target element
 * @param {boolean} shouldHaveClass True if the classes should be added to the element, false if they should be removed
-* @param {string[} classNames The list of classes to process
+* @param {string[]} classNames The list of classes to process
 */
 export function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...classNames: string[]): void {
     if (classNames) {
@@ -224,6 +224,16 @@ export function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...c
 
         node.className = currentClassNames.join(" ");
     }
+}
+
+/**
+* Determines if the specified DOM element has the specified CSS-Class
+* @param {Node} node The target element
+* @param {string} className The classe to check
+*/
+export function hasCssClass(node: HTMLElement, className: string): boolean {
+    let currentClassNames = node.className.match(regexCssClassName) || [];
+    return currentClassNames.indexOf(className) !== -1;
 }
 
 /**

@@ -72,9 +72,15 @@ export declare class PropertyInfo<T> {
 * Toggles one ore more css classes on the specified DOM element
 * @param {Node} node The target element
 * @param {boolean} shouldHaveClass True if the classes should be added to the element, false if they should be removed
-* @param {string[} classNames The list of classes to process
+* @param {string[]} classNames The list of classes to process
 */
 export declare function toggleCssClass(node: HTMLElement, shouldHaveClass: boolean, ...classNames: string[]): void;
+/**
+* Determines if the specified DOM element has the specified CSS-Class
+* @param {Node} node The target element
+* @param {string} className The classe to check
+*/
+export declare function hasCssClass(node: HTMLElement, className: string): boolean;
 /**
  * Trigger a reflow on the target element
  * @param {HTMLElement} el

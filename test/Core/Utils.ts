@@ -122,6 +122,22 @@ describe("Utils",() => {
         expect($(el)).toHaveClass("foo bar");
     });
 
+    it("hassCssClass smoke-test",() => {
+        loadFixtures('templates/Core/Utils.html');
+
+        var el = <HTMLMapElement> document.querySelector('#fixture');
+        expect($(el)).toHaveClass("foo bar");
+        expect(wx.hasCssClass(el, "foo")).toBeTruthy();
+        expect(wx.hasCssClass(el, "bar")).toBeTruthy();
+
+        // test with single class
+        expect($(el)).not.toHaveClass("hidden");
+        expect(wx.hasCssClass(el, "hidden")).toBeFalsy();
+
+        wx.toggleCssClass(el, true, "hidden");
+        expect(wx.hasCssClass(el, "hidden")).toBeTruthy();
+    });
+
     it("whenAny using observable properties",() => {
         function ViewModel() {
             this.prop1 = wx.property('Homer');

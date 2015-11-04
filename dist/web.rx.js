@@ -648,7 +648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	* Toggles one ore more css classes on the specified DOM element
 	* @param {Node} node The target element
 	* @param {boolean} shouldHaveClass True if the classes should be added to the element, false if they should be removed
-	* @param {string[} classNames The list of classes to process
+	* @param {string[]} classNames The list of classes to process
 	*/
 	function toggleCssClass(node, shouldHaveClass) {
 	    var classNames = [];
@@ -679,6 +679,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 	exports.toggleCssClass = toggleCssClass;
+	/**
+	* Determines if the specified DOM element has the specified CSS-Class
+	* @param {Node} node The target element
+	* @param {string} className The classe to check
+	*/
+	function hasCssClass(node, className) {
+	    var currentClassNames = node.className.match(regexCssClassName) || [];
+	    return currentClassNames.indexOf(className) !== -1;
+	}
+	exports.hasCssClass = hasCssClass;
 	/**
 	 * Trigger a reflow on the target element
 	 * @param {HTMLElement} el
