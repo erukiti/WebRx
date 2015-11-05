@@ -936,29 +936,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        .refCount();
 	}
 	exports.observeObject = observeObject;
-	function toObservable(o) {
-	    if (isProperty(o)) {
-	        var prop = o;
-	        return prop.changed.startWith(prop());
-	    }
-	    if (isRxObservable(o))
-	        return o;
-	    throwError("toObservable: argument is neither observable property nor observable");
-	}
 	/**
 	 * whenAny allows you to observe whenever the value of one or more properties
 	 * on an object have changed, providing an initial value when the Observable is set up.
 	 */
 	function whenAny() {
+	    function getObservable(o) {
+	        if (isProperty(o)) {
+	            var prop = o;
+	            return prop.changed.startWith(prop());
+	        }
+	        if (isRxObservable(o))
+	            return o;
+	        throwError("getObservable: argument is neither observable property nor observable");
+	    }
 	    // no need to invoke combineLatest for the simplest case
 	    if (arguments.length === 2) {
-	        return toObservable(arguments[0]).select(arguments[1]);
+	        return getObservable(arguments[0]).select(arguments[1]);
 	    }
 	    var args = args2Array(arguments);
 	    // extract selector
 	    var selector = args.pop();
 	    // prepend sequence with current values to satisfy combineLatest
-	    args = args.map(function (x) { return toObservable(x); });
+	    args = args.map(function (x) { return getObservable(x); });
 	    // finally append the selector
 	    args.push(selector);
 	    return Rx.Observable.combineLatest.apply(this, args);

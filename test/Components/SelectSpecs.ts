@@ -111,7 +111,7 @@ describe('Components', () => {
                         this.itemToAdd("");
                     }
                 }, wx.whenAny(this.itemToAdd, function (itemToAdd) {
-                    return itemToAdd.length > 0;
+                    return (<string> itemToAdd).length > 0;
                 }), this);
 
                 this.removeItemCmd = wx.command(function () {

@@ -139,13 +139,11 @@ describe("Utils",() => {
     });
 
     it("whenAny using observable properties",() => {
-        function ViewModel() {
-            this.prop1 = wx.property('Homer');
-            this.prop2 = wx.property('Bart');
-            this.prop3 = wx.property('Apu');
+        var vm = {
+            prop1: wx.property('Homer'),
+            prop2: wx.property('Bart'),
+            prop3: wx.property('Apu'),
         }
-
-        var vm = new ViewModel();
 
         var combined1 = wx.whenAny(vm.prop1, (prop1) => {
             return prop1;
@@ -167,14 +165,14 @@ describe("Utils",() => {
     });
 
     it("whenAny using observable properties and plain observables",() => {
-        function ViewModel() {
-            this.prop1 = wx.property('Homer');
-            this.prop2 = wx.property('Bart');
-            this.prop3 = wx.property('Apu');
-            this.obs4 = Rx.Observable.return(this.prop3());
+        var vm = {
+            prop1: wx.property('Homer'),
+            prop2: wx.property('Bart'),
+            prop3: wx.property('Apu'),
+            obs4: null
         }
-
-        var vm = new ViewModel();
+        
+        vm.obs4 = Rx.Observable.return(vm.prop3()); 
 
         var combined3 = wx.whenAny(vm.prop1, vm.prop2, vm.obs4,(prop1, prop2, obs4) => {
             return prop1 + prop2 + obs4;
