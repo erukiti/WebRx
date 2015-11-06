@@ -68,6 +68,10 @@ declare module wx {
         changed: Rx.Observable<T>;
         source?: Rx.Observable<T>;
     }
+    interface IRangeInfo {
+        from: number;
+        to?: number;
+    }
     /**
     * Provides information about a changed property value on an object
     * @interface
@@ -80,10 +84,8 @@ declare module wx {
     * Encapsulates change notifications published by various IObservableList members
     * @interface
     **/
-    interface IListChangeInfo<T> {
+    interface IListChangeInfo<T> extends IRangeInfo {
         items: T[];
-        from: number;
-        to?: number;
     }
     /**
     * INotifyListItemChanged provides notifications for collection item updates, ie when an object in
@@ -192,40 +194,61 @@ declare module wx {
         suppressChangeNotifications(): Rx.IDisposable;
     }
     /**
-    * Represents a collection of objects that can be individually accessed by index.
-    * @interface
+    /* Represents a read-only collection of objects that can be individually accessed by index.
+    /* @interface
     **/
-    interface IObservableReadOnlyList<T> extends INotifyListChanged<T>, INotifyListItemChanged {
+    interface IList<T> {
         length: IObservableProperty<number>;
         get(index: number): T;
         isReadOnly: boolean;
         toArray(): Array<T>;
+    }
+    /**
+    /* Represents an observable read-only collection of objects that can be individually accessed by index.
+    /* @interface
+    **/
+    interface IObservableReadOnlyList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
         /**
-        * Creates a live-projection of itself that can be filtered, re-ordered and mapped.
-        * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
-        * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
-        * @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
-        * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
+        /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+        /* @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
+        /* @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
+        /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
         project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
         /**
-        * Creates a live-projection of itself that can be filtered, re-ordered and mapped.
-        * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
-        * @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
-        * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
+        /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+        /* @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
+        /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
         project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
         /**
-        * Creates a live-projection of itself that can be filtered, re-ordered and mapped.
-        * @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
-        * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
+        /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
+        /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
         project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
         /**
-        * Creates a live-projection of itself that can be filtered, re-ordered and mapped.
-        * @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
+        /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
+        /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
         project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        /**
+        * Creates a paged live-projection of itself.
+        * @param pageSize {number} Initial page-size of the projection
+        * @param currentPage {number} Current page of the projection
+        **/
+        page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): IObservablePagedReadOnlyList<T>;
+    }
+    /**
+    * Represents a paged observable read-only collection of objects that can be individually accessed by index.
+    * @interface
+    **/
+    interface IObservablePagedReadOnlyList<T> extends IList<T>, INotifyListChanged<T> {
+        pageSize: IObservableProperty<number>;
+        currentPage: IObservableProperty<number>;
+        pageCount: IObservableProperty<number>;
     }
     /**
     * IObservableList of T represents a list that can notify when its

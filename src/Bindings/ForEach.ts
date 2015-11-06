@@ -520,6 +520,8 @@ export default class ForEachBinding implements wx.IBindingHandler {
             recalcIndextrigger = new Rx.Subject<any>();
 
             this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
+        } else {
+            throwError("forEach-Binding: value must be either array or observable list");
         }
     }
 }

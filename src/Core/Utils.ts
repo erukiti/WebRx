@@ -119,6 +119,18 @@ export function unwrapProperty(prop: any) {
     return prop;
 }
 
+export function getObservable<T>(o: any): Rx.Observable<T> {            
+    if(isProperty(o)) {
+        let prop = <wx.IObservableProperty<T>> o;
+        return prop.changed.startWith(prop());
+    }
+    
+    if(isRxObservable(o))
+        return o;
+
+    throwError("getObservable: argument is neither observable property nor observable");
+}
+
 /**
 * Returns true if a Unit-Testing environment is detected
 */
@@ -548,19 +560,7 @@ export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
  * whenAny allows you to observe whenever the value of one or more properties
  * on an object have changed, providing an initial value when the Observable is set up.
  */
-export function whenAny<TRet>(): Rx.Observable<TRet> {
-    function getObservable<T>(o: any): Rx.Observable<T> {            
-        if(isProperty(o)) {
-            let prop = <wx.IObservableProperty<T>> o;
-            return prop.changed.startWith(prop());
-        }
-        
-        if(isRxObservable(o))
-            return o;
-    
-        throwError("getObservable: argument is neither observable property nor observable");
-    }
-    
+export function whenAny<TRet>(): Rx.Observable<TRet> {    
     // no need to invoke combineLatest for the simplest case
     if (arguments.length === 2) {
         return getObservable<TRet>(arguments[0]).select<TRet>(arguments[1]);

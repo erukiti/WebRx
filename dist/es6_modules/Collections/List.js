@@ -1,5 +1,5 @@
 /// <reference path="../Interfaces.ts" />
-import { isInUnitTest, args2Array, throwError, using, isRxObservable, observeObject } from "../Core/Utils";
+import { isInUnitTest, whenAny, args2Array, throwError, using, isRxObservable, isRxScheduler, observeObject } from "../Core/Utils";
 import { getOid } from "../Core/Oid";
 import IID from "./../IID";
 import Lazy from "./../Core/Lazy";
@@ -9,6 +9,7 @@ import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper";
 import * as log from "./../Core/Log";
 import { injector } from "../Core/Injector";
 import * as res from "../Core/Resources";
+import { property } from "../Core/Property";
 "use strict";
 /**
 * ReactiveUI's awesome ReactiveList ported to Typescript
@@ -24,21 +25,24 @@ export class ObservableList {
         this.resetChangeThreshold = 0;
         this.resetSubCount = 0;
         this.hasWhinedAboutNoResetSub = false;
+        this.readonlyExceptionMessage = "Derived collections cannot be modified.";
+        this.disposables = new Rx.CompositeDisposable();
         this.app = injector.get(res.app);
         this.setupRx(initialContents, resetChangeThreshold, scheduler);
     }
     //////////////////////////////////
-    // wx.IUnknown implementation
+    // IUnknown implementation
     queryInterface(iid) {
         return iid === IID.IObservableList || iid === IID.IDisposable;
     }
     //////////////////////////////////
-    // wx.IDisposable implementation
+    // IDisposable implementation
     dispose() {
         this.clearAllPropertyChangeWatchers();
+        this.disposables.dispose();
     }
     ////////////////////
-    /// wx.IObservableList<T>
+    /// IObservableList<T>
     get isReadOnly() {
         return false;
     }
@@ -177,9 +181,7 @@ export class ObservableList {
             }
             else {
                 if (this.beforeItemsAddedSubject.isValueCreated) {
-                    items.forEach(x => {
-                        this.beforeItemsAddedSubject.value.onNext({ items: items, from: index });
-                    });
+                    this.beforeItemsAddedSubject.value.onNext({ items: items, from: index });
                 }
                 Array.prototype.splice.apply(this.inner, [index, 0].concat(items));
                 if (this.itemsAddedSubject.isValueCreated) {
@@ -200,7 +202,7 @@ export class ObservableList {
         let disp = this.isLengthAboveResetThreshold(items.length) ?
             this.suppressChangeNotifications() : Rx.Disposable.empty;
         using(disp, () => {
-            // NB: wx.If we don't do this, we'll break Collection<T>'s
+            // NB: If we don't do this, we'll break Collection<T>'s
             // accounting of the length
             items.forEach(x => this.remove(x));
         });
@@ -221,9 +223,7 @@ export class ObservableList {
             }
             else {
                 if (this.beforeItemsRemovedSubject.isValueCreated) {
-                    items.forEach(x => {
-                        this.beforeItemsRemovedSubject.value.onNext({ items: items, from: index });
-                    });
+                    this.beforeItemsRemovedSubject.value.onNext({ items: items, from: index });
                 }
                 this.inner.splice(index, count);
                 if (this.changeTrackingEnabled) {
@@ -232,9 +232,7 @@ export class ObservableList {
                     });
                 }
                 if (this.itemsRemovedSubject.isValueCreated) {
-                    items.forEach(x => {
-                        this.itemsRemovedSubject.value.onNext({ items: items, from: index });
-                    });
+                    this.itemsRemovedSubject.value.onNext({ items: items, from: index });
                 }
             }
         });
@@ -288,6 +286,9 @@ export class ObservableList {
             return new ObservableListProjection(this, filter, orderer, undefined, selector, args.shift());
         }
         return new ObservableListProjection(this, filter, orderer, selector, args.shift(), args.shift());
+    }
+    page(pageSize, currentPage, scheduler) {
+        return new PagedObservableListProjection(this, pageSize, currentPage, scheduler);
     }
     suppressChangeNotifications() {
         this.changeNotificationsSuppressed++;
@@ -372,9 +373,11 @@ export class ObservableList {
             Array.prototype.splice.apply(this.inner, [0, 0].concat(initialContents));
         }
         this.length = this.lengthChanged.toProperty(this.inner.length);
+        this.disposables.add(this.length);
         this.isEmpty = this.lengthChanged
             .select(x => (x === 0))
             .toProperty(this.inner.length === 0);
+        this.disposables.add(this.isEmpty);
     }
     areChangeNotificationsEnabled() {
         return this.changeNotificationsSuppressed === 0;
@@ -488,9 +491,6 @@ export class ObservableList {
 class ObservableListProjection extends ObservableList {
     constructor(source, filter, orderer, selector, refreshTrigger, scheduler) {
         super();
-        ////////////////////
-        // wx.Implementation
-        this.readonlyExceptionMessage = "Derived collections cannot be modified.";
         // This list maps indices in this collection to their corresponding indices in the source collection.
         this.indexToSourceIndexMap = [];
         this.sourceCopy = [];
@@ -555,7 +555,7 @@ class ObservableListProjection extends ObservableList {
         });
     }
     //////////////////////////////////
-    // wx.IDisposable implementation
+    // IDisposable implementation
     dispose() {
         this.disp.dispose();
         super.dispose();
@@ -648,8 +648,8 @@ class ObservableListProjection extends ObservableList {
             }
         }
         else {
-            // TODO: Conceptually wx.I feel like we shouldn't concern ourselves with ordering when we 
-            // receive a Move notification. wx.If it affects ordering it should be picked up by the
+            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we 
+            // receive a Move notification. If it affects ordering it should be picked up by the
             // onItemChange and resorted there instead.
             this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
         }
@@ -687,7 +687,7 @@ class ObservableListProjection extends ObservableList {
                 if (this.orderer == null) {
                     // We don't have an orderer so we're currently using the source collection index for sorting 
                     // meaning that no item change will affect ordering. Look at our current item and see if it's
-                    // the exact (reference-wise) same object. wx.If it is then we're done, if it's not (for example 
+                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example 
                     // if it's an integer) we'll issue a replace event so that subscribers get the new value.
                     if (!this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
                         super.set(currentDestinationIndex, newItem);
@@ -781,23 +781,23 @@ class ObservableListProjection extends ObservableList {
         return indices;
     }
     /// <summary>
-    /// wx.Increases (or decreases depending on move direction) all source indices between the source and destination
+    /// Increases (or decreases depending on move direction) all source indices between the source and destination
     /// move indices.
     /// </summary>
     moveSourceIndexInMap(oldSourceIndex, newSourceIndex) {
         if (newSourceIndex > oldSourceIndex) {
-            // wx.Item is moving towards the end of the list, everything between its current position and its 
+            // Item is moving towards the end of the list, everything between its current position and its 
             // new position needs to be shifted down one index
             this.shiftSourceIndicesInRange(oldSourceIndex + 1, newSourceIndex + 1, -1);
         }
         else {
-            // wx.Item is moving towards the front of the list, everything between its current position and its
+            // Item is moving towards the front of the list, everything between its current position and its
             // new position needs to be shifted up one index
             this.shiftSourceIndicesInRange(newSourceIndex, oldSourceIndex, 1);
         }
     }
     /// <summary>
-    /// wx.Increases (or decreases) all source indices equal to or higher than the threshold. Represents an
+    /// Increases (or decreases) all source indices equal to or higher than the threshold. Represents an
     /// insert or remove of one or more items in the source list thus causing all subsequent items to shift
     /// up or down.
     /// </summary>
@@ -809,7 +809,7 @@ class ObservableListProjection extends ObservableList {
         }
     }
     /// <summary>
-    /// wx.Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive). 
+    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive). 
     /// </summary>
     shiftSourceIndicesInRange(rangeStart, rangeStop, value) {
         for (let i = 0; i < this.indexToSourceIndexMap.length; i++) {
@@ -843,7 +843,7 @@ class ObservableListProjection extends ObservableList {
         super.removeAt(destinationIndex);
     }
     positionForNewItem(sourceIndex, value) {
-        // wx.If we haven't got an orderer we'll simply match our items to that of the source collection.
+        // If we haven't got an orderer we'll simply match our items to that of the source collection.
         return this.orderer == null
             ? ObservableListProjection.positionForNewItemArray(this.indexToSourceIndexMap, sourceIndex, ObservableListProjection.defaultOrderer)
             : ObservableListProjection.positionForNewItemArray2(this.inner, 0, this.inner.length, value, this.orderer);
@@ -884,7 +884,7 @@ class ObservableListProjection extends ObservableList {
     /// Calculates a new destination for an updated item that's already in the list.
     /// </summary>
     newPositionForExistingItem(sourceIndex, currentIndex, item) {
-        // wx.If we haven't got an orderer we'll simply match our items to that of the source collection.
+        // If we haven't got an orderer we'll simply match our items to that of the source collection.
         return this.orderer == null
             ? ObservableListProjection.newPositionForExistingItem2(this.indexToSourceIndexMap, sourceIndex, currentIndex)
             : ObservableListProjection.newPositionForExistingItem2(this.inner, item, currentIndex, this.orderer);
@@ -931,7 +931,7 @@ class ObservableListProjection extends ObservableList {
             return currentIndex;
         }
         let ix = ObservableListProjection.positionForNewItemArray2(array, min, max - min, item, orderer);
-        // wx.If the item moves 'forward' in the collection we have to account for the index where
+        // If the item moves 'forward' in the collection we have to account for the index where
         // the item currently resides getting removed first.
         return ix >= currentIndex ? ix - 1 : ix;
     }
@@ -948,6 +948,289 @@ ObservableListProjection.defaultOrderer = (a, b) => {
         result = a - b;
     return result;
 };
+class PagedObservableListProjection {
+    constructor(source, pageSize, currentPage, scheduler) {
+        this.disp = new Rx.CompositeDisposable();
+        this.changeNotificationsSuppressed = 0;
+        this.resetSubject = new Rx.Subject();
+        this.beforeResetSubject = new Rx.Subject();
+        this.source = source;
+        this.scheduler = scheduler || (isRxScheduler(currentPage) ? currentPage : Rx.Scheduler.immediate);
+        let sourceLength = source.lengthChanged.startWith(this.source.length());
+        // IObservablePagedReadOnlyList
+        this.pageSize = property(pageSize);
+        this.currentPage = property(currentPage || 0);
+        this.pageCount = whenAny(sourceLength, this.pageSize, (sl, ps) => Math.ceil(sl / ps))
+            .toProperty();
+        this.disp.add(this.pageCount);
+        // IObservableReadOnlyList
+        this.beforeItemsAddedSubject = new Lazy(() => new Rx.Subject());
+        this.itemsAddedSubject = new Lazy(() => new Rx.Subject());
+        this.beforeItemsRemovedSubject = new Lazy(() => new Rx.Subject());
+        this.itemsRemovedSubject = new Lazy(() => new Rx.Subject());
+        this.beforeItemReplacedSubject = new Lazy(() => new Rx.Subject());
+        this.itemReplacedSubject = new Lazy(() => new Rx.Subject());
+        this.itemChangingSubject = new Lazy(() => createScheduledSubject(scheduler));
+        this.itemChangedSubject = new Lazy(() => createScheduledSubject(scheduler));
+        this.beforeItemsMovedSubject = new Lazy(() => new Rx.Subject());
+        this.itemsMovedSubject = new Lazy(() => new Rx.Subject());
+        // length
+        this.length = whenAny(sourceLength, this.currentPage, this.pageSize, (len, cp, ps) => Math.max(Math.min(len - (ps * cp), ps), 0))
+            .toProperty();
+        this.disp.add(this.length);
+        // isEmptyChanged
+        this.isEmptyChanged = whenAny(this.length, (len) => len == 0)
+            .distinctUntilChanged();
+        // shouldReset (short-circuit)
+        this.shouldReset = this.resetSubject.asObservable();
+        this.listChanged = Rx.Observable.merge(this.itemsAdded.select(x => false), this.itemsRemoved.select(x => false), this.itemReplaced.select(x => false), this.itemsMoved.select(x => false), this.resetSubject.select(x => true))
+            .publish()
+            .refCount();
+        this.listChanging = Rx.Observable.merge(this.beforeItemsAdded.select(x => false), this.beforeItemsRemoved.select(x => false), this.beforeItemReplaced.select(x => false), this.beforeItemsMoved.select(x => false), this.beforeResetSubject.select(x => true))
+            .publish()
+            .refCount();
+        this.wireUpChangeNotifications();
+    }
+    //////////////////////////////////
+    // IUnknown implementation
+    queryInterface(iid) {
+        return iid === IID.IObservableList || iid === IID.IDisposable;
+    }
+    get(index) {
+        if (index < 0 || index >= this.length())
+            throw new Error("index is out of range");
+        index = (this.pageSize() * this.currentPage()) + index;
+        return this.source.get(index);
+    }
+    get isReadOnly() {
+        return true;
+    }
+    toArray() {
+        let start = this.pageSize() * this.currentPage();
+        return this.source.toArray().slice(start, start + this.pageSize());
+    }
+    project() {
+        throwError("Projecting a paged-projection is not supported. What you want is to page an existing projection");
+    }
+    page(pageSize, currentPage, scheduler) {
+        throwError("Paging a paged-projection is not supported");
+        return undefined; // satisfy compiler
+    }
+    suppressChangeNotifications() {
+        this.changeNotificationsSuppressed++;
+        return Rx.Disposable.create(() => {
+            this.changeNotificationsSuppressed--;
+            if (this.changeNotificationsSuppressed === 0) {
+                this.publishBeforeResetNotification();
+                this.publishResetNotification();
+            }
+        });
+    }
+    //////////////////////////////////
+    // IDisposable implementation
+    dispose() {
+        this.disp.dispose();
+    }
+    get itemsAdded() {
+        if (!this._itemsAdded)
+            this._itemsAdded = this.itemsAddedSubject.value.asObservable();
+        return this._itemsAdded;
+    }
+    get beforeItemsAdded() {
+        if (!this._beforeItemsAdded)
+            this._beforeItemsAdded = this.beforeItemsAddedSubject.value.asObservable();
+        return this._beforeItemsAdded;
+    }
+    get itemsRemoved() {
+        if (!this._itemsRemoved)
+            this._itemsRemoved = this.itemsRemovedSubject.value.asObservable();
+        return this._itemsRemoved;
+    }
+    get beforeItemsRemoved() {
+        if (!this._beforeItemsRemoved)
+            this._beforeItemsRemoved = this.beforeItemsRemovedSubject.value.asObservable();
+        return this._beforeItemsRemoved;
+    }
+    get itemReplaced() {
+        if (!this._itemReplaced)
+            this._itemReplaced = this.itemReplacedSubject.value.asObservable();
+        return this._itemReplaced;
+    }
+    get beforeItemReplaced() {
+        if (!this._beforeItemReplaced)
+            this._beforeItemReplaced = this.beforeItemReplacedSubject.value.asObservable();
+        return this._beforeItemReplaced;
+    }
+    get beforeItemsMoved() {
+        if (!this._beforeItemsMoved)
+            this._beforeItemsMoved = this.beforeItemsMovedSubject.value.asObservable();
+        return this._beforeItemsMoved;
+    }
+    get itemsMoved() {
+        if (!this._itemsMoved)
+            this._itemsMoved = this.itemsMovedSubject.value.asObservable();
+        return this._itemsMoved;
+    }
+    get lengthChanging() {
+        if (!this._lengthChanging)
+            this._lengthChanging = this.length.changing.distinctUntilChanged();
+        return this._lengthChanging;
+    }
+    get lengthChanged() {
+        if (!this._lengthChanged)
+            this._lengthChanged = this.length.changed.distinctUntilChanged();
+        return this._lengthChanged;
+    }
+    wireUpChangeNotifications() {
+        this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe((e) => {
+            this.onItemsAdded(e);
+        }));
+        this.disp.add(this.source.itemsRemoved.observeOn(this.scheduler).subscribe((e) => {
+            this.onItemsRemoved(e);
+        }));
+        this.disp.add(this.source.itemsMoved.observeOn(this.scheduler).subscribe((e) => {
+            this.onItemsMoved(e);
+        }));
+        this.disp.add(this.source.itemReplaced.observeOn(this.scheduler).subscribe((e) => {
+            this.onItemsReplaced(e);
+        }));
+        this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe((e) => {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }));
+    }
+    getPageRange() {
+        const from = this.currentPage() * this.pageSize();
+        const result = { from: from, to: from + this.length() };
+        return result;
+    }
+    publishResetNotification() {
+        this.resetSubject.onNext(true);
+    }
+    publishBeforeResetNotification() {
+        this.beforeResetSubject.onNext(true);
+    }
+    onItemsAdded(e) {
+        const page = this.getPageRange();
+        // items added beneath the window can be ignored
+        if (e.from > page.to)
+            return;
+        // adding items before the window results in a reset
+        if (e.from < page.from) {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }
+        else {
+            // compute relative start index
+            const from = e.from - page.from;
+            const numItems = Math.min(this.pageSize() - from, e.items.length);
+            // limit items
+            const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
+            // emit translated notifications
+            const er = { from: from, items: items };
+            if (this.beforeItemsAddedSubject.isValueCreated)
+                this.beforeItemsAddedSubject.value.onNext(er);
+            if (this.itemsAddedSubject.isValueCreated)
+                this.itemsAddedSubject.value.onNext(er);
+        }
+    }
+    onItemsRemoved(e) {
+        const page = this.getPageRange();
+        // items added beneath the window can be ignored
+        if (e.from > page.to)
+            return;
+        // adding items before the window results in a reset
+        if (e.from < page.from) {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }
+        else {
+            // compute relative start index
+            const from = e.from - page.from;
+            const numItems = Math.min(this.pageSize() - from, e.items.length);
+            // limit items
+            const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
+            // emit translated notifications
+            const er = { from: from, items: items };
+            if (this.beforeItemsRemovedSubject.isValueCreated)
+                this.beforeItemsRemovedSubject.value.onNext(er);
+            if (this.itemsRemovedSubject.isValueCreated)
+                this.itemsRemovedSubject.value.onNext(er);
+        }
+    }
+    onItemsMoved(e) {
+        const page = this.getPageRange();
+        let from = 0, to = 0;
+        let er;
+        // a move completely above or below the window should be ignored
+        if (e.from >= page.to && e.to >= page.to ||
+            e.from < page.from && e.to < page.from) {
+            return;
+        }
+        // from-index inside page?
+        if (e.from >= page.from && e.from < page.to) {
+            // to-index as well?
+            if (e.to >= page.from && e.to < page.to) {
+                // item was moved inside the page
+                from = e.from - page.from;
+                to = e.to - page.from;
+                er = { from: from, to: to, items: e.items };
+                if (this.beforeItemsMovedSubject.isValueCreated)
+                    this.beforeItemsMovedSubject.value.onNext(er);
+                if (this.itemsMovedSubject.isValueCreated)
+                    this.itemsMovedSubject.value.onNext(er);
+                return;
+            }
+            else if (e.to >= page.to) {
+                // item was moved out of the page somewhere below window
+                const lastValidIndex = this.length() - 1;
+                // generate removed notification
+                from = e.from - page.from;
+                if (from !== lastValidIndex) {
+                    er = { from: from, items: e.items };
+                    if (this.beforeItemsRemovedSubject.isValueCreated)
+                        this.beforeItemsRemovedSubject.value.onNext(er);
+                    if (this.itemsRemovedSubject.isValueCreated)
+                        this.itemsRemovedSubject.value.onNext(er);
+                    // generate fake-add notification for last item in page
+                    from = this.length() - 1;
+                    er = { from: from, items: [this.get(from)] };
+                    if (this.beforeItemsAddedSubject.isValueCreated)
+                        this.beforeItemsAddedSubject.value.onNext(er);
+                    if (this.itemsAddedSubject.isValueCreated)
+                        this.itemsAddedSubject.value.onNext(er);
+                }
+                else {
+                    // generate fake-replace notification for last item in page
+                    from = this.length() - 1;
+                    er = { from: from, items: [this.get(from)] };
+                    if (this.beforeItemReplacedSubject.isValueCreated)
+                        this.beforeItemReplacedSubject.value.onNext(er);
+                    if (this.itemReplacedSubject.isValueCreated)
+                        this.itemReplacedSubject.value.onNext(er);
+                }
+                return;
+            }
+        }
+        // reset in all other cases
+        this.publishBeforeResetNotification();
+        this.publishResetNotification();
+    }
+    onItemsReplaced(e) {
+        const page = this.getPageRange();
+        // items replaced outside the window can be ignored
+        if (e.from > page.to || e.from < page.from)
+            return;
+        // compute relative start index
+        const from = e.from - page.from;
+        // emit translated notifications
+        const er = { from: from, items: e.items };
+        if (this.beforeItemReplacedSubject.isValueCreated)
+            this.beforeItemReplacedSubject.value.onNext(er);
+        if (this.itemReplacedSubject.isValueCreated)
+            this.itemReplacedSubject.value.onNext(er);
+    }
+}
 /**
 * Creates a new observable list with optional default contents
 * @param {Array<T>} initialContents The initial contents of the list
@@ -963,6 +1246,7 @@ export function list(initialContents, resetChangeThreshold = 0.3, scheduler = nu
 export function isList(target) {
     if (target == null)
         return false;
-    return target instanceof ObservableList;
+    return target instanceof ObservableList ||
+        target instanceof PagedObservableListProjection;
 }
 //# sourceMappingURL=List.js.map

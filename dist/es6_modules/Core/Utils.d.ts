@@ -45,6 +45,7 @@ export declare function isPromise(target: any): boolean;
 * @param {any} prop
 */
 export declare function unwrapProperty(prop: any): any;
+export declare function getObservable<T>(o: any): Rx.Observable<T>;
 /**
 * Returns true if a Unit-Testing environment is detected
 */

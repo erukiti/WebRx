@@ -397,7 +397,7 @@ describe("Observable List", () => {
     });
 });
 
-describe("Derived Observable List", () => {
+describe("Projected Observable List", () => {
     var stringOrderer = (a, b) => {
         if (a.toString() < b.toString()) return -1;
         if (a.toString() > b.toString()) return 1;
@@ -416,7 +416,7 @@ describe("Derived Observable List", () => {
     }
 
 
-    it("derived observable lists should follow base collection", () => {
+    it("should follow base collection", () => {
         var input = ["Foo", "Bar", "Baz", "Bamf"];
         var fixture = wx.list<TestFixture>(input.map(x => {
             var tf = new TestFixture();
@@ -449,7 +449,7 @@ describe("Derived Observable List", () => {
     });
 
 
-    it("derived observable lists should be filtered", () => {
+    it("should be filtered", () => {
         var input = ["Foo", "Bar", "Baz", "Bamf"];
         var fixture = wx.list<TestFixture>(input.map(x => {
             var tf = new TestFixture();
@@ -492,7 +492,7 @@ describe("Derived Observable List", () => {
         expect(1).toEqual(itemsRemoved.length);
     });
 
-    it("derived observable lists should be sorted", () => {
+    it("should be sorted", () => {
         var input = ["Foo", "Bar", "Baz"];
         var fixture = wx.list<string>(input);
 
@@ -523,7 +523,7 @@ describe("Derived Observable List", () => {
             output.toArray()), (expected, actual) => expected === actual).all(x => x)).toBeTruthy();
     });
 
-    it("derived observable lists move notification smoke-test", () => {
+    it("move notification smoke-test", () => {
         var initial = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         var source = wx.list<number>(initial);
 
@@ -542,7 +542,7 @@ describe("Derived Observable List", () => {
         }
     });
 
-    it("derived observable lists should understand nested move signals", () => {
+    it("should understand nested move signals", () => {
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
         var derived = source.project(undefined, undefined, x => x);
         var nested = derived.project(x => x);
@@ -558,7 +558,7 @@ describe("Derived Observable List", () => {
         expect(Ix.Enumerable.fromArray(source.toArray()).orderBy(x => x).toArray()).toEqual(sortedNested.toArray());
     });
     
-    it("derived observable lists should understand move even when sorted", () => {
+    it("should understand move even when sorted", () => {
         var sanity = ["a", "b", "c", "d", "e", "f"];
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
 
@@ -599,7 +599,7 @@ describe("Derived Observable List", () => {
         }
     });
     
-    it("derived observable lists should understand dummy move signal", () => {
+    it("should understand dummy move signal", () => {
         var sanity = ["a", "b", "c", "d", "e", "f"];
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
 
@@ -619,7 +619,7 @@ describe("Derived Observable List", () => {
         expect(0).toEqual(derivedNotifications.length);
     });
 
-    it("derived observable lists should not signal redundant move signals", () => {
+    it("should not signal redundant move signals", () => {
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
 
         var derived = source.project(x => x == "d" || x == "e");
@@ -633,7 +633,7 @@ describe("Derived Observable List", () => {
         expect(0).toEqual(derivedNotifications.length);
     });
 
-    it("derived observable lists should handle moves when only containing one item", () => {
+    it("should handle moves when only containing one item", () => {
         // This test is here to verify a bug in where newPositionForItem would return an incorrect
         // index for lists only containing a single item (the item to find a new position for)
 
@@ -656,7 +656,7 @@ describe("Derived Observable List", () => {
     /// be tempting to try and reorder the shiftIndices operation in there.
     /// </summary>
 
-    it("derived observable lists removal regression-test", () => {
+    it("removal regression-test", () => {
         var input = ['A', 'B', 'C', 'D'];
         var source = wx.list<string>(input);
 
@@ -679,7 +679,7 @@ describe("Derived Observable List", () => {
         expect(derived.toArray()).toEqual(['D']);
     });
 
-    it("derived observable lists should handle items removed", () => {
+    it("should handle items removed", () => {
         var input = ["Foo", "Bar", "Baz", "Bamf"];
         var disposed = new Array<TestFixture>();
 
@@ -729,7 +729,7 @@ describe("Derived Observable List", () => {
         expect(Ix.Enumerable.fromArray(fixture.toArray()).skip(1).all(x => x === "Bar")).toBeTruthy();
         expect(Ix.Enumerable.fromArray(output.toArray()).skip(1).all(x => x === "PrefixBar")).toBeTruthy();
 
-        // Trigger the Reset by.adding a ton of items
+        // Trigger the Reset by adding a ton of items
         fixture.addRange(Ix.Enumerable.repeat("Bar", 35).toArray());
         expect(40).toEqual(fixture.length());
         expect(40).toEqual(output.length());
@@ -756,7 +756,7 @@ describe("Derived Observable List", () => {
         expect(Ix.Enumerable.fromArray(fixture.toArray()).take(4).all(x => x === "Bar")).toBeTruthy();
         expect(Ix.Enumerable.fromArray(output.toArray()).take(4).all(x => x === "PrefixBar")).toBeTruthy();
 
-        // Trigger the Reset by.adding a ton of items
+        // Trigger the Reset by adding a ton of items
         fixture.insertRange(0, Ix.Enumerable.repeat("Bar", 35).toArray());
         expect(40).toEqual(fixture.length());
         expect(40).toEqual(output.length());
@@ -764,7 +764,7 @@ describe("Derived Observable List", () => {
         expect("PrefixBamf").toEqual(output.get(39));
     });
 
-    it("derived observable lists should order correctly", () => {
+    it("should order correctly", () => {
         var collection = wx.list<number>();
         var orderedCollection = collection.project(undefined, numberOrderer, x => x);
 
@@ -776,22 +776,7 @@ describe("Derived Observable List", () => {
         expect(2).toEqual(orderedCollection.get(1));
     });
 
-    it("derived observable lists should stop following after disposal", () => {
-        var collection = wx.list<number>();
-        var orderedCollection = collection.project(undefined, numberOrderer, x => x.toString());
-
-        collection.add(1);
-        collection.add(2);
-
-        expect(2).toEqual(orderedCollection.length());
-
-        (<Rx.IDisposable> <any> orderedCollection).dispose();
-
-        collection.add(3);
-        expect(2).toEqual(orderedCollection.length());
-    });
-
-    it("derived observable lists filter-test", () => {
+    it("filter-test", () => {
         var models = wx.list<FakeCollectionModel>(Ix.Enumerable.fromArray([0, 1, 2, 3, 4]).select(x => {
             var fcm = new FakeCollectionModel();
             fcm.someNumber(x);
@@ -811,5 +796,385 @@ describe("Derived Observable List", () => {
 
         models.get(0).isHidden(false);
         expect(4).toEqual(viewModels.length());
+    });
+});
+
+describe("Paged Observable List", () => {
+    it("length smoke-test", () => {
+        let source = wx.list<number>();
+        let paged = source.page(20);
+
+        // source is empty
+        expect(0).toEqual(paged.length());
+
+        // fill source        
+        source.addRange(Ix.Enumerable.range(1, 110).toArray());
+
+        // paged length should match pagesize now
+        expect(paged.pageSize()).toEqual(paged.length());
+        
+        paged.currentPage(1);
+
+        // paged length should still match pagesize 
+        expect(paged.pageSize()).toEqual(paged.length());
+
+        // move current page partially outside of source range
+        paged.currentPage(5);
+
+        expect(10).toEqual(paged.length());
+
+        // move current page totally outside of source range
+        paged.currentPage(6);
+
+        expect(0).toEqual(paged.length());
+    });
+
+    it("pageCount smoke-test", () => {
+        let source = wx.list<number>();
+        let paged = source.page(20);
+
+        // source is empty
+        expect(0).toEqual(paged.pageCount());
+
+        // fill source        
+        source.addRange(Ix.Enumerable.range(1, 100).toArray());
+
+        expect(5).toEqual(paged.pageCount());
+
+        // fill more
+        source.addRange(Ix.Enumerable.range(1, 10).toArray());
+        expect(6).toEqual(paged.pageCount());
+
+        // cldar
+        source.clear();
+        expect(0).toEqual(paged.pageCount());
+    });
+
+    it("toArray smoke-test", () => {
+        let source = wx.list<number>();
+        let paged = source.page(20);
+
+        // fill source        
+        source.addRange(Ix.Enumerable.range(1, 110).toArray());
+
+        // check default page
+        expect(paged.toArray()).toEqual(Ix.Enumerable.range(1, 20).toArray());
+        
+        paged.currentPage(2);
+        expect(paged.toArray()).toEqual(Ix.Enumerable.range(41, 20).toArray());
+    });
+
+    it("get smoke-test", () => {
+        let source = wx.list<number>();
+        let paged = source.page(20);
+        
+        // fill source        
+        source.addRange(Ix.Enumerable.range(1, 110).toArray());
+
+        expect(paged.get(2)).toEqual(3);
+
+        paged.currentPage(2);
+        expect(paged.get(3)).toEqual(44);
+
+        paged.currentPage(6);
+        expect(() => paged.get(0)).toThrowError();
+    });
+
+    it("reset notification test", () => {
+        let source = wx.list<number>();
+        let paged = source.page(20);
+
+        let resetCount = 0;
+        paged.shouldReset.subscribe(x=> resetCount++);
+        
+        source.reset();        
+        expect(resetCount).toEqual(1);
+
+        source.addRange(Ix.Enumerable.range(1, 110).toArray());
+        expect(resetCount).toEqual(2);
+
+        source.clear();
+        expect(resetCount).toEqual(3);
+    });
+
+    it("isEmpty smoke-test",() => {
+        let source = wx.list<number>();
+        let paged = source.page(20);
+
+        let count = 0;
+        let value: boolean;
+        paged.isEmptyChanged.subscribe(x=> { count++; value = x });
+
+        expect(count).toEqual(1);
+        expect(value).toBeTruthy();
+
+        source.addRange(Ix.Enumerable.range(1, 110).toArray());
+        source.addRange(Ix.Enumerable.range(1, 10).toArray());
+        expect(count).toEqual(2);
+        expect(value).toBeFalsy();
+    });
+
+    it("itemsAdded smoke-test", () => {
+        let source = wx.list<number>();
+        source.addRange(Ix.Enumerable.range(1, 100).toArray());
+
+        let paged = source.page(20, 2);
+        let e: wx.IListChangeInfo<number>;
+
+        let resetCount = 0;
+        paged.shouldReset.subscribe(x=> resetCount++);
+
+        let addedCount = 0;
+        paged.itemsAdded.subscribe(x=> { e = x; addedCount++ });
+
+        expect(resetCount).toEqual(0);
+        expect(addedCount).toEqual(0);
+        expect(e).toBe(undefined);
+        
+        // adding items to source after the current page window should result in no-notifications
+        source.insert(80, 42);
+        expect(resetCount).toEqual(0);
+        expect(addedCount).toEqual(0);
+
+        // adding items to source before the current page window should result in a reset
+        source.insert(10, 42);
+        expect(resetCount).toEqual(1);
+        expect(addedCount).toEqual(0);
+
+        // adding an item to the source inside the current page window should result in itemsAdded notification with correct index and item.length
+        source.insert(50, 42);
+        expect(resetCount).toEqual(1);
+        expect(addedCount).toEqual(1);
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(10);
+        expect(e.items).toBeDefined();
+        expect(e.items.length).toEqual(1);
+
+        // adding items to the source inside the current page window should result in itemsAdded notification with correct index and item.length
+        e = undefined;
+        let items = Ix.Enumerable.range(1000, 12).toArray();
+        source.insertRange(50, items);
+        expect(resetCount).toEqual(1);
+        expect(addedCount).toEqual(2);
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(10);
+        expect(e.items).toBeDefined();
+        expect(e.items).toEqual(items.slice(0, 10));
+    });
+
+    it("itemsRemoved smoke-test", () => {
+        let source = wx.list<number>();
+        source.addRange(Ix.Enumerable.range(1, 100).toArray());
+
+        let paged = source.page(20, 2);
+        let e: wx.IListChangeInfo<number>;
+
+        let resetCount = 0;
+        paged.shouldReset.subscribe(x=> resetCount++);
+
+        let removedCount = 0;
+        paged.itemsRemoved.subscribe(x=> { e = x; removedCount++ });
+
+        expect(resetCount).toEqual(0);
+        expect(removedCount).toEqual(0);
+        expect(e).toBe(undefined);
+        
+        // removing items from source after the current page window should result in no-notifications
+        source.removeAt(80);
+        expect(resetCount).toEqual(0);
+        expect(removedCount).toEqual(0);
+
+        // removing items from source before the current page window should result in a reset
+        source.removeAt(10);
+        expect(resetCount).toEqual(1);
+        expect(removedCount).toEqual(0);
+
+        // removing an item from the source inside the current page window should result in itemsAdded notification with correct index and item.length
+        source.removeAt(50);
+        expect(resetCount).toEqual(1);
+        expect(removedCount).toEqual(1);
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(10);
+        expect(e.items).toBeDefined();
+        expect(e.items.length).toEqual(1);
+
+        // removing items from the source inside the current page window should result in itemsAdded notification with correct index and item.length
+        e = undefined;
+        source.removeRange(50, 12);
+        expect(resetCount).toEqual(1);
+        expect(removedCount).toEqual(2);
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(10);
+        expect(e.items).toBeDefined();
+        expect(e.items.length).toEqual(10);
+    });
+
+    it("itemsReplaced smoke-test", () => {
+        let source = wx.list<number>();
+        source.addRange(Ix.Enumerable.range(1, 100).toArray());
+
+        let paged = source.page(20, 2);
+        let e: wx.IListChangeInfo<number>;
+
+        let resetCount = 0;
+        paged.shouldReset.subscribe(x=> resetCount++);
+
+        let replacedCount = 0;
+        paged.itemReplaced.subscribe(x=> { e = x; replacedCount++ });
+
+        expect(resetCount).toEqual(0);
+        expect(replacedCount).toEqual(0);
+        expect(e).toBe(undefined);
+        
+        // replacing an item in source after the current page window should result in no-notifications
+        source.set(80, 0);
+        expect(resetCount).toEqual(0);
+        expect(replacedCount).toEqual(0);
+
+        // replacing an item in source before the current page window should result in a reset
+        source.set(10, 0);
+        expect(resetCount).toEqual(0);
+        expect(replacedCount).toEqual(0);
+
+        // replacing an item in the source inside the current page window should result in itemsAdded notification with correct index and item.length
+        source.set(50, 0);
+        expect(resetCount).toEqual(0);
+        expect(replacedCount).toEqual(1);
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(10);
+        expect(e.items).toBeDefined();
+        expect(e.items.length).toEqual(1);
+
+        // replacing an item in the source inside the current page window should result in itemsAdded notification with correct index and item.length
+        e = undefined;
+        source.set(50, 6969);
+        expect(resetCount).toEqual(0);
+        expect(replacedCount).toEqual(2);
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(10);
+        expect(e.items).toBeDefined();
+        expect(e.items.length).toEqual(1);
+        expect(paged.get(10)).toEqual(6969);
+    });
+
+    it("itemsMoved smoke-test", () => {
+        let source = wx.list<number>();
+        source.addRange(Ix.Enumerable.range(1, 30).toArray());
+
+        let paged = source.page(10, 1);
+        let e: wx.IListChangeInfo<number>;
+        let eReplaced: wx.IListChangeInfo<number>;
+        let eAdded: wx.IListChangeInfo<number>;
+
+        let resetCount = 0;
+        paged.shouldReset.subscribe(x=> resetCount++);
+
+        let removedCount = 0;
+        paged.itemsRemoved.subscribe(x=> { e = x; removedCount++ });
+
+        let movedCount = 0;
+        paged.itemsMoved.subscribe(x=> { e = x; movedCount++ });
+
+        let replacedCount = 0;
+        paged.itemReplaced.subscribe(x=> { eReplaced = x; replacedCount++ });
+
+        let addedCount = 0;
+        paged.itemsAdded.subscribe(x=> { eAdded = x; addedCount++ });
+
+        expect(resetCount).toEqual(0);
+        expect(removedCount).toEqual(0);
+        expect(e).toBe(undefined);
+        
+        // a move with both from- and to-index below the current window should be ignored
+        source.move(25, 26);
+        expect(resetCount).toEqual(0);
+        expect(removedCount).toEqual(0);
+        expect(movedCount).toEqual(0);
+
+        // a move with both from- and to-index above the current window should be ignored as well
+        source.move(5, 6);
+        expect(resetCount).toEqual(0);
+        expect(removedCount).toEqual(0);
+        expect(movedCount).toEqual(0);
+
+        // a move with a from-index above the window and to-index below it should result in a reset
+        source.move(5, 26);
+        expect(resetCount).toEqual(1);
+        expect(removedCount).toEqual(0);
+        expect(movedCount).toEqual(0);
+
+        // a move with a from-index above the window and to-index inside it should result in a reset
+        source.move(5, 16);
+        expect(resetCount).toEqual(2);
+        expect(removedCount).toEqual(0);
+        expect(movedCount).toEqual(0);
+
+        // a move with both from- and and to-index inside it should result in a move
+        source.move(17, 19);
+        expect(resetCount).toEqual(2);
+        expect(removedCount).toEqual(0);
+        expect(movedCount).toEqual(1);
+        
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(7);
+        expect(e.to).toEqual(9);
+        expect(e.items).toBeDefined();
+        expect(e.items.length).toEqual(1);
+
+        // a move with a from-index inside the window and to-index below it should result in a remove followed by add
+        e = undefined;
+        source.move(17, 25);
+        expect(resetCount).toEqual(2);
+        expect(removedCount).toEqual(1);
+        expect(movedCount).toEqual(1);
+        expect(addedCount).toEqual(1);
+
+        expect(e).toBeDefined();
+        expect(e.from).toEqual(7);
+        
+        expect(eAdded).toBeDefined();
+        expect(eAdded.from).toEqual(9);        
+
+        // a move with a from-index at the bottom of the window and to-index below it should result in a replace for the last item
+        e = undefined;
+        eReplaced = undefined;
+        eAdded = undefined;
+        source.move(19, 25);
+        expect(resetCount).toEqual(2);
+        expect(removedCount).toEqual(1);
+        expect(movedCount).toEqual(1);
+        expect(replacedCount).toEqual(1);
+        expect(addedCount).toEqual(1);
+
+        expect(e).not.toBeDefined();
+        
+        expect(eReplaced).toBeDefined();
+        expect(eReplaced.from).toEqual(9);        
+    });
+
+    it("itemsMoved forEach-Binding edge-case test", () => {
+        loadFixtures('templates/Bindings/ForEach.html');
+
+        let source = wx.list<number>();
+        source.addRange(Ix.Enumerable.range(1, 30).toArray());
+
+        let paged = source.page(10, 1);
+
+        var el = <HTMLElement> document.getElementById("foreach-list-scalar");
+        expect(() => wx.applyBindings({ src: paged }, el)).not.toThrowError();
+
+        expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
+
+        // a move with both from- and and to-index inside it should result in a move
+        source.move(17, 19);
+        expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
+
+        // a move with a from-index inside the window and to-index below it should result in a remove followed by replace
+        source.move(17, 25);
+        expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
+
+        // a move with a from-index at the bottom of the window and to-index below it should result in a replace for the last item
+        source.move(19, 25);
+        expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
     });
 });

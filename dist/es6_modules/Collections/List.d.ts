@@ -42,6 +42,7 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
     project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
     project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+    page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IObservablePagedReadOnlyList<T>;
     suppressChangeNotifications(): Rx.IDisposable;
     get(index: number): T;
     set(index: number, item: T): void;
@@ -74,6 +75,8 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     private resetSubCount;
     private hasWhinedAboutNoResetSub;
     protected app: wx.IWebRxApp;
+    protected readonlyExceptionMessage: string;
+    private disposables;
     private _itemsAdded;
     private _beforeItemsAdded;
     private _itemsRemoved;

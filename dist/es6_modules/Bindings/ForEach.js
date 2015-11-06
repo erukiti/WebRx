@@ -391,6 +391,9 @@ export default class ForEachBinding {
             recalcIndextrigger = new Rx.Subject();
             this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
         }
+        else {
+            throwError("forEach-Binding: value must be either array or observable list");
+        }
     }
 }
 //# sourceMappingURL=ForEach.js.map
