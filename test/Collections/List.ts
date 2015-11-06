@@ -914,6 +914,23 @@ describe("Paged Observable List", () => {
         expect(value).toBeFalsy();
     });
 
+    it("changing pageSize or currentPage should result in a reset notification",() => {
+        let source = wx.list<number>();
+        source.addRange(Ix.Enumerable.range(1, 110).toArray());
+        let paged = source.page(20);
+
+        let count = 0;
+        paged.shouldReset.subscribe(x=> { count++; });
+
+        expect(count).toEqual(0);
+
+        paged.pageSize(10);
+        expect(count).toEqual(1);
+
+        paged.currentPage(1);
+        expect(count).toEqual(2);
+    });
+
     it("itemsAdded smoke-test", () => {
         let source = wx.list<number>();
         source.addRange(Ix.Enumerable.range(1, 100).toArray());

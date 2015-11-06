@@ -1581,6 +1581,16 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
             this.publishBeforeResetNotification();
             this.publishResetNotification();
         }));
+
+        this.disp.add(this.pageSize.changed.observeOn(this.scheduler).subscribe((e) => {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }));
+
+        this.disp.add(this.currentPage.changed.observeOn(this.scheduler).subscribe((e) => {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }));
     }
     
     private getPageRange(): wx.IRangeInfo {
