@@ -6267,6 +6267,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.publishBeforeResetNotification();
 	            _this.publishResetNotification();
 	        }));
+	        this.disp.add(this.pageSize.changed.observeOn(this.scheduler).subscribe(function (e) {
+	            _this.publishBeforeResetNotification();
+	            _this.publishResetNotification();
+	        }));
+	        this.disp.add(this.currentPage.changed.observeOn(this.scheduler).subscribe(function (e) {
+	            _this.publishBeforeResetNotification();
+	            _this.publishResetNotification();
+	        }));
 	    };
 	    PagedObservableListProjection.prototype.getPageRange = function () {
 	        var from = this.currentPage() * this.pageSize();

@@ -1098,6 +1098,14 @@ class PagedObservableListProjection {
             this.publishBeforeResetNotification();
             this.publishResetNotification();
         }));
+        this.disp.add(this.pageSize.changed.observeOn(this.scheduler).subscribe((e) => {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }));
+        this.disp.add(this.currentPage.changed.observeOn(this.scheduler).subscribe((e) => {
+            this.publishBeforeResetNotification();
+            this.publishResetNotification();
+        }));
     }
     getPageRange() {
         const from = this.currentPage() * this.pageSize();
