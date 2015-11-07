@@ -315,7 +315,7 @@ module wx {
         move(oldIndex, newIndex): void;
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
-        reset(): void;
+        reset(contents?: Array<T>): void;
 
         sort(comparison: (a: T, b: T) => number): void;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
