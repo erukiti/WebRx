@@ -48,7 +48,7 @@ module wx {
         has(key: T): boolean;
         delete(key: T): boolean;
         clear(): void;
-        forEach(callback: (T) => void, thisArg?): void;
+        forEach(callback: (item: T) => void, thisArg?: any): void;
         size: number;
         isEmulated: boolean;
     }
@@ -252,7 +252,7 @@ module wx {
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
         project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, 
-            selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+            selector?: (item: T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
         /**        
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
@@ -300,7 +300,7 @@ module wx {
     **/
     export interface IObservableList<T> extends IObservableReadOnlyList<T> {
         isEmpty: IObservableProperty<boolean>;
-        set(index: number, item: T);
+        set(index: number, item: T): any;
 
         add(item: T): void;
         push(item: T): void;
@@ -312,7 +312,7 @@ module wx {
         removeAt(index: number): void;
         addRange(collection: Array<T>): void;
         insertRange(index: number, collection: Array<T>): void;
-        move(oldIndex, newIndex): void;
+        move(oldIndex: any, newIndex: any): void;
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
         reset(): void;
@@ -434,7 +434,7 @@ module wx {
 
         literal?: boolean;
         constant?: boolean;
-        assign?: (self, value, locals) => any;
+        assign?: (self: any, value: any, locals: any) => any;
     }
 
     export interface ICompiledExpressionRuntimeHooks {
@@ -448,7 +448,7 @@ module wx {
         compileExpression(src: string, options?: IExpressionCompilerOptions, cache?: { [exp: string]: ICompiledExpression }): ICompiledExpression;
         getRuntimeHooks(locals: any): ICompiledExpressionRuntimeHooks;
         setRuntimeHooks(locals: any, hooks: ICompiledExpressionRuntimeHooks): void;
-        parseObjectLiteral(objectLiteralString): Array<IObjectLiteralToken>;
+        parseObjectLiteral(objectLiteralString: any): Array<IObjectLiteralToken>;
     }
 
     export interface IAnimation {
@@ -531,7 +531,7 @@ module wx {
         * Removes any binding-related state from the specified node. Use with care! In most cases you would want to use cleanNode!
         * @param {Node} node The node to clear
         **/
-        clearNodeState(node: Node);
+        clearNodeState(node: Node): any;
 
         /**
         * Compiles a simple string expression or multiple expressions within an object-literal recursively into an expression tree
@@ -556,7 +556,7 @@ module wx {
         * @param {Node} node The node for which the data-context gets assembled
         * @param {IDataContext} ctx The current data-context
         **/
-        registerDataContextExtension(extension:(node: Node, ctx:IDataContext)=> void);
+        registerDataContextExtension(extension:(node: Node, ctx:IDataContext)=> void): any;
 
         /**
         * Evaluates an expression against a data-context and returns the result
@@ -709,7 +709,7 @@ module wx {
     }
 
     export interface IRoute {
-        parse(url): Object;
+        parse(url: any): Object;
         stringify(params?: Object): string;
         concat(route: IRoute): IRoute;
         isAbsolute: boolean;
@@ -851,7 +851,7 @@ module wx {
         * missing and no extras.
         * @param {string} state Absolute state path.
         **/
-        is(state: string, params?: any, options?: any);
+        is(state: string, params?: any, options?: any): any;
 
         /**
         * A method to determine if the current active state is equal to or is the child of the state stateName. 
@@ -859,7 +859,7 @@ module wx {
         * to be passed, just the ones you'd like to test for equality.
         * @param {string} state Absolute state path.
         **/
-        includes(state: string, params?: any, options?: any);
+        includes(state: string, params?: any, options?: any): any;
 
         /**
         * Resets internal state configuration to defaults (for unit-testing)
@@ -1079,10 +1079,10 @@ module wx {
         data?: any;
         headers?: Object;
         raw?: boolean;  // do not deserialize response text
-        dump?: (any)=> string;
-        load?: (string)=> Object;
+        dump?: (value: any)=> string;
+        load?: (text: string)=> Object;
         xmlHttpRequest?: ()=> XMLHttpRequest;
-        promise?: (fn)=> Promise<any>;
+        promise?: (executor: (resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void) => void)=> Promise<any>;
     }
     
     export interface IHttpClient {
