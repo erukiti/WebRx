@@ -1,6 +1,6 @@
 declare module wx {
     // Type alias for observables and properties
-    type ObservablePropertyOrObservable<T> = Rx.Observable<T> | IObservableProperty<T>;
+    type ObservableOrProperty<T> = Rx.Observable<T> | IObservableProperty<T>;
 
     /**        
     /* Dependency Injector and service locator
@@ -1150,47 +1150,47 @@ declare module wx {
     /* @return {Rx.Observable<T>} An observable
     **/
     function whenAny<TRet, T1>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>,
+        arg1: wx.ObservableOrProperty<T1>,
         selector: (arg1: T1) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
         selector: (arg1: T1, arg2: T2) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2, T3>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
-        arg3: wx.IObservableProperty<T3> | Rx.Observable<T3>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
+        arg3: wx.ObservableOrProperty<T3>,
         selector: (arg1: T1, arg2: T2, arg3: T3) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2, T3, T4>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
-        arg3: wx.IObservableProperty<T3> | Rx.Observable<T3>, arg4: wx.IObservableProperty<T4> | Rx.Observable<T4>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
+        arg3: wx.ObservableOrProperty<T3>, arg4: wx.ObservableOrProperty<T4>,
         selector: (arg1: T1, arg2: T2, arg3: T3, arg4: T4) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2, T3, T4, T5>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
-        arg3: wx.IObservableProperty<T3> | Rx.Observable<T3>, arg4: wx.IObservableProperty<T4> | Rx.Observable<T4>,
-        arg5: wx.IObservableProperty<T5> | Rx.Observable<T5>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
+        arg3: wx.ObservableOrProperty<T3>, arg4: wx.ObservableOrProperty<T4>,
+        arg5: wx.ObservableOrProperty<T5>,
         selector: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2, T3, T4, T5, T6>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
-        arg3: wx.IObservableProperty<T3> | Rx.Observable<T3>, arg4: wx.IObservableProperty<T4> | Rx.Observable<T4>,
-        arg5: wx.IObservableProperty<T5> | Rx.Observable<T5>, arg6: wx.IObservableProperty<T6> | Rx.Observable<T6>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
+        arg3: wx.ObservableOrProperty<T3>, arg4: wx.ObservableOrProperty<T4>,
+        arg5: wx.ObservableOrProperty<T5>, arg6: wx.ObservableOrProperty<T6>,
         selector: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
-        arg3: wx.IObservableProperty<T3> | Rx.Observable<T3>, arg4: wx.IObservableProperty<T4> | Rx.Observable<T4>,
-        arg5: wx.IObservableProperty<T5> | Rx.Observable<T5>, arg6: wx.IObservableProperty<T6> | Rx.Observable<T6>,
-        arg7: wx.IObservableProperty<T7> | Rx.Observable<T7>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
+        arg3: wx.ObservableOrProperty<T3>, arg4: wx.ObservableOrProperty<T4>,
+        arg5: wx.ObservableOrProperty<T5>, arg6: wx.ObservableOrProperty<T6>,
+        arg7: wx.ObservableOrProperty<T7>,
         selector: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7) => TRet): Rx.Observable<TRet>;
     
     function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
-        arg1: wx.IObservableProperty<T1> | Rx.Observable<T1>, arg2: wx.IObservableProperty<T2> | Rx.Observable<T2>,
-        arg3: wx.IObservableProperty<T3> | Rx.Observable<T3>, arg4: wx.IObservableProperty<T4> | Rx.Observable<T4>,
-        arg5: wx.IObservableProperty<T5> | Rx.Observable<T5>, arg6: wx.IObservableProperty<T6> | Rx.Observable<T6>,
-        arg7: wx.IObservableProperty<T7> | Rx.Observable<T7>, arg8: wx.IObservableProperty<T8> | Rx.Observable<T8>,
+        arg1: wx.ObservableOrProperty<T1>, arg2: wx.ObservableOrProperty<T2>,
+        arg3: wx.ObservableOrProperty<T3>, arg4: wx.ObservableOrProperty<T4>,
+        arg5: wx.ObservableOrProperty<T5>, arg6: wx.ObservableOrProperty<T6>,
+        arg7: wx.ObservableOrProperty<T7>, arg8: wx.ObservableOrProperty<T8>,
         selector: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8) => TRet): Rx.Observable<TRet>;
 
     /**        

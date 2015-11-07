@@ -1,6 +1,6 @@
 /// <reference path="../../../node_modules/rx/ts/rx.all.d.ts" />
 declare module wx {
-    type ObservablePropertyOrObservable<T> = Rx.Observable<T> | IObservableProperty<T>;
+    type ObservableOrProperty<T> = Rx.Observable<T> | IObservableProperty<T>;
     /**
     * IUnknown
     * @interface

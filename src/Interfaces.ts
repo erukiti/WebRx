@@ -4,7 +4,7 @@ module wx {
     "use strict";
 
     // Type alias for observables and properties
-    export type ObservablePropertyOrObservable<T> = Rx.Observable<T> | IObservableProperty<T>;
+    export type ObservableOrProperty<T> = Rx.Observable<T> | IObservableProperty<T>;
 
     /**
     * IUnknown
