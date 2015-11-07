@@ -1446,7 +1446,7 @@ declare module wx {
         dump?: (value: any)=> string;
         load?: (text: string)=> Object;
         xmlHttpRequest?: ()=> XMLHttpRequest;
-        promise?: (fn: Function)=> Rx.IPromise<any>;
+        promise?: (executor: (resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void) => void)=> Rx.IPromise<any>;
     }
     
     export interface IHttpClient {
