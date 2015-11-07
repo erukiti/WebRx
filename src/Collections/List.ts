@@ -1309,18 +1309,38 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
     constructor(source: wx.IObservableReadOnlyList<T>, pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler) {
         this.source = source;
         this.scheduler = scheduler || (isRxScheduler(currentPage) ? <Rx.IScheduler> <any> currentPage : Rx.Scheduler.immediate);
-        
-        let sourceLength = source.lengthChanged.startWith(this.source.length());
-        
+
         // IObservablePagedReadOnlyList
         this.pageSize = property(pageSize);
         this.currentPage = property(currentPage || 0);
+        
+        let updateLengthTrigger = Rx.Observable.merge(
+                this.updateLengthTrigger, 
+                source.lengthChanged)
+            .startWith(true)
+            .observeOn(Rx.Scheduler.immediate);
 
-        this.pageCount = whenAny(sourceLength, this.pageSize, (sl, ps)=> Math.ceil(sl / ps))
+        this.pageCount = whenAny(this.pageSize, updateLengthTrigger, (ps, _)=> Math.ceil(source.length() / ps))
+            //.do(x=> log.info(`** Recomputed pageCount: ${x}`))
+            .distinctUntilChanged()
+            .observeOn(this.scheduler)
             .toProperty();
 
         this.disp.add(this.pageCount);
 
+        // length
+        this.length = whenAny(this.currentPage, this.pageSize, updateLengthTrigger, (cp, ps, _)=> Math.max(Math.min(source.length() - (ps * cp), ps), 0))
+            //.do(x=> log.info(`** Recomputed length: ${x}`))
+            .distinctUntilChanged()
+            .observeOn(this.scheduler)
+            .toProperty();
+
+        this.disp.add(this.length);
+
+        // isEmptyChanged
+        this.isEmptyChanged = whenAny(this.length, (len)=> len == 0)
+            .distinctUntilChanged();
+        
         // IObservableReadOnlyList
         this.beforeItemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
         this.itemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
@@ -1334,16 +1354,6 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
             <any> createScheduledSubject<wx.IPropertyChangedEventArgs>(scheduler));
         this.beforeItemsMovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
         this.itemsMovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
-        
-        // length
-        this.length = whenAny(sourceLength, this.currentPage, this.pageSize, (len, cp, ps)=> Math.max(Math.min(len - (ps * cp), ps), 0))
-            .toProperty();
-
-        this.disp.add(this.length);
-
-        // isEmptyChanged
-        this.isEmptyChanged = whenAny(this.length, (len)=> len == 0)
-            .distinctUntilChanged();
 
         // shouldReset (short-circuit)
         this.shouldReset = this.resetSubject.asObservable();
@@ -1365,7 +1375,7 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
             this.beforeResetSubject.select(x => true))
             .publish()
             .refCount();
-        
+
         this.wireUpChangeNotifications();
     }
    
@@ -1389,9 +1399,6 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
     public length: wx.IObservableProperty<number>;
     
     public get(index: number): T {
-        if(index < 0 || index >= this.length())
-            throw new Error("index is out of range");
-
         index = (this.pageSize() * this.currentPage()) + index;
             
         return this.source.get(index);    
@@ -1404,27 +1411,7 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
     public toArray(): Array<T> {
         let start = this.pageSize() * this.currentPage();
         return this.source.toArray().slice(start, start + this.pageSize());
-    }
-    
-    public project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
-        selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<TNew>;
-
-    public project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
-        refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
-
-    public project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
-        scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
-
-    public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
-
-    public project(): any {
-        throwError("Projecting a paged-projection is not supported. What you want is to page an existing projection");
-    }
-
-    public page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IObservablePagedReadOnlyList<T> {
-        throwError("Paging a paged-projection is not supported");
-        return undefined;   // satisfy compiler
-    }        
+    }     
 
     //////////////////////////////////
     // INotifyListChanged
@@ -1464,6 +1451,7 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
     private resetSubject = new Rx.Subject<any>();
     private beforeResetSubject = new Rx.Subject<any>();
     private scheduler: Rx.IScheduler;
+    private updateLengthTrigger = new Rx.Subject<any>();
 
     private beforeItemsAddedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
     private itemsAddedSubject: Lazy<Rx.Subject<wx.IListChangeInfo<T>>>;
@@ -1562,10 +1550,16 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
 
     private wireUpChangeNotifications() {
         this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe((e) => {
+            // force immediate recalculation of length, pageCount etc.
+            this.updateLengthTrigger.onNext(true);
+
             this.onItemsAdded(e);
         }));
 
         this.disp.add(this.source.itemsRemoved.observeOn(this.scheduler).subscribe((e) => {
+            // force immediate recalculation of length, pageCount etc.
+            this.updateLengthTrigger.onNext(true);
+
             this.onItemsRemoved(e);
         }));
 
@@ -1578,16 +1572,14 @@ class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyLis
         }));
 
         this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe((e) => {
+            // force immediate recalculation of length, pageCount etc.
+            this.updateLengthTrigger.onNext(true);
+
             this.publishBeforeResetNotification();
             this.publishResetNotification();
         }));
 
-        this.disp.add(this.pageSize.changed.observeOn(this.scheduler).subscribe((e) => {
-            this.publishBeforeResetNotification();
-            this.publishResetNotification();
-        }));
-
-        this.disp.add(this.currentPage.changed.observeOn(this.scheduler).subscribe((e) => {
+        this.disp.add(whenAny(this.pageSize, this.currentPage, (ps, cp)=> true).observeOn(this.scheduler).subscribe((e) => {
             this.publishBeforeResetNotification();
             this.publishResetNotification();
         }));

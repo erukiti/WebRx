@@ -954,15 +954,29 @@ class PagedObservableListProjection {
         this.changeNotificationsSuppressed = 0;
         this.resetSubject = new Rx.Subject();
         this.beforeResetSubject = new Rx.Subject();
+        this.updateLengthTrigger = new Rx.Subject();
         this.source = source;
         this.scheduler = scheduler || (isRxScheduler(currentPage) ? currentPage : Rx.Scheduler.immediate);
-        let sourceLength = source.lengthChanged.startWith(this.source.length());
         // IObservablePagedReadOnlyList
         this.pageSize = property(pageSize);
         this.currentPage = property(currentPage || 0);
-        this.pageCount = whenAny(sourceLength, this.pageSize, (sl, ps) => Math.ceil(sl / ps))
+        let updateLengthTrigger = Rx.Observable.merge(this.updateLengthTrigger, source.lengthChanged)
+            .startWith(true)
+            .observeOn(Rx.Scheduler.immediate);
+        this.pageCount = whenAny(this.pageSize, updateLengthTrigger, (ps, _) => Math.ceil(source.length() / ps))
+            .distinctUntilChanged()
+            .observeOn(this.scheduler)
             .toProperty();
         this.disp.add(this.pageCount);
+        // length
+        this.length = whenAny(this.currentPage, this.pageSize, updateLengthTrigger, (cp, ps, _) => Math.max(Math.min(source.length() - (ps * cp), ps), 0))
+            .distinctUntilChanged()
+            .observeOn(this.scheduler)
+            .toProperty();
+        this.disp.add(this.length);
+        // isEmptyChanged
+        this.isEmptyChanged = whenAny(this.length, (len) => len == 0)
+            .distinctUntilChanged();
         // IObservableReadOnlyList
         this.beforeItemsAddedSubject = new Lazy(() => new Rx.Subject());
         this.itemsAddedSubject = new Lazy(() => new Rx.Subject());
@@ -974,13 +988,6 @@ class PagedObservableListProjection {
         this.itemChangedSubject = new Lazy(() => createScheduledSubject(scheduler));
         this.beforeItemsMovedSubject = new Lazy(() => new Rx.Subject());
         this.itemsMovedSubject = new Lazy(() => new Rx.Subject());
-        // length
-        this.length = whenAny(sourceLength, this.currentPage, this.pageSize, (len, cp, ps) => Math.max(Math.min(len - (ps * cp), ps), 0))
-            .toProperty();
-        this.disp.add(this.length);
-        // isEmptyChanged
-        this.isEmptyChanged = whenAny(this.length, (len) => len == 0)
-            .distinctUntilChanged();
         // shouldReset (short-circuit)
         this.shouldReset = this.resetSubject.asObservable();
         this.listChanged = Rx.Observable.merge(this.itemsAdded.select(x => false), this.itemsRemoved.select(x => false), this.itemReplaced.select(x => false), this.itemsMoved.select(x => false), this.resetSubject.select(x => true))
@@ -997,8 +1004,6 @@ class PagedObservableListProjection {
         return iid === IID.IObservableList || iid === IID.IDisposable;
     }
     get(index) {
-        if (index < 0 || index >= this.length())
-            throw new Error("index is out of range");
         index = (this.pageSize() * this.currentPage()) + index;
         return this.source.get(index);
     }
@@ -1008,13 +1013,6 @@ class PagedObservableListProjection {
     toArray() {
         let start = this.pageSize() * this.currentPage();
         return this.source.toArray().slice(start, start + this.pageSize());
-    }
-    project() {
-        throwError("Projecting a paged-projection is not supported. What you want is to page an existing projection");
-    }
-    page(pageSize, currentPage, scheduler) {
-        throwError("Paging a paged-projection is not supported");
-        return undefined; // satisfy compiler
     }
     suppressChangeNotifications() {
         this.changeNotificationsSuppressed++;
@@ -1083,9 +1081,13 @@ class PagedObservableListProjection {
     }
     wireUpChangeNotifications() {
         this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe((e) => {
+            // force immediate recalculation of length, pageCount etc.
+            this.updateLengthTrigger.onNext(true);
             this.onItemsAdded(e);
         }));
         this.disp.add(this.source.itemsRemoved.observeOn(this.scheduler).subscribe((e) => {
+            // force immediate recalculation of length, pageCount etc.
+            this.updateLengthTrigger.onNext(true);
             this.onItemsRemoved(e);
         }));
         this.disp.add(this.source.itemsMoved.observeOn(this.scheduler).subscribe((e) => {
@@ -1095,14 +1097,12 @@ class PagedObservableListProjection {
             this.onItemsReplaced(e);
         }));
         this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe((e) => {
+            // force immediate recalculation of length, pageCount etc.
+            this.updateLengthTrigger.onNext(true);
             this.publishBeforeResetNotification();
             this.publishResetNotification();
         }));
-        this.disp.add(this.pageSize.changed.observeOn(this.scheduler).subscribe((e) => {
-            this.publishBeforeResetNotification();
-            this.publishResetNotification();
-        }));
-        this.disp.add(this.currentPage.changed.observeOn(this.scheduler).subscribe((e) => {
+        this.disp.add(whenAny(this.pageSize, this.currentPage, (ps, cp) => true).observeOn(this.scheduler).subscribe((e) => {
             this.publishBeforeResetNotification();
             this.publishResetNotification();
         }));

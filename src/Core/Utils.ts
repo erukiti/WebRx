@@ -128,7 +128,7 @@ export function getObservable<T>(o: any): Rx.Observable<T> {
     if(isRxObservable(o))
         return o;
 
-    throwError("getObservable: argument is neither observable property nor observable");
+    throwError(`getObservable: '${o}' is neither observable property nor observable`);
 }
 
 /**
@@ -571,7 +571,7 @@ export function whenAny<TRet>(): Rx.Observable<TRet> {
     // extract selector
     let selector = args.pop();
 
-    // prepend sequence with current values to satisfy combineLatest
+    // transform args
     args = args.map(x => getObservable(x));
 
     // finally append the selector

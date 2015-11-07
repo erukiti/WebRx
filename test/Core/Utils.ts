@@ -91,6 +91,7 @@ describe("Utils",() => {
         expect(wx.isRxObservable(new Rx.Subject<any>().asObservable())).toBeTruthy();
         expect(wx.isRxObservable(Rx.Observable.return(true))).toBeTruthy();
         expect(wx.isRxObservable(Rx.Observable.create(obs=> Rx.Disposable.empty))).toBeTruthy();
+        expect(wx.isRxObservable(Rx.Observable.return(true).select(x=> 42).publish().refCount())).toBeTruthy();
     });
 
     it("toggleCssClass smoke-test",() => {

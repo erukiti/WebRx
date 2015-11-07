@@ -99,7 +99,7 @@ export function getObservable(o) {
     }
     if (isRxObservable(o))
         return o;
-    throwError("getObservable: argument is neither observable property nor observable");
+    throwError(`getObservable: '${o}' is neither observable property nor observable`);
 }
 /**
 * Returns true if a Unit-Testing environment is detected
@@ -447,7 +447,7 @@ export function whenAny() {
     let args = args2Array(arguments);
     // extract selector
     let selector = args.pop();
-    // prepend sequence with current values to satisfy combineLatest
+    // transform args
     args = args.map(x => getObservable(x));
     // finally append the selector
     args.push(selector);

@@ -581,7 +581,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (isRxObservable(o))
 	        return o;
-	    throwError("getObservable: argument is neither observable property nor observable");
+	    throwError("getObservable: '" + o + "' is neither observable property nor observable");
 	}
 	exports.getObservable = getObservable;
 	/**
@@ -958,7 +958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var args = args2Array(arguments);
 	    // extract selector
 	    var selector = args.pop();
-	    // prepend sequence with current values to satisfy combineLatest
+	    // transform args
 	    args = args.map(function (x) { return getObservable(x); });
 	    // finally append the selector
 	    args.push(selector);
@@ -6073,15 +6073,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.changeNotificationsSuppressed = 0;
 	        this.resetSubject = new Rx.Subject();
 	        this.beforeResetSubject = new Rx.Subject();
+	        this.updateLengthTrigger = new Rx.Subject();
 	        this.source = source;
 	        this.scheduler = scheduler || (Utils_1.isRxScheduler(currentPage) ? currentPage : Rx.Scheduler.immediate);
-	        var sourceLength = source.lengthChanged.startWith(this.source.length());
 	        // IObservablePagedReadOnlyList
 	        this.pageSize = Property_1.property(pageSize);
 	        this.currentPage = Property_1.property(currentPage || 0);
-	        this.pageCount = Utils_1.whenAny(sourceLength, this.pageSize, function (sl, ps) { return Math.ceil(sl / ps); })
+	        var updateLengthTrigger = Rx.Observable.merge(this.updateLengthTrigger, source.lengthChanged)
+	            .startWith(true)
+	            .observeOn(Rx.Scheduler.immediate);
+	        this.pageCount = Utils_1.whenAny(this.pageSize, updateLengthTrigger, function (ps, _) { return Math.ceil(source.length() / ps); })
+	            .distinctUntilChanged()
+	            .observeOn(this.scheduler)
 	            .toProperty();
 	        this.disp.add(this.pageCount);
+	        // length
+	        this.length = Utils_1.whenAny(this.currentPage, this.pageSize, updateLengthTrigger, function (cp, ps, _) { return Math.max(Math.min(source.length() - (ps * cp), ps), 0); })
+	            .distinctUntilChanged()
+	            .observeOn(this.scheduler)
+	            .toProperty();
+	        this.disp.add(this.length);
+	        // isEmptyChanged
+	        this.isEmptyChanged = Utils_1.whenAny(this.length, function (len) { return len == 0; })
+	            .distinctUntilChanged();
 	        // IObservableReadOnlyList
 	        this.beforeItemsAddedSubject = new Lazy_1.default(function () { return new Rx.Subject(); });
 	        this.itemsAddedSubject = new Lazy_1.default(function () { return new Rx.Subject(); });
@@ -6097,13 +6111,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        this.beforeItemsMovedSubject = new Lazy_1.default(function () { return new Rx.Subject(); });
 	        this.itemsMovedSubject = new Lazy_1.default(function () { return new Rx.Subject(); });
-	        // length
-	        this.length = Utils_1.whenAny(sourceLength, this.currentPage, this.pageSize, function (len, cp, ps) { return Math.max(Math.min(len - (ps * cp), ps), 0); })
-	            .toProperty();
-	        this.disp.add(this.length);
-	        // isEmptyChanged
-	        this.isEmptyChanged = Utils_1.whenAny(this.length, function (len) { return len == 0; })
-	            .distinctUntilChanged();
 	        // shouldReset (short-circuit)
 	        this.shouldReset = this.resetSubject.asObservable();
 	        this.listChanged = Rx.Observable.merge(this.itemsAdded.select(function (x) { return false; }), this.itemsRemoved.select(function (x) { return false; }), this.itemReplaced.select(function (x) { return false; }), this.itemsMoved.select(function (x) { return false; }), this.resetSubject.select(function (x) { return true; }))
@@ -6120,8 +6127,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return iid === IID_1.default.IObservableList || iid === IID_1.default.IDisposable;
 	    };
 	    PagedObservableListProjection.prototype.get = function (index) {
-	        if (index < 0 || index >= this.length())
-	            throw new Error("index is out of range");
 	        index = (this.pageSize() * this.currentPage()) + index;
 	        return this.source.get(index);
 	    };
@@ -6135,13 +6140,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    PagedObservableListProjection.prototype.toArray = function () {
 	        var start = this.pageSize() * this.currentPage();
 	        return this.source.toArray().slice(start, start + this.pageSize());
-	    };
-	    PagedObservableListProjection.prototype.project = function () {
-	        Utils_1.throwError("Projecting a paged-projection is not supported. What you want is to page an existing projection");
-	    };
-	    PagedObservableListProjection.prototype.page = function (pageSize, currentPage, scheduler) {
-	        Utils_1.throwError("Paging a paged-projection is not supported");
-	        return undefined; // satisfy compiler
 	    };
 	    PagedObservableListProjection.prototype.suppressChangeNotifications = function () {
 	        var _this = this;
@@ -6252,9 +6250,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    PagedObservableListProjection.prototype.wireUpChangeNotifications = function () {
 	        var _this = this;
 	        this.disp.add(this.source.itemsAdded.observeOn(this.scheduler).subscribe(function (e) {
+	            // force immediate recalculation of length, pageCount etc.
+	            _this.updateLengthTrigger.onNext(true);
 	            _this.onItemsAdded(e);
 	        }));
 	        this.disp.add(this.source.itemsRemoved.observeOn(this.scheduler).subscribe(function (e) {
+	            // force immediate recalculation of length, pageCount etc.
+	            _this.updateLengthTrigger.onNext(true);
 	            _this.onItemsRemoved(e);
 	        }));
 	        this.disp.add(this.source.itemsMoved.observeOn(this.scheduler).subscribe(function (e) {
@@ -6264,14 +6266,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            _this.onItemsReplaced(e);
 	        }));
 	        this.disp.add(this.source.shouldReset.observeOn(this.scheduler).subscribe(function (e) {
+	            // force immediate recalculation of length, pageCount etc.
+	            _this.updateLengthTrigger.onNext(true);
 	            _this.publishBeforeResetNotification();
 	            _this.publishResetNotification();
 	        }));
-	        this.disp.add(this.pageSize.changed.observeOn(this.scheduler).subscribe(function (e) {
-	            _this.publishBeforeResetNotification();
-	            _this.publishResetNotification();
-	        }));
-	        this.disp.add(this.currentPage.changed.observeOn(this.scheduler).subscribe(function (e) {
+	        this.disp.add(Utils_1.whenAny(this.pageSize, this.currentPage, function (ps, cp) { return true; }).observeOn(this.scheduler).subscribe(function (e) {
 	            _this.publishBeforeResetNotification();
 	            _this.publishResetNotification();
 	        }));

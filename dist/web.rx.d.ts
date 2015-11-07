@@ -1,4 +1,7 @@
 declare module wx {
+    // Type alias for observables and properties
+    type ObservablePropertyOrObservable<T> = Rx.Observable<T> | IObservableProperty<T>;
+
     /**        
     /* Dependency Injector and service locator
     /* @interface
