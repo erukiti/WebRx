@@ -108,6 +108,19 @@ RxObsConstructor.prototype.continueWith = function() {
     return this.selectMany(_ => obs);
 }
 
+RxObsConstructor.prototype.invokeCommand = <T, TResult>(command: wx.ICommand<TResult>) => {
+  // see the ReactiveUI project for the inspiration behind this function:
+  // https://github.com/reactiveui/ReactiveUI/blob/master/ReactiveUI/ReactiveCommand.cs#L511
+  return (this as Rx.Observable<T>)
+      // debounce typings want the (incorrectly named) durationSelector to return a number here
+      // this is why there is a .select(x => 0) at the end
+      // the 0 doesn't get used, as the debounce occurs on the observable not the values it produces
+      .debounce(x => command.canExecuteObservable.startWith(command.canExecute(x)).where(b => b).select(x => 0))
+      .select(x => command.executeAsync(x).catch(Rx.Observable.empty<TResult>()))
+      .switch()
+      .subscribe();
+}
+
 RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
     return Rx.Observable.defer(() => {
         return Rx.Observable.create<T>(observer => {
