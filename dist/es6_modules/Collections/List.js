@@ -748,14 +748,14 @@ class ObservableListProjection extends ObservableList {
     canItemStayAtPosition(item, currentIndex) {
         let hasPrecedingItem = currentIndex > 0;
         if (hasPrecedingItem) {
-            let isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this[currentIndex - 1]) >= 0;
+            let isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this.get(currentIndex - 1)) >= 0;
             if (!isGreaterThanOrEqualToPrecedingItem) {
                 return false;
             }
         }
         let hasSucceedingItem = currentIndex < this.length() - 1;
         if (hasSucceedingItem) {
-            let isLessThanOrEqualToSucceedingItem = this.orderer(item, this[currentIndex + 1]) <= 0;
+            let isLessThanOrEqualToSucceedingItem = this.orderer(item, this.get(currentIndex + 1)) <= 0;
             if (!isLessThanOrEqualToSucceedingItem) {
                 return false;
             }

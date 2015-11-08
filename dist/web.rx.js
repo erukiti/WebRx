@@ -5892,14 +5892,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableListProjection.prototype.canItemStayAtPosition = function (item, currentIndex) {
 	        var hasPrecedingItem = currentIndex > 0;
 	        if (hasPrecedingItem) {
-	            var isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this[currentIndex - 1]) >= 0;
+	            var isGreaterThanOrEqualToPrecedingItem = this.orderer(item, this.get(currentIndex - 1)) >= 0;
 	            if (!isGreaterThanOrEqualToPrecedingItem) {
 	                return false;
 	            }
 	        }
 	        var hasSucceedingItem = currentIndex < this.length() - 1;
 	        if (hasSucceedingItem) {
-	            var isLessThanOrEqualToSucceedingItem = this.orderer(item, this[currentIndex + 1]) <= 0;
+	            var isLessThanOrEqualToSucceedingItem = this.orderer(item, this.get(currentIndex + 1)) <= 0;
 	            if (!isLessThanOrEqualToSucceedingItem) {
 	                return false;
 	            }
@@ -9113,7 +9113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 51 */
 /***/ function(module, exports) {
 
-	exports.version = '1.4.0';
+	exports.version = '1.4.1';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
