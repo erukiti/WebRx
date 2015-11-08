@@ -29,7 +29,7 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     removeAll(items: T[]): void;
     removeRange(index: number, count: number): void;
     toArray(): Array<T>;
-    reset(): void;
+    reset(contents?: Array<T>): void;
     add(item: T): void;
     clear(): void;
     contains(item: T): boolean;

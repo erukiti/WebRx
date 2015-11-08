@@ -5363,8 +5363,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ObservableList.prototype.toArray = function () {
 	        return this.inner;
 	    };
-	    ObservableList.prototype.reset = function () {
-	        this.publishResetNotification();
+	    ObservableList.prototype.reset = function (contents) {
+	        var _this = this;
+	        if (contents == null) {
+	            this.publishResetNotification();
+	        }
+	        else {
+	            Utils_1.using(this.suppressChangeNotifications(), function (suppress) {
+	                _this.clear();
+	                _this.addRange(contents);
+	            });
+	        }
 	    };
 	    ObservableList.prototype.add = function (item) {
 	        this.insertItem(this.inner.length, item);
@@ -9112,6 +9121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="./Interfaces.ts" />
+	var _this = this;
 	var Utils_1 = __webpack_require__(3);
 	var IID_1 = __webpack_require__(5);
 	var ScheduledSubject_1 = __webpack_require__(30);
@@ -9194,6 +9204,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        obs = Rx.Observable.startDeferred(action);
 	    }
 	    return this.selectMany(function (_) { return obs; });
+	};
+	RxObsConstructor.prototype.invokeCommand = function (command) {
+	    // see the ReactiveUI project for the inspiration behind this function:
+	    // https://github.com/reactiveui/ReactiveUI/blob/master/ReactiveUI/ReactiveCommand.cs#L511
+	    return _this
+	        .debounce(function (x) { return command.canExecuteObservable.startWith(command.canExecute(x)).where(function (b) { return b; }).select(function (x) { return 0; }); })
+	        .select(function (x) { return command.executeAsync(x).catch(Rx.Observable.empty()); })
+	        .switch()
+	        .subscribe();
 	};
 	RxObsConstructor.startDeferred = function (action) {
 	    return Rx.Observable.defer(function () {

@@ -310,12 +310,12 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
 
     public reset(contents?: Array<T>): void {
         if (contents == null) {
-        this.publishResetNotification();
+            this.publishResetNotification();
         } else {
-            let suppress = this.suppressChangeNotifications();
-            this.clear();
-            this.addRange(contents);
-            suppress.dispose();
+            using(this.suppressChangeNotifications(), (suppress)=> {
+                this.clear();
+                this.addRange(contents);
+            });
         }
     }
 

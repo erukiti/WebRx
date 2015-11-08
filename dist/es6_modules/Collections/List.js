@@ -240,8 +240,16 @@ export class ObservableList {
     toArray() {
         return this.inner;
     }
-    reset() {
-        this.publishResetNotification();
+    reset(contents) {
+        if (contents == null) {
+            this.publishResetNotification();
+        }
+        else {
+            using(this.suppressChangeNotifications(), (suppress) => {
+                this.clear();
+                this.addRange(contents);
+            });
+        }
     }
     add(item) {
         this.insertItem(this.inner.length, item);
