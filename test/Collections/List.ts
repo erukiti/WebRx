@@ -545,7 +545,7 @@ describe("Projected Observable List", () => {
     it("should understand nested move signals", () => {
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
         var derived = source.project(undefined, undefined, x => x);
-        var nested = derived.project(x => x);
+        var nested = derived.project(x => !!x);
 
         var reverseNested = nested.project(undefined, stringOrdererAsc, x => x);
         var sortedNested = reverseNested.project(undefined, stringOrderer, x => x);

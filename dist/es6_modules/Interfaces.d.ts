@@ -39,7 +39,7 @@ declare module wx {
         has(key: T): boolean;
         delete(key: T): boolean;
         clear(): void;
-        forEach(callback: (T) => void, thisArg?: any): void;
+        forEach(callback: (item: T) => void, thisArg?: any): void;
         size: number;
         isEmulated: boolean;
     }
@@ -216,7 +216,7 @@ declare module wx {
         /* @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (item: T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
         /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
@@ -378,7 +378,7 @@ declare module wx {
         (scope?: any, locals?: any): any;
         literal?: boolean;
         constant?: boolean;
-        assign?: (self, value, locals) => any;
+        assign?: (self: any, value: any, locals: any) => any;
     }
     interface ICompiledExpressionRuntimeHooks {
         readFieldHook?: (o: any, field: any) => any;
@@ -953,10 +953,10 @@ declare module wx {
         data?: any;
         headers?: Object;
         raw?: boolean;
-        dump?: (any) => string;
-        load?: (string) => Object;
+        dump?: (value: any) => string;
+        load?: (text: string) => Object;
         xmlHttpRequest?: () => XMLHttpRequest;
-        promise?: (fn) => Promise<any>;
+        promise?: (executor: (resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void) => void) => Promise<any>;
     }
     interface IHttpClient {
         /**
