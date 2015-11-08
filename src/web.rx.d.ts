@@ -277,7 +277,7 @@ declare module wx {
         move(oldIndex: any, newIndex: any): void;
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
-        reset(): void;
+        reset(contents?: Array<T>): void;
         sort(comparison: (a: T, b: T) => number): void;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
