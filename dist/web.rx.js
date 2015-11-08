@@ -75,34 +75,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.asyncCommand = Command_1.asyncCommand;
 	exports.combinedCommand = Command_1.combinedCommand;
 	exports.isCommand = Command_1.isCommand;
-	var Animation_1 = __webpack_require__(51);
+	var Animation_1 = __webpack_require__(53);
 	exports.animation = Animation_1.animation;
 	var Oid_1 = __webpack_require__(13);
 	exports.getOid = Oid_1.getOid;
-	var List_1 = __webpack_require__(27);
+	var List_1 = __webpack_require__(28);
 	exports.list = List_1.list;
-	exports.isList = List_1.isList;
-	var Map_1 = __webpack_require__(52);
+	var ListSupport_1 = __webpack_require__(27);
+	exports.isList = ListSupport_1.isList;
+	var Map_1 = __webpack_require__(54);
 	exports.createMap = Map_1.createMap;
 	var Set_1 = __webpack_require__(14);
 	exports.createSet = Set_1.createSet;
 	exports.setToArray = Set_1.setToArray;
 	var WeakMap_1 = __webpack_require__(12);
 	exports.createWeakMap = WeakMap_1.createWeakMap;
-	var Lazy_1 = __webpack_require__(28);
+	var Lazy_1 = __webpack_require__(29);
 	exports.Lazy = Lazy_1.default;
 	var VirtualChildNodes_1 = __webpack_require__(25);
 	exports.VirtualChildNodes = VirtualChildNodes_1.default;
-	var RouteMatcher_1 = __webpack_require__(46);
+	var RouteMatcher_1 = __webpack_require__(48);
 	exports.route = RouteMatcher_1.route;
-	var Value_1 = __webpack_require__(31);
+	var Value_1 = __webpack_require__(33);
 	exports.getNodeValue = Value_1.getNodeValue;
 	exports.setNodeValue = Value_1.setNodeValue;
 	var Injector_1 = __webpack_require__(2);
 	exports.injector = Injector_1.injector;
 	var IID_1 = __webpack_require__(5);
 	exports.IID = IID_1.default;
-	var HttpClient_1 = __webpack_require__(48);
+	var HttpClient_1 = __webpack_require__(50);
 	exports.getHttpClientDefaultConfig = HttpClient_1.getHttpClientDefaultConfig;
 	var BindingBase_1 = __webpack_require__(22);
 	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
@@ -139,26 +140,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	var MultiOneWay_1 = __webpack_require__(21);
 	var SingleOneWay_1 = __webpack_require__(23);
 	var ForEach_1 = __webpack_require__(24);
-	var Event_1 = __webpack_require__(30);
-	var Value_1 = __webpack_require__(31);
-	var HasFocus_1 = __webpack_require__(32);
-	var With_1 = __webpack_require__(34);
-	var Checked_1 = __webpack_require__(35);
-	var KeyPress_1 = __webpack_require__(36);
-	var TextInput_1 = __webpack_require__(37);
-	var SelectedValue_1 = __webpack_require__(38);
-	var Component_1 = __webpack_require__(39);
-	var StateActive_1 = __webpack_require__(40);
-	var View_1 = __webpack_require__(41);
-	var StateRef_1 = __webpack_require__(42);
-	var Select_1 = __webpack_require__(43);
-	var RadioGroup_1 = __webpack_require__(44);
-	var Router_1 = __webpack_require__(45);
-	var MessageBus_1 = __webpack_require__(47);
-	var HttpClient_1 = __webpack_require__(48);
-	var Version_1 = __webpack_require__(49);
+	var Event_1 = __webpack_require__(32);
+	var Value_1 = __webpack_require__(33);
+	var HasFocus_1 = __webpack_require__(34);
+	var With_1 = __webpack_require__(36);
+	var Checked_1 = __webpack_require__(37);
+	var KeyPress_1 = __webpack_require__(38);
+	var TextInput_1 = __webpack_require__(39);
+	var SelectedValue_1 = __webpack_require__(40);
+	var Component_1 = __webpack_require__(41);
+	var StateActive_1 = __webpack_require__(42);
+	var View_1 = __webpack_require__(43);
+	var StateRef_1 = __webpack_require__(44);
+	var Select_1 = __webpack_require__(45);
+	var RadioGroup_1 = __webpack_require__(46);
+	var Router_1 = __webpack_require__(47);
+	var MessageBus_1 = __webpack_require__(49);
+	var HttpClient_1 = __webpack_require__(50);
+	var Version_1 = __webpack_require__(51);
 	// make sure RxExtensions get installed
-	var RxExtensions_1 = __webpack_require__(50);
+	var RxExtensions_1 = __webpack_require__(52);
 	RxExtensions_1.install();
 	"use strict";
 	var App = (function (_super) {
@@ -4485,7 +4486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var VirtualChildNodes_1 = __webpack_require__(25);
 	var RefCountDisposeWrapper_1 = __webpack_require__(26);
 	var Injector_1 = __webpack_require__(2);
-	var List_1 = __webpack_require__(27);
+	var ListSupport_1 = __webpack_require__(27);
 	"use strict";
 	var ForEachBinding = (function () {
 	    function ForEachBinding(domManager, app) {
@@ -4870,7 +4871,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.appendRow(proxy, i_5, arr[i_5], ctx, template, hooks, animations, undefined, true);
 	            }
 	        }
-	        else if (List_1.isList(value)) {
+	        else if (ListSupport_1.isList(value)) {
 	            var list = value;
 	            recalcIndextrigger = new Rx.Subject();
 	            this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
@@ -5021,6 +5022,27 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
+	var List_1 = __webpack_require__(28);
+	var ListPaged_1 = __webpack_require__(31);
+	"use strict";
+	/**
+	* Determines if target is an instance of a IObservableList
+	* @param {any} target
+	*/
+	function isList(target) {
+	    if (target == null)
+	        return false;
+	    return target instanceof List_1.ObservableList ||
+	        target instanceof ListPaged_1.PagedObservableListProjection;
+	}
+	exports.isList = isList;
+	//# sourceMappingURL=ListSupport.js.map
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
 	    function __() { this.constructor = d; }
@@ -5029,14 +5051,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Utils_1 = __webpack_require__(3);
 	var Oid_1 = __webpack_require__(13);
 	var IID_1 = __webpack_require__(5);
-	var Lazy_1 = __webpack_require__(28);
-	var ScheduledSubject_1 = __webpack_require__(29);
+	var Lazy_1 = __webpack_require__(29);
+	var ScheduledSubject_1 = __webpack_require__(30);
 	var Events_1 = __webpack_require__(4);
 	var RefCountDisposeWrapper_1 = __webpack_require__(26);
 	var log = __webpack_require__(7);
 	var Injector_1 = __webpack_require__(2);
 	var res = __webpack_require__(6);
-	var Property_1 = __webpack_require__(8);
+	var ListPaged_1 = __webpack_require__(31);
 	"use strict";
 	/**
 	* ReactiveUI's awesome ReactiveList ported to Typescript
@@ -5389,7 +5411,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return new ObservableListProjection(this, filter, orderer, selector, args.shift(), args.shift());
 	    };
 	    ObservableList.prototype.page = function (pageSize, currentPage, scheduler) {
-	        return new PagedObservableListProjection(this, pageSize, currentPage, scheduler);
+	        return new ListPaged_1.PagedObservableListProjection(this, pageSize, currentPage, scheduler);
 	    };
 	    ObservableList.prototype.suppressChangeNotifications = function () {
 	        var _this = this;
@@ -5599,6 +5621,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ObservableList;
 	})();
 	exports.ObservableList = ObservableList;
+	/**
+	* Creates a new observable list with optional default contents
+	* @param {Array<T>} initialContents The initial contents of the list
+	* @param {number = 0.3} resetChangeThreshold
+	*/
+	function list(initialContents, resetChangeThreshold, scheduler) {
+	    if (resetChangeThreshold === void 0) { resetChangeThreshold = 0.3; }
+	    if (scheduler === void 0) { scheduler = null; }
+	    return new ObservableList(initialContents, resetChangeThreshold, scheduler);
+	}
+	exports.list = list;
 	var ObservableListProjection = (function (_super) {
 	    __extends(ObservableListProjection, _super);
 	    function ObservableListProjection(source, filter, orderer, selector, refreshTrigger, scheduler) {
@@ -6067,6 +6100,103 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return ObservableListProjection;
 	})(ObservableList);
+	//# sourceMappingURL=List.js.map
+
+/***/ },
+/* 29 */
+/***/ function(module, exports) {
+
+	"use strict";
+	/**
+	* .Net's Lazy<T>
+	* @class
+	*/
+	var Lazy = (function () {
+	    function Lazy(createValue) {
+	        this.createValue = createValue;
+	    }
+	    Object.defineProperty(Lazy.prototype, "value", {
+	        get: function () {
+	            if (!this.isValueCreated) {
+	                this.createdValue = this.createValue();
+	                this.isValueCreated = true;
+	            }
+	            return this.createdValue;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    return Lazy;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Lazy;
+	//# sourceMappingURL=Lazy.js.map
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Utils_1 = __webpack_require__(3);
+	"use strict";
+	var ScheduledSubject = (function () {
+	    function ScheduledSubject(scheduler, defaultObserver, defaultSubject) {
+	        this._observerRefCount = 0;
+	        this._defaultObserverSub = Rx.Disposable.empty;
+	        this._scheduler = scheduler;
+	        this._defaultObserver = defaultObserver;
+	        this._subject = defaultSubject || new Rx.Subject();
+	        if (defaultObserver != null) {
+	            this._defaultObserverSub = this._subject
+	                .observeOn(this._scheduler)
+	                .subscribe(this._defaultObserver);
+	        }
+	    }
+	    ScheduledSubject.prototype.dispose = function () {
+	        if (Utils_1.isDisposable(this._subject)) {
+	            this._subject.dispose();
+	        }
+	    };
+	    ScheduledSubject.prototype.onCompleted = function () {
+	        this._subject.onCompleted();
+	    };
+	    ScheduledSubject.prototype.onError = function (error) {
+	        this._subject.onError(error);
+	    };
+	    ScheduledSubject.prototype.onNext = function (value) {
+	        this._subject.onNext(value);
+	    };
+	    ScheduledSubject.prototype.subscribe = function (observer) {
+	        var _this = this;
+	        if (this._defaultObserverSub)
+	            this._defaultObserverSub.dispose();
+	        this._observerRefCount++;
+	        return new Rx.CompositeDisposable(this._subject.observeOn(this._scheduler).subscribe(observer), Rx.Disposable.create(function () {
+	            if ((--_this._observerRefCount) <= 0 && _this._defaultObserver != null) {
+	                _this._defaultObserverSub = _this._subject.observeOn(_this._scheduler).subscribe(_this._defaultObserver);
+	            }
+	        }));
+	    };
+	    return ScheduledSubject;
+	})();
+	function createScheduledSubject(scheduler, defaultObserver, defaultSubject) {
+	    var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
+	    var result = Utils_1.extend(scheduled, new Rx.Subject(), true);
+	    return result;
+	}
+	exports.createScheduledSubject = createScheduledSubject;
+	//# sourceMappingURL=ScheduledSubject.js.map
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var Utils_1 = __webpack_require__(3);
+	var IID_1 = __webpack_require__(5);
+	var Lazy_1 = __webpack_require__(29);
+	var ScheduledSubject_1 = __webpack_require__(30);
+	var Property_1 = __webpack_require__(8);
+	"use strict";
 	var PagedObservableListProjection = (function () {
 	    function PagedObservableListProjection(source, pageSize, currentPage, scheduler) {
 	        this.disp = new Rx.CompositeDisposable();
@@ -6409,116 +6539,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return PagedObservableListProjection;
 	})();
-	/**
-	* Creates a new observable list with optional default contents
-	* @param {Array<T>} initialContents The initial contents of the list
-	* @param {number = 0.3} resetChangeThreshold
-	*/
-	function list(initialContents, resetChangeThreshold, scheduler) {
-	    if (resetChangeThreshold === void 0) { resetChangeThreshold = 0.3; }
-	    if (scheduler === void 0) { scheduler = null; }
-	    return new ObservableList(initialContents, resetChangeThreshold, scheduler);
-	}
-	exports.list = list;
-	/**
-	* Determines if target is an instance of a IObservableList
-	* @param {any} target
-	*/
-	function isList(target) {
-	    if (target == null)
-	        return false;
-	    return target instanceof ObservableList ||
-	        target instanceof PagedObservableListProjection;
-	}
-	exports.isList = isList;
-	//# sourceMappingURL=List.js.map
+	exports.PagedObservableListProjection = PagedObservableListProjection;
+	//# sourceMappingURL=ListPaged.js.map
 
 /***/ },
-/* 28 */
-/***/ function(module, exports) {
-
-	"use strict";
-	/**
-	* .Net's Lazy<T>
-	* @class
-	*/
-	var Lazy = (function () {
-	    function Lazy(createValue) {
-	        this.createValue = createValue;
-	    }
-	    Object.defineProperty(Lazy.prototype, "value", {
-	        get: function () {
-	            if (!this.isValueCreated) {
-	                this.createdValue = this.createValue();
-	                this.isValueCreated = true;
-	            }
-	            return this.createdValue;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    return Lazy;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Lazy;
-	//# sourceMappingURL=Lazy.js.map
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Utils_1 = __webpack_require__(3);
-	"use strict";
-	var ScheduledSubject = (function () {
-	    function ScheduledSubject(scheduler, defaultObserver, defaultSubject) {
-	        this._observerRefCount = 0;
-	        this._defaultObserverSub = Rx.Disposable.empty;
-	        this._scheduler = scheduler;
-	        this._defaultObserver = defaultObserver;
-	        this._subject = defaultSubject || new Rx.Subject();
-	        if (defaultObserver != null) {
-	            this._defaultObserverSub = this._subject
-	                .observeOn(this._scheduler)
-	                .subscribe(this._defaultObserver);
-	        }
-	    }
-	    ScheduledSubject.prototype.dispose = function () {
-	        if (Utils_1.isDisposable(this._subject)) {
-	            this._subject.dispose();
-	        }
-	    };
-	    ScheduledSubject.prototype.onCompleted = function () {
-	        this._subject.onCompleted();
-	    };
-	    ScheduledSubject.prototype.onError = function (error) {
-	        this._subject.onError(error);
-	    };
-	    ScheduledSubject.prototype.onNext = function (value) {
-	        this._subject.onNext(value);
-	    };
-	    ScheduledSubject.prototype.subscribe = function (observer) {
-	        var _this = this;
-	        if (this._defaultObserverSub)
-	            this._defaultObserverSub.dispose();
-	        this._observerRefCount++;
-	        return new Rx.CompositeDisposable(this._subject.observeOn(this._scheduler).subscribe(observer), Rx.Disposable.create(function () {
-	            if ((--_this._observerRefCount) <= 0 && _this._defaultObserver != null) {
-	                _this._defaultObserverSub = _this._subject.observeOn(_this._scheduler).subscribe(_this._defaultObserver);
-	            }
-	        }));
-	    };
-	    return ScheduledSubject;
-	})();
-	function createScheduledSubject(scheduler, defaultObserver, defaultSubject) {
-	    var scheduled = new ScheduledSubject(scheduler, defaultObserver, defaultSubject);
-	    var result = Utils_1.extend(scheduled, new Rx.Subject(), true);
-	    return result;
-	}
-	exports.createScheduledSubject = createScheduledSubject;
-	//# sourceMappingURL=ScheduledSubject.js.map
-
-/***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -6615,7 +6640,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Event.js.map
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -6769,12 +6794,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Value.js.map
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var BindingSupport_1 = __webpack_require__(33);
+	var BindingSupport_1 = __webpack_require__(35);
 	"use strict";
 	var HasFocusBinding = (function () {
 	    function HasFocusBinding(domManager, app) {
@@ -6910,7 +6935,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HasFocus.js.map
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -6924,7 +6949,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=BindingSupport.js.map
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -6988,12 +7013,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=With.js.map
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var BindingSupport_1 = __webpack_require__(33);
+	var BindingSupport_1 = __webpack_require__(35);
 	"use strict";
 	var CheckedBinding = (function () {
 	    function CheckedBinding(domManager, app) {
@@ -7092,7 +7117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Checked.js.map
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7253,13 +7278,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=KeyPress.js.map
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var env = __webpack_require__(15);
-	var BindingSupport_1 = __webpack_require__(33);
+	var BindingSupport_1 = __webpack_require__(35);
 	"use strict";
 	var TextInputBinding = (function () {
 	    function TextInputBinding(domManager, app) {
@@ -7408,14 +7433,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=TextInput.js.map
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Value_1 = __webpack_require__(31);
-	var List_1 = __webpack_require__(27);
-	var BindingSupport_1 = __webpack_require__(33);
+	var Value_1 = __webpack_require__(33);
+	var ListSupport_1 = __webpack_require__(27);
+	var BindingSupport_1 = __webpack_require__(35);
 	"use strict";
 	var impls = new Array();
 	var RadioSingleSelectionImpl = (function () {
@@ -7425,7 +7450,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    RadioSingleSelectionImpl.prototype.supports = function (el, model) {
 	        return (el.tagName.toLowerCase() === 'input' &&
 	            el.getAttribute("type") === 'radio') &&
-	            !List_1.isList(model);
+	            !ListSupport_1.isList(model);
 	    };
 	    RadioSingleSelectionImpl.prototype.observeElement = function (el) {
 	        return Rx.Observable.merge(Rx.Observable.fromEvent(el, 'click'), Rx.Observable.fromEvent(el, 'change'));
@@ -7455,7 +7480,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    OptionSingleSelectionImpl.prototype.supports = function (el, model) {
 	        return el.tagName.toLowerCase() === 'select' &&
-	            !List_1.isList(model);
+	            !ListSupport_1.isList(model);
 	    };
 	    OptionSingleSelectionImpl.prototype.observeElement = function (el) {
 	        return Rx.Observable.fromEvent(el, 'change');
@@ -7588,7 +7613,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SelectedValue.js.map
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -7732,7 +7757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Component.js.map
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -7829,7 +7854,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateActive.js.map
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -7992,7 +8017,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=View.js.map
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../Interfaces.ts" />
@@ -8088,7 +8113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=StateRef.js.map
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8204,7 +8229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Select.js.map
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8299,13 +8324,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RadioGroup.js.map
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Property_1 = __webpack_require__(8);
-	var RouteMatcher_1 = __webpack_require__(46);
+	var RouteMatcher_1 = __webpack_require__(48);
 	"use strict";
 	var Router = (function () {
 	    function Router(domManager, app) {
@@ -8705,7 +8730,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Router.js.map
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -8862,11 +8887,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RouteMatcher.js.map
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var ScheduledSubject_1 = __webpack_require__(29);
+	var ScheduledSubject_1 = __webpack_require__(30);
 	// ReactiveUI's MessageBus
 	"use strict";
 	var MessageBus = (function () {
@@ -8912,7 +8937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=MessageBus.js.map
 
 /***/ },
-/* 48 */
+/* 50 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -9076,20 +9101,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HttpClient.js.map
 
 /***/ },
-/* 49 */
+/* 51 */
 /***/ function(module, exports) {
 
 	exports.version = '1.3.2';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
-/* 50 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="./Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var IID_1 = __webpack_require__(5);
-	var ScheduledSubject_1 = __webpack_require__(29);
+	var ScheduledSubject_1 = __webpack_require__(30);
 	var Injector_1 = __webpack_require__(2);
 	var res = __webpack_require__(6);
 	"use strict";
@@ -9189,7 +9214,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RxExtensions.js.map
 
 /***/ },
-/* 51 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -9380,7 +9405,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Animation.js.map
 
 /***/ },
-/* 52 */
+/* 54 */
 /***/ function(module, exports) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />

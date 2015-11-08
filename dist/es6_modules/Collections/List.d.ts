@@ -109,8 +109,3 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
 * @param {number = 0.3} resetChangeThreshold
 */
 export declare function list<T>(initialContents?: Array<T>, resetChangeThreshold?: number, scheduler?: Rx.IScheduler): wx.IObservableList<T>;
-/**
-* Determines if target is an instance of a IObservableList
-* @param {any} target
-*/
-export declare function isList(target: any): boolean;

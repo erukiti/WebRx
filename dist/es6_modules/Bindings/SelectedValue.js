@@ -1,7 +1,7 @@
 /// <reference path="../Interfaces.ts" />
 import { throwError, unwrapProperty, isProperty } from "../Core/Utils";
 import { getNodeValue } from "./Value";
-import { isList } from "../Collections/List";
+import { isList } from "../Collections/ListSupport";
 import { emitPropRefHint } from "./BindingSupport";
 "use strict";
 let impls = new Array();

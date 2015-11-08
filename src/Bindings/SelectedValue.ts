@@ -4,7 +4,7 @@ import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, isProperty } from "../Core/Utils"
 import { applyBindings, cleanNode } from "../Core/DomManager"
 import { getNodeValue, setNodeValue } from "./Value"
-import { isList } from "../Collections/List"
+import { isList } from "../Collections/ListSupport"
 import { emitPropRefHint } from "./BindingSupport"
 
 "use strict";

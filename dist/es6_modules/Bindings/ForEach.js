@@ -3,7 +3,7 @@ import { throwError, cloneNodeArray, noop } from "../Core/Utils";
 import VirtualChildNodes from "./../Core/VirtualChildNodes";
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper";
 import { injector } from "../Core/Injector";
-import { isList } from "../Collections/List";
+import { isList } from "../Collections/ListSupport";
 "use strict";
 export default class ForEachBinding {
     constructor(domManager, app) {

@@ -5,7 +5,7 @@ import { extend, isInUnitTest, args2Array, isFunction, throwError, using, format
 import VirtualChildNodes from "./../Core/VirtualChildNodes"
 import RefCountDisposeWrapper from "./../Core/RefCountDisposeWrapper"
 import { injector } from "../Core/Injector"
-import { isList } from "../Collections/List"
+import { isList } from "../Collections/ListSupport"
 import * as log from "../Core/Log"
 
 "use strict";
