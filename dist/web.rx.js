@@ -9113,7 +9113,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 51 */
 /***/ function(module, exports) {
 
-	exports.version = '1.3.2';
+	exports.version = '1.4.0';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },
