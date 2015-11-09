@@ -270,8 +270,11 @@ export class DomManager implements wx.IDomManager {
 
         let obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
             let innerDisp = Rx.Observable.defer(() => {
+                let sources = setToArray(captured).map(x=> x.replay(null, 1));
+                sources.forEach(x=> x.connect());
+                
                 // construct observable that represents the first change of any of the expression's dependencies
-                return Rx.Observable.merge(setToArray(captured)).take(1);
+                return Rx.Observable.merge(sources).take(1);
             })
             .repeat()
             .subscribe(trigger => {
