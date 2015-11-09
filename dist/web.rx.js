@@ -2,7 +2,7 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define([], factory);
+		define(factory);
 	else if(typeof exports === 'object')
 		exports["wx"] = factory();
 	else
@@ -62,56 +62,56 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.app = App_1.app;
 	exports.router = App_1.router;
 	exports.messageBus = App_1.messageBus;
-	var Module_1 = __webpack_require__(9);
+	var Module_1 = __webpack_require__(11);
 	exports.module = Module_1.module;
 	__export(__webpack_require__(3));
-	var Property_1 = __webpack_require__(8);
+	var Property_1 = __webpack_require__(10);
 	exports.property = Property_1.property;
-	var DomManager_1 = __webpack_require__(11);
+	var DomManager_1 = __webpack_require__(13);
 	exports.applyBindings = DomManager_1.applyBindings;
 	exports.cleanNode = DomManager_1.cleanNode;
-	var Command_1 = __webpack_require__(18);
+	var Command_1 = __webpack_require__(20);
 	exports.command = Command_1.command;
 	exports.asyncCommand = Command_1.asyncCommand;
 	exports.combinedCommand = Command_1.combinedCommand;
 	exports.isCommand = Command_1.isCommand;
 	var Animation_1 = __webpack_require__(53);
 	exports.animation = Animation_1.animation;
-	var Oid_1 = __webpack_require__(13);
+	var Oid_1 = __webpack_require__(15);
 	exports.getOid = Oid_1.getOid;
-	var List_1 = __webpack_require__(28);
+	var List_1 = __webpack_require__(30);
 	exports.list = List_1.list;
-	var ListSupport_1 = __webpack_require__(27);
+	var ListSupport_1 = __webpack_require__(29);
 	exports.isList = ListSupport_1.isList;
 	var Map_1 = __webpack_require__(54);
 	exports.createMap = Map_1.createMap;
-	var Set_1 = __webpack_require__(14);
+	var Set_1 = __webpack_require__(16);
 	exports.createSet = Set_1.createSet;
 	exports.setToArray = Set_1.setToArray;
-	var WeakMap_1 = __webpack_require__(12);
+	var WeakMap_1 = __webpack_require__(14);
 	exports.createWeakMap = WeakMap_1.createWeakMap;
-	var Lazy_1 = __webpack_require__(29);
+	var Lazy_1 = __webpack_require__(31);
 	exports.Lazy = Lazy_1.default;
-	var VirtualChildNodes_1 = __webpack_require__(25);
+	var VirtualChildNodes_1 = __webpack_require__(27);
 	exports.VirtualChildNodes = VirtualChildNodes_1.default;
 	var RouteMatcher_1 = __webpack_require__(48);
 	exports.route = RouteMatcher_1.route;
-	var Value_1 = __webpack_require__(33);
+	var Value_1 = __webpack_require__(35);
 	exports.getNodeValue = Value_1.getNodeValue;
 	exports.setNodeValue = Value_1.setNodeValue;
-	var Injector_1 = __webpack_require__(2);
+	var Injector_1 = __webpack_require__(8);
 	exports.injector = Injector_1.injector;
 	var IID_1 = __webpack_require__(5);
 	exports.IID = IID_1.default;
 	var HttpClient_1 = __webpack_require__(50);
 	exports.getHttpClientDefaultConfig = HttpClient_1.getHttpClientDefaultConfig;
-	var BindingBase_1 = __webpack_require__(22);
+	var BindingBase_1 = __webpack_require__(24);
 	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
 	exports.MultiOneWayBindingBase = BindingBase_1.MultiOneWayBindingBase;
 	// re-exports
-	var res = __webpack_require__(6);
+	var res = __webpack_require__(9);
 	exports.res = res;
-	var env = __webpack_require__(15);
+	var env = __webpack_require__(17);
 	exports.env = env;
 	//# sourceMappingURL=WebRx.js.map
 
@@ -125,24 +125,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Injector_1 = __webpack_require__(2);
+	var Injector_1 = __webpack_require__(8);
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(6);
+	var res = __webpack_require__(9);
 	var log = __webpack_require__(7);
-	var Property_1 = __webpack_require__(8);
-	var Module_1 = __webpack_require__(9);
-	var ExpressionCompiler = __webpack_require__(10);
-	var DomManager_1 = __webpack_require__(11);
-	var HtmlTemplateEngine_1 = __webpack_require__(16);
-	var Command_1 = __webpack_require__(17);
-	var Module_2 = __webpack_require__(19);
-	var If_1 = __webpack_require__(20);
-	var MultiOneWay_1 = __webpack_require__(21);
-	var SingleOneWay_1 = __webpack_require__(23);
-	var ForEach_1 = __webpack_require__(24);
-	var Event_1 = __webpack_require__(32);
-	var Value_1 = __webpack_require__(33);
-	var HasFocus_1 = __webpack_require__(34);
+	var Property_1 = __webpack_require__(10);
+	var Module_1 = __webpack_require__(11);
+	var ExpressionCompiler = __webpack_require__(12);
+	var DomManager_1 = __webpack_require__(13);
+	var HtmlTemplateEngine_1 = __webpack_require__(18);
+	var Command_1 = __webpack_require__(19);
+	var Module_2 = __webpack_require__(21);
+	var If_1 = __webpack_require__(22);
+	var MultiOneWay_1 = __webpack_require__(23);
+	var SingleOneWay_1 = __webpack_require__(25);
+	var ForEach_1 = __webpack_require__(26);
+	var Event_1 = __webpack_require__(34);
+	var Value_1 = __webpack_require__(35);
+	var HasFocus_1 = __webpack_require__(2);
 	var With_1 = __webpack_require__(36);
 	var Checked_1 = __webpack_require__(37);
 	var KeyPress_1 = __webpack_require__(38);
@@ -368,105 +368,140 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(6);
+	var BindingSupport_1 = __webpack_require__(6);
 	"use strict";
-	/**
-	* Simple IoC & Service Locator
-	*/
-	var Injector = (function () {
-	    function Injector() {
-	        //////////////////////////////////
-	        // Implementation
-	        this.registrations = {};
+	var HasFocusBinding = (function () {
+	    function HasFocusBinding(domManager, app) {
+	        this.priority = -1;
+	        this.domManager = domManager;
+	        this.app = app;
 	    }
-	    Injector.prototype.register = function () {
-	        var key = arguments[0];
-	        var val = arguments[1];
-	        var isSingleton = arguments[2];
-	        var factory;
-	        if (this.registrations.hasOwnProperty(key))
-	            Utils_1.throwError("'{0}' is already registered", key);
-	        if (Utils_1.isFunction(val)) {
-	            // second overload
-	            // it's a factory function
-	            factory = function (args, deps) { return val.apply(null, args); };
-	        }
-	        else if (Array.isArray(val)) {
-	            // first overload
-	            // array assumed to be inline array notation with constructor
-	            var self_1 = this;
-	            var ctor = val.pop();
-	            var dependencies = val;
-	            factory = function (args, deps) {
-	                // resolve dependencies
-	                var resolved = dependencies.map(function (x) {
-	                    try {
-	                        return self_1.get(x, undefined, deps);
-	                    }
-	                    catch (e) {
-	                        Utils_1.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, key, e);
-	                    }
-	                });
-	                // invoke constructor
-	                var _args = [null].concat(resolved).concat(args);
-	                var ctorFunc = ctor.bind.apply(ctor, _args);
-	                return new ctorFunc();
-	            };
+	    ////////////////////
+	    // wx.IBinding
+	    HasFocusBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("hasFocus-binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("invalid binding-options!");
+	        var el = node;
+	        var prop;
+	        var cleanup;
+	        var compiled = this.domManager.compileBindingOptions(options, module);
+	        var exp;
+	        var delay = 0;
+	        if (typeof compiled === "object" && compiled.hasOwnProperty("property")) {
+	            var opt = compiled;
+	            exp = opt.property;
+	            delay = this.domManager.evaluateExpression(opt.delay, ctx);
+	            // convert boolean to number
+	            if (typeof delay === "boolean")
+	                delay = delay ? 1 : 0;
 	        }
 	        else {
-	            // third overload
-	            // singleton
-	            factory = function (args, deps) { return val; };
+	            exp = compiled;
 	        }
-	        this.registrations[key] = { factory: factory, isSingleton: isSingleton };
-	        return this;
-	    };
-	    Injector.prototype.get = function (key, args, deps) {
-	        deps = deps || {};
-	        if (deps.hasOwnProperty(key))
-	            Utils_1.throwError("Detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
-	        // registered?
-	        var registration = this.registrations[key];
-	        if (registration === undefined)
-	            Utils_1.throwError("'{0}' is not registered", key);
-	        // already instantiated?
-	        if (registration.isSingleton && registration.value)
-	            return registration.value;
-	        // append current key
-	        var newDeps = {};
-	        newDeps[key] = true;
-	        Utils_1.extend(deps, newDeps);
-	        // create it
-	        var result = registration.factory(args, newDeps);
-	        // cache if singleton
-	        if (registration.isSingleton)
-	            registration.value = result;
-	        return result;
-	    };
-	    Injector.prototype.resolve = function (iaa, args) {
-	        var ctor = iaa.pop();
-	        if (!Utils_1.isFunction(ctor))
-	            Utils_1.throwError("Error resolving inline-annotated-array. Constructor must be of type 'function' but is '{0}", typeof ctor);
-	        var self = this;
-	        // resolve dependencies
-	        var resolved = iaa.map(function (x) {
+	        function doCleanup() {
+	            if (cleanup) {
+	                cleanup.dispose();
+	                cleanup = null;
+	            }
+	        }
+	        function handleElementFocusChange(isFocused) {
+	            // wx.If possible, ignore which event was raised and determine focus state using activeElement,
+	            // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
+	            var ownerDoc = el.ownerDocument;
+	            if ("activeElement" in ownerDoc) {
+	                var active;
+	                try {
+	                    active = ownerDoc.activeElement;
+	                }
+	                catch (e) {
+	                    // wx.IE9 throws if you access activeElement during page load (see issue #703)
+	                    active = ownerDoc.body;
+	                }
+	                isFocused = (active === el);
+	            }
+	            prop(isFocused);
+	        }
+	        function updateElement(value) {
+	            if (value) {
+	                // Note: wx.If the element is currently hidden, we schedule the focus change
+	                // to occur "soonish". Technically this is a hack because it hides the fact
+	                // that we make tricky assumption about the presence of a "visible" binding 
+	                // on the same element who's subscribe handler runs after us 
+	                if (delay === 0 && el.style.display !== 'none') {
+	                    el.focus();
+	                }
+	                else {
+	                    Rx.Observable.timer(delay).subscribe(function () {
+	                        el.focus();
+	                    });
+	                }
+	            }
+	            else {
+	                el.blur();
+	            }
+	        }
+	        // options is supposed to be a @propref
+	        state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
 	            try {
-	                return self.get(x, undefined, iaa);
+	                if (!Utils_1.isProperty(model)) {
+	                    BindingSupport_1.emitPropRefHint("HasFocus", options);
+	                    // initial and final update
+	                    updateElement(model);
+	                }
+	                else {
+	                    doCleanup();
+	                    cleanup = new Rx.CompositeDisposable();
+	                    // update on property change
+	                    prop = model;
+	                    cleanup.add(prop.changed.subscribe(function (x) {
+	                        updateElement(x);
+	                    }));
+	                    // initial update
+	                    updateElement(prop());
+	                    // don't attempt to updated computed properties
+	                    if (!prop.source) {
+	                        cleanup.add(Rx.Observable.merge(_this.getFocusEventObservables(el)).subscribe(function (hasFocus) {
+	                            handleElementFocusChange(hasFocus);
+	                        }));
+	                    }
+	                }
 	            }
 	            catch (e) {
-	                Utils_1.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
+	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
-	        });
-	        // invoke constructor
-	        var _args = [null].concat(resolved).concat(args);
-	        var ctorFunc = ctor.bind.apply(ctor, _args);
-	        return new ctorFunc();
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            el = null;
+	            // nullify locals
+	            doCleanup();
+	        }));
 	    };
-	    return Injector;
+	    HasFocusBinding.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    HasFocusBinding.prototype.getFocusEventObservables = function (el) {
+	        var result = [];
+	        result.push(Rx.Observable.fromEvent(el, 'focus').select(function (x) { return true; }));
+	        result.push(Rx.Observable.fromEvent(el, 'focusin').select(function (x) { return true; }));
+	        result.push(Rx.Observable.fromEvent(el, 'blur').select(function (x) { return false; }));
+	        result.push(Rx.Observable.fromEvent(el, 'focusout').select(function (x) { return false; }));
+	        return result;
+	    };
+	    return HasFocusBinding;
 	})();
-	exports.injector = new Injector();
-	exports.injector.register(res.injector, function () { return new Injector(); });
-	//# sourceMappingURL=Injector.js.map
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = HasFocusBinding;
+	//# sourceMappingURL=HasFocus.js.map
 
 /***/ },
 /* 3 */
@@ -996,7 +1031,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -1017,7 +1052,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/// <summary>
@@ -1039,20 +1074,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
+	/// <reference path="../Interfaces.ts" />
+	var log = __webpack_require__(7);
 	"use strict";
-	exports.app = "app";
-	exports.injector = "injector";
-	exports.domManager = "domservice";
-	exports.router = "router";
-	exports.messageBus = "messageBus";
-	exports.expressionCompiler = "expressioncompiler";
-	exports.templateEngine = "templateEngine";
-	exports.httpClient = "httpClient";
-	exports.hasValueBindingValue = "has.bindings.value";
-	exports.valueBindingValue = "bindings.value";
-	//# sourceMappingURL=Resources.js.map
+	function emitPropRefHint(bindingName, bindingString) {
+	    var msg = bindingName + "-Binding: You have passed a property instead of a propRef to a Two-Way binding. This is most likely not what you want because the binding won't be able to update your model when your view changes - Solution: Prefix your property with an @-symbol - Binding-Expression [\"" + bindingString + "\"]";
+	    log.hint(msg);
+	}
+	exports.emitPropRefHint = emitPropRefHint;
+	//# sourceMappingURL=BindingSupport.js.map
 
 /***/ },
 /* 7 */
@@ -1131,6 +1163,129 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
+	var Utils_1 = __webpack_require__(3);
+	var res = __webpack_require__(9);
+	"use strict";
+	/**
+	* Simple IoC & Service Locator
+	*/
+	var Injector = (function () {
+	    function Injector() {
+	        //////////////////////////////////
+	        // Implementation
+	        this.registrations = {};
+	    }
+	    Injector.prototype.register = function () {
+	        var key = arguments[0];
+	        var val = arguments[1];
+	        var isSingleton = arguments[2];
+	        var factory;
+	        if (this.registrations.hasOwnProperty(key))
+	            Utils_1.throwError("'{0}' is already registered", key);
+	        if (Utils_1.isFunction(val)) {
+	            // second overload
+	            // it's a factory function
+	            factory = function (args, deps) { return val.apply(null, args); };
+	        }
+	        else if (Array.isArray(val)) {
+	            // first overload
+	            // array assumed to be inline array notation with constructor
+	            var self_1 = this;
+	            var ctor = val.pop();
+	            var dependencies = val;
+	            factory = function (args, deps) {
+	                // resolve dependencies
+	                var resolved = dependencies.map(function (x) {
+	                    try {
+	                        return self_1.get(x, undefined, deps);
+	                    }
+	                    catch (e) {
+	                        Utils_1.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, key, e);
+	                    }
+	                });
+	                // invoke constructor
+	                var _args = [null].concat(resolved).concat(args);
+	                var ctorFunc = ctor.bind.apply(ctor, _args);
+	                return new ctorFunc();
+	            };
+	        }
+	        else {
+	            // third overload
+	            // singleton
+	            factory = function (args, deps) { return val; };
+	        }
+	        this.registrations[key] = { factory: factory, isSingleton: isSingleton };
+	        return this;
+	    };
+	    Injector.prototype.get = function (key, args, deps) {
+	        deps = deps || {};
+	        if (deps.hasOwnProperty(key))
+	            Utils_1.throwError("Detected circular dependency a from '{0}' to '{1}'", Object.keys(deps).join(", "), key);
+	        // registered?
+	        var registration = this.registrations[key];
+	        if (registration === undefined)
+	            Utils_1.throwError("'{0}' is not registered", key);
+	        // already instantiated?
+	        if (registration.isSingleton && registration.value)
+	            return registration.value;
+	        // append current key
+	        var newDeps = {};
+	        newDeps[key] = true;
+	        Utils_1.extend(deps, newDeps);
+	        // create it
+	        var result = registration.factory(args, newDeps);
+	        // cache if singleton
+	        if (registration.isSingleton)
+	            registration.value = result;
+	        return result;
+	    };
+	    Injector.prototype.resolve = function (iaa, args) {
+	        var ctor = iaa.pop();
+	        if (!Utils_1.isFunction(ctor))
+	            Utils_1.throwError("Error resolving inline-annotated-array. Constructor must be of type 'function' but is '{0}", typeof ctor);
+	        var self = this;
+	        // resolve dependencies
+	        var resolved = iaa.map(function (x) {
+	            try {
+	                return self.get(x, undefined, iaa);
+	            }
+	            catch (e) {
+	                Utils_1.throwError("Error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
+	            }
+	        });
+	        // invoke constructor
+	        var _args = [null].concat(resolved).concat(args);
+	        var ctorFunc = ctor.bind.apply(ctor, _args);
+	        return new ctorFunc();
+	    };
+	    return Injector;
+	})();
+	exports.injector = new Injector();
+	exports.injector.register(res.injector, function () { return new Injector(); });
+	//# sourceMappingURL=Injector.js.map
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	exports.app = "app";
+	exports.injector = "injector";
+	exports.domManager = "domservice";
+	exports.router = "router";
+	exports.messageBus = "messageBus";
+	exports.expressionCompiler = "expressioncompiler";
+	exports.templateEngine = "templateEngine";
+	exports.httpClient = "httpClient";
+	exports.hasValueBindingValue = "has.bindings.value";
+	exports.valueBindingValue = "bindings.value";
+	//# sourceMappingURL=Resources.js.map
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
 	var IID_1 = __webpack_require__(5);
 	// NOTE: The factory method approach is necessary because it is  
 	// currently impossible to implement a Typescript interface 
@@ -1184,13 +1339,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Property.js.map
 
 /***/ },
-/* 9 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var Injector_1 = __webpack_require__(2);
+	var Injector_1 = __webpack_require__(8);
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(6);
+	var res = __webpack_require__(9);
 	"use strict";
 	var Module = (function () {
 	    function Module(name) {
@@ -1499,7 +1654,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Module.js.map
 
 /***/ },
-/* 10 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -2619,17 +2774,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ExpressionCompiler.js.map
 
 /***/ },
-/* 11 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var WeakMap_1 = __webpack_require__(12);
-	var Set_1 = __webpack_require__(14);
+	var WeakMap_1 = __webpack_require__(14);
+	var Set_1 = __webpack_require__(16);
 	var IID_1 = __webpack_require__(5);
-	var Injector_1 = __webpack_require__(2);
+	var Injector_1 = __webpack_require__(8);
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(6);
-	var env = __webpack_require__(15);
+	var res = __webpack_require__(9);
+	var env = __webpack_require__(17);
 	"use strict";
 	/**
 	* The heart of WebRx's binding-system
@@ -3134,12 +3289,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=DomManager.js.map
 
 /***/ },
-/* 12 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
-	var Oid_1 = __webpack_require__(13);
+	var Oid_1 = __webpack_require__(15);
 	"use strict";
 	/**
 	* This class emulates the semantics of a WeakMap.
@@ -3197,8 +3352,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=WeakMap.js.map
 
 /***/ },
-/* 13 */
-/***/ function(module, exports) {
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var oid = 1;
@@ -3232,12 +3387,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Oid.js.map
 
 /***/ },
-/* 14 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />
-	var Oid_1 = __webpack_require__(13);
+	var Oid_1 = __webpack_require__(15);
 	"use strict";
 	/**
 	* ES6 Set Shim
@@ -3324,10 +3479,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Set.js.map
 
 /***/ },
-/* 15 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var WeakMap_1 = __webpack_require__(12);
+	var WeakMap_1 = __webpack_require__(14);
 	"use strict";
 	var _window = window;
 	var userAgent = _window.navigator.userAgent;
@@ -3409,8 +3564,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Environment.js.map
 
 /***/ },
-/* 16 */
-/***/ function(module, exports) {
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -3526,12 +3681,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=HtmlTemplateEngine.js.map
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(18);
+	var Command_1 = __webpack_require__(20);
 	"use strict";
 	var CommandBinding = (function () {
 	    function CommandBinding(domManager, app) {
@@ -3636,14 +3791,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Command.js.map
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var IID_1 = __webpack_require__(5);
 	var Utils_1 = __webpack_require__(3);
-	var Injector_1 = __webpack_require__(2);
-	var res = __webpack_require__(6);
+	var Injector_1 = __webpack_require__(8);
+	var res = __webpack_require__(9);
 	"use strict";
 	var Command = (function () {
 	    /// <summary>
@@ -3861,12 +4016,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Command.js.map
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Module_1 = __webpack_require__(9);
+	var Module_1 = __webpack_require__(11);
 	"use strict";
 	var ModuleBinding = (function () {
 	    function ModuleBinding(domManager, app) {
@@ -3979,7 +4134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Module.js.map
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4155,7 +4310,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=If.js.map
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4165,7 +4320,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
-	var BindingBase_1 = __webpack_require__(22);
+	var BindingBase_1 = __webpack_require__(24);
 	"use strict";
 	var CssBinding = (function (_super) {
 	    __extends(CssBinding, _super);
@@ -4237,7 +4392,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=MultiOneWay.js.map
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4380,7 +4535,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=BindingBase.js.map
 
 /***/ },
-/* 23 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -4390,7 +4545,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
-	var BindingBase_1 = __webpack_require__(22);
+	var BindingBase_1 = __webpack_require__(24);
 	"use strict";
 	////////////////////
 	// Bindings
@@ -4491,15 +4646,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=SingleOneWay.js.map
 
 /***/ },
-/* 24 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../RxExtensions.d.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var VirtualChildNodes_1 = __webpack_require__(25);
-	var RefCountDisposeWrapper_1 = __webpack_require__(26);
-	var Injector_1 = __webpack_require__(2);
-	var ListSupport_1 = __webpack_require__(27);
+	var VirtualChildNodes_1 = __webpack_require__(27);
+	var RefCountDisposeWrapper_1 = __webpack_require__(28);
+	var Injector_1 = __webpack_require__(8);
+	var ListSupport_1 = __webpack_require__(29);
 	"use strict";
 	var ForEachBinding = (function () {
 	    function ForEachBinding(domManager, app) {
@@ -4900,8 +5055,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ForEach.js.map
 
 /***/ },
-/* 25 */
-/***/ function(module, exports) {
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/**
@@ -5000,8 +5155,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=VirtualChildNodes.js.map
 
 /***/ },
-/* 26 */
-/***/ function(module, exports) {
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	"use strict";
@@ -5031,12 +5186,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=RefCountDisposeWrapper.js.map
 
 /***/ },
-/* 27 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var List_1 = __webpack_require__(28);
-	var ListPaged_1 = __webpack_require__(31);
+	var List_1 = __webpack_require__(30);
+	var ListPaged_1 = __webpack_require__(33);
 	"use strict";
 	/**
 	* Determines if target is an instance of a IObservableList
@@ -5052,7 +5207,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ListSupport.js.map
 
 /***/ },
-/* 28 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5062,16 +5217,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Utils_1 = __webpack_require__(3);
-	var Oid_1 = __webpack_require__(13);
+	var Oid_1 = __webpack_require__(15);
 	var IID_1 = __webpack_require__(5);
-	var Lazy_1 = __webpack_require__(29);
-	var ScheduledSubject_1 = __webpack_require__(30);
+	var Lazy_1 = __webpack_require__(31);
+	var ScheduledSubject_1 = __webpack_require__(32);
 	var Events_1 = __webpack_require__(4);
-	var RefCountDisposeWrapper_1 = __webpack_require__(26);
+	var RefCountDisposeWrapper_1 = __webpack_require__(28);
 	var log = __webpack_require__(7);
-	var Injector_1 = __webpack_require__(2);
-	var res = __webpack_require__(6);
-	var ListPaged_1 = __webpack_require__(31);
+	var Injector_1 = __webpack_require__(8);
+	var res = __webpack_require__(9);
+	var ListPaged_1 = __webpack_require__(33);
 	"use strict";
 	/**
 	* ReactiveUI's awesome ReactiveList ported to Typescript
@@ -6125,8 +6280,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=List.js.map
 
 /***/ },
-/* 29 */
-/***/ function(module, exports) {
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/**
@@ -6155,7 +6310,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Lazy.js.map
 
 /***/ },
-/* 30 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Utils_1 = __webpack_require__(3);
@@ -6209,15 +6364,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ScheduledSubject.js.map
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var IID_1 = __webpack_require__(5);
-	var Lazy_1 = __webpack_require__(29);
-	var ScheduledSubject_1 = __webpack_require__(30);
-	var Property_1 = __webpack_require__(8);
+	var Lazy_1 = __webpack_require__(31);
+	var ScheduledSubject_1 = __webpack_require__(32);
+	var Property_1 = __webpack_require__(10);
 	"use strict";
 	var PagedObservableListProjection = (function () {
 	    function PagedObservableListProjection(source, pageSize, currentPage, scheduler) {
@@ -6565,12 +6720,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ListPaged.js.map
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(18);
+	var Command_1 = __webpack_require__(20);
 	"use strict";
 	var EventBinding = (function () {
 	    function EventBinding(domManager, app) {
@@ -6662,12 +6817,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Event.js.map
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var res = __webpack_require__(6);
+	var res = __webpack_require__(9);
 	"use strict";
 	var ValueBinding = (function () {
 	    function ValueBinding(domManager, app) {
@@ -6816,161 +6971,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Value.js.map
 
 /***/ },
-/* 34 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var Utils_1 = __webpack_require__(3);
-	var BindingSupport_1 = __webpack_require__(35);
-	"use strict";
-	var HasFocusBinding = (function () {
-	    function HasFocusBinding(domManager, app) {
-	        this.priority = -1;
-	        this.domManager = domManager;
-	        this.app = app;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    HasFocusBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("hasFocus-binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("invalid binding-options!");
-	        var el = node;
-	        var prop;
-	        var cleanup;
-	        var compiled = this.domManager.compileBindingOptions(options, module);
-	        var exp;
-	        var delay = 0;
-	        if (typeof compiled === "object" && compiled.hasOwnProperty("property")) {
-	            var opt = compiled;
-	            exp = opt.property;
-	            delay = this.domManager.evaluateExpression(opt.delay, ctx);
-	            // convert boolean to number
-	            if (typeof delay === "boolean")
-	                delay = delay ? 1 : 0;
-	        }
-	        else {
-	            exp = compiled;
-	        }
-	        function doCleanup() {
-	            if (cleanup) {
-	                cleanup.dispose();
-	                cleanup = null;
-	            }
-	        }
-	        function handleElementFocusChange(isFocused) {
-	            // wx.If possible, ignore which event was raised and determine focus state using activeElement,
-	            // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
-	            var ownerDoc = el.ownerDocument;
-	            if ("activeElement" in ownerDoc) {
-	                var active;
-	                try {
-	                    active = ownerDoc.activeElement;
-	                }
-	                catch (e) {
-	                    // wx.IE9 throws if you access activeElement during page load (see issue #703)
-	                    active = ownerDoc.body;
-	                }
-	                isFocused = (active === el);
-	            }
-	            prop(isFocused);
-	        }
-	        function updateElement(value) {
-	            if (value) {
-	                // Note: wx.If the element is currently hidden, we schedule the focus change
-	                // to occur "soonish". Technically this is a hack because it hides the fact
-	                // that we make tricky assumption about the presence of a "visible" binding 
-	                // on the same element who's subscribe handler runs after us 
-	                if (delay === 0 && el.style.display !== 'none') {
-	                    el.focus();
-	                }
-	                else {
-	                    Rx.Observable.timer(delay).subscribe(function () {
-	                        el.focus();
-	                    });
-	                }
-	            }
-	            else {
-	                el.blur();
-	            }
-	        }
-	        // options is supposed to be a @propref
-	        state.cleanup.add(this.domManager.expressionToObservable(exp, ctx).subscribe(function (model) {
-	            try {
-	                if (!Utils_1.isProperty(model)) {
-	                    BindingSupport_1.emitPropRefHint("HasFocus", options);
-	                    // initial and final update
-	                    updateElement(model);
-	                }
-	                else {
-	                    doCleanup();
-	                    cleanup = new Rx.CompositeDisposable();
-	                    // update on property change
-	                    prop = model;
-	                    cleanup.add(prop.changed.subscribe(function (x) {
-	                        updateElement(x);
-	                    }));
-	                    // initial update
-	                    updateElement(prop());
-	                    // don't attempt to updated computed properties
-	                    if (!prop.source) {
-	                        cleanup.add(Rx.Observable.merge(_this.getFocusEventObservables(el)).subscribe(function (hasFocus) {
-	                            handleElementFocusChange(hasFocus);
-	                        }));
-	                    }
-	                }
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            el = null;
-	            // nullify locals
-	            doCleanup();
-	        }));
-	    };
-	    HasFocusBinding.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    HasFocusBinding.prototype.getFocusEventObservables = function (el) {
-	        var result = [];
-	        result.push(Rx.Observable.fromEvent(el, 'focus').select(function (x) { return true; }));
-	        result.push(Rx.Observable.fromEvent(el, 'focusin').select(function (x) { return true; }));
-	        result.push(Rx.Observable.fromEvent(el, 'blur').select(function (x) { return false; }));
-	        result.push(Rx.Observable.fromEvent(el, 'focusout').select(function (x) { return false; }));
-	        return result;
-	    };
-	    return HasFocusBinding;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = HasFocusBinding;
-	//# sourceMappingURL=HasFocus.js.map
-
-/***/ },
-/* 35 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var log = __webpack_require__(7);
-	"use strict";
-	function emitPropRefHint(bindingName, bindingString) {
-	    var msg = bindingName + "-Binding: You have passed a property instead of a propRef to a Two-Way binding. This is most likely not what you want because the binding won't be able to update your model when your view changes - Solution: Prefix your property with an @-symbol - Binding-Expression [\"" + bindingString + "\"]";
-	    log.hint(msg);
-	}
-	exports.emitPropRefHint = emitPropRefHint;
-	//# sourceMappingURL=BindingSupport.js.map
-
-/***/ },
 /* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -7040,7 +7040,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var BindingSupport_1 = __webpack_require__(35);
+	var BindingSupport_1 = __webpack_require__(6);
 	"use strict";
 	var CheckedBinding = (function () {
 	    function CheckedBinding(domManager, app) {
@@ -7144,7 +7144,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(18);
+	var Command_1 = __webpack_require__(20);
 	"use strict";
 	var keysByCode = {
 	    8: 'backspace',
@@ -7305,8 +7305,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var env = __webpack_require__(15);
-	var BindingSupport_1 = __webpack_require__(35);
+	var env = __webpack_require__(17);
+	var BindingSupport_1 = __webpack_require__(6);
 	"use strict";
 	var TextInputBinding = (function () {
 	    function TextInputBinding(domManager, app) {
@@ -7460,9 +7460,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Value_1 = __webpack_require__(33);
-	var ListSupport_1 = __webpack_require__(27);
-	var BindingSupport_1 = __webpack_require__(35);
+	var Value_1 = __webpack_require__(35);
+	var ListSupport_1 = __webpack_require__(29);
+	var BindingSupport_1 = __webpack_require__(6);
 	"use strict";
 	var impls = new Array();
 	var RadioSingleSelectionImpl = (function () {
@@ -7717,12 +7717,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (component.viewModel) {
 	                        if (Utils_1.isDisposable(component.viewModel)) {
 	                            cleanup.add(component.viewModel);
-	                        }
-	                        else if (!Utils_1.isPrimitive(component.viewModel)) {
-	                            cleanup.add(Rx.Disposable.create(function () {
-	                                return Utils_1.disposeMembers(component.viewModel);
-	                            }));
-	                        }
+	                        } /* else if(!isPrimitive(component.viewModel)) {
+	                            cleanup.add(Rx.Disposable.create(()=>
+	                                disposeMembers(component.viewModel)));
+	                        } */
 	                    }
 	                    // done
 	                    _this.applyTemplate(component, el, ctx, state, component.template, component.viewModel);
@@ -8356,7 +8354,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Property_1 = __webpack_require__(8);
+	var Property_1 = __webpack_require__(10);
 	var RouteMatcher_1 = __webpack_require__(48);
 	"use strict";
 	var Router = (function () {
@@ -8918,7 +8916,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var ScheduledSubject_1 = __webpack_require__(30);
+	var ScheduledSubject_1 = __webpack_require__(32);
 	// ReactiveUI's MessageBus
 	"use strict";
 	var MessageBus = (function () {
@@ -8965,7 +8963,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 50 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	/**
@@ -9129,7 +9127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 51 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	exports.version = '1.4.1';
 	//# sourceMappingURL=Version.js.map
@@ -9142,9 +9140,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _this = this;
 	var Utils_1 = __webpack_require__(3);
 	var IID_1 = __webpack_require__(5);
-	var ScheduledSubject_1 = __webpack_require__(30);
-	var Injector_1 = __webpack_require__(2);
-	var res = __webpack_require__(6);
+	var ScheduledSubject_1 = __webpack_require__(32);
+	var Injector_1 = __webpack_require__(8);
+	var res = __webpack_require__(9);
 	"use strict";
 	var RxObsConstructor = Rx.Observable; // this hack is neccessary because the .d.ts for RxJs declares Observable as an interface)
 	/**
@@ -9443,7 +9441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 54 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 	/// <reference path="../Interfaces.ts" />

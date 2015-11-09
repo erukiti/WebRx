@@ -89,10 +89,10 @@ export default class ComponentBinding implements wx.IBindingHandler {
                     if (component.viewModel) {
                         if (isDisposable(component.viewModel)) {
                             cleanup.add(component.viewModel);
-                        } else if(!isPrimitive(component.viewModel)) {
+                        } /* else if(!isPrimitive(component.viewModel)) {
                             cleanup.add(Rx.Disposable.create(()=> 
                                 disposeMembers(component.viewModel)));
-                        }
+                        } */
                     }
 
                     // done

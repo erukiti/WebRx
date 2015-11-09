@@ -450,6 +450,7 @@ describe('Bindings', () => {
             expect(disposed).toBeTruthy();
         });
 
+/*
         it("Disposes a component viewmodel's members if the viewmodel itself is not disposable",() => {
             loadFixtures('templates/Bindings/Component.html');
 
@@ -473,5 +474,6 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             expect(disposed).toBeTruthy();
         });
+*/        
     });
 });
