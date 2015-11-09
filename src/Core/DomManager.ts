@@ -2,6 +2,7 @@
 
 import { createWeakMap } from "../Collections/WeakMap"
 import { createSet, setToArray } from "../Collections/Set"
+import { createMap } from "../Collections/Map"
 import IID from "../IID"
 import { injector } from "./Injector"
 import { extend, observableRequire, isInUnitTest, args2Array, isFunction, throwError, isRxObservable, queryInterface, isProperty } from "../Core/Utils"
@@ -269,9 +270,26 @@ export class DomManager implements wx.IDomManager {
         }
 
         let obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
+            // associate observables with subscriptions
+            let obs2Disp = createMap<Rx.Observable<any>, Rx.IDisposable>();
+            let obs2Replay = createMap<Rx.Observable<any>, Rx.Observable<any>>();
+            
             let innerDisp = Rx.Observable.defer(() => {
-                let sources = setToArray(captured).map(x=> x.replay(null, 1));
-                sources.forEach(x=> x.connect());
+                // We have to make sure that we don't miss any values emitted
+                // by dependent observables during the brief timespan when this
+                // inner observable re-subscribes. Therefore we map all captured
+                // observables to pre-connected replay-versions 
+                let sources = setToArray(captured).map(x=> {
+                    let replay = obs2Replay.get(x);
+                    
+                    if(replay == null) {
+                        replay = obs.replay(null, 1);
+                        obs2Replay.set(x, replay);
+                        obs2Disp.set(x, (<Rx.ConnectableObservable<any>> replay).connect());
+                    }
+                    
+                    return replay;        
+                });
                 
                 // construct observable that represents the first change of any of the expression's dependencies
                 return Rx.Observable.merge(sources).take(1);
@@ -279,9 +297,18 @@ export class DomManager implements wx.IDomManager {
             .repeat()
             .subscribe(trigger => {
                 try {
-                    // reset execution state before evaluation
-                    captured.clear();
-                    locals = this.createLocals(captured, ctx);
+                    let capturedNew = createSet<Rx.Observable<any>>();
+                    locals = this.createLocals(capturedNew, ctx);
+
+                    // house-keeping: let go of unused observables
+                    setToArray(captured).filter(x=> !capturedNew.has(x)).forEach(x=> {
+                        obs2Disp.get(x).dispose();
+                        obs2Disp.delete(x);
+                        obs2Replay.delete(x);
+                    });
+                    
+                    // add new ones
+                    capturedNew.forEach(x=> captured.add(x));
 
                     // evaluate and produce next value
                     result = exp(ctx.$data, locals);
@@ -301,7 +328,16 @@ export class DomManager implements wx.IDomManager {
                 }
             });
 
-            return innerDisp;
+            return Rx.Disposable.create(()=> {
+                innerDisp.dispose();
+                
+                // dispose subscriptions
+                captured.forEach(x=> obs2Disp.get(x).dispose());
+                
+                // cleanup
+                obs2Disp.clear();
+                obs2Replay.clear();
+            });
         });
 
         // prefix with initial result
