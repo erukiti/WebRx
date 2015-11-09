@@ -485,12 +485,12 @@ export class DomManager implements wx.IDomManager {
                 if (!noUnwrap && isProperty(result)) {
                     let prop = <wx.IObservableProperty<any>> result;
 
+                    // get the property's real value
+                    result = prop();
+
                     // register observable
                     if (captured)
                         captured.add(prop.changed);
-
-                    // get the property's real value
-                    result = prop();
                 }
 
                 return result;
@@ -539,12 +539,12 @@ export class DomManager implements wx.IDomManager {
                 if (isProperty(result)) {
                     let prop = <wx.IObservableProperty<any>> result;
 
+                    // get the property's real value
+                    result = prop();
+
                     // register observable
                     if (captured)
                         captured.add(prop.changed);
-
-                    // get the property's real value
-                    result = prop();
                 }
 
                 return result;
