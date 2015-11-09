@@ -526,6 +526,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.getOwnPropertiesImplementingInterface = getOwnPropertiesImplementingInterface;
 	/**
+	* Disposes all disposable members of an object
+	* @param {any} target
+	*/
+	function disposeMembers(target) {
+	    Object.keys(target).filter(function (propertyName) {
+	        var disp = target[propertyName];
+	        return disp != null && isFunction(disp.dispose);
+	    })
+	        .map(function (propertyName) { return target[propertyName]; })
+	        .forEach(function (disp) { return disp.dispose(); });
+	}
+	exports.disposeMembers = disposeMembers;
+	/**
 	* Determines if target is an instance of a IObservableProperty
 	* @param {any} target
 	*/
@@ -7704,6 +7717,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    if (component.viewModel) {
 	                        if (Utils_1.isDisposable(component.viewModel)) {
 	                            cleanup.add(component.viewModel);
+	                        }
+	                        else if (!Utils_1.isPrimitive(component.viewModel)) {
+	                            cleanup.add(Rx.Disposable.create(function () {
+	                                return Utils_1.disposeMembers(component.viewModel);
+	                            }));
 	                        }
 	                    }
 	                    // done

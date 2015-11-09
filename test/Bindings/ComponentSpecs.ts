@@ -425,5 +425,53 @@ describe('Bindings', () => {
             expect(__this).toBe(vm);
             expect(elementArg).toBeTruthy();
         });
+
+        it("Disposes a component's viewmodel if it's disposable",() => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = '<span>foo</span>';
+            let disposed = false;
+            
+            function vm() {
+                this.dispose = ()=> disposed = true;    
+            }
+
+            wx.app.component("test1", {
+                template: template,
+                viewModel: vm
+            });
+
+            expect(disposed).toBeFalsy();
+
+            var el = <HTMLElement> document.querySelector("#fixture1");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            wx.cleanNode(el);
+            expect(disposed).toBeTruthy();
+        });
+
+        it("Disposes a component viewmodel's members if the viewmodel itself is not disposable",() => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var template = '<span>foo</span>';
+            let disposed = false;
+
+            function vm() {
+                this.disposable = Rx.Disposable.create(()=> disposed = true);    
+            }
+            
+            wx.app.component("test1", {
+                template: template,
+                viewModel: vm
+            });
+
+            expect(disposed).toBeFalsy();
+
+            var el = <HTMLElement> document.querySelector("#fixture1");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            wx.cleanNode(el);
+            expect(disposed).toBeTruthy();
+        });
     });
 });

@@ -1,7 +1,7 @@
 ﻿/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, throwError, formatString, cloneNodeArray, noop, isDisposable } from "../Core/Utils"
+import { extend, isInUnitTest, args2Array, isFunction, throwError, formatString, cloneNodeArray, noop, isDisposable, disposeMembers, isPrimitive } from "../Core/Utils"
 
 "use strict";
 
@@ -89,6 +89,9 @@ export default class ComponentBinding implements wx.IBindingHandler {
                     if (component.viewModel) {
                         if (isDisposable(component.viewModel)) {
                             cleanup.add(component.viewModel);
+                        } else if(!isPrimitive(component.viewModel)) {
+                            cleanup.add(Rx.Disposable.create(()=> 
+                                disposeMembers(component.viewModel)));
                         }
                     }
 

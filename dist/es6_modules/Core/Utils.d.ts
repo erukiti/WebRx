@@ -21,6 +21,11 @@ export declare function queryInterface(target: any, iid: string): boolean;
 */
 export declare function getOwnPropertiesImplementingInterface<T>(target: any, iid: string): PropertyInfo<T>[];
 /**
+* Disposes all disposable members of an object
+* @param {any} target
+*/
+export declare function disposeMembers<T>(target: any): void;
+/**
 * Determines if target is an instance of a IObservableProperty
 * @param {any} target
 */

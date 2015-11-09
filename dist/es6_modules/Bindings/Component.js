@@ -1,5 +1,5 @@
 /// <reference path="../Interfaces.ts" />
-import { isFunction, throwError, isDisposable } from "../Core/Utils";
+import { isFunction, throwError, isDisposable, disposeMembers, isPrimitive } from "../Core/Utils";
 "use strict";
 export default class ComponentBinding {
     constructor(domManager, app) {
@@ -76,6 +76,9 @@ export default class ComponentBinding {
                     if (component.viewModel) {
                         if (isDisposable(component.viewModel)) {
                             cleanup.add(component.viewModel);
+                        }
+                        else if (!isPrimitive(component.viewModel)) {
+                            cleanup.add(Rx.Disposable.create(() => disposeMembers(component.viewModel)));
                         }
                     }
                     // done

@@ -48,6 +48,18 @@ export function getOwnPropertiesImplementingInterface(target, iid) {
     }).map(x => new PropertyInfo(x, target[x]));
 }
 /**
+* Disposes all disposable members of an object
+* @param {any} target
+*/
+export function disposeMembers(target) {
+    Object.keys(target).filter(propertyName => {
+        var disp = target[propertyName];
+        return disp != null && isFunction(disp.dispose);
+    })
+        .map(propertyName => target[propertyName])
+        .forEach(disp => disp.dispose());
+}
+/**
 * Determines if target is an instance of a IObservableProperty
 * @param {any} target
 */
