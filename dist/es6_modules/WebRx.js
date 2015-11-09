@@ -1,4 +1,4 @@
-// WebRx's API-Surface
+// WebRx Complete API-Surface
 export { app, router, messageBus } from "./App";
 export { module } from "./Core/Module";
 export * from "./Core/Utils";

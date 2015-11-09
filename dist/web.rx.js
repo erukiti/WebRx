@@ -54,10 +54,10 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// WebRx's API-Surface
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
+	// WebRx Complete API-Surface
 	var App_1 = __webpack_require__(1);
 	exports.app = App_1.app;
 	exports.router = App_1.router;
@@ -3134,7 +3134,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var i = 0; i < length_1; i++) {
 	                var child = node.childNodes[i];
 	                // only elements
-	                if (node.nodeType !== 1)
+	                if (child.nodeType !== 1)
 	                    continue;
 	                this.cleanNodeRecursive(child);
 	            }

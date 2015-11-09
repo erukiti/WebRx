@@ -451,7 +451,7 @@ export class DomManager implements wx.IDomManager {
                 let child = node.childNodes[i];
 
                 // only elements
-                if (node.nodeType !== 1)
+                if (child.nodeType !== 1)
                     continue;
 
                 this.cleanNodeRecursive(child);
