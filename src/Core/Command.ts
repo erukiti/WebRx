@@ -17,7 +17,7 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
         this.func = executeAsync;
 
         // setup canExecute
-        this.canExecuteObs = canExecute
+        let canExecuteObs = canExecute
             .combineLatest(this.isExecutingSubject.startWith(false),(ce, ie) => ce && !ie)
             .catch(ex => {
                 this.exceptionsSubject.onNext(ex);
@@ -26,9 +26,12 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
             .do(x => {
                 this.canExecuteLatest = x;
             })
+            .startWith(this.canExecuteLatest)
+            .distinctUntilChanged()
             .publish();
-
-        this.canExecuteObs.connect();
+            
+        this.canExecuteDisp = canExecuteObs.connect();
+        this.canExecuteObservable = canExecuteObs;
 
         // setup thrownExceptions
         this.exceptionsSubject = new Rx.Subject<Error>();
@@ -58,23 +61,7 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     ////////////////////
     /// wx.ICommand
 
-    public get canExecuteObservable(): Rx.Observable<boolean> {
-        // setup canExecuteObservable
-        let ret = this.canExecuteObs.startWith(this.canExecuteLatest).distinctUntilChanged();
-
-        if (this.canExecuteDisp != null)
-            return ret;
-
-        return Rx.Observable.create<boolean>(subj => {
-            let disp = ret.subscribe(subj);
-
-            // NB: We intentionally leak the CanExecute disconnect, it's
-            // cleaned up by the global Dispose. This is kind of a
-            // "Lazy Subscription" to CanExecute by the command itself.
-            this.canExecuteDisp = this.canExecuteObs.connect();
-            return disp;
-        });
-    }
+    public canExecuteObservable: Rx.Observable<boolean>;
 
     public get isExecuting(): Rx.Observable<boolean> {
         return this.isExecutingSubject.startWith(this.inflightCount > 0);
@@ -87,9 +74,6 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     public thrownExceptions: Rx.Observable<Error>;
 
     public canExecute(parameter): boolean {
-        if (this.canExecuteDisp == null)
-            this.canExecuteDisp = this.canExecuteObs.connect();
-
         return this.canExecuteLatest;
     }
 
@@ -142,8 +126,7 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     private exceptionsSubject: Rx.Subject<Error>; // ScheduledSubject<Exception>;
     private inflightCount = 0;
     private canExecuteLatest = false;
-    private canExecuteObs: Rx.ConnectableObservable<boolean>;
-    private canExecuteDisp: Rx.IDisposable = null;
+    private canExecuteDisp: Rx.IDisposable;
 }
 
 export module internal {
@@ -288,51 +271,6 @@ export function asyncCommand<T>(): wx.ICommand<T> {
     scheduler = isRxScheduler(args[0]) ? args.shift() : undefined;
 
     return new Command<T>(canExecute, executeAsync, scheduler);
-}
-
-/**
-* This creates a Command that calls several child Commands when invoked. Its canExecute will match the combined result of the child canExecutes (i.e. if any child commands cannot execute, neither can the parent)
-* @param {(any) => Rx.Observable<T>} commands The commands to combine
-* @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
-* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
-*/
-export function combinedCommand(canExecute: Rx.Observable<boolean>, ...commands:wx.ICommand<any>[]): wx.ICommand<any>;
-
-/**
-* This creates a Command that calls several child Commands when invoked. Its canExecute will match the combined result of the child canExecutes (i.e. if any child commands cannot execute, neither can the parent)
-* @param {(any) => Rx.Observable<T>} commands The commands to combine
-* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
-*/
-export function combinedCommand(...commands: wx.ICommand<any>[]): wx.ICommand<any>;
-
-// factory method implementation
-export function combinedCommand<T>(): wx.ICommand<any> {
-    let args = args2Array(arguments);
-
-    let commands: wx.ICommand<any>[] = args
-        .filter(x=> isCommand(x));
-
-    let canExecute: Rx.Observable<boolean> = args
-        .filter(x => isRxObservable(x))
-        .pop();
-
-    if (!canExecute)
-        canExecute = Rx.Observable.return(true);
-
-    let childrenCanExecute = Rx.Observable.combineLatest(commands.map(x => x.canExecuteObservable),
-        (...latestCanExecute:boolean[]) => latestCanExecute.every(x => x));
-
-    let canExecuteSum = Rx.Observable.combineLatest(
-        canExecute.startWith(true),
-        childrenCanExecute,
-        (parent, child) => parent && child);
-
-    let ret = command(canExecuteSum);
-    ret.results.subscribe(x => commands.forEach(cmd => {
-        cmd.execute(x);
-    }));
-
-    return ret;
 }
 
 /**

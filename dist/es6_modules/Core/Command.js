@@ -13,11 +13,10 @@ export class Command {
         this.isExecutingSubject = new Rx.Subject();
         this.inflightCount = 0;
         this.canExecuteLatest = false;
-        this.canExecuteDisp = null;
         this.scheduler = scheduler || injector.get(res.app).mainThreadScheduler;
         this.func = executeAsync;
         // setup canExecute
-        this.canExecuteObs = canExecute
+        let canExecuteObs = canExecute
             .combineLatest(this.isExecutingSubject.startWith(false), (ce, ie) => ce && !ie)
             .catch(ex => {
             this.exceptionsSubject.onNext(ex);
@@ -26,8 +25,11 @@ export class Command {
             .do(x => {
             this.canExecuteLatest = x;
         })
+            .startWith(this.canExecuteLatest)
+            .distinctUntilChanged()
             .publish();
-        this.canExecuteObs.connect();
+        this.canExecuteDisp = canExecuteObs.connect();
+        this.canExecuteObservable = canExecuteObs;
         // setup thrownExceptions
         this.exceptionsSubject = new Rx.Subject();
         this.thrownExceptions = this.exceptionsSubject.asObservable();
@@ -47,22 +49,6 @@ export class Command {
         if (disp != null)
             disp.dispose();
     }
-    ////////////////////
-    /// wx.ICommand
-    get canExecuteObservable() {
-        // setup canExecuteObservable
-        let ret = this.canExecuteObs.startWith(this.canExecuteLatest).distinctUntilChanged();
-        if (this.canExecuteDisp != null)
-            return ret;
-        return Rx.Observable.create(subj => {
-            let disp = ret.subscribe(subj);
-            // NB: We intentionally leak the CanExecute disconnect, it's
-            // cleaned up by the global Dispose. This is kind of a
-            // "Lazy Subscription" to CanExecute by the command itself.
-            this.canExecuteDisp = this.canExecuteObs.connect();
-            return disp;
-        });
-    }
     get isExecuting() {
         return this.isExecutingSubject.startWith(this.inflightCount > 0);
     }
@@ -70,8 +56,6 @@ export class Command {
         return this.resultsSubject.asObservable();
     }
     canExecute(parameter) {
-        if (this.canExecuteDisp == null)
-            this.canExecuteDisp = this.canExecuteObs.connect();
         return this.canExecuteLatest;
     }
     execute(parameter) {
@@ -160,24 +144,6 @@ export function asyncCommand() {
     executeAsync = args.shift();
     scheduler = isRxScheduler(args[0]) ? args.shift() : undefined;
     return new Command(canExecute, executeAsync, scheduler);
-}
-// factory method implementation
-export function combinedCommand() {
-    let args = args2Array(arguments);
-    let commands = args
-        .filter(x => isCommand(x));
-    let canExecute = args
-        .filter(x => isRxObservable(x))
-        .pop();
-    if (!canExecute)
-        canExecute = Rx.Observable.return(true);
-    let childrenCanExecute = Rx.Observable.combineLatest(commands.map(x => x.canExecuteObservable), (...latestCanExecute) => latestCanExecute.every(x => x));
-    let canExecuteSum = Rx.Observable.combineLatest(canExecute.startWith(true), childrenCanExecute, (parent, child) => parent && child);
-    let ret = command(canExecuteSum);
-    ret.results.subscribe(x => commands.forEach(cmd => {
-        cmd.execute(x);
-    }));
-    return ret;
 }
 /**
 * Determines if target is an instance of a ICommand

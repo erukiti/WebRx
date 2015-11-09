@@ -18,9 +18,6 @@ function toProperty(initialValue, scheduler) {
         if (arguments.length > 0) {
             throwError("attempt to write to a read-only observable property");
         }
-        if (accessor.sub == null) {
-            accessor.sub = accessor._source.connect();
-        }
         return accessor.value;
     };
     //////////////////////////////////

@@ -15,7 +15,7 @@ export declare class PagedObservableListProjection<T> implements wx.IObservableP
     shouldReset: Rx.Observable<any>;
     suppressChangeNotifications(): Rx.IDisposable;
     dispose(): void;
-    private source;
+    source: wx.IObservableReadOnlyList<T>;
     private disp;
     private changeNotificationsSuppressed;
     private resetSubject;

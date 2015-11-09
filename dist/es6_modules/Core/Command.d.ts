@@ -18,7 +18,6 @@ export declare class Command<T> implements wx.ICommand<T>, wx.IUnknown {
     private exceptionsSubject;
     private inflightCount;
     private canExecuteLatest;
-    private canExecuteObs;
     private canExecuteDisp;
 }
 export declare module internal {
@@ -88,19 +87,6 @@ export declare function asyncCommand<T>(executeAsync: (any) => Rx.Observable<T>,
 * @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
 */
 export declare function asyncCommand<T>(executeAsync: (any) => Rx.Observable<T>, thisArg?: any): wx.ICommand<T>;
-/**
-* This creates a Command that calls several child Commands when invoked. Its canExecute will match the combined result of the child canExecutes (i.e. if any child commands cannot execute, neither can the parent)
-* @param {(any) => Rx.Observable<T>} commands The commands to combine
-* @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
-* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
-*/
-export declare function combinedCommand(canExecute: Rx.Observable<boolean>, ...commands: wx.ICommand<any>[]): wx.ICommand<any>;
-/**
-* This creates a Command that calls several child Commands when invoked. Its canExecute will match the combined result of the child canExecutes (i.e. if any child commands cannot execute, neither can the parent)
-* @param {(any) => Rx.Observable<T>} commands The commands to combine
-* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
-*/
-export declare function combinedCommand(...commands: wx.ICommand<any>[]): wx.ICommand<any>;
 /**
 * Determines if target is an instance of a ICommand
 * @param {any} target

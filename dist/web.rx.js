@@ -73,7 +73,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Command_1 = __webpack_require__(20);
 	exports.command = Command_1.command;
 	exports.asyncCommand = Command_1.asyncCommand;
-	exports.combinedCommand = Command_1.combinedCommand;
 	exports.isCommand = Command_1.isCommand;
 	var Animation_1 = __webpack_require__(53);
 	exports.animation = Animation_1.animation;
@@ -3810,11 +3809,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.isExecutingSubject = new Rx.Subject();
 	        this.inflightCount = 0;
 	        this.canExecuteLatest = false;
-	        this.canExecuteDisp = null;
 	        this.scheduler = scheduler || Injector_1.injector.get(res.app).mainThreadScheduler;
 	        this.func = executeAsync;
 	        // setup canExecute
-	        this.canExecuteObs = canExecute
+	        var canExecuteObs = canExecute
 	            .combineLatest(this.isExecutingSubject.startWith(false), function (ce, ie) { return ce && !ie; })
 	            .catch(function (ex) {
 	            _this.exceptionsSubject.onNext(ex);
@@ -3823,8 +3821,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .do(function (x) {
 	            _this.canExecuteLatest = x;
 	        })
+	            .startWith(this.canExecuteLatest)
+	            .distinctUntilChanged()
 	            .publish();
-	        this.canExecuteObs.connect();
+	        this.canExecuteDisp = canExecuteObs.connect();
+	        this.canExecuteObservable = canExecuteObs;
 	        // setup thrownExceptions
 	        this.exceptionsSubject = new Rx.Subject();
 	        this.thrownExceptions = this.exceptionsSubject.asObservable();
@@ -3844,27 +3845,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (disp != null)
 	            disp.dispose();
 	    };
-	    Object.defineProperty(Command.prototype, "canExecuteObservable", {
-	        ////////////////////
-	        /// wx.ICommand
-	        get: function () {
-	            var _this = this;
-	            // setup canExecuteObservable
-	            var ret = this.canExecuteObs.startWith(this.canExecuteLatest).distinctUntilChanged();
-	            if (this.canExecuteDisp != null)
-	                return ret;
-	            return Rx.Observable.create(function (subj) {
-	                var disp = ret.subscribe(subj);
-	                // NB: We intentionally leak the CanExecute disconnect, it's
-	                // cleaned up by the global Dispose. This is kind of a
-	                // "Lazy Subscription" to CanExecute by the command itself.
-	                _this.canExecuteDisp = _this.canExecuteObs.connect();
-	                return disp;
-	            });
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
 	    Object.defineProperty(Command.prototype, "isExecuting", {
 	        get: function () {
 	            return this.isExecutingSubject.startWith(this.inflightCount > 0);
@@ -3880,8 +3860,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        configurable: true
 	    });
 	    Command.prototype.canExecute = function (parameter) {
-	        if (this.canExecuteDisp == null)
-	            this.canExecuteDisp = this.canExecuteObs.connect();
 	        return this.canExecuteLatest;
 	    };
 	    Command.prototype.execute = function (parameter) {
@@ -3977,31 +3955,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return new Command(canExecute, executeAsync, scheduler);
 	}
 	exports.asyncCommand = asyncCommand;
-	// factory method implementation
-	function combinedCommand() {
-	    var args = Utils_1.args2Array(arguments);
-	    var commands = args
-	        .filter(function (x) { return isCommand(x); });
-	    var canExecute = args
-	        .filter(function (x) { return Utils_1.isRxObservable(x); })
-	        .pop();
-	    if (!canExecute)
-	        canExecute = Rx.Observable.return(true);
-	    var childrenCanExecute = Rx.Observable.combineLatest(commands.map(function (x) { return x.canExecuteObservable; }), function () {
-	        var latestCanExecute = [];
-	        for (var _i = 0; _i < arguments.length; _i++) {
-	            latestCanExecute[_i - 0] = arguments[_i];
-	        }
-	        return latestCanExecute.every(function (x) { return x; });
-	    });
-	    var canExecuteSum = Rx.Observable.combineLatest(canExecute.startWith(true), childrenCanExecute, function (parent, child) { return parent && child; });
-	    var ret = command(canExecuteSum);
-	    ret.results.subscribe(function (x) { return commands.forEach(function (cmd) {
-	        cmd.execute(x);
-	    }); });
-	    return ret;
-	}
-	exports.combinedCommand = combinedCommand;
 	/**
 	* Determines if target is an instance of a ICommand
 	* @param {any} target
@@ -9156,9 +9109,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var accessor = function propertyAccessor(newVal) {
 	        if (arguments.length > 0) {
 	            Utils_1.throwError("attempt to write to a read-only observable property");
-	        }
-	        if (accessor.sub == null) {
-	            accessor.sub = accessor._source.connect();
 	        }
 	        return accessor.value;
 	    };

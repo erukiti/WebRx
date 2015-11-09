@@ -250,6 +250,7 @@ declare module wx {
     * @interface
     **/
     interface IObservablePagedReadOnlyList<T> extends IList<T>, INotifyListChanged<T> {
+        source: IObservableReadOnlyList<T>;
         pageSize: IObservableProperty<number>;
         currentPage: IObservableProperty<number>;
         pageCount: IObservableProperty<number>;
@@ -1302,19 +1303,6 @@ declare module wx {
     /* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
     **/
     function asyncCommand<T>(executeAsync: (param: any) => Rx.Observable<T>, thisArg?: any): ICommand<T>;
-    /**        
-    /* This creates a Command that calls several child Commands when invoked. Its canExecute will match the combined result of the child canExecutes (i.e. if any child commands cannot execute, neither can the parent)
-    /* @param {(any) => Rx.Observable<T>} commands The commands to combine
-    /* @param {Rx.Observable<boolean>} canExecute An Observable that determines when the Command can Execute. WhenAny is a great way to create this!
-    /* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
-    **/
-    function combinedCommand(canExecute: Rx.Observable<boolean>, ...commands: ICommand<any>[]): ICommand<any>;
-    /**        
-    /* This creates a Command that calls several child Commands when invoked. Its canExecute will match the combined result of the child canExecutes (i.e. if any child commands cannot execute, neither can the parent)
-    /* @param {(any) => Rx.Observable<T>} commands The commands to combine
-    /* @return {Command<T>} A Command which returns all items that are created via calling executeAsync as a single stream.
-    **/
-    function combinedCommand(...commands: ICommand<any>[]): ICommand<any>;
     /**        
     /* Determines if target is an instance of a ICommand
     /* @param {any} target

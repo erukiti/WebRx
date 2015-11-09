@@ -4,7 +4,7 @@ export { module } from "./Core/Module";
 export * from "./Core/Utils";
 export { property } from "./Core/Property";
 export { applyBindings, cleanNode } from "./Core/DomManager";
-export { command, asyncCommand, combinedCommand, isCommand } from "./Core/Command";
+export { command, asyncCommand, isCommand } from "./Core/Command";
 export { animation } from "./Core/Animation";
 export { getOid } from "./Core/Oid";
 export { list } from "./Collections/List";
