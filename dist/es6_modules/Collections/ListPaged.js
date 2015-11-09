@@ -22,13 +22,11 @@ export class PagedObservableListProjection {
             .observeOn(Rx.Scheduler.immediate);
         this.pageCount = whenAny(this.pageSize, updateLengthTrigger, (ps, _) => Math.ceil(source.length() / ps))
             .distinctUntilChanged()
-            .observeOn(this.scheduler)
             .toProperty();
         this.disp.add(this.pageCount);
         // length
         this.length = whenAny(this.currentPage, this.pageSize, updateLengthTrigger, (cp, ps, _) => Math.max(Math.min(source.length() - (ps * cp), ps), 0))
             .distinctUntilChanged()
-            .observeOn(this.scheduler)
             .toProperty();
         this.disp.add(this.length);
         // isEmptyChanged

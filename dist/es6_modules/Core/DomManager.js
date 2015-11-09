@@ -380,11 +380,11 @@ export class DomManager {
                 // intercept access to observable properties
                 if (!noUnwrap && isProperty(result)) {
                     let prop = result;
+                    // get the property's real value
+                    result = prop();
                     // register observable
                     if (captured)
                         captured.add(prop.changed);
-                    // get the property's real value
-                    result = prop();
                 }
                 return result;
             },
@@ -424,11 +424,11 @@ export class DomManager {
                 // intercept access to observable properties
                 if (isProperty(result)) {
                     let prop = result;
+                    // get the property's real value
+                    result = prop();
                     // register observable
                     if (captured)
                         captured.add(prop.changed);
-                    // get the property's real value
-                    result = prop();
                 }
                 return result;
             },

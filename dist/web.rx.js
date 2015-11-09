@@ -1325,13 +1325,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        accessor.value = initialValue;
 	    // setup observables
 	    accessor.changedSubject = new Rx.Subject();
-	    accessor.changed = accessor.changedSubject
-	        .publish()
-	        .refCount();
+	    accessor.changed = accessor.changedSubject.asObservable();
 	    accessor.changingSubject = new Rx.Subject();
-	    accessor.changing = accessor.changingSubject
-	        .publish()
-	        .refCount();
+	    accessor.changing = accessor.changingSubject.asObservable();
 	    return accessor;
 	}
 	exports.property = property;
@@ -3159,11 +3155,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // intercept access to observable properties
 	                if (!noUnwrap && Utils_1.isProperty(result)) {
 	                    var prop_1 = result;
+	                    // get the property's real value
+	                    result = prop_1();
 	                    // register observable
 	                    if (captured)
 	                        captured.add(prop_1.changed);
-	                    // get the property's real value
-	                    result = prop_1();
 	                }
 	                return result;
 	            },
@@ -3203,11 +3199,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // intercept access to observable properties
 	                if (Utils_1.isProperty(result)) {
 	                    var prop_3 = result;
+	                    // get the property's real value
+	                    result = prop_3();
 	                    // register observable
 	                    if (captured)
 	                        captured.add(prop_3.changed);
-	                    // get the property's real value
-	                    result = prop_3();
 	                }
 	                return result;
 	            },
@@ -4799,13 +4795,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .observeOn(Rx.Scheduler.immediate);
 	        this.pageCount = Utils_1.whenAny(this.pageSize, updateLengthTrigger, function (ps, _) { return Math.ceil(source.length() / ps); })
 	            .distinctUntilChanged()
-	            .observeOn(this.scheduler)
 	            .toProperty();
 	        this.disp.add(this.pageCount);
 	        // length
 	        this.length = Utils_1.whenAny(this.currentPage, this.pageSize, updateLengthTrigger, function (cp, ps, _) { return Math.max(Math.min(source.length() - (ps * cp), ps), 0); })
 	            .distinctUntilChanged()
-	            .observeOn(this.scheduler)
 	            .toProperty();
 	        this.disp.add(this.length);
 	        // isEmptyChanged
@@ -9130,13 +9124,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    accessor.value = initialValue;
 	    // setup observables
 	    accessor.changedSubject = new Rx.Subject();
-	    accessor.changed = accessor.changedSubject
-	        .publish()
-	        .refCount();
+	    accessor.changed = accessor.changedSubject.asObservable();
 	    accessor.changingSubject = new Rx.Subject();
-	    accessor.changing = accessor.changingSubject
-	        .publish()
-	        .refCount();
+	    accessor.changing = accessor.changingSubject.asObservable();
 	    accessor.source = this;
 	    accessor.thrownExceptions = ScheduledSubject_1.createScheduledSubject(scheduler, Injector_1.injector.get(res.app).defaultExceptionHandler);
 	    //////////////////////////////////

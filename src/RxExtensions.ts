@@ -51,14 +51,10 @@ function toProperty(initialValue?: any, scheduler?: Rx.IScheduler) {
 
     // setup observables
     accessor.changedSubject = new Rx.Subject<any>();
-    accessor.changed = accessor.changedSubject
-        .publish()
-        .refCount();
+    accessor.changed = accessor.changedSubject.asObservable();
 
     accessor.changingSubject = new Rx.Subject<any>();
-    accessor.changing = accessor.changingSubject
-        .publish()
-        .refCount();
+    accessor.changing = accessor.changingSubject.asObservable()
 
     accessor.source = this;
     accessor.thrownExceptions = createScheduledSubject<Error>(scheduler, injector.get<wx.IWebRxApp>(res.app).defaultExceptionHandler);

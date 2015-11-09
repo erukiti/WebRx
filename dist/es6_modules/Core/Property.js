@@ -39,13 +39,9 @@ export function property(initialValue) {
         accessor.value = initialValue;
     // setup observables
     accessor.changedSubject = new Rx.Subject();
-    accessor.changed = accessor.changedSubject
-        .publish()
-        .refCount();
+    accessor.changed = accessor.changedSubject.asObservable();
     accessor.changingSubject = new Rx.Subject();
-    accessor.changing = accessor.changingSubject
-        .publish()
-        .refCount();
+    accessor.changing = accessor.changingSubject.asObservable();
     return accessor;
 }
 //# sourceMappingURL=Property.js.map
