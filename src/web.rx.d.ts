@@ -250,6 +250,7 @@ declare module wx {
     * @interface
     **/
     interface IObservablePagedReadOnlyList<T> extends IList<T>, INotifyListChanged<T> {
+        source: IObservableReadOnlyList<T>;
         pageSize: IObservableProperty<number>;
         currentPage: IObservableProperty<number>;
         pageCount: IObservableProperty<number>;

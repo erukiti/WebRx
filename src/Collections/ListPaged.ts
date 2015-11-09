@@ -153,7 +153,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     ////////////////////
     // Implementation
     
-    private source: wx.IObservableReadOnlyList<T>;
+    public source: wx.IObservableReadOnlyList<T>;
     private disp = new Rx.CompositeDisposable();
 
     private changeNotificationsSuppressed: number = 0;
