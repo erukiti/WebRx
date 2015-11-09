@@ -1,11 +1,11 @@
 /// <reference path="../Interfaces.ts" />
 import { createWeakMap } from "../Collections/WeakMap";
 import { createSet, setToArray } from "../Collections/Set";
-import IID from "../IID";
 import { injector } from "./Injector";
-import { extend, throwError, isRxObservable, queryInterface, isProperty } from "../Core/Utils";
+import { extend, throwError, isRxObservable, isProperty } from "../Core/Utils";
 import * as res from "./Resources";
 import * as env from "./Environment";
+import { isList } from "../Collections/ListSupport";
 "use strict";
 /**
 * The heart of WebRx's binding-system
@@ -410,7 +410,7 @@ export class DomManager {
             },
             readIndexHook: (o, index) => {
                 // recognize observable lists
-                if (queryInterface(o, IID.IObservableList)) {
+                if (isList(o)) {
                     // translate indexer to list.get()
                     list = o;
                     result = list.get(index);
@@ -422,7 +422,7 @@ export class DomManager {
                     result = o[index];
                 }
                 // intercept access to observable properties
-                if (queryInterface(result, IID.IObservableProperty)) {
+                if (isProperty(result)) {
                     let prop = result;
                     // register observable
                     if (captured)
@@ -434,7 +434,7 @@ export class DomManager {
             },
             writeIndexHook: (o, index, newValue) => {
                 // recognize observable lists
-                if (queryInterface(o, IID.IObservableList)) {
+                if (isList(o)) {
                     // translate indexer to list.get()
                     list = o;
                     target = list.get(index);

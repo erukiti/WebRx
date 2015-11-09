@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var DomManager_1 = __webpack_require__(13);
 	exports.applyBindings = DomManager_1.applyBindings;
 	exports.cleanNode = DomManager_1.cleanNode;
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(26);
 	exports.command = Command_1.command;
 	exports.asyncCommand = Command_1.asyncCommand;
 	exports.isCommand = Command_1.isCommand;
@@ -78,9 +78,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.animation = Animation_1.animation;
 	var Oid_1 = __webpack_require__(15);
 	exports.getOid = Oid_1.getOid;
-	var List_1 = __webpack_require__(30);
+	var List_1 = __webpack_require__(19);
 	exports.list = List_1.list;
-	var ListSupport_1 = __webpack_require__(29);
+	var ListSupport_1 = __webpack_require__(18);
 	exports.isList = ListSupport_1.isList;
 	var Map_1 = __webpack_require__(54);
 	exports.createMap = Map_1.createMap;
@@ -89,9 +89,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.setToArray = Set_1.setToArray;
 	var WeakMap_1 = __webpack_require__(14);
 	exports.createWeakMap = WeakMap_1.createWeakMap;
-	var Lazy_1 = __webpack_require__(31);
+	var Lazy_1 = __webpack_require__(20);
 	exports.Lazy = Lazy_1.default;
-	var VirtualChildNodes_1 = __webpack_require__(27);
+	var VirtualChildNodes_1 = __webpack_require__(33);
 	exports.VirtualChildNodes = VirtualChildNodes_1.default;
 	var RouteMatcher_1 = __webpack_require__(48);
 	exports.route = RouteMatcher_1.route;
@@ -104,7 +104,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.IID = IID_1.default;
 	var HttpClient_1 = __webpack_require__(50);
 	exports.getHttpClientDefaultConfig = HttpClient_1.getHttpClientDefaultConfig;
-	var BindingBase_1 = __webpack_require__(24);
+	var BindingBase_1 = __webpack_require__(30);
 	exports.SingleOneWayBindingBase = BindingBase_1.SingleOneWayBindingBase;
 	exports.MultiOneWayBindingBase = BindingBase_1.MultiOneWayBindingBase;
 	// re-exports
@@ -132,13 +132,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Module_1 = __webpack_require__(11);
 	var ExpressionCompiler = __webpack_require__(12);
 	var DomManager_1 = __webpack_require__(13);
-	var HtmlTemplateEngine_1 = __webpack_require__(18);
-	var Command_1 = __webpack_require__(19);
-	var Module_2 = __webpack_require__(21);
-	var If_1 = __webpack_require__(22);
-	var MultiOneWay_1 = __webpack_require__(23);
-	var SingleOneWay_1 = __webpack_require__(25);
-	var ForEach_1 = __webpack_require__(26);
+	var HtmlTemplateEngine_1 = __webpack_require__(24);
+	var Command_1 = __webpack_require__(25);
+	var Module_2 = __webpack_require__(27);
+	var If_1 = __webpack_require__(28);
+	var MultiOneWay_1 = __webpack_require__(29);
+	var SingleOneWay_1 = __webpack_require__(31);
+	var ForEach_1 = __webpack_require__(32);
 	var Event_1 = __webpack_require__(34);
 	var Value_1 = __webpack_require__(35);
 	var HasFocus_1 = __webpack_require__(2);
@@ -2779,11 +2779,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/// <reference path="../Interfaces.ts" />
 	var WeakMap_1 = __webpack_require__(14);
 	var Set_1 = __webpack_require__(16);
-	var IID_1 = __webpack_require__(5);
 	var Injector_1 = __webpack_require__(8);
 	var Utils_1 = __webpack_require__(3);
 	var res = __webpack_require__(9);
 	var env = __webpack_require__(17);
+	var ListSupport_1 = __webpack_require__(18);
 	"use strict";
 	/**
 	* The heart of WebRx's binding-system
@@ -3189,7 +3189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            },
 	            readIndexHook: function (o, index) {
 	                // recognize observable lists
-	                if (Utils_1.queryInterface(o, IID_1.default.IObservableList)) {
+	                if (ListSupport_1.isList(o)) {
 	                    // translate indexer to list.get()
 	                    list = o;
 	                    result = list.get(index);
@@ -3201,7 +3201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    result = o[index];
 	                }
 	                // intercept access to observable properties
-	                if (Utils_1.queryInterface(result, IID_1.default.IObservableProperty)) {
+	                if (Utils_1.isProperty(result)) {
 	                    var prop_3 = result;
 	                    // register observable
 	                    if (captured)
@@ -3213,7 +3213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            },
 	            writeIndexHook: function (o, index, newValue) {
 	                // recognize observable lists
-	                if (Utils_1.queryInterface(o, IID_1.default.IObservableList)) {
+	                if (ListSupport_1.isList(o)) {
 	                    // translate indexer to list.get()
 	                    list = o;
 	                    target = list.get(index);
@@ -3567,1584 +3567,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	"use strict";
-	/**
-	* Html Template Engine based on JQuery's parseHTML
-	* NOTE: This version does not support scripts in templates!
-	*/
-	var rsingleTag = /^<([\w-]+)\s*\/?>(?:<\/\1>|)$/, rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:-]+)[^>]*)\/>/gi, rtagName = /<([\w:-]+)/, rhtml = /<|&#?\w+;/, rscriptType = /^$|\/(?:java|ecma)script/i, 
-	// We have to close these tags to support XHTML (#13200)
-	wrapMap = {
-	    // Support: IE9
-	    option: [1, "<select multiple='multiple'>", "</select>"],
-	    thead: [1, "<table>", "</table>"],
-	    // Some of the following wrappers are not fully defined, because
-	    // their parent elements (except for "table" element) could be omitted
-	    // since browser parsers are smart enough to auto-insert them
-	    // Support: Android 2.3
-	    // Android browser doesn't auto-insert colgroup
-	    col: [2, "<table><colgroup>", "</colgroup></table>"],
-	    // Auto-insert "tbody" element
-	    tr: [2, "<table>", "</table>"],
-	    // Auto-insert "tbody" and "tr" elements
-	    td: [3, "<table>", "</table>"],
-	    _default: [0, "", ""]
-	};
-	// Support: IE9
-	wrapMap.optgroup = wrapMap.option;
-	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
-	wrapMap.th = wrapMap.td;
-	var supportsCreateHTMLDocument = (function () {
-	    var doc = document.implementation.createHTMLDocument("");
-	    // Support: Node with jsdom<=1.5.0+
-	    // jsdom's document created via the above method doesn't contain the body
-	    if (!doc.body) {
-	        return false;
-	    }
-	    doc.body.innerHTML = "<form></form><form></form>";
-	    return doc.body.childNodes.length === 2;
-	})();
-	function merge(first, second) {
-	    var len = +second.length, j = 0, i = first.length;
-	    for (; j < len; j++) {
-	        first[i++] = second[j];
-	    }
-	    first.length = i;
-	    return first;
-	}
-	function buildFragment(elems, context) {
-	    var elem, tmp, tag, wrap, j, fragment = context.createDocumentFragment(), nodes = [], i = 0, l = elems.length;
-	    for (; i < l; i++) {
-	        elem = elems[i];
-	        if (elem || elem === 0) {
-	            // Add nodes directly
-	            if (typeof elem === "object") {
-	                // Support: Android<4.1, PhantomJS<2
-	                // push.apply(_, arraylike) throws on ancient WebKit
-	                merge(nodes, elem.nodeType ? [elem] : elem);
-	            }
-	            else if (!rhtml.test(elem)) {
-	                nodes.push(context.createTextNode(elem));
-	            }
-	            else {
-	                tmp = tmp || fragment.appendChild(context.createElement("div"));
-	                // Deserialize a standard representation
-	                tag = (rtagName.exec(elem) || ["", ""])[1].toLowerCase();
-	                wrap = wrapMap[tag] || wrapMap._default;
-	                tmp.innerHTML = wrap[1] + elem.replace(rxhtmlTag, "<$1></$2>") + wrap[2];
-	                // Descend through wrappers to the right content
-	                j = wrap[0];
-	                while (j--) {
-	                    tmp = tmp.lastChild;
-	                }
-	                // Support: Android<4.1, PhantomJS<2
-	                // push.apply(_, arraylike) throws on ancient WebKit
-	                merge(nodes, tmp.childNodes);
-	                // Remember the top-level container
-	                tmp = fragment.firstChild;
-	                // Ensure the created nodes are orphaned (#12392)
-	                tmp.textContent = "";
-	            }
-	        }
-	    }
-	    // Remove wrapper from fragment
-	    fragment.textContent = "";
-	    i = 0;
-	    while ((elem = nodes[i++])) {
-	        // filter out scripts
-	        if (elem.nodeType !== 1 || elem.tagName.toLowerCase() !== "script" || !rscriptType.test(elem.type || "")) {
-	            fragment.appendChild(elem);
-	        }
-	    }
-	    return fragment;
-	}
-	var HtmlTemplateEngine = (function () {
-	    function HtmlTemplateEngine() {
-	    }
-	    HtmlTemplateEngine.prototype.parse = function (data) {
-	        // document.implementation stops scripts or inline event handlers from being executed immediately
-	        var context = supportsCreateHTMLDocument ? document.implementation.createHTMLDocument("") : document;
-	        var parsed = rsingleTag.exec(data);
-	        // Single tag
-	        if (parsed) {
-	            return [context.createElement(parsed[1])];
-	        }
-	        parsed = buildFragment([data], context);
-	        var result = merge([], parsed.childNodes);
-	        return result;
-	    };
-	    return HtmlTemplateEngine;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = HtmlTemplateEngine;
-	//# sourceMappingURL=HtmlTemplateEngine.js.map
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(20);
-	"use strict";
-	var CommandBinding = (function () {
-	    function CommandBinding(domManager, app) {
-	        this.priority = 0;
-	        this.domManager = domManager;
-	        this.app = app;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    CommandBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("command-binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("invalid binding-options!");
-	        var compiled = this.domManager.compileBindingOptions(options, module);
-	        var el = node;
-	        var exp;
-	        var cmdObservable;
-	        var paramObservable;
-	        var cleanup;
-	        var isAnchor = el.tagName.toLowerCase() === "a";
-	        var event = "click";
-	        function doCleanup() {
-	            if (cleanup) {
-	                cleanup.dispose();
-	                cleanup = null;
-	            }
-	        }
-	        if (typeof compiled === "function") {
-	            exp = compiled;
-	            cmdObservable = this.domManager.expressionToObservable(exp, ctx);
-	        }
-	        else {
-	            var opt = compiled;
-	            exp = opt.command;
-	            cmdObservable = this.domManager.expressionToObservable(exp, ctx);
-	            if (opt.parameter) {
-	                exp = opt.parameter;
-	                paramObservable = this.domManager.expressionToObservable(exp, ctx);
-	            }
-	        }
-	        if (paramObservable == null) {
-	            paramObservable = Rx.Observable.return(undefined);
-	        }
-	        state.cleanup.add(Rx.Observable
-	            .combineLatest(cmdObservable, paramObservable, function (cmd, param) { return ({ cmd: cmd, param: param }); })
-	            .subscribe(function (x) {
-	            try {
-	                doCleanup();
-	                cleanup = new Rx.CompositeDisposable();
-	                if (x.cmd != null) {
-	                    if (!Command_1.isCommand(x.cmd))
-	                        Utils_1.throwError("Command-Binding only supports binding to a command!");
-	                    // disabled handling if supported by element
-	                    if (Utils_1.elementCanBeDisabled(el)) {
-	                        // initial update
-	                        el.disabled = !x.cmd.canExecute(x.param);
-	                        // listen to changes
-	                        cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
-	                            el.disabled = !canExecute;
-	                        }));
-	                    }
-	                    // handle input events
-	                    cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
-	                        // verify that the command can actually execute since we cannot disable 
-	                        // all elements - only form elements such as buttons 
-	                        if (x.cmd.canExecute(x.param)) {
-	                            x.cmd.execute(x.param);
-	                        }
-	                        // prevent default for anchors
-	                        if (isAnchor) {
-	                            e.preventDefault();
-	                        }
-	                    }));
-	                }
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            el = null;
-	            // nullify locals
-	            doCleanup();
-	        }));
-	    };
-	    CommandBinding.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    return CommandBinding;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = CommandBinding;
-	//# sourceMappingURL=Command.js.map
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var IID_1 = __webpack_require__(5);
-	var Utils_1 = __webpack_require__(3);
-	var Injector_1 = __webpack_require__(8);
-	var res = __webpack_require__(9);
-	"use strict";
-	var Command = (function () {
-	    /// <summary>
-	    /// Don't use this directly, use commandXYZ instead
-	    /// </summary>
-	    function Command(canExecute, executeAsync, scheduler) {
-	        var _this = this;
-	        this.resultsSubject = new Rx.Subject();
-	        this.isExecutingSubject = new Rx.Subject();
-	        this.inflightCount = 0;
-	        this.canExecuteLatest = false;
-	        this.scheduler = scheduler || Injector_1.injector.get(res.app).mainThreadScheduler;
-	        this.func = executeAsync;
-	        // setup canExecute
-	        var canExecuteObs = canExecute
-	            .combineLatest(this.isExecutingSubject.startWith(false), function (ce, ie) { return ce && !ie; })
-	            .catch(function (ex) {
-	            _this.exceptionsSubject.onNext(ex);
-	            return Rx.Observable.return(false);
-	        })
-	            .do(function (x) {
-	            _this.canExecuteLatest = x;
-	        })
-	            .startWith(this.canExecuteLatest)
-	            .distinctUntilChanged()
-	            .publish();
-	        this.canExecuteDisp = canExecuteObs.connect();
-	        this.canExecuteObservable = canExecuteObs;
-	        // setup thrownExceptions
-	        this.exceptionsSubject = new Rx.Subject();
-	        this.thrownExceptions = this.exceptionsSubject.asObservable();
-	        this.exceptionsSubject
-	            .observeOn(this.scheduler)
-	            .subscribe(Injector_1.injector.get(res.app).defaultExceptionHandler);
-	    }
-	    //////////////////////////////////
-	    // wx.IUnknown implementation
-	    Command.prototype.queryInterface = function (iid) {
-	        return iid === IID_1.default.ICommand || iid === IID_1.default.IDisposable;
-	    };
-	    //////////////////////////////////
-	    // IDisposable implementation
-	    Command.prototype.dispose = function () {
-	        var disp = this.canExecuteDisp;
-	        if (disp != null)
-	            disp.dispose();
-	    };
-	    Object.defineProperty(Command.prototype, "isExecuting", {
-	        get: function () {
-	            return this.isExecutingSubject.startWith(this.inflightCount > 0);
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(Command.prototype, "results", {
-	        get: function () {
-	            return this.resultsSubject.asObservable();
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Command.prototype.canExecute = function (parameter) {
-	        return this.canExecuteLatest;
-	    };
-	    Command.prototype.execute = function (parameter) {
-	        this.executeAsync(parameter)
-	            .catch(Rx.Observable.empty())
-	            .subscribe();
-	    };
-	    Command.prototype.executeAsync = function (parameter) {
-	        var self = this;
-	        var ret = this.canExecute(parameter) ? Rx.Observable.create(function (subj) {
-	            if (++self.inflightCount === 1) {
-	                self.isExecutingSubject.onNext(true);
-	            }
-	            var decrement = new Rx.SerialDisposable();
-	            decrement.setDisposable(Rx.Disposable.create(function () {
-	                if (--self.inflightCount === 0) {
-	                    self.isExecutingSubject.onNext(false);
-	                }
-	            }));
-	            var disp = self.func(parameter)
-	                .observeOn(self.scheduler)
-	                .do(function (_) { }, function (e) { return decrement.setDisposable(Rx.Disposable.empty); }, function () { return decrement.setDisposable(Rx.Disposable.empty); })
-	                .do(function (x) { return self.resultsSubject.onNext(x); }, function (x) { return self.exceptionsSubject.onNext(x); })
-	                .subscribe(subj);
-	            return new Rx.CompositeDisposable(disp, decrement);
-	        }) : Rx.Observable.throw(new Error("canExecute currently forbids execution"));
-	        return ret
-	            .publish()
-	            .refCount();
-	    };
-	    return Command;
-	})();
-	exports.Command = Command;
-	var internal;
-	(function (internal) {
-	    internal.commandConstructor = Command;
-	})(internal = exports.internal || (exports.internal = {}));
-	// factory method implementation
-	function command() {
-	    var args = Utils_1.args2Array(arguments);
-	    var canExecute;
-	    var execute;
-	    var scheduler;
-	    var thisArg;
-	    if (Utils_1.isFunction(args[0])) {
-	        // first overload
-	        execute = args.shift();
-	        canExecute = Utils_1.isRxObservable(args[0]) ? args.shift() : Rx.Observable.return(true);
-	        scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
-	        thisArg = args.shift();
-	        if (thisArg != null)
-	            execute = execute.bind(thisArg);
-	        return asyncCommand(canExecute, function (parameter) {
-	            return Rx.Observable.create(function (obs) {
-	                try {
-	                    execute(parameter);
-	                    obs.onNext(null);
-	                    obs.onCompleted();
-	                }
-	                catch (e) {
-	                    obs.onError(e);
-	                }
-	                return Rx.Disposable.empty;
-	            });
-	        }, scheduler);
-	    }
-	    // second overload
-	    canExecute = args.shift() || Rx.Observable.return(true);
-	    scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
-	    return new Command(canExecute, function (x) { return Rx.Observable.return(x); }, scheduler);
-	}
-	exports.command = command;
-	// factory method implementation
-	function asyncCommand() {
-	    var args = Utils_1.args2Array(arguments);
-	    var canExecute;
-	    var executeAsync;
-	    var scheduler;
-	    var thisArg;
-	    if (Utils_1.isFunction(args[0])) {
-	        // second overload
-	        executeAsync = args.shift();
-	        scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
-	        thisArg = args.shift();
-	        if (thisArg != null)
-	            executeAsync = executeAsync.bind(thisArg);
-	        return new Command(Rx.Observable.return(true), executeAsync, scheduler);
-	    }
-	    // first overload
-	    canExecute = args.shift();
-	    executeAsync = args.shift();
-	    scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
-	    return new Command(canExecute, executeAsync, scheduler);
-	}
-	exports.asyncCommand = asyncCommand;
-	/**
-	* Determines if target is an instance of a ICommand
-	* @param {any} target
-	*/
-	function isCommand(target) {
-	    if (target == null)
-	        return false;
-	    return target instanceof Command ||
-	        Utils_1.queryInterface(target, IID_1.default.ICommand);
-	}
-	exports.isCommand = isCommand;
-	//# sourceMappingURL=Command.js.map
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var Utils_1 = __webpack_require__(3);
-	var Module_1 = __webpack_require__(11);
-	"use strict";
-	var ModuleBinding = (function () {
-	    function ModuleBinding(domManager, app) {
-	        this.priority = 100;
-	        this.controlsDescendants = true;
-	        this.domManager = domManager;
-	        this.app = app;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    ModuleBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("module-binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("invalid binding-options!");
-	        var el = node;
-	        var self = this;
-	        var exp = this.domManager.compileBindingOptions(options, module);
-	        var obs = this.domManager.expressionToObservable(exp, ctx);
-	        var initialApply = true;
-	        var cleanup;
-	        function doCleanup() {
-	            if (cleanup) {
-	                cleanup.dispose();
-	                cleanup = null;
-	            }
-	        }
-	        // backup inner HTML
-	        var template = new Array();
-	        // subscribe
-	        state.cleanup.add(obs.subscribe(function (x) {
-	            try {
-	                doCleanup();
-	                cleanup = new Rx.CompositeDisposable();
-	                var value = Utils_1.unwrapProperty(x);
-	                var moduleNames;
-	                var disp = undefined;
-	                // split names
-	                if (value) {
-	                    value = value.trim();
-	                    moduleNames = value.split(" ").filter(function (x) { return x; });
-	                }
-	                if (moduleNames.length > 0) {
-	                    var observables = moduleNames.map(function (x) { return Module_1.loadModule(x); });
-	                    disp = Rx.Observable.combineLatest(observables, function (_) { return Utils_1.args2Array(arguments); }).subscribe(function (modules) {
-	                        try {
-	                            // create intermediate module
-	                            var moduleName = (module || _this.app).name + "+" + moduleNames.join("+");
-	                            var merged = new Module_1.Module(moduleName);
-	                            // merge modules into intermediate
-	                            merged.merge(module || _this.app);
-	                            modules.forEach(function (x) { return merged.merge(x); });
-	                            // done
-	                            self.applyValue(el, merged, template, ctx, state, initialApply);
-	                            initialApply = false;
-	                        }
-	                        catch (e) {
-	                            _this.app.defaultExceptionHandler.onNext(e);
-	                        }
-	                    });
-	                    if (disp != null)
-	                        cleanup.add(disp);
-	                }
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            obs = null;
-	            self = null;
-	        }));
-	    };
-	    ModuleBinding.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    ModuleBinding.prototype.applyValue = function (el, module, template, ctx, state, initialApply) {
-	        if (initialApply) {
-	            // clone to template
-	            for (var i = 0; i < el.childNodes.length; i++) {
-	                template.push(el.childNodes[i].cloneNode(true));
-	            }
-	        }
-	        state.module = module;
-	        // clean first
-	        this.domManager.cleanDescendants(el);
-	        // clear
-	        while (el.firstChild) {
-	            el.removeChild(el.firstChild);
-	        }
-	        // clone nodes and inject
-	        for (var i = 0; i < template.length; i++) {
-	            var node = template[i].cloneNode(true);
-	            el.appendChild(node);
-	        }
-	        this.domManager.applyBindingsToDescendants(ctx, el);
-	    };
-	    return ModuleBinding;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = ModuleBinding;
-	//# sourceMappingURL=Module.js.map
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Utils_1 = __webpack_require__(3);
-	"use strict";
-	var IfBinding = (function () {
-	    function IfBinding(domManager, app) {
-	        this.priority = 50;
-	        this.controlsDescendants = true;
-	        ////////////////////
-	        // wx.Implementation
-	        this.inverse = false;
-	        this.domManager = domManager;
-	        this.app = app;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    IfBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("if-binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("invalid binding-options!");
-	        var compiled = this.domManager.compileBindingOptions(options, module);
-	        var el = node;
-	        var self = this;
-	        var initialApply = true;
-	        var exp;
-	        var animations = {};
-	        var cleanup;
-	        function doCleanup() {
-	            if (cleanup) {
-	                cleanup.dispose();
-	                cleanup = null;
-	            }
-	        }
-	        if (typeof compiled === "object") {
-	            var opt = compiled;
-	            exp = opt.condition;
-	            // extract animations
-	            if (opt.enter) {
-	                animations.enter = this.domManager.evaluateExpression(opt.enter, ctx);
-	                if (typeof animations.enter === "string") {
-	                    animations.enter = module.animation(animations.enter);
-	                }
-	            }
-	            if (opt.leave) {
-	                animations.leave = this.domManager.evaluateExpression(opt.leave, ctx);
-	                if (typeof animations.leave === "string") {
-	                    animations.leave = module.animation(animations.leave);
-	                }
-	            }
-	        }
-	        else {
-	            exp = compiled;
-	        }
-	        var obs = this.domManager.expressionToObservable(exp, ctx);
-	        // backup inner HTML
-	        var template = new Array();
-	        // subscribe
-	        state.cleanup.add(obs.subscribe(function (x) {
-	            try {
-	                doCleanup();
-	                cleanup = new Rx.CompositeDisposable();
-	                cleanup.add(self.applyValue(el, Utils_1.unwrapProperty(x), template, ctx, animations, initialApply));
-	                initialApply = false;
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            obs = null;
-	            el = null;
-	            self = null;
-	            // nullify locals
-	            template = null;
-	        }));
-	    };
-	    IfBinding.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    IfBinding.prototype.applyValue = function (el, value, template, ctx, animations, initialApply) {
-	        var _this = this;
-	        var leaveAnimation = animations.leave;
-	        var enterAnimation = animations.enter;
-	        var self = this;
-	        var obs = undefined;
-	        if (initialApply) {
-	            // clone to template
-	            for (var i = 0; i < el.childNodes.length; i++) {
-	                template.push(el.childNodes[i].cloneNode(true));
-	            }
-	            // clear
-	            while (el.firstChild) {
-	                el.removeChild(el.firstChild);
-	            }
-	        }
-	        var oldElements = Utils_1.nodeChildrenToArray(el);
-	        value = this.inverse ? !value : value;
-	        function removeOldElements() {
-	            oldElements.forEach(function (x) {
-	                self.domManager.cleanNode(x);
-	                el.removeChild(x);
-	            });
-	        }
-	        if (oldElements.length > 0) {
-	            if (leaveAnimation) {
-	                leaveAnimation.prepare(oldElements);
-	                obs = leaveAnimation.run(oldElements)
-	                    .continueWith(function () { return leaveAnimation.complete(oldElements); })
-	                    .continueWith(removeOldElements);
-	            }
-	            else {
-	                removeOldElements();
-	            }
-	        }
-	        if (value) {
-	            var nodes = template.map(function (x) { return x.cloneNode(true); });
-	            if (obs) {
-	                obs = obs.continueWith(function () {
-	                    if (enterAnimation)
-	                        enterAnimation.prepare(nodes);
-	                    for (var i = 0; i < template.length; i++) {
-	                        el.appendChild(nodes[i]);
-	                    }
-	                    _this.domManager.applyBindingsToDescendants(ctx, el);
-	                });
-	                if (enterAnimation) {
-	                    obs = enterAnimation.run(nodes)
-	                        .continueWith(function () { return enterAnimation.complete(nodes); });
-	                }
-	            }
-	            else {
-	                if (enterAnimation)
-	                    enterAnimation.prepare(nodes);
-	                for (var i = 0; i < template.length; i++) {
-	                    el.appendChild(nodes[i]);
-	                }
-	                this.domManager.applyBindingsToDescendants(ctx, el);
-	                if (enterAnimation) {
-	                    obs = enterAnimation.run(nodes)
-	                        .continueWith(function () { return enterAnimation.complete(nodes); });
-	                }
-	            }
-	        }
-	        return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
-	    };
-	    return IfBinding;
-	})();
-	exports.IfBinding = IfBinding;
-	var NotIfBinding = (function (_super) {
-	    __extends(NotIfBinding, _super);
-	    function NotIfBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.inverse = true;
-	    }
-	    return NotIfBinding;
-	})(IfBinding);
-	exports.NotIfBinding = NotIfBinding;
-	//# sourceMappingURL=If.js.map
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Utils_1 = __webpack_require__(3);
-	var BindingBase_1 = __webpack_require__(24);
-	"use strict";
-	var CssBinding = (function (_super) {
-	    __extends(CssBinding, _super);
-	    function CssBinding(domManager, app) {
-	        _super.call(this, domManager, app, true);
-	    }
-	    CssBinding.prototype.applyValue = function (el, value, key) {
-	        var classes;
-	        if (key !== "") {
-	            classes = key.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
-	            if (classes.length) {
-	                Utils_1.toggleCssClass.apply(null, [el, !!value].concat(classes));
-	            }
-	        }
-	        else {
-	            var state = this.domManager.getNodeState(el);
-	            // if we have previously added classes, remove them
-	            if (state.cssBindingPreviousDynamicClasses != null) {
-	                Utils_1.toggleCssClass.apply(null, [el, false].concat(state.cssBindingPreviousDynamicClasses));
-	                state.cssBindingPreviousDynamicClasses = null;
-	            }
-	            if (value) {
-	                classes = value.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
-	                if (classes.length) {
-	                    Utils_1.toggleCssClass.apply(null, [el, true].concat(classes));
-	                    state.cssBindingPreviousDynamicClasses = classes;
-	                }
-	            }
-	        }
-	    };
-	    return CssBinding;
-	})(BindingBase_1.MultiOneWayBindingBase);
-	exports.CssBinding = CssBinding;
-	var AttrBinding = (function (_super) {
-	    __extends(AttrBinding, _super);
-	    function AttrBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.priority = 5;
-	    }
-	    AttrBinding.prototype.applyValue = function (el, value, key) {
-	        // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
-	        // when someProp is a "no value"-like value (strictly null, false, or undefined)
-	        // (because the absence of the "checked" attr is how to mark an element as not checked, etc.)
-	        var toRemove = (value === false) || (value === null) || (value === undefined);
-	        if (toRemove)
-	            el.removeAttribute(key);
-	        else {
-	            el.setAttribute(key, value.toString());
-	        }
-	    };
-	    return AttrBinding;
-	})(BindingBase_1.MultiOneWayBindingBase);
-	exports.AttrBinding = AttrBinding;
-	var StyleBinding = (function (_super) {
-	    __extends(StyleBinding, _super);
-	    function StyleBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	    }
-	    StyleBinding.prototype.applyValue = function (el, value, key) {
-	        if (value === null || value === undefined || value === false) {
-	            // Empty string removes the value, whereas null/undefined have no effect
-	            value = "";
-	        }
-	        el.style[key] = value;
-	    };
-	    return StyleBinding;
-	})(BindingBase_1.MultiOneWayBindingBase);
-	exports.StyleBinding = StyleBinding;
-	//# sourceMappingURL=MultiOneWay.js.map
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var Utils_1 = __webpack_require__(3);
-	"use strict";
-	/**
-	* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
-	* @class
-	*/
-	var SingleOneWayBindingBase = (function () {
-	    function SingleOneWayBindingBase(domManager, app) {
-	        this.priority = 0;
-	        this.domManager = domManager;
-	        this.app = app;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    SingleOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("invalid binding-options!");
-	        var el = node;
-	        var self = this;
-	        var exp = this.domManager.compileBindingOptions(options, module);
-	        var obs = this.domManager.expressionToObservable(exp, ctx);
-	        // subscribe
-	        state.cleanup.add(obs.subscribe(function (x) {
-	            try {
-	                self.applyValue(el, Utils_1.unwrapProperty(x));
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            el = null;
-	            obs = null;
-	            self = null;
-	        }));
-	    };
-	    SingleOneWayBindingBase.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    SingleOneWayBindingBase.prototype.applyValue = function (el, value) {
-	        Utils_1.throwError("you need to override this method!");
-	    };
-	    return SingleOneWayBindingBase;
-	})();
-	exports.SingleOneWayBindingBase = SingleOneWayBindingBase;
-	/**
-	* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
-	* @class
-	*/
-	var MultiOneWayBindingBase = (function () {
-	    function MultiOneWayBindingBase(domManager, app, supportsDynamicValues) {
-	        if (supportsDynamicValues === void 0) { supportsDynamicValues = false; }
-	        this.priority = 0;
-	        this.supportsDynamicValues = false;
-	        this.domManager = domManager;
-	        this.app = app;
-	        this.supportsDynamicValues = supportsDynamicValues;
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    MultiOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("binding only operates on elements!");
-	        var compiled = this.domManager.compileBindingOptions(options, module);
-	        if (compiled == null || (typeof compiled !== "object" && !this.supportsDynamicValues))
-	            Utils_1.throwError("invalid binding-options!");
-	        var el = node;
-	        var observables = new Array();
-	        var obs;
-	        var exp;
-	        var keys = Object.keys(compiled);
-	        var key;
-	        if (typeof compiled === "function") {
-	            exp = compiled;
-	            obs = this.domManager.expressionToObservable(exp, ctx);
-	            observables.push(["", obs]);
-	        }
-	        else {
-	            for (var i = 0; i < keys.length; i++) {
-	                key = keys[i];
-	                var value = compiled[key];
-	                exp = value;
-	                obs = this.domManager.expressionToObservable(exp, ctx);
-	                observables.push([key, obs]);
-	            }
-	        }
-	        // subscribe
-	        for (var i = 0; i < observables.length; i++) {
-	            key = observables[i][0];
-	            obs = observables[i][1];
-	            this.subscribe(el, obs, key, state);
-	        }
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            el = null;
-	            keys = null;
-	            // nullify locals
-	            observables = null;
-	        }));
-	    };
-	    MultiOneWayBindingBase.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    MultiOneWayBindingBase.prototype.subscribe = function (el, obs, key, state) {
-	        var _this = this;
-	        state.cleanup.add(obs.subscribe(function (x) {
-	            try {
-	                _this.applyValue(el, Utils_1.unwrapProperty(x), key);
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	    };
-	    MultiOneWayBindingBase.prototype.applyValue = function (el, key, value) {
-	        Utils_1.throwError("you need to override this method!");
-	    };
-	    return MultiOneWayBindingBase;
-	})();
-	exports.MultiOneWayBindingBase = MultiOneWayBindingBase;
-	//# sourceMappingURL=BindingBase.js.map
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Utils_1 = __webpack_require__(3);
-	var BindingBase_1 = __webpack_require__(24);
-	"use strict";
-	////////////////////
-	// Bindings
-	var TextBinding = (function (_super) {
-	    __extends(TextBinding, _super);
-	    function TextBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	    }
-	    TextBinding.prototype.applyValue = function (el, value) {
-	        if ((value === null) || (value === undefined))
-	            value = "";
-	        el.textContent = value;
-	    };
-	    return TextBinding;
-	})(BindingBase_1.SingleOneWayBindingBase);
-	exports.TextBinding = TextBinding;
-	var VisibleBinding = (function (_super) {
-	    __extends(VisibleBinding, _super);
-	    function VisibleBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.inverse = false;
-	        this.inverse = false;
-	        this.priority = 10;
-	    }
-	    VisibleBinding.prototype.configure = function (_options) {
-	        var options = _options;
-	        VisibleBinding.useCssClass = options.useCssClass;
-	        VisibleBinding.hiddenClass = options.hiddenClass;
-	    };
-	    ////////////////////
-	    // implementation
-	    VisibleBinding.prototype.applyValue = function (el, value) {
-	        value = this.inverse ? !value : value;
-	        if (!VisibleBinding.useCssClass) {
-	            if (!value) {
-	                el.style.display = "none";
-	            }
-	            else {
-	                el.style.display = "";
-	            }
-	        }
-	        else {
-	            Utils_1.toggleCssClass(el, !value, VisibleBinding.hiddenClass);
-	        }
-	    };
-	    return VisibleBinding;
-	})(BindingBase_1.SingleOneWayBindingBase);
-	exports.VisibleBinding = VisibleBinding;
-	var HiddenBinding = (function (_super) {
-	    __extends(HiddenBinding, _super);
-	    function HiddenBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.inverse = true;
-	    }
-	    return HiddenBinding;
-	})(VisibleBinding);
-	exports.HiddenBinding = HiddenBinding;
-	var HtmlBinding = (function (_super) {
-	    __extends(HtmlBinding, _super);
-	    function HtmlBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	    }
-	    HtmlBinding.prototype.applyValue = function (el, value) {
-	        if ((value === null) || (value === undefined))
-	            value = "";
-	        el.innerHTML = value;
-	    };
-	    return HtmlBinding;
-	})(BindingBase_1.SingleOneWayBindingBase);
-	exports.HtmlBinding = HtmlBinding;
-	var DisableBinding = (function (_super) {
-	    __extends(DisableBinding, _super);
-	    function DisableBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.inverse = false;
-	        this.inverse = false;
-	    }
-	    ////////////////////
-	    // implementation
-	    DisableBinding.prototype.applyValue = function (el, value) {
-	        value = this.inverse ? !value : value;
-	        if (Utils_1.elementCanBeDisabled(el)) {
-	            el.disabled = value;
-	        }
-	    };
-	    return DisableBinding;
-	})(BindingBase_1.SingleOneWayBindingBase);
-	exports.DisableBinding = DisableBinding;
-	var EnableBinding = (function (_super) {
-	    __extends(EnableBinding, _super);
-	    function EnableBinding(domManager, app) {
-	        _super.call(this, domManager, app);
-	        this.inverse = true;
-	    }
-	    return EnableBinding;
-	})(DisableBinding);
-	exports.EnableBinding = EnableBinding;
-	//# sourceMappingURL=SingleOneWay.js.map
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../RxExtensions.d.ts" />
-	var Utils_1 = __webpack_require__(3);
-	var VirtualChildNodes_1 = __webpack_require__(27);
-	var RefCountDisposeWrapper_1 = __webpack_require__(28);
-	var Injector_1 = __webpack_require__(8);
-	var ListSupport_1 = __webpack_require__(29);
-	"use strict";
-	var ForEachBinding = (function () {
-	    function ForEachBinding(domManager, app) {
-	        this.priority = 40;
-	        this.controlsDescendants = true;
-	        this.domManager = domManager;
-	        this.app = app;
-	        // hook into getDataContext() to map state['index'] to ctx['$index']
-	        domManager.registerDataContextExtension(function (node, ctx) {
-	            var state = domManager.getNodeState(node);
-	            ctx.$index = state.index;
-	        });
-	    }
-	    ////////////////////
-	    // wx.IBinding
-	    ForEachBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
-	        var _this = this;
-	        if (node.nodeType !== 1)
-	            Utils_1.throwError("forEach binding only operates on elements!");
-	        if (options == null)
-	            Utils_1.throwError("** invalid binding options!");
-	        var compiled = this.domManager.compileBindingOptions(options, module);
-	        var el = node;
-	        var self = this;
-	        var initialApply = true;
-	        var cleanup = null;
-	        var hooks;
-	        var exp;
-	        var setProxyFunc;
-	        var animations = {};
-	        if (typeof compiled === "object" && compiled.hasOwnProperty("data")) {
-	            var opt = compiled;
-	            exp = opt.data;
-	            // extract animations
-	            if (opt.itemEnter) {
-	                animations.itemEnter = this.domManager.evaluateExpression(opt.itemEnter, ctx);
-	                if (typeof animations.itemEnter === "string") {
-	                    animations.itemEnter = module.animation(animations.itemEnter);
-	                }
-	            }
-	            if (opt.itemLeave) {
-	                animations.itemLeave = this.domManager.evaluateExpression(opt.itemLeave, ctx);
-	                if (typeof animations.itemLeave === "string") {
-	                    animations.itemLeave = module.animation(animations.itemLeave);
-	                }
-	            }
-	            if (opt.hooks) {
-	                // extract hooks
-	                hooks = this.domManager.evaluateExpression(opt.hooks, ctx);
-	            }
-	            // optionally resolve hooks if passed as string identifier
-	            if (typeof hooks === "string")
-	                hooks = Injector_1.injector.get(hooks);
-	            if (opt['debug']) {
-	                if (opt['debug']['setProxyFunc']) {
-	                    setProxyFunc = this.domManager.evaluateExpression(opt['debug']['setProxyFunc'], ctx);
-	                }
-	            }
-	        }
-	        else {
-	            exp = compiled;
-	        }
-	        var obs = this.domManager.expressionToObservable(exp, ctx);
-	        // add own disposables
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            if (cleanup) {
-	                cleanup.dispose();
-	                cleanup = null;
-	            }
-	        }));
-	        // backup inner HTML
-	        var template = new Array();
-	        // subscribe
-	        state.cleanup.add(obs.subscribe(function (x) {
-	            try {
-	                if (cleanup) {
-	                    cleanup.dispose();
-	                }
-	                cleanup = new Rx.CompositeDisposable();
-	                self.applyValue(el, x, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc);
-	                initialApply = false;
-	            }
-	            catch (e) {
-	                _this.app.defaultExceptionHandler.onNext(e);
-	            }
-	        }));
-	        // release closure references to GC 
-	        state.cleanup.add(Rx.Disposable.create(function () {
-	            // nullify args
-	            node = null;
-	            options = null;
-	            ctx = null;
-	            state = null;
-	            // nullify common locals
-	            obs = null;
-	            el = null;
-	            self = null;
-	            // nullify locals
-	            template = null;
-	            hooks = null;
-	        }));
-	    };
-	    ForEachBinding.prototype.configure = function (options) {
-	        // intentionally left blank
-	    };
-	    ForEachBinding.prototype.createIndexPropertyForNode = function (proxy, child, startIndex, trigger, templateLength) {
-	        return Rx.Observable.defer(function () {
-	            return Rx.Observable.create(function (obs) {
-	                return trigger.subscribe(function (_) {
-	                    // recalculate index from node position within parent
-	                    var index = proxy.childNodes.indexOf(child);
-	                    index /= templateLength;
-	                    obs.onNext(index);
-	                });
-	            });
-	        })
-	            .toProperty(startIndex);
-	    };
-	    ForEachBinding.prototype.appendAllRows = function (proxy, list, ctx, template, hooks, animations, indexTrigger, isInitial) {
-	        var length = list.length();
-	        for (var i = 0; i < length; i++) {
-	            this.appendRow(proxy, i, list.get(i), ctx, template, hooks, animations, indexTrigger, isInitial);
-	        }
-	    };
-	    ForEachBinding.prototype.appendRow = function (proxy, index, item, ctx, template, hooks, animations, indexTrigger, isInitial) {
-	        var nodes = Utils_1.cloneNodeArray(template);
-	        var _index = index;
-	        var enterAnimation = animations.itemEnter;
-	        var cbData = {
-	            item: item
-	        };
-	        if (indexTrigger) {
-	            _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
-	            cbData.indexDisp = new RefCountDisposeWrapper_1.default(_index, 0);
-	        }
-	        cbData.index = _index;
-	        if (enterAnimation != null)
-	            enterAnimation.prepare(nodes);
-	        proxy.appendChilds(nodes, cbData);
-	        if (hooks) {
-	            if (hooks.afterRender)
-	                hooks.afterRender(nodes, item);
-	            if (!isInitial && hooks.afterAdd)
-	                hooks.afterAdd(nodes, item, index);
-	        }
-	        if (enterAnimation) {
-	            var disp = enterAnimation.run(nodes)
-	                .continueWith(function () { return enterAnimation.complete(nodes); })
-	                .subscribe(function (x) {
-	                if (disp != null)
-	                    disp.dispose();
-	            });
-	        }
-	    };
-	    ForEachBinding.prototype.insertRow = function (proxy, index, item, ctx, template, hooks, animations, indexTrigger) {
-	        var templateLength = template.length;
-	        var enterAnimation = animations.itemEnter;
-	        var nodes = Utils_1.cloneNodeArray(template);
-	        var _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
-	        if (enterAnimation != null)
-	            enterAnimation.prepare(nodes);
-	        proxy.insertChilds(index * templateLength, nodes, {
-	            index: _index,
-	            item: item,
-	            indexDisp: new RefCountDisposeWrapper_1.default(_index, 0)
-	        });
-	        if (hooks) {
-	            if (hooks.afterRender)
-	                hooks.afterRender(nodes, item);
-	            if (hooks.afterAdd)
-	                hooks.afterAdd(nodes, item, index);
-	        }
-	        if (enterAnimation) {
-	            var disp = enterAnimation.run(nodes)
-	                .continueWith(function () { return enterAnimation.complete(nodes); })
-	                .subscribe(function (x) {
-	                if (disp != null)
-	                    disp.dispose();
-	            });
-	        }
-	    };
-	    ForEachBinding.prototype.removeRow = function (proxy, index, item, template, hooks, animations) {
-	        var templateLength = template.length;
-	        var el = proxy.targetNode;
-	        var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
-	        var leaveAnimation = animations.itemLeave;
-	        function removeNodes() {
-	            for (var i = 0; i < templateLength; i++) {
-	                el.removeChild(nodes[i]);
-	            }
-	        }
-	        if (hooks && hooks.beforeRemove) {
-	            hooks.beforeRemove(nodes, item, index);
-	        }
-	        else {
-	            if (leaveAnimation != null) {
-	                leaveAnimation.prepare(nodes);
-	                var disp = leaveAnimation.run(nodes)
-	                    .continueWith(function () { return leaveAnimation.complete(nodes); })
-	                    .continueWith(removeNodes)
-	                    .subscribe(function (x) {
-	                    if (disp != null)
-	                        disp.dispose();
-	                });
-	            }
-	            else {
-	                removeNodes();
-	            }
-	        }
-	    };
-	    ForEachBinding.prototype.moveRow = function (proxy, from, to, item, template, hooks, animations, indexTrigger) {
-	        var templateLength = template.length;
-	        var el = proxy.targetNode;
-	        var nodes = proxy.removeChilds(from * templateLength, templateLength, true);
-	        var leaveAnimation = animations.itemLeave;
-	        var enterAnimation = animations.itemEnter;
-	        var combined = [];
-	        var obs;
-	        var self = this;
-	        if (hooks && hooks.beforeMove) {
-	            hooks.beforeMove(nodes, item, from);
-	        }
-	        function removeNodes() {
-	            for (var i = 0; i < templateLength; i++) {
-	                el.removeChild(nodes[i]);
-	            }
-	        }
-	        function createRow() {
-	            // create new row
-	            nodes = Utils_1.cloneNodeArray(template);
-	            var _index = self.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
-	            if (enterAnimation != null)
-	                enterAnimation.prepare(nodes);
-	            proxy.insertChilds(templateLength * to, nodes, {
-	                index: _index,
-	                item: item,
-	                indexDisp: new RefCountDisposeWrapper_1.default(_index, 0)
-	            });
-	            if (hooks && hooks.afterMove) {
-	                hooks.afterMove(nodes, item, from);
-	            }
-	        }
-	        // construct leave-observable
-	        if (leaveAnimation) {
-	            leaveAnimation.prepare(nodes);
-	            obs = leaveAnimation.run(nodes)
-	                .continueWith(function () { return leaveAnimation.complete(nodes); })
-	                .continueWith(removeNodes);
-	        }
-	        else {
-	            obs = Rx.Observable.startDeferred(removeNodes);
-	        }
-	        combined.push(obs);
-	        // construct enter-observable
-	        obs = Rx.Observable.startDeferred(createRow);
-	        if (enterAnimation) {
-	            obs = obs.continueWith(enterAnimation.run(nodes))
-	                .continueWith(function () { return enterAnimation.complete(nodes); });
-	        }
-	        combined.push(obs);
-	        // optimize return
-	        if (combined.length > 1)
-	            obs = Rx.Observable.combineLatest(combined, Utils_1.noop).take(1);
-	        else if (combined.length === 1)
-	            obs = combined[0].take(1);
-	        var disp = obs.subscribe(function (x) {
-	            if (disp != null)
-	                disp.dispose();
-	        });
-	    };
-	    ForEachBinding.prototype.rebindRow = function (proxy, index, item, template, indexTrigger) {
-	        var templateLength = template.length;
-	        var _index = this.createIndexPropertyForNode(proxy, proxy.childNodes[(index * templateLength)], index, indexTrigger, template.length);
-	        var indexDisp = new RefCountDisposeWrapper_1.default(_index, 0);
-	        for (var i = 0; i < template.length; i++) {
-	            var node = proxy.childNodes[(index * templateLength) + i];
-	            if (node.nodeType === 1) {
-	                this.domManager.cleanNode(node);
-	                var state = this.domManager.createNodeState(item);
-	                state.index = _index;
-	                indexDisp.addRef();
-	                state.cleanup.add(indexDisp);
-	                this.domManager.setNodeState(node, state);
-	                this.domManager.applyBindings(item, node);
-	            }
-	        }
-	    };
-	    ForEachBinding.prototype.observeList = function (proxy, ctx, template, cleanup, list, hooks, animations, indexTrigger) {
-	        var _this = this;
-	        var i;
-	        var length;
-	        cleanup.add(indexTrigger);
-	        // initial insert
-	        this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, true);
-	        // track changes
-	        cleanup.add(list.itemsAdded.subscribe(function (e) {
-	            length = e.items.length;
-	            if (e.from === list.length()) {
-	                for (var i_1 = 0; i_1 < length; i_1++) {
-	                    _this.appendRow(proxy, i_1 + e.from, e.items[i_1], ctx, template, hooks, animations, indexTrigger, false);
-	                }
-	            }
-	            else {
-	                for (var i_2 = 0; i_2 < e.items.length; i_2++) {
-	                    _this.insertRow(proxy, i_2 + e.from, e.items[i_2], ctx, template, hooks, animations, indexTrigger);
-	                }
-	            }
-	            indexTrigger.onNext(true);
-	        }));
-	        cleanup.add(list.itemsRemoved.subscribe(function (e) {
-	            length = e.items.length;
-	            for (var i_3 = 0; i_3 < length; i_3++) {
-	                _this.removeRow(proxy, i_3 + e.from, e.items[i_3], template, hooks, animations);
-	            }
-	            indexTrigger.onNext(true);
-	        }));
-	        cleanup.add(list.itemsMoved.subscribe(function (e) {
-	            _this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, animations, indexTrigger);
-	            indexTrigger.onNext(true);
-	        }));
-	        cleanup.add(list.itemReplaced.subscribe(function (e) {
-	            _this.rebindRow(proxy, e.from, e.items[0], template, indexTrigger);
-	            indexTrigger.onNext(true);
-	        }));
-	        cleanup.add(list.shouldReset.subscribe(function (e) {
-	            proxy.clear();
-	            _this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, false);
-	            indexTrigger.onNext(true);
-	        }));
-	    };
-	    ForEachBinding.prototype.applyValue = function (el, value, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc) {
-	        var i, length;
-	        if (initialApply) {
-	            // clone to template
-	            length = el.childNodes.length;
-	            for (var i_4 = 0; i_4 < length; i_4++) {
-	                template.push(el.childNodes[i_4].cloneNode(true));
-	            }
-	        }
-	        // perform initial clear
-	        while (el.firstChild) {
-	            el.removeChild(el.firstChild);
-	        }
-	        if (template.length === 0)
-	            return; // nothing to do
-	        var proxy;
-	        var self = this;
-	        var recalcIndextrigger;
-	        function nodeInsertCB(node, callbackData) {
-	            var item = callbackData.item;
-	            var index = callbackData.index;
-	            var indexDisp = callbackData.indexDisp;
-	            if (node.nodeType === 1) {
-	                // propagate index to state
-	                var state = (self.domManager.getNodeState(node) || self.domManager.createNodeState());
-	                state.model = item;
-	                state.index = index;
-	                self.domManager.setNodeState(node, state);
-	                if (recalcIndextrigger != null && indexDisp != null) {
-	                    indexDisp.addRef();
-	                    state.cleanup.add(indexDisp);
-	                }
-	                self.domManager.applyBindings(item, node);
-	            }
-	        }
-	        function nodeRemoveCB(node) {
-	            if (node.nodeType === 1) {
-	                self.domManager.cleanNode(node);
-	            }
-	        }
-	        proxy = new VirtualChildNodes_1.default(el, false, nodeInsertCB, nodeRemoveCB);
-	        if (setProxyFunc)
-	            setProxyFunc(proxy);
-	        cleanup.add(Rx.Disposable.create(function () {
-	            proxy = null;
-	        }));
-	        if (Array.isArray(value)) {
-	            var arr = value;
-	            // iterate once and be done with it
-	            length = arr.length;
-	            for (var i_5 = 0; i_5 < length; i_5++) {
-	                this.appendRow(proxy, i_5, arr[i_5], ctx, template, hooks, animations, undefined, true);
-	            }
-	        }
-	        else if (ListSupport_1.isList(value)) {
-	            var list = value;
-	            recalcIndextrigger = new Rx.Subject();
-	            this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
-	        }
-	        else {
-	            Utils_1.throwError("forEach-Binding: value must be either array or observable list");
-	        }
-	    };
-	    return ForEachBinding;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = ForEachBinding;
-	//# sourceMappingURL=ForEach.js.map
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	/**
-	* VirtualChildNodes implements consisent and predictable manipulation
-	* of a DOM Node's childNodes collection regardless its the true contents
-	* @class
-	**/
-	var VirtualChildNodes = (function () {
-	    function VirtualChildNodes(targetNode, initialSyncToTarget, insertCB, removeCB) {
-	        this.childNodes = [];
-	        this.targetNode = targetNode;
-	        this.insertCB = insertCB;
-	        this.removeCB = removeCB;
-	        if (initialSyncToTarget) {
-	            for (var i = 0; i < targetNode.childNodes.length; i++) {
-	                this.childNodes.push(targetNode.childNodes[i]);
-	            }
-	        }
-	    }
-	    VirtualChildNodes.prototype.appendChilds = function (nodes, callbackData) {
-	        var length = nodes.length;
-	        // append to proxy array
-	        if (nodes.length > 1)
-	            Array.prototype.push.apply(this.childNodes, nodes);
-	        else
-	            this.childNodes.push(nodes[0]);
-	        // append to DOM
-	        for (var i = 0; i < length; i++) {
-	            this.targetNode.appendChild(nodes[i]);
-	        }
-	        // callback
-	        if (this.insertCB) {
-	            for (var i = 0; i < length; i++) {
-	                this.insertCB(nodes[i], callbackData);
-	            }
-	        }
-	    };
-	    VirtualChildNodes.prototype.insertChilds = function (index, nodes, callbackData) {
-	        if (index === this.childNodes.length) {
-	            this.appendChilds(nodes, callbackData);
-	        }
-	        else {
-	            var refNode = this.childNodes[index];
-	            var length_1 = nodes.length;
-	            // insert into proxy array
-	            Array.prototype.splice.apply(this.childNodes, [index, 0].concat(nodes));
-	            // insert into DOM
-	            for (var i = 0; i < length_1; i++) {
-	                this.targetNode.insertBefore(nodes[i], refNode);
-	            }
-	            // callback
-	            if (this.insertCB) {
-	                for (var i = 0; i < length_1; i++) {
-	                    this.insertCB(nodes[i], callbackData);
-	                }
-	            }
-	        }
-	    };
-	    VirtualChildNodes.prototype.removeChilds = function (index, count, keepDom) {
-	        var node;
-	        if (count === 0)
-	            return [];
-	        // extract removed nodes
-	        var nodes = this.childNodes.slice(index, index + count);
-	        // remove from proxy array
-	        this.childNodes.splice(index, count);
-	        if (!keepDom) {
-	            // remove from DOM
-	            var length_2 = nodes.length;
-	            for (var i = 0; i < length_2; i++) {
-	                node = nodes[i];
-	                if (this.removeCB)
-	                    this.removeCB(node);
-	                this.targetNode.removeChild(node);
-	            }
-	        }
-	        return nodes;
-	    };
-	    VirtualChildNodes.prototype.clear = function () {
-	        // remove from DOM
-	        var length = this.childNodes.length;
-	        var node;
-	        for (var i = 0; i < length; i++) {
-	            node = this.childNodes[i];
-	            if (this.removeCB)
-	                this.removeCB(node);
-	            this.targetNode.removeChild(node);
-	        }
-	        // reset proxy array
-	        this.childNodes = [];
-	    };
-	    return VirtualChildNodes;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = VirtualChildNodes;
-	//# sourceMappingURL=VirtualChildNodes.js.map
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	"use strict";
-	var RefCountDisposeWrapper = (function () {
-	    function RefCountDisposeWrapper(inner, initialRefCount) {
-	        if (initialRefCount === void 0) { initialRefCount = 1; }
-	        this.inner = inner;
-	        this.refCount = initialRefCount;
-	    }
-	    RefCountDisposeWrapper.prototype.addRef = function () {
-	        this.refCount++;
-	    };
-	    RefCountDisposeWrapper.prototype.release = function () {
-	        if (--this.refCount === 0) {
-	            this.inner.dispose();
-	            this.inner = null;
-	        }
-	        return this.refCount;
-	    };
-	    RefCountDisposeWrapper.prototype.dispose = function () {
-	        this.release();
-	    };
-	    return RefCountDisposeWrapper;
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = RefCountDisposeWrapper;
-	//# sourceMappingURL=RefCountDisposeWrapper.js.map
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/// <reference path="../Interfaces.ts" />
-	var List_1 = __webpack_require__(30);
-	var ListPaged_1 = __webpack_require__(33);
+	var List_1 = __webpack_require__(19);
+	var ListPaged_1 = __webpack_require__(23);
 	"use strict";
 	/**
 	* Determines if target is an instance of a IObservableList
@@ -5160,7 +3584,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ListSupport.js.map
 
 /***/ },
-/* 30 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
@@ -5172,14 +3596,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	var Utils_1 = __webpack_require__(3);
 	var Oid_1 = __webpack_require__(15);
 	var IID_1 = __webpack_require__(5);
-	var Lazy_1 = __webpack_require__(31);
-	var ScheduledSubject_1 = __webpack_require__(32);
+	var Lazy_1 = __webpack_require__(20);
+	var ScheduledSubject_1 = __webpack_require__(21);
 	var Events_1 = __webpack_require__(4);
-	var RefCountDisposeWrapper_1 = __webpack_require__(28);
+	var RefCountDisposeWrapper_1 = __webpack_require__(22);
 	var log = __webpack_require__(7);
 	var Injector_1 = __webpack_require__(8);
 	var res = __webpack_require__(9);
-	var ListPaged_1 = __webpack_require__(33);
+	var ListPaged_1 = __webpack_require__(23);
 	"use strict";
 	/**
 	* ReactiveUI's awesome ReactiveList ported to Typescript
@@ -6233,7 +4657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=List.js.map
 
 /***/ },
-/* 31 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -6263,7 +4687,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=Lazy.js.map
 
 /***/ },
-/* 32 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Utils_1 = __webpack_require__(3);
@@ -6317,14 +4741,45 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ScheduledSubject.js.map
 
 /***/ },
-/* 33 */
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	"use strict";
+	var RefCountDisposeWrapper = (function () {
+	    function RefCountDisposeWrapper(inner, initialRefCount) {
+	        if (initialRefCount === void 0) { initialRefCount = 1; }
+	        this.inner = inner;
+	        this.refCount = initialRefCount;
+	    }
+	    RefCountDisposeWrapper.prototype.addRef = function () {
+	        this.refCount++;
+	    };
+	    RefCountDisposeWrapper.prototype.release = function () {
+	        if (--this.refCount === 0) {
+	            this.inner.dispose();
+	            this.inner = null;
+	        }
+	        return this.refCount;
+	    };
+	    RefCountDisposeWrapper.prototype.dispose = function () {
+	        this.release();
+	    };
+	    return RefCountDisposeWrapper;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = RefCountDisposeWrapper;
+	//# sourceMappingURL=RefCountDisposeWrapper.js.map
+
+/***/ },
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var IID_1 = __webpack_require__(5);
-	var Lazy_1 = __webpack_require__(31);
-	var ScheduledSubject_1 = __webpack_require__(32);
+	var Lazy_1 = __webpack_require__(20);
+	var ScheduledSubject_1 = __webpack_require__(21);
 	var Property_1 = __webpack_require__(10);
 	"use strict";
 	var PagedObservableListProjection = (function () {
@@ -6673,12 +5128,1557 @@ return /******/ (function(modules) { // webpackBootstrap
 	//# sourceMappingURL=ListPaged.js.map
 
 /***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	"use strict";
+	/**
+	* Html Template Engine based on JQuery's parseHTML
+	* NOTE: This version does not support scripts in templates!
+	*/
+	var rsingleTag = /^<([\w-]+)\s*\/?>(?:<\/\1>|)$/, rxhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:-]+)[^>]*)\/>/gi, rtagName = /<([\w:-]+)/, rhtml = /<|&#?\w+;/, rscriptType = /^$|\/(?:java|ecma)script/i, 
+	// We have to close these tags to support XHTML (#13200)
+	wrapMap = {
+	    // Support: IE9
+	    option: [1, "<select multiple='multiple'>", "</select>"],
+	    thead: [1, "<table>", "</table>"],
+	    // Some of the following wrappers are not fully defined, because
+	    // their parent elements (except for "table" element) could be omitted
+	    // since browser parsers are smart enough to auto-insert them
+	    // Support: Android 2.3
+	    // Android browser doesn't auto-insert colgroup
+	    col: [2, "<table><colgroup>", "</colgroup></table>"],
+	    // Auto-insert "tbody" element
+	    tr: [2, "<table>", "</table>"],
+	    // Auto-insert "tbody" and "tr" elements
+	    td: [3, "<table>", "</table>"],
+	    _default: [0, "", ""]
+	};
+	// Support: IE9
+	wrapMap.optgroup = wrapMap.option;
+	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+	wrapMap.th = wrapMap.td;
+	var supportsCreateHTMLDocument = (function () {
+	    var doc = document.implementation.createHTMLDocument("");
+	    // Support: Node with jsdom<=1.5.0+
+	    // jsdom's document created via the above method doesn't contain the body
+	    if (!doc.body) {
+	        return false;
+	    }
+	    doc.body.innerHTML = "<form></form><form></form>";
+	    return doc.body.childNodes.length === 2;
+	})();
+	function merge(first, second) {
+	    var len = +second.length, j = 0, i = first.length;
+	    for (; j < len; j++) {
+	        first[i++] = second[j];
+	    }
+	    first.length = i;
+	    return first;
+	}
+	function buildFragment(elems, context) {
+	    var elem, tmp, tag, wrap, j, fragment = context.createDocumentFragment(), nodes = [], i = 0, l = elems.length;
+	    for (; i < l; i++) {
+	        elem = elems[i];
+	        if (elem || elem === 0) {
+	            // Add nodes directly
+	            if (typeof elem === "object") {
+	                // Support: Android<4.1, PhantomJS<2
+	                // push.apply(_, arraylike) throws on ancient WebKit
+	                merge(nodes, elem.nodeType ? [elem] : elem);
+	            }
+	            else if (!rhtml.test(elem)) {
+	                nodes.push(context.createTextNode(elem));
+	            }
+	            else {
+	                tmp = tmp || fragment.appendChild(context.createElement("div"));
+	                // Deserialize a standard representation
+	                tag = (rtagName.exec(elem) || ["", ""])[1].toLowerCase();
+	                wrap = wrapMap[tag] || wrapMap._default;
+	                tmp.innerHTML = wrap[1] + elem.replace(rxhtmlTag, "<$1></$2>") + wrap[2];
+	                // Descend through wrappers to the right content
+	                j = wrap[0];
+	                while (j--) {
+	                    tmp = tmp.lastChild;
+	                }
+	                // Support: Android<4.1, PhantomJS<2
+	                // push.apply(_, arraylike) throws on ancient WebKit
+	                merge(nodes, tmp.childNodes);
+	                // Remember the top-level container
+	                tmp = fragment.firstChild;
+	                // Ensure the created nodes are orphaned (#12392)
+	                tmp.textContent = "";
+	            }
+	        }
+	    }
+	    // Remove wrapper from fragment
+	    fragment.textContent = "";
+	    i = 0;
+	    while ((elem = nodes[i++])) {
+	        // filter out scripts
+	        if (elem.nodeType !== 1 || elem.tagName.toLowerCase() !== "script" || !rscriptType.test(elem.type || "")) {
+	            fragment.appendChild(elem);
+	        }
+	    }
+	    return fragment;
+	}
+	var HtmlTemplateEngine = (function () {
+	    function HtmlTemplateEngine() {
+	    }
+	    HtmlTemplateEngine.prototype.parse = function (data) {
+	        // document.implementation stops scripts or inline event handlers from being executed immediately
+	        var context = supportsCreateHTMLDocument ? document.implementation.createHTMLDocument("") : document;
+	        var parsed = rsingleTag.exec(data);
+	        // Single tag
+	        if (parsed) {
+	            return [context.createElement(parsed[1])];
+	        }
+	        parsed = buildFragment([data], context);
+	        var result = merge([], parsed.childNodes);
+	        return result;
+	    };
+	    return HtmlTemplateEngine;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = HtmlTemplateEngine;
+	//# sourceMappingURL=HtmlTemplateEngine.js.map
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var Utils_1 = __webpack_require__(3);
+	var Command_1 = __webpack_require__(26);
+	"use strict";
+	var CommandBinding = (function () {
+	    function CommandBinding(domManager, app) {
+	        this.priority = 0;
+	        this.domManager = domManager;
+	        this.app = app;
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    CommandBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("command-binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("invalid binding-options!");
+	        var compiled = this.domManager.compileBindingOptions(options, module);
+	        var el = node;
+	        var exp;
+	        var cmdObservable;
+	        var paramObservable;
+	        var cleanup;
+	        var isAnchor = el.tagName.toLowerCase() === "a";
+	        var event = "click";
+	        function doCleanup() {
+	            if (cleanup) {
+	                cleanup.dispose();
+	                cleanup = null;
+	            }
+	        }
+	        if (typeof compiled === "function") {
+	            exp = compiled;
+	            cmdObservable = this.domManager.expressionToObservable(exp, ctx);
+	        }
+	        else {
+	            var opt = compiled;
+	            exp = opt.command;
+	            cmdObservable = this.domManager.expressionToObservable(exp, ctx);
+	            if (opt.parameter) {
+	                exp = opt.parameter;
+	                paramObservable = this.domManager.expressionToObservable(exp, ctx);
+	            }
+	        }
+	        if (paramObservable == null) {
+	            paramObservable = Rx.Observable.return(undefined);
+	        }
+	        state.cleanup.add(Rx.Observable
+	            .combineLatest(cmdObservable, paramObservable, function (cmd, param) { return ({ cmd: cmd, param: param }); })
+	            .subscribe(function (x) {
+	            try {
+	                doCleanup();
+	                cleanup = new Rx.CompositeDisposable();
+	                if (x.cmd != null) {
+	                    if (!Command_1.isCommand(x.cmd))
+	                        Utils_1.throwError("Command-Binding only supports binding to a command!");
+	                    // disabled handling if supported by element
+	                    if (Utils_1.elementCanBeDisabled(el)) {
+	                        // initial update
+	                        el.disabled = !x.cmd.canExecute(x.param);
+	                        // listen to changes
+	                        cleanup.add(x.cmd.canExecuteObservable.subscribe(function (canExecute) {
+	                            el.disabled = !canExecute;
+	                        }));
+	                    }
+	                    // handle input events
+	                    cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
+	                        // verify that the command can actually execute since we cannot disable 
+	                        // all elements - only form elements such as buttons 
+	                        if (x.cmd.canExecute(x.param)) {
+	                            x.cmd.execute(x.param);
+	                        }
+	                        // prevent default for anchors
+	                        if (isAnchor) {
+	                            e.preventDefault();
+	                        }
+	                    }));
+	                }
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            el = null;
+	            // nullify locals
+	            doCleanup();
+	        }));
+	    };
+	    CommandBinding.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    return CommandBinding;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = CommandBinding;
+	//# sourceMappingURL=Command.js.map
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var IID_1 = __webpack_require__(5);
+	var Utils_1 = __webpack_require__(3);
+	var Injector_1 = __webpack_require__(8);
+	var res = __webpack_require__(9);
+	"use strict";
+	var Command = (function () {
+	    /// <summary>
+	    /// Don't use this directly, use commandXYZ instead
+	    /// </summary>
+	    function Command(canExecute, executeAsync, scheduler) {
+	        var _this = this;
+	        this.resultsSubject = new Rx.Subject();
+	        this.isExecutingSubject = new Rx.Subject();
+	        this.inflightCount = 0;
+	        this.canExecuteLatest = false;
+	        this.scheduler = scheduler || Injector_1.injector.get(res.app).mainThreadScheduler;
+	        this.func = executeAsync;
+	        // setup canExecute
+	        var canExecuteObs = canExecute
+	            .combineLatest(this.isExecutingSubject.startWith(false), function (ce, ie) { return ce && !ie; })
+	            .catch(function (ex) {
+	            _this.exceptionsSubject.onNext(ex);
+	            return Rx.Observable.return(false);
+	        })
+	            .do(function (x) {
+	            _this.canExecuteLatest = x;
+	        })
+	            .startWith(this.canExecuteLatest)
+	            .distinctUntilChanged()
+	            .publish();
+	        this.canExecuteDisp = canExecuteObs.connect();
+	        this.canExecuteObservable = canExecuteObs;
+	        // setup thrownExceptions
+	        this.exceptionsSubject = new Rx.Subject();
+	        this.thrownExceptions = this.exceptionsSubject.asObservable();
+	        this.exceptionsSubject
+	            .observeOn(this.scheduler)
+	            .subscribe(Injector_1.injector.get(res.app).defaultExceptionHandler);
+	    }
+	    //////////////////////////////////
+	    // wx.IUnknown implementation
+	    Command.prototype.queryInterface = function (iid) {
+	        return iid === IID_1.default.ICommand || iid === IID_1.default.IDisposable;
+	    };
+	    //////////////////////////////////
+	    // IDisposable implementation
+	    Command.prototype.dispose = function () {
+	        var disp = this.canExecuteDisp;
+	        if (disp != null)
+	            disp.dispose();
+	    };
+	    Object.defineProperty(Command.prototype, "isExecuting", {
+	        get: function () {
+	            return this.isExecutingSubject.startWith(this.inflightCount > 0);
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(Command.prototype, "results", {
+	        get: function () {
+	            return this.resultsSubject.asObservable();
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Command.prototype.canExecute = function (parameter) {
+	        return this.canExecuteLatest;
+	    };
+	    Command.prototype.execute = function (parameter) {
+	        this.executeAsync(parameter)
+	            .catch(Rx.Observable.empty())
+	            .subscribe();
+	    };
+	    Command.prototype.executeAsync = function (parameter) {
+	        var self = this;
+	        var ret = this.canExecute(parameter) ? Rx.Observable.create(function (subj) {
+	            if (++self.inflightCount === 1) {
+	                self.isExecutingSubject.onNext(true);
+	            }
+	            var decrement = new Rx.SerialDisposable();
+	            decrement.setDisposable(Rx.Disposable.create(function () {
+	                if (--self.inflightCount === 0) {
+	                    self.isExecutingSubject.onNext(false);
+	                }
+	            }));
+	            var disp = self.func(parameter)
+	                .observeOn(self.scheduler)
+	                .do(function (_) { }, function (e) { return decrement.setDisposable(Rx.Disposable.empty); }, function () { return decrement.setDisposable(Rx.Disposable.empty); })
+	                .do(function (x) { return self.resultsSubject.onNext(x); }, function (x) { return self.exceptionsSubject.onNext(x); })
+	                .subscribe(subj);
+	            return new Rx.CompositeDisposable(disp, decrement);
+	        }) : Rx.Observable.throw(new Error("canExecute currently forbids execution"));
+	        return ret
+	            .publish()
+	            .refCount();
+	    };
+	    return Command;
+	})();
+	exports.Command = Command;
+	var internal;
+	(function (internal) {
+	    internal.commandConstructor = Command;
+	})(internal = exports.internal || (exports.internal = {}));
+	// factory method implementation
+	function command() {
+	    var args = Utils_1.args2Array(arguments);
+	    var canExecute;
+	    var execute;
+	    var scheduler;
+	    var thisArg;
+	    if (Utils_1.isFunction(args[0])) {
+	        // first overload
+	        execute = args.shift();
+	        canExecute = Utils_1.isRxObservable(args[0]) ? args.shift() : Rx.Observable.return(true);
+	        scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
+	        thisArg = args.shift();
+	        if (thisArg != null)
+	            execute = execute.bind(thisArg);
+	        return asyncCommand(canExecute, function (parameter) {
+	            return Rx.Observable.create(function (obs) {
+	                try {
+	                    execute(parameter);
+	                    obs.onNext(null);
+	                    obs.onCompleted();
+	                }
+	                catch (e) {
+	                    obs.onError(e);
+	                }
+	                return Rx.Disposable.empty;
+	            });
+	        }, scheduler);
+	    }
+	    // second overload
+	    canExecute = args.shift() || Rx.Observable.return(true);
+	    scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
+	    return new Command(canExecute, function (x) { return Rx.Observable.return(x); }, scheduler);
+	}
+	exports.command = command;
+	// factory method implementation
+	function asyncCommand() {
+	    var args = Utils_1.args2Array(arguments);
+	    var canExecute;
+	    var executeAsync;
+	    var scheduler;
+	    var thisArg;
+	    if (Utils_1.isFunction(args[0])) {
+	        // second overload
+	        executeAsync = args.shift();
+	        scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
+	        thisArg = args.shift();
+	        if (thisArg != null)
+	            executeAsync = executeAsync.bind(thisArg);
+	        return new Command(Rx.Observable.return(true), executeAsync, scheduler);
+	    }
+	    // first overload
+	    canExecute = args.shift();
+	    executeAsync = args.shift();
+	    scheduler = Utils_1.isRxScheduler(args[0]) ? args.shift() : undefined;
+	    return new Command(canExecute, executeAsync, scheduler);
+	}
+	exports.asyncCommand = asyncCommand;
+	/**
+	* Determines if target is an instance of a ICommand
+	* @param {any} target
+	*/
+	function isCommand(target) {
+	    if (target == null)
+	        return false;
+	    return target instanceof Command ||
+	        Utils_1.queryInterface(target, IID_1.default.ICommand);
+	}
+	exports.isCommand = isCommand;
+	//# sourceMappingURL=Command.js.map
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var Utils_1 = __webpack_require__(3);
+	var Module_1 = __webpack_require__(11);
+	"use strict";
+	var ModuleBinding = (function () {
+	    function ModuleBinding(domManager, app) {
+	        this.priority = 100;
+	        this.controlsDescendants = true;
+	        this.domManager = domManager;
+	        this.app = app;
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    ModuleBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("module-binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("invalid binding-options!");
+	        var el = node;
+	        var self = this;
+	        var exp = this.domManager.compileBindingOptions(options, module);
+	        var obs = this.domManager.expressionToObservable(exp, ctx);
+	        var initialApply = true;
+	        var cleanup;
+	        function doCleanup() {
+	            if (cleanup) {
+	                cleanup.dispose();
+	                cleanup = null;
+	            }
+	        }
+	        // backup inner HTML
+	        var template = new Array();
+	        // subscribe
+	        state.cleanup.add(obs.subscribe(function (x) {
+	            try {
+	                doCleanup();
+	                cleanup = new Rx.CompositeDisposable();
+	                var value = Utils_1.unwrapProperty(x);
+	                var moduleNames;
+	                var disp = undefined;
+	                // split names
+	                if (value) {
+	                    value = value.trim();
+	                    moduleNames = value.split(" ").filter(function (x) { return x; });
+	                }
+	                if (moduleNames.length > 0) {
+	                    var observables = moduleNames.map(function (x) { return Module_1.loadModule(x); });
+	                    disp = Rx.Observable.combineLatest(observables, function (_) { return Utils_1.args2Array(arguments); }).subscribe(function (modules) {
+	                        try {
+	                            // create intermediate module
+	                            var moduleName = (module || _this.app).name + "+" + moduleNames.join("+");
+	                            var merged = new Module_1.Module(moduleName);
+	                            // merge modules into intermediate
+	                            merged.merge(module || _this.app);
+	                            modules.forEach(function (x) { return merged.merge(x); });
+	                            // done
+	                            self.applyValue(el, merged, template, ctx, state, initialApply);
+	                            initialApply = false;
+	                        }
+	                        catch (e) {
+	                            _this.app.defaultExceptionHandler.onNext(e);
+	                        }
+	                    });
+	                    if (disp != null)
+	                        cleanup.add(disp);
+	                }
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            obs = null;
+	            self = null;
+	        }));
+	    };
+	    ModuleBinding.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    ModuleBinding.prototype.applyValue = function (el, module, template, ctx, state, initialApply) {
+	        if (initialApply) {
+	            // clone to template
+	            for (var i = 0; i < el.childNodes.length; i++) {
+	                template.push(el.childNodes[i].cloneNode(true));
+	            }
+	        }
+	        state.module = module;
+	        // clean first
+	        this.domManager.cleanDescendants(el);
+	        // clear
+	        while (el.firstChild) {
+	            el.removeChild(el.firstChild);
+	        }
+	        // clone nodes and inject
+	        for (var i = 0; i < template.length; i++) {
+	            var node = template[i].cloneNode(true);
+	            el.appendChild(node);
+	        }
+	        this.domManager.applyBindingsToDescendants(ctx, el);
+	    };
+	    return ModuleBinding;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ModuleBinding;
+	//# sourceMappingURL=Module.js.map
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Utils_1 = __webpack_require__(3);
+	"use strict";
+	var IfBinding = (function () {
+	    function IfBinding(domManager, app) {
+	        this.priority = 50;
+	        this.controlsDescendants = true;
+	        ////////////////////
+	        // wx.Implementation
+	        this.inverse = false;
+	        this.domManager = domManager;
+	        this.app = app;
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    IfBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("if-binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("invalid binding-options!");
+	        var compiled = this.domManager.compileBindingOptions(options, module);
+	        var el = node;
+	        var self = this;
+	        var initialApply = true;
+	        var exp;
+	        var animations = {};
+	        var cleanup;
+	        function doCleanup() {
+	            if (cleanup) {
+	                cleanup.dispose();
+	                cleanup = null;
+	            }
+	        }
+	        if (typeof compiled === "object") {
+	            var opt = compiled;
+	            exp = opt.condition;
+	            // extract animations
+	            if (opt.enter) {
+	                animations.enter = this.domManager.evaluateExpression(opt.enter, ctx);
+	                if (typeof animations.enter === "string") {
+	                    animations.enter = module.animation(animations.enter);
+	                }
+	            }
+	            if (opt.leave) {
+	                animations.leave = this.domManager.evaluateExpression(opt.leave, ctx);
+	                if (typeof animations.leave === "string") {
+	                    animations.leave = module.animation(animations.leave);
+	                }
+	            }
+	        }
+	        else {
+	            exp = compiled;
+	        }
+	        var obs = this.domManager.expressionToObservable(exp, ctx);
+	        // backup inner HTML
+	        var template = new Array();
+	        // subscribe
+	        state.cleanup.add(obs.subscribe(function (x) {
+	            try {
+	                doCleanup();
+	                cleanup = new Rx.CompositeDisposable();
+	                cleanup.add(self.applyValue(el, Utils_1.unwrapProperty(x), template, ctx, animations, initialApply));
+	                initialApply = false;
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            obs = null;
+	            el = null;
+	            self = null;
+	            // nullify locals
+	            template = null;
+	        }));
+	    };
+	    IfBinding.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    IfBinding.prototype.applyValue = function (el, value, template, ctx, animations, initialApply) {
+	        var _this = this;
+	        var leaveAnimation = animations.leave;
+	        var enterAnimation = animations.enter;
+	        var self = this;
+	        var obs = undefined;
+	        if (initialApply) {
+	            // clone to template
+	            for (var i = 0; i < el.childNodes.length; i++) {
+	                template.push(el.childNodes[i].cloneNode(true));
+	            }
+	            // clear
+	            while (el.firstChild) {
+	                el.removeChild(el.firstChild);
+	            }
+	        }
+	        var oldElements = Utils_1.nodeChildrenToArray(el);
+	        value = this.inverse ? !value : value;
+	        function removeOldElements() {
+	            oldElements.forEach(function (x) {
+	                self.domManager.cleanNode(x);
+	                el.removeChild(x);
+	            });
+	        }
+	        if (oldElements.length > 0) {
+	            if (leaveAnimation) {
+	                leaveAnimation.prepare(oldElements);
+	                obs = leaveAnimation.run(oldElements)
+	                    .continueWith(function () { return leaveAnimation.complete(oldElements); })
+	                    .continueWith(removeOldElements);
+	            }
+	            else {
+	                removeOldElements();
+	            }
+	        }
+	        if (value) {
+	            var nodes = template.map(function (x) { return x.cloneNode(true); });
+	            if (obs) {
+	                obs = obs.continueWith(function () {
+	                    if (enterAnimation)
+	                        enterAnimation.prepare(nodes);
+	                    for (var i = 0; i < template.length; i++) {
+	                        el.appendChild(nodes[i]);
+	                    }
+	                    _this.domManager.applyBindingsToDescendants(ctx, el);
+	                });
+	                if (enterAnimation) {
+	                    obs = enterAnimation.run(nodes)
+	                        .continueWith(function () { return enterAnimation.complete(nodes); });
+	                }
+	            }
+	            else {
+	                if (enterAnimation)
+	                    enterAnimation.prepare(nodes);
+	                for (var i = 0; i < template.length; i++) {
+	                    el.appendChild(nodes[i]);
+	                }
+	                this.domManager.applyBindingsToDescendants(ctx, el);
+	                if (enterAnimation) {
+	                    obs = enterAnimation.run(nodes)
+	                        .continueWith(function () { return enterAnimation.complete(nodes); });
+	                }
+	            }
+	        }
+	        return obs ? (obs.subscribe() || Rx.Disposable.empty) : Rx.Disposable.empty;
+	    };
+	    return IfBinding;
+	})();
+	exports.IfBinding = IfBinding;
+	var NotIfBinding = (function (_super) {
+	    __extends(NotIfBinding, _super);
+	    function NotIfBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.inverse = true;
+	    }
+	    return NotIfBinding;
+	})(IfBinding);
+	exports.NotIfBinding = NotIfBinding;
+	//# sourceMappingURL=If.js.map
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Utils_1 = __webpack_require__(3);
+	var BindingBase_1 = __webpack_require__(30);
+	"use strict";
+	var CssBinding = (function (_super) {
+	    __extends(CssBinding, _super);
+	    function CssBinding(domManager, app) {
+	        _super.call(this, domManager, app, true);
+	    }
+	    CssBinding.prototype.applyValue = function (el, value, key) {
+	        var classes;
+	        if (key !== "") {
+	            classes = key.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+	            if (classes.length) {
+	                Utils_1.toggleCssClass.apply(null, [el, !!value].concat(classes));
+	            }
+	        }
+	        else {
+	            var state = this.domManager.getNodeState(el);
+	            // if we have previously added classes, remove them
+	            if (state.cssBindingPreviousDynamicClasses != null) {
+	                Utils_1.toggleCssClass.apply(null, [el, false].concat(state.cssBindingPreviousDynamicClasses));
+	                state.cssBindingPreviousDynamicClasses = null;
+	            }
+	            if (value) {
+	                classes = value.split(/\s+/).map(function (x) { return x.trim(); }).filter(function (x) { return x; });
+	                if (classes.length) {
+	                    Utils_1.toggleCssClass.apply(null, [el, true].concat(classes));
+	                    state.cssBindingPreviousDynamicClasses = classes;
+	                }
+	            }
+	        }
+	    };
+	    return CssBinding;
+	})(BindingBase_1.MultiOneWayBindingBase);
+	exports.CssBinding = CssBinding;
+	var AttrBinding = (function (_super) {
+	    __extends(AttrBinding, _super);
+	    function AttrBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.priority = 5;
+	    }
+	    AttrBinding.prototype.applyValue = function (el, value, key) {
+	        // To cover cases like "attr: { checked:someProp }", we want to remove the attribute entirely
+	        // when someProp is a "no value"-like value (strictly null, false, or undefined)
+	        // (because the absence of the "checked" attr is how to mark an element as not checked, etc.)
+	        var toRemove = (value === false) || (value === null) || (value === undefined);
+	        if (toRemove)
+	            el.removeAttribute(key);
+	        else {
+	            el.setAttribute(key, value.toString());
+	        }
+	    };
+	    return AttrBinding;
+	})(BindingBase_1.MultiOneWayBindingBase);
+	exports.AttrBinding = AttrBinding;
+	var StyleBinding = (function (_super) {
+	    __extends(StyleBinding, _super);
+	    function StyleBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	    }
+	    StyleBinding.prototype.applyValue = function (el, value, key) {
+	        if (value === null || value === undefined || value === false) {
+	            // Empty string removes the value, whereas null/undefined have no effect
+	            value = "";
+	        }
+	        el.style[key] = value;
+	    };
+	    return StyleBinding;
+	})(BindingBase_1.MultiOneWayBindingBase);
+	exports.StyleBinding = StyleBinding;
+	//# sourceMappingURL=MultiOneWay.js.map
+
+/***/ },
+/* 30 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var Utils_1 = __webpack_require__(3);
+	"use strict";
+	/**
+	* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
+	* @class
+	*/
+	var SingleOneWayBindingBase = (function () {
+	    function SingleOneWayBindingBase(domManager, app) {
+	        this.priority = 0;
+	        this.domManager = domManager;
+	        this.app = app;
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    SingleOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("invalid binding-options!");
+	        var el = node;
+	        var self = this;
+	        var exp = this.domManager.compileBindingOptions(options, module);
+	        var obs = this.domManager.expressionToObservable(exp, ctx);
+	        // subscribe
+	        state.cleanup.add(obs.subscribe(function (x) {
+	            try {
+	                self.applyValue(el, Utils_1.unwrapProperty(x));
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            el = null;
+	            obs = null;
+	            self = null;
+	        }));
+	    };
+	    SingleOneWayBindingBase.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    SingleOneWayBindingBase.prototype.applyValue = function (el, value) {
+	        Utils_1.throwError("you need to override this method!");
+	    };
+	    return SingleOneWayBindingBase;
+	})();
+	exports.SingleOneWayBindingBase = SingleOneWayBindingBase;
+	/**
+	* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
+	* @class
+	*/
+	var MultiOneWayBindingBase = (function () {
+	    function MultiOneWayBindingBase(domManager, app, supportsDynamicValues) {
+	        if (supportsDynamicValues === void 0) { supportsDynamicValues = false; }
+	        this.priority = 0;
+	        this.supportsDynamicValues = false;
+	        this.domManager = domManager;
+	        this.app = app;
+	        this.supportsDynamicValues = supportsDynamicValues;
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    MultiOneWayBindingBase.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("binding only operates on elements!");
+	        var compiled = this.domManager.compileBindingOptions(options, module);
+	        if (compiled == null || (typeof compiled !== "object" && !this.supportsDynamicValues))
+	            Utils_1.throwError("invalid binding-options!");
+	        var el = node;
+	        var observables = new Array();
+	        var obs;
+	        var exp;
+	        var keys = Object.keys(compiled);
+	        var key;
+	        if (typeof compiled === "function") {
+	            exp = compiled;
+	            obs = this.domManager.expressionToObservable(exp, ctx);
+	            observables.push(["", obs]);
+	        }
+	        else {
+	            for (var i = 0; i < keys.length; i++) {
+	                key = keys[i];
+	                var value = compiled[key];
+	                exp = value;
+	                obs = this.domManager.expressionToObservable(exp, ctx);
+	                observables.push([key, obs]);
+	            }
+	        }
+	        // subscribe
+	        for (var i = 0; i < observables.length; i++) {
+	            key = observables[i][0];
+	            obs = observables[i][1];
+	            this.subscribe(el, obs, key, state);
+	        }
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            el = null;
+	            keys = null;
+	            // nullify locals
+	            observables = null;
+	        }));
+	    };
+	    MultiOneWayBindingBase.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    MultiOneWayBindingBase.prototype.subscribe = function (el, obs, key, state) {
+	        var _this = this;
+	        state.cleanup.add(obs.subscribe(function (x) {
+	            try {
+	                _this.applyValue(el, Utils_1.unwrapProperty(x), key);
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	    };
+	    MultiOneWayBindingBase.prototype.applyValue = function (el, key, value) {
+	        Utils_1.throwError("you need to override this method!");
+	    };
+	    return MultiOneWayBindingBase;
+	})();
+	exports.MultiOneWayBindingBase = MultiOneWayBindingBase;
+	//# sourceMappingURL=BindingBase.js.map
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../Interfaces.ts" />
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Utils_1 = __webpack_require__(3);
+	var BindingBase_1 = __webpack_require__(30);
+	"use strict";
+	////////////////////
+	// Bindings
+	var TextBinding = (function (_super) {
+	    __extends(TextBinding, _super);
+	    function TextBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	    }
+	    TextBinding.prototype.applyValue = function (el, value) {
+	        if ((value === null) || (value === undefined))
+	            value = "";
+	        el.textContent = value;
+	    };
+	    return TextBinding;
+	})(BindingBase_1.SingleOneWayBindingBase);
+	exports.TextBinding = TextBinding;
+	var VisibleBinding = (function (_super) {
+	    __extends(VisibleBinding, _super);
+	    function VisibleBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.inverse = false;
+	        this.inverse = false;
+	        this.priority = 10;
+	    }
+	    VisibleBinding.prototype.configure = function (_options) {
+	        var options = _options;
+	        VisibleBinding.useCssClass = options.useCssClass;
+	        VisibleBinding.hiddenClass = options.hiddenClass;
+	    };
+	    ////////////////////
+	    // implementation
+	    VisibleBinding.prototype.applyValue = function (el, value) {
+	        value = this.inverse ? !value : value;
+	        if (!VisibleBinding.useCssClass) {
+	            if (!value) {
+	                el.style.display = "none";
+	            }
+	            else {
+	                el.style.display = "";
+	            }
+	        }
+	        else {
+	            Utils_1.toggleCssClass(el, !value, VisibleBinding.hiddenClass);
+	        }
+	    };
+	    return VisibleBinding;
+	})(BindingBase_1.SingleOneWayBindingBase);
+	exports.VisibleBinding = VisibleBinding;
+	var HiddenBinding = (function (_super) {
+	    __extends(HiddenBinding, _super);
+	    function HiddenBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.inverse = true;
+	    }
+	    return HiddenBinding;
+	})(VisibleBinding);
+	exports.HiddenBinding = HiddenBinding;
+	var HtmlBinding = (function (_super) {
+	    __extends(HtmlBinding, _super);
+	    function HtmlBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	    }
+	    HtmlBinding.prototype.applyValue = function (el, value) {
+	        if ((value === null) || (value === undefined))
+	            value = "";
+	        el.innerHTML = value;
+	    };
+	    return HtmlBinding;
+	})(BindingBase_1.SingleOneWayBindingBase);
+	exports.HtmlBinding = HtmlBinding;
+	var DisableBinding = (function (_super) {
+	    __extends(DisableBinding, _super);
+	    function DisableBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.inverse = false;
+	        this.inverse = false;
+	    }
+	    ////////////////////
+	    // implementation
+	    DisableBinding.prototype.applyValue = function (el, value) {
+	        value = this.inverse ? !value : value;
+	        if (Utils_1.elementCanBeDisabled(el)) {
+	            el.disabled = value;
+	        }
+	    };
+	    return DisableBinding;
+	})(BindingBase_1.SingleOneWayBindingBase);
+	exports.DisableBinding = DisableBinding;
+	var EnableBinding = (function (_super) {
+	    __extends(EnableBinding, _super);
+	    function EnableBinding(domManager, app) {
+	        _super.call(this, domManager, app);
+	        this.inverse = true;
+	    }
+	    return EnableBinding;
+	})(DisableBinding);
+	exports.EnableBinding = EnableBinding;
+	//# sourceMappingURL=SingleOneWay.js.map
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/// <reference path="../RxExtensions.d.ts" />
+	var Utils_1 = __webpack_require__(3);
+	var VirtualChildNodes_1 = __webpack_require__(33);
+	var RefCountDisposeWrapper_1 = __webpack_require__(22);
+	var Injector_1 = __webpack_require__(8);
+	var ListSupport_1 = __webpack_require__(18);
+	"use strict";
+	var ForEachBinding = (function () {
+	    function ForEachBinding(domManager, app) {
+	        this.priority = 40;
+	        this.controlsDescendants = true;
+	        this.domManager = domManager;
+	        this.app = app;
+	        // hook into getDataContext() to map state['index'] to ctx['$index']
+	        domManager.registerDataContextExtension(function (node, ctx) {
+	            var state = domManager.getNodeState(node);
+	            ctx.$index = state.index;
+	        });
+	    }
+	    ////////////////////
+	    // wx.IBinding
+	    ForEachBinding.prototype.applyBinding = function (node, options, ctx, state, module) {
+	        var _this = this;
+	        if (node.nodeType !== 1)
+	            Utils_1.throwError("forEach binding only operates on elements!");
+	        if (options == null)
+	            Utils_1.throwError("** invalid binding options!");
+	        var compiled = this.domManager.compileBindingOptions(options, module);
+	        var el = node;
+	        var self = this;
+	        var initialApply = true;
+	        var cleanup = null;
+	        var hooks;
+	        var exp;
+	        var setProxyFunc;
+	        var animations = {};
+	        if (typeof compiled === "object" && compiled.hasOwnProperty("data")) {
+	            var opt = compiled;
+	            exp = opt.data;
+	            // extract animations
+	            if (opt.itemEnter) {
+	                animations.itemEnter = this.domManager.evaluateExpression(opt.itemEnter, ctx);
+	                if (typeof animations.itemEnter === "string") {
+	                    animations.itemEnter = module.animation(animations.itemEnter);
+	                }
+	            }
+	            if (opt.itemLeave) {
+	                animations.itemLeave = this.domManager.evaluateExpression(opt.itemLeave, ctx);
+	                if (typeof animations.itemLeave === "string") {
+	                    animations.itemLeave = module.animation(animations.itemLeave);
+	                }
+	            }
+	            if (opt.hooks) {
+	                // extract hooks
+	                hooks = this.domManager.evaluateExpression(opt.hooks, ctx);
+	            }
+	            // optionally resolve hooks if passed as string identifier
+	            if (typeof hooks === "string")
+	                hooks = Injector_1.injector.get(hooks);
+	            if (opt['debug']) {
+	                if (opt['debug']['setProxyFunc']) {
+	                    setProxyFunc = this.domManager.evaluateExpression(opt['debug']['setProxyFunc'], ctx);
+	                }
+	            }
+	        }
+	        else {
+	            exp = compiled;
+	        }
+	        var obs = this.domManager.expressionToObservable(exp, ctx);
+	        // add own disposables
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            if (cleanup) {
+	                cleanup.dispose();
+	                cleanup = null;
+	            }
+	        }));
+	        // backup inner HTML
+	        var template = new Array();
+	        // subscribe
+	        state.cleanup.add(obs.subscribe(function (x) {
+	            try {
+	                if (cleanup) {
+	                    cleanup.dispose();
+	                }
+	                cleanup = new Rx.CompositeDisposable();
+	                self.applyValue(el, x, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc);
+	                initialApply = false;
+	            }
+	            catch (e) {
+	                _this.app.defaultExceptionHandler.onNext(e);
+	            }
+	        }));
+	        // release closure references to GC 
+	        state.cleanup.add(Rx.Disposable.create(function () {
+	            // nullify args
+	            node = null;
+	            options = null;
+	            ctx = null;
+	            state = null;
+	            // nullify common locals
+	            obs = null;
+	            el = null;
+	            self = null;
+	            // nullify locals
+	            template = null;
+	            hooks = null;
+	        }));
+	    };
+	    ForEachBinding.prototype.configure = function (options) {
+	        // intentionally left blank
+	    };
+	    ForEachBinding.prototype.createIndexPropertyForNode = function (proxy, child, startIndex, trigger, templateLength) {
+	        return Rx.Observable.defer(function () {
+	            return Rx.Observable.create(function (obs) {
+	                return trigger.subscribe(function (_) {
+	                    // recalculate index from node position within parent
+	                    var index = proxy.childNodes.indexOf(child);
+	                    index /= templateLength;
+	                    obs.onNext(index);
+	                });
+	            });
+	        })
+	            .toProperty(startIndex);
+	    };
+	    ForEachBinding.prototype.appendAllRows = function (proxy, list, ctx, template, hooks, animations, indexTrigger, isInitial) {
+	        var length = list.length();
+	        for (var i = 0; i < length; i++) {
+	            this.appendRow(proxy, i, list.get(i), ctx, template, hooks, animations, indexTrigger, isInitial);
+	        }
+	    };
+	    ForEachBinding.prototype.appendRow = function (proxy, index, item, ctx, template, hooks, animations, indexTrigger, isInitial) {
+	        var nodes = Utils_1.cloneNodeArray(template);
+	        var _index = index;
+	        var enterAnimation = animations.itemEnter;
+	        var cbData = {
+	            item: item
+	        };
+	        if (indexTrigger) {
+	            _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
+	            cbData.indexDisp = new RefCountDisposeWrapper_1.default(_index, 0);
+	        }
+	        cbData.index = _index;
+	        if (enterAnimation != null)
+	            enterAnimation.prepare(nodes);
+	        proxy.appendChilds(nodes, cbData);
+	        if (hooks) {
+	            if (hooks.afterRender)
+	                hooks.afterRender(nodes, item);
+	            if (!isInitial && hooks.afterAdd)
+	                hooks.afterAdd(nodes, item, index);
+	        }
+	        if (enterAnimation) {
+	            var disp = enterAnimation.run(nodes)
+	                .continueWith(function () { return enterAnimation.complete(nodes); })
+	                .subscribe(function (x) {
+	                if (disp != null)
+	                    disp.dispose();
+	            });
+	        }
+	    };
+	    ForEachBinding.prototype.insertRow = function (proxy, index, item, ctx, template, hooks, animations, indexTrigger) {
+	        var templateLength = template.length;
+	        var enterAnimation = animations.itemEnter;
+	        var nodes = Utils_1.cloneNodeArray(template);
+	        var _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
+	        if (enterAnimation != null)
+	            enterAnimation.prepare(nodes);
+	        proxy.insertChilds(index * templateLength, nodes, {
+	            index: _index,
+	            item: item,
+	            indexDisp: new RefCountDisposeWrapper_1.default(_index, 0)
+	        });
+	        if (hooks) {
+	            if (hooks.afterRender)
+	                hooks.afterRender(nodes, item);
+	            if (hooks.afterAdd)
+	                hooks.afterAdd(nodes, item, index);
+	        }
+	        if (enterAnimation) {
+	            var disp = enterAnimation.run(nodes)
+	                .continueWith(function () { return enterAnimation.complete(nodes); })
+	                .subscribe(function (x) {
+	                if (disp != null)
+	                    disp.dispose();
+	            });
+	        }
+	    };
+	    ForEachBinding.prototype.removeRow = function (proxy, index, item, template, hooks, animations) {
+	        var templateLength = template.length;
+	        var el = proxy.targetNode;
+	        var nodes = proxy.removeChilds(index * templateLength, templateLength, true);
+	        var leaveAnimation = animations.itemLeave;
+	        function removeNodes() {
+	            for (var i = 0; i < templateLength; i++) {
+	                el.removeChild(nodes[i]);
+	            }
+	        }
+	        if (hooks && hooks.beforeRemove) {
+	            hooks.beforeRemove(nodes, item, index);
+	        }
+	        else {
+	            if (leaveAnimation != null) {
+	                leaveAnimation.prepare(nodes);
+	                var disp = leaveAnimation.run(nodes)
+	                    .continueWith(function () { return leaveAnimation.complete(nodes); })
+	                    .continueWith(removeNodes)
+	                    .subscribe(function (x) {
+	                    if (disp != null)
+	                        disp.dispose();
+	                });
+	            }
+	            else {
+	                removeNodes();
+	            }
+	        }
+	    };
+	    ForEachBinding.prototype.moveRow = function (proxy, from, to, item, template, hooks, animations, indexTrigger) {
+	        var templateLength = template.length;
+	        var el = proxy.targetNode;
+	        var nodes = proxy.removeChilds(from * templateLength, templateLength, true);
+	        var leaveAnimation = animations.itemLeave;
+	        var enterAnimation = animations.itemEnter;
+	        var combined = [];
+	        var obs;
+	        var self = this;
+	        if (hooks && hooks.beforeMove) {
+	            hooks.beforeMove(nodes, item, from);
+	        }
+	        function removeNodes() {
+	            for (var i = 0; i < templateLength; i++) {
+	                el.removeChild(nodes[i]);
+	            }
+	        }
+	        function createRow() {
+	            // create new row
+	            nodes = Utils_1.cloneNodeArray(template);
+	            var _index = self.createIndexPropertyForNode(proxy, nodes[0], from, indexTrigger, template.length);
+	            if (enterAnimation != null)
+	                enterAnimation.prepare(nodes);
+	            proxy.insertChilds(templateLength * to, nodes, {
+	                index: _index,
+	                item: item,
+	                indexDisp: new RefCountDisposeWrapper_1.default(_index, 0)
+	            });
+	            if (hooks && hooks.afterMove) {
+	                hooks.afterMove(nodes, item, from);
+	            }
+	        }
+	        // construct leave-observable
+	        if (leaveAnimation) {
+	            leaveAnimation.prepare(nodes);
+	            obs = leaveAnimation.run(nodes)
+	                .continueWith(function () { return leaveAnimation.complete(nodes); })
+	                .continueWith(removeNodes);
+	        }
+	        else {
+	            obs = Rx.Observable.startDeferred(removeNodes);
+	        }
+	        combined.push(obs);
+	        // construct enter-observable
+	        obs = Rx.Observable.startDeferred(createRow);
+	        if (enterAnimation) {
+	            obs = obs.continueWith(enterAnimation.run(nodes))
+	                .continueWith(function () { return enterAnimation.complete(nodes); });
+	        }
+	        combined.push(obs);
+	        // optimize return
+	        if (combined.length > 1)
+	            obs = Rx.Observable.combineLatest(combined, Utils_1.noop).take(1);
+	        else if (combined.length === 1)
+	            obs = combined[0].take(1);
+	        var disp = obs.subscribe(function (x) {
+	            if (disp != null)
+	                disp.dispose();
+	        });
+	    };
+	    ForEachBinding.prototype.rebindRow = function (proxy, index, item, template, indexTrigger) {
+	        var templateLength = template.length;
+	        var _index = this.createIndexPropertyForNode(proxy, proxy.childNodes[(index * templateLength)], index, indexTrigger, template.length);
+	        var indexDisp = new RefCountDisposeWrapper_1.default(_index, 0);
+	        for (var i = 0; i < template.length; i++) {
+	            var node = proxy.childNodes[(index * templateLength) + i];
+	            if (node.nodeType === 1) {
+	                this.domManager.cleanNode(node);
+	                var state = this.domManager.createNodeState(item);
+	                state.index = _index;
+	                indexDisp.addRef();
+	                state.cleanup.add(indexDisp);
+	                this.domManager.setNodeState(node, state);
+	                this.domManager.applyBindings(item, node);
+	            }
+	        }
+	    };
+	    ForEachBinding.prototype.observeList = function (proxy, ctx, template, cleanup, list, hooks, animations, indexTrigger) {
+	        var _this = this;
+	        var i;
+	        var length;
+	        cleanup.add(indexTrigger);
+	        // initial insert
+	        this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, true);
+	        // track changes
+	        cleanup.add(list.itemsAdded.subscribe(function (e) {
+	            length = e.items.length;
+	            if (e.from === list.length()) {
+	                for (var i_1 = 0; i_1 < length; i_1++) {
+	                    _this.appendRow(proxy, i_1 + e.from, e.items[i_1], ctx, template, hooks, animations, indexTrigger, false);
+	                }
+	            }
+	            else {
+	                for (var i_2 = 0; i_2 < e.items.length; i_2++) {
+	                    _this.insertRow(proxy, i_2 + e.from, e.items[i_2], ctx, template, hooks, animations, indexTrigger);
+	                }
+	            }
+	            indexTrigger.onNext(true);
+	        }));
+	        cleanup.add(list.itemsRemoved.subscribe(function (e) {
+	            length = e.items.length;
+	            for (var i_3 = 0; i_3 < length; i_3++) {
+	                _this.removeRow(proxy, i_3 + e.from, e.items[i_3], template, hooks, animations);
+	            }
+	            indexTrigger.onNext(true);
+	        }));
+	        cleanup.add(list.itemsMoved.subscribe(function (e) {
+	            _this.moveRow(proxy, e.from, e.to, e.items[0], template, hooks, animations, indexTrigger);
+	            indexTrigger.onNext(true);
+	        }));
+	        cleanup.add(list.itemReplaced.subscribe(function (e) {
+	            _this.rebindRow(proxy, e.from, e.items[0], template, indexTrigger);
+	            indexTrigger.onNext(true);
+	        }));
+	        cleanup.add(list.shouldReset.subscribe(function (e) {
+	            proxy.clear();
+	            _this.appendAllRows(proxy, list, ctx, template, hooks, animations, indexTrigger, false);
+	            indexTrigger.onNext(true);
+	        }));
+	    };
+	    ForEachBinding.prototype.applyValue = function (el, value, hooks, animations, template, ctx, initialApply, cleanup, setProxyFunc) {
+	        var i, length;
+	        if (initialApply) {
+	            // clone to template
+	            length = el.childNodes.length;
+	            for (var i_4 = 0; i_4 < length; i_4++) {
+	                template.push(el.childNodes[i_4].cloneNode(true));
+	            }
+	        }
+	        // perform initial clear
+	        while (el.firstChild) {
+	            el.removeChild(el.firstChild);
+	        }
+	        if (template.length === 0)
+	            return; // nothing to do
+	        var proxy;
+	        var self = this;
+	        var recalcIndextrigger;
+	        function nodeInsertCB(node, callbackData) {
+	            var item = callbackData.item;
+	            var index = callbackData.index;
+	            var indexDisp = callbackData.indexDisp;
+	            if (node.nodeType === 1) {
+	                // propagate index to state
+	                var state = (self.domManager.getNodeState(node) || self.domManager.createNodeState());
+	                state.model = item;
+	                state.index = index;
+	                self.domManager.setNodeState(node, state);
+	                if (recalcIndextrigger != null && indexDisp != null) {
+	                    indexDisp.addRef();
+	                    state.cleanup.add(indexDisp);
+	                }
+	                self.domManager.applyBindings(item, node);
+	            }
+	        }
+	        function nodeRemoveCB(node) {
+	            if (node.nodeType === 1) {
+	                self.domManager.cleanNode(node);
+	            }
+	        }
+	        proxy = new VirtualChildNodes_1.default(el, false, nodeInsertCB, nodeRemoveCB);
+	        if (setProxyFunc)
+	            setProxyFunc(proxy);
+	        cleanup.add(Rx.Disposable.create(function () {
+	            proxy = null;
+	        }));
+	        if (Array.isArray(value)) {
+	            var arr = value;
+	            // iterate once and be done with it
+	            length = arr.length;
+	            for (var i_5 = 0; i_5 < length; i_5++) {
+	                this.appendRow(proxy, i_5, arr[i_5], ctx, template, hooks, animations, undefined, true);
+	            }
+	        }
+	        else if (ListSupport_1.isList(value)) {
+	            var list = value;
+	            recalcIndextrigger = new Rx.Subject();
+	            this.observeList(proxy, ctx, template, cleanup, list, hooks, animations, recalcIndextrigger);
+	        }
+	        else {
+	            Utils_1.throwError("forEach-Binding: value must be either array or observable list");
+	        }
+	    };
+	    return ForEachBinding;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = ForEachBinding;
+	//# sourceMappingURL=ForEach.js.map
+
+/***/ },
+/* 33 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	/**
+	* VirtualChildNodes implements consisent and predictable manipulation
+	* of a DOM Node's childNodes collection regardless its the true contents
+	* @class
+	**/
+	var VirtualChildNodes = (function () {
+	    function VirtualChildNodes(targetNode, initialSyncToTarget, insertCB, removeCB) {
+	        this.childNodes = [];
+	        this.targetNode = targetNode;
+	        this.insertCB = insertCB;
+	        this.removeCB = removeCB;
+	        if (initialSyncToTarget) {
+	            for (var i = 0; i < targetNode.childNodes.length; i++) {
+	                this.childNodes.push(targetNode.childNodes[i]);
+	            }
+	        }
+	    }
+	    VirtualChildNodes.prototype.appendChilds = function (nodes, callbackData) {
+	        var length = nodes.length;
+	        // append to proxy array
+	        if (nodes.length > 1)
+	            Array.prototype.push.apply(this.childNodes, nodes);
+	        else
+	            this.childNodes.push(nodes[0]);
+	        // append to DOM
+	        for (var i = 0; i < length; i++) {
+	            this.targetNode.appendChild(nodes[i]);
+	        }
+	        // callback
+	        if (this.insertCB) {
+	            for (var i = 0; i < length; i++) {
+	                this.insertCB(nodes[i], callbackData);
+	            }
+	        }
+	    };
+	    VirtualChildNodes.prototype.insertChilds = function (index, nodes, callbackData) {
+	        if (index === this.childNodes.length) {
+	            this.appendChilds(nodes, callbackData);
+	        }
+	        else {
+	            var refNode = this.childNodes[index];
+	            var length_1 = nodes.length;
+	            // insert into proxy array
+	            Array.prototype.splice.apply(this.childNodes, [index, 0].concat(nodes));
+	            // insert into DOM
+	            for (var i = 0; i < length_1; i++) {
+	                this.targetNode.insertBefore(nodes[i], refNode);
+	            }
+	            // callback
+	            if (this.insertCB) {
+	                for (var i = 0; i < length_1; i++) {
+	                    this.insertCB(nodes[i], callbackData);
+	                }
+	            }
+	        }
+	    };
+	    VirtualChildNodes.prototype.removeChilds = function (index, count, keepDom) {
+	        var node;
+	        if (count === 0)
+	            return [];
+	        // extract removed nodes
+	        var nodes = this.childNodes.slice(index, index + count);
+	        // remove from proxy array
+	        this.childNodes.splice(index, count);
+	        if (!keepDom) {
+	            // remove from DOM
+	            var length_2 = nodes.length;
+	            for (var i = 0; i < length_2; i++) {
+	                node = nodes[i];
+	                if (this.removeCB)
+	                    this.removeCB(node);
+	                this.targetNode.removeChild(node);
+	            }
+	        }
+	        return nodes;
+	    };
+	    VirtualChildNodes.prototype.clear = function () {
+	        // remove from DOM
+	        var length = this.childNodes.length;
+	        var node;
+	        for (var i = 0; i < length; i++) {
+	            node = this.childNodes[i];
+	            if (this.removeCB)
+	                this.removeCB(node);
+	            this.targetNode.removeChild(node);
+	        }
+	        // reset proxy array
+	        this.childNodes = [];
+	    };
+	    return VirtualChildNodes;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = VirtualChildNodes;
+	//# sourceMappingURL=VirtualChildNodes.js.map
+
+/***/ },
 /* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(26);
 	"use strict";
 	var EventBinding = (function () {
 	    function EventBinding(domManager, app) {
@@ -7097,7 +7097,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
-	var Command_1 = __webpack_require__(20);
+	var Command_1 = __webpack_require__(26);
 	"use strict";
 	var keysByCode = {
 	    8: 'backspace',
@@ -7414,7 +7414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/// <reference path="../Interfaces.ts" />
 	var Utils_1 = __webpack_require__(3);
 	var Value_1 = __webpack_require__(35);
-	var ListSupport_1 = __webpack_require__(29);
+	var ListSupport_1 = __webpack_require__(18);
 	var BindingSupport_1 = __webpack_require__(6);
 	"use strict";
 	var impls = new Array();
@@ -8869,7 +8869,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	/// <reference path="../Interfaces.ts" />
-	var ScheduledSubject_1 = __webpack_require__(32);
+	var ScheduledSubject_1 = __webpack_require__(21);
 	// ReactiveUI's MessageBus
 	"use strict";
 	var MessageBus = (function () {
@@ -9093,7 +9093,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _this = this;
 	var Utils_1 = __webpack_require__(3);
 	var IID_1 = __webpack_require__(5);
-	var ScheduledSubject_1 = __webpack_require__(32);
+	var ScheduledSubject_1 = __webpack_require__(21);
 	var Injector_1 = __webpack_require__(8);
 	var res = __webpack_require__(9);
 	"use strict";

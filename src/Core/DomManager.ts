@@ -9,6 +9,7 @@ import * as res from "./Resources"
 import * as log from "./Log"
 import { property } from "./Property"
 import * as env from "./Environment"
+import { isList } from "../Collections/ListSupport";
 
 "use strict";
 
@@ -522,7 +523,7 @@ export class DomManager implements wx.IDomManager {
 
             readIndexHook: (o: any, index: any): any => {
                 // recognize observable lists
-                if (queryInterface(o, IID.IObservableList)) {
+                if (isList(o)) {
                     // translate indexer to list.get()
                     list = <wx.IObservableList<any>> o;
                     result = list.get(index);
@@ -535,7 +536,7 @@ export class DomManager implements wx.IDomManager {
                 }
                 
                 // intercept access to observable properties
-                if (queryInterface(result, IID.IObservableProperty)) {
+                if (isProperty(result)) {
                     let prop = <wx.IObservableProperty<any>> result;
 
                     // register observable
@@ -551,7 +552,7 @@ export class DomManager implements wx.IDomManager {
 
             writeIndexHook: (o: any, index: any, newValue: any): any => {
                 // recognize observable lists
-                if (queryInterface(o, IID.IObservableList)) {
+                if (isList(o)) {
                     // translate indexer to list.get()
                     list = <wx.IObservableList<any>> o;
                     target = list.get(index);
