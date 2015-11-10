@@ -63,7 +63,7 @@ module wx {
         has(key: TKey): boolean;
         delete(key: TKey): void;
         clear(): void;
-        forEach(callback: (value: any, key: any, map: IMap<any, any>) => void, thisArg?: any): void;
+        forEach(callback: (value: T, key: TKey, map: IMap<TKey, T>) => void, thisArg?: any): void;
         size: number;
         isEmulated: boolean;
     }

@@ -2,6 +2,7 @@
 
 import { createWeakMap } from "../Collections/WeakMap"
 import { createSet, setToArray } from "../Collections/Set"
+import { createMap } from "../Collections/Map"
 import IID from "../IID"
 import { injector } from "./Injector"
 import { extend, observableRequire, isInUnitTest, args2Array, isFunction, throwError, isRxObservable, queryInterface, isProperty } from "../Core/Utils"
@@ -267,22 +268,61 @@ export class DomManager implements wx.IDomManager {
             // wrap it
             return Rx.Observable.return(result);
         }
+        
+        // create a subject that receives values from all dependencies
+        let allSeeingEye = new Rx.Subject<any>();
+
+        // associate observables with subscriptions
+        let subs = createMap<Rx.Observable<any>, Rx.IDisposable>();
+        
+        // subscribe initial dependencies to subject
+        let arr = setToArray(captured);
+        let length = arr.length;
+        let o: Rx.Observable<any>;
+
+        for(let i=0;i<length;i++) {
+            o = arr[i];
+            subs.set(o, o.subscribe(allSeeingEye));
+        }
 
         let obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
-            let innerDisp = Rx.Observable.defer(() => {
-                // construct observable that represents the first change of any of the expression's dependencies
-                return Rx.Observable.merge(setToArray(captured)).take(1);
-            })
-            .repeat()
-            .subscribe(trigger => {
+            let innerDisp = allSeeingEye.subscribe(trigger => {
                 try {
-                    // reset execution state before evaluation
-                    captured.clear();
-                    locals = this.createLocals(captured, ctx);
+                    let capturedNew = createSet<Rx.Observable<any>>();
+                    locals = this.createLocals(capturedNew, ctx);
 
                     // evaluate and produce next value
                     result = exp(ctx.$data, locals);
 
+                    // house-keeping: let go of unused observables
+                    let arr = setToArray(captured);
+                    let length = arr.length;
+                    
+                    for(let i=0;i<length;i++) {
+                        o = arr[i];
+                        
+                        if(!capturedNew.has(o)) {
+                            let disp = subs.get(o);
+                            if(disp != null)
+                                disp.dispose();
+                                
+                            subs.delete(o);
+                        }
+                    }
+                    
+                    // add new ones
+                    arr = setToArray(capturedNew);
+                    length = arr.length;
+
+                    for(let i=0;i<length;i++) {
+                        o = arr[i];
+                        captured.add(o);
+                        
+                        if(!subs.has(o))
+                            subs.set(o, o.subscribe(allSeeingEye));
+                    }
+
+                    // emit new value
                     if (!isRxObservable(result)) {
                         // wrap non-observable
                         observer.onNext(Rx.Observable.return(result));
@@ -298,7 +338,27 @@ export class DomManager implements wx.IDomManager {
                 }
             });
 
-            return innerDisp;
+            return Rx.Disposable.create(()=> {
+                innerDisp.dispose();
+                
+                // dispose subscriptions
+                subs.forEach((value, key, map)=> {
+                    if(value) 
+                        value.dispose()
+                });
+                
+                // cleanup
+                subs.clear();
+                subs = null;
+                
+                captured.clear();
+                captured = null;
+                
+                allSeeingEye.dispose();
+                allSeeingEye = null;
+                
+                locals = null;
+            });
         });
 
         // prefix with initial result

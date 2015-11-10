@@ -405,5 +405,24 @@ describe('DomManager',() => {
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toEqual("5");
         });
+   
+        it('does not miss values of expression dependencies when the dependency is hot and fast',() => {
+            var def = "{ text: foo }";
+            var compiled: any;
+
+            var model: any = {
+                foo: new Rx.Subject<string>()
+            };
+
+            var ctx = testutils.createModelContext(model);
+            expect(() => compiled = domManager.compileBindingOptions(def, undefined)).not.toThrow();
+
+            var text = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
+
+            // index access should be translated to list.get(index)
+            model.foo.onNext("bar");
+            model.foo.onNext("baz");
+            expect(text()).toEqual("baz");
+        });
     });
 });
