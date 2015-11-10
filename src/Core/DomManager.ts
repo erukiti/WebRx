@@ -268,34 +268,25 @@ export class DomManager implements wx.IDomManager {
             // wrap it
             return Rx.Observable.return(result);
         }
+        
+        // create a subject that receives values from all dependencies
+        let allSeeingEye = new Rx.Subject<any>();
 
         // associate observables with subscriptions
-        let obs2Disp = createMap<Rx.Observable<any>, Rx.IDisposable>();
-        let obs2Buffered = createMap<Rx.Observable<any>, Rx.ConnectableObservable<any>>();
+        let subs = createMap<Rx.Observable<any>, Rx.IDisposable>();
+        
+        // subscribe initial dependencies to subject
+        let arr = setToArray(captured);
+        let length = arr.length;
+        let o: Rx.Observable<any>;
+
+        for(let i=0;i<length;i++) {
+            o = arr[i];
+            subs.set(o, o.subscribe(allSeeingEye));
+        }
 
         let obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
-            let innerDisp = Rx.Observable.defer(() => {
-                // We have to make sure that we don't miss any values emitted
-                // by dependent observables during the brief timespan when this
-                // inner observable re-subscribes. Therefore we map all captured
-                // observables to pre-connected replay-versions 
-                let sources = setToArray(captured).map(x=> {
-                    let buffered = obs2Buffered.get(x);
-                    
-                    if(buffered == null) {
-                        buffered = obs.replay(null, 1);
-                        obs2Buffered.set(x, buffered);
-                        obs2Disp.set(x, buffered.connect());
-                    }
-                    
-                    return buffered;        
-                });
-                
-                // construct observable that represents the first change of any of the expression's dependencies
-                return Rx.Observable.merge(sources).take(1);
-            })
-            .repeat()
-            .subscribe(trigger => {
+            let innerDisp = allSeeingEye.subscribe(trigger => {
                 try {
                     let capturedNew = createSet<Rx.Observable<any>>();
                     locals = this.createLocals(capturedNew, ctx);
@@ -304,14 +295,32 @@ export class DomManager implements wx.IDomManager {
                     result = exp(ctx.$data, locals);
 
                     // house-keeping: let go of unused observables
-                    setToArray(captured).filter(x=> !capturedNew.has(x)).forEach(x=> {
-                        obs2Disp.get(x).dispose();
-                        obs2Disp.delete(x);
-                        obs2Buffered.delete(x);
-                    });
+                    let arr = setToArray(captured);
+                    let length = arr.length;
+                    
+                    for(let i=0;i<length;i++) {
+                        o = arr[i];
+                        
+                        if(!capturedNew.has(o)) {
+                            let disp = subs.get(o);
+                            if(disp != null)
+                                disp.dispose();
+                                
+                            subs.delete(o);
+                        }
+                    }
                     
                     // add new ones
-                    capturedNew.forEach(x=> captured.add(x));
+                    arr = setToArray(capturedNew);
+                    length = arr.length;
+
+                    for(let i=0;i<length;i++) {
+                        o = arr[i];
+                        captured.add(o);
+                        
+                        if(!subs.has(o))
+                            subs.set(o, o.subscribe(allSeeingEye));
+                    }
 
                     // emit new value
                     if (!isRxObservable(result)) {
@@ -333,11 +342,22 @@ export class DomManager implements wx.IDomManager {
                 innerDisp.dispose();
                 
                 // dispose subscriptions
-                captured.forEach(x=> obs2Disp.get(x).dispose());
+                subs.forEach((value, key, map)=> {
+                    if(value) 
+                        value.dispose()
+                });
                 
                 // cleanup
-                obs2Disp.clear();
-                obs2Buffered.clear();
+                subs.clear();
+                subs = null;
+                
+                captured.clear();
+                captured = null;
+                
+                allSeeingEye.dispose();
+                allSeeingEye = null;
+                
+                locals = null;
             });
         });
 

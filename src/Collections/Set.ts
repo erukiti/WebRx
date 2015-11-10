@@ -67,9 +67,15 @@ class SetEmulated<T> implements wx.ISet<T> {
     private keys: { [key: string]: boolean } = {};
 }
 
-let hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
-    && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
-    && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
+function isFunction(o: any): boolean {
+    return typeof o === 'function';
+}
+
+var proto: wx.ISet<any> = <any> Set.prototype;
+
+var hasNativeSupport = isFunction(Set) && isFunction(proto.forEach) &&
+    isFunction(proto.add) && isFunction(proto.clear) &&
+    isFunction(proto.delete) && isFunction(proto.has);
 
 /**
 * Creates a new Set instance

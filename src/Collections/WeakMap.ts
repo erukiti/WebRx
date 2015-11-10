@@ -45,8 +45,15 @@ class WeakMapEmulated<TKey extends Object, T> implements wx.IWeakMap<TKey, T> {
     private inner: { [key: string]: T } = {};
 }
 
-let hasNativeSupport = typeof WeakMap === "function";
-//let hasNativeSupport = false;
+function isFunction(o: any): boolean {
+    return typeof o === 'function';
+}
+
+var proto: wx.IWeakMap<any, any> = <any> WeakMap.prototype;
+
+var hasNativeSupport = isFunction(WeakMap) && 
+    isFunction(proto.set) && isFunction(proto.get) &&
+    isFunction(proto.delete) && isFunction(proto.has);
 
 /**
 * Creates a new WeakMap instance

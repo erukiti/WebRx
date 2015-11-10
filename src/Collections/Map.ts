@@ -96,9 +96,15 @@ class MapEmulated<TKey extends Object, T> implements wx.IMap<TKey, T> {
     }
 }
 
-var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty("forEach")
-    && Map.prototype.hasOwnProperty("add") && Map.prototype.hasOwnProperty("clear")
-    && Map.prototype.hasOwnProperty("devare") && Map.prototype.hasOwnProperty("has");
+function isFunction(o: any): boolean {
+    return typeof o === 'function';
+}
+
+var proto: wx.IMap<any, any> = <any> Map.prototype;
+
+var hasNativeSupport = isFunction(Map) && isFunction(proto.forEach) &&
+    isFunction(proto.set) && isFunction(proto.clear) &&
+    isFunction(proto.delete) && isFunction(proto.has);
 
 /**
 * Creates a new WeakMap instance
