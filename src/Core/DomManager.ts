@@ -282,7 +282,7 @@ export class DomManager implements wx.IDomManager {
 
         for(let i=0;i<length;i++) {
             o = arr[i];
-            subs.set(o, o.subscribe(allSeeingEye));
+            subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
         }
 
         let obs = Rx.Observable.create<Rx.Observable<any>>(observer => {
@@ -318,8 +318,9 @@ export class DomManager implements wx.IDomManager {
                         o = arr[i];
                         captured.add(o);
                         
-                        if(!subs.has(o))
-                            subs.set(o, o.subscribe(allSeeingEye));
+                        if(!subs.has(o)) {
+                            subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
+                        }
                     }
 
                     // emit new value

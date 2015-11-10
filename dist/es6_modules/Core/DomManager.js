@@ -229,7 +229,7 @@ export class DomManager {
         let o;
         for (let i = 0; i < length; i++) {
             o = arr[i];
-            subs.set(o, o.subscribe(allSeeingEye));
+            subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
         }
         let obs = Rx.Observable.create(observer => {
             let innerDisp = allSeeingEye.subscribe(trigger => {
@@ -256,8 +256,9 @@ export class DomManager {
                     for (let i = 0; i < length; i++) {
                         o = arr[i];
                         captured.add(o);
-                        if (!subs.has(o))
-                            subs.set(o, o.subscribe(allSeeingEye));
+                        if (!subs.has(o)) {
+                            subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
+                        }
                     }
                     // emit new value
                     if (!isRxObservable(result)) {

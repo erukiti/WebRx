@@ -2849,7 +2849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var o;
 	        for (var i = 0; i < length; i++) {
 	            o = arr[i];
-	            subs.set(o, o.subscribe(allSeeingEye));
+	            subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
 	        }
 	        var obs = Rx.Observable.create(function (observer) {
 	            var innerDisp = allSeeingEye.subscribe(function (trigger) {
@@ -2876,8 +2876,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    for (var i = 0; i < length_1; i++) {
 	                        o = arr_1[i];
 	                        captured.add(o);
-	                        if (!subs.has(o))
-	                            subs.set(o, o.subscribe(allSeeingEye));
+	                        if (!subs.has(o)) {
+	                            subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
+	                        }
 	                    }
 	                    // emit new value
 	                    if (!Utils_1.isRxObservable(result)) {
