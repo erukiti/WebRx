@@ -100,9 +100,9 @@ function isFunction(o: any): boolean {
     return typeof o === 'function';
 }
 
-var proto: wx.IMap<any, any> = <any> Map.prototype;
+var proto: wx.IMap<any, any> = window["Map"] !== undefined ? <any> Map.prototype : undefined;
 
-var hasNativeSupport = isFunction(Map) && isFunction(proto.forEach) &&
+var hasNativeSupport = isFunction(window["Map"]) && isFunction(proto.forEach) &&
     isFunction(proto.set) && isFunction(proto.clear) &&
     isFunction(proto.delete) && isFunction(proto.has);
 

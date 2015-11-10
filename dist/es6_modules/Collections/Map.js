@@ -82,9 +82,13 @@ class MapEmulated {
         return -1;
     }
 }
-var hasNativeSupport = typeof Map === "function" && Map.prototype.hasOwnProperty("forEach")
-    && Map.prototype.hasOwnProperty("add") && Map.prototype.hasOwnProperty("clear")
-    && Map.prototype.hasOwnProperty("devare") && Map.prototype.hasOwnProperty("has");
+function isFunction(o) {
+    return typeof o === 'function';
+}
+var proto = window["Map"] !== undefined ? Map.prototype : undefined;
+var hasNativeSupport = isFunction(window["Map"]) && isFunction(proto.forEach) &&
+    isFunction(proto.set) && isFunction(proto.clear) &&
+    isFunction(proto.delete) && isFunction(proto.has);
 /**
 * Creates a new WeakMap instance
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.

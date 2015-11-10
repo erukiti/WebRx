@@ -36,8 +36,13 @@ class WeakMapEmulated {
         return true;
     }
 }
-let hasNativeSupport = typeof WeakMap === "function";
-//let hasNativeSupport = false;
+function isFunction(o) {
+    return typeof o === 'function';
+}
+var proto = window["WeakMap"] !== undefined ? WeakMap.prototype : undefined;
+var hasNativeSupport = isFunction(window["WeakMap"]) &&
+    isFunction(proto.set) && isFunction(proto.get) &&
+    isFunction(proto.delete) && isFunction(proto.has);
 /**
 * Creates a new WeakMap instance
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.

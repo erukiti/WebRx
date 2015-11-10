@@ -51,9 +51,13 @@ class SetEmulated {
         return true;
     }
 }
-let hasNativeSupport = typeof Set === "function" && Set.prototype.hasOwnProperty("forEach")
-    && Set.prototype.hasOwnProperty("add") && Set.prototype.hasOwnProperty("clear")
-    && Set.prototype.hasOwnProperty("delete") && Set.prototype.hasOwnProperty("has");
+function isFunction(o) {
+    return typeof o === 'function';
+}
+var proto = window["Set"] !== undefined ? Set.prototype : undefined;
+var hasNativeSupport = isFunction(window["Set"]) && isFunction(proto.forEach) &&
+    isFunction(proto.add) && isFunction(proto.clear) &&
+    isFunction(proto.delete) && isFunction(proto.has);
 /**
 * Creates a new Set instance
 * @param {boolean} disableNativeSupport Force creation of an emulated implementation, regardless of browser native support.
