@@ -264,12 +264,12 @@ module.exports = function (grunt) {
         grunt.file.write('src/Version.ts', grunt.template.process(template));
     });
 
-    grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
-    grunt.registerTask("test", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
-    grunt.registerTask("debug", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
+    grunt.registerTask("default", ["clean:build", "trimtrailingspaces", "shell:tsc_src_es5"]);
+    grunt.registerTask("test", ["trimtrailingspaces", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
+    grunt.registerTask("debug", ["trimtrailingspaces", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
     grunt.registerTask("build-dist", ["gen-ver", "trimtrailingspaces", "clean:build", "shell:tsc_src_es5", "shell:tsc_src_es6", "madge:src", "webpack:webrx", "clean:dist", "copy:dist", "uglify:dist", "compress:dist"]);
-    grunt.registerTask("dist", ["gen-ver", "build-dist", "shell:tsc_specs", "jasmine:dist"]);
-    grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src_es5", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
+    grunt.registerTask("dist", ["build-dist", "shell:tsc_specs", "jasmine:dist"]);
+    grunt.registerTask("xtest", ["gen-ver", "trimtrailingspaces", "shell:tsc_src_es5", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 
     grunt.registerTask('publish:patch', ['dist', 'bump:patch', 'build-dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
     grunt.registerTask('publish:minor', ['dist', 'bump:minor', 'build-dist', "shell:gitadd", "release", 'nugetpack', 'nugetpush']);
