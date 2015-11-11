@@ -467,23 +467,5 @@ describe('Bindings', () => {
 
             expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
-
-        it("Loads a component which is registered in the future (deferred loading)",(done) => {
-            loadFixtures('templates/Bindings/Component.html');
-
-            var el = <HTMLElement> document.querySelector("#fixture6");
-            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
-
-            // register component _after_ applyBindings
-            let descriptor: wx.IComponentDescriptor = {
-                template: "<span>foo</span>",
-                viewModel: function(params) {
-                    console.log("in const");
-                    done();
-                }
-            };
-
-            wx.app.component("test-deferred", descriptor);
-        });
     });
 });
