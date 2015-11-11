@@ -1,4 +1,4 @@
-﻿/// <reference path="typings/URI.d.ts" />
+/// <reference path="typings/URI.d.ts" />
 
 /// <reference path="../node_modules/rx/ts/rx.lite.d.ts" />
 /// <reference path="../src/web.rx.d.ts" />
@@ -131,7 +131,7 @@ module testutils {
             location.hash = u.hash();
 
             location.toString = () => uri;
-        } 
+        }
 
         function back() {
             if (current > 0) {
@@ -181,10 +181,10 @@ module testutils {
             pushState: pushState,
             replaceState: replaceState,
             reset: reset,
-            
+
             getSearchParameters: (query?:string)=> {
                 query = query || result.location.search.substr(1);
-                
+
                 if(query) {
                     let result = {};
                     let params = query.split("&");
@@ -192,10 +192,10 @@ module testutils {
                         var tmp = params[i].split("=");
                         result[tmp[0]] = decodeURIComponent(tmp[1]);
                     }
-            
+
                     return result;
-                } 
-                
+                }
+
                 return {};
             }
         };

@@ -132,7 +132,7 @@ function cssTransitionAnimation(prepare, run, complete) {
                 let duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
                 return Rx.Observable.timer(duration);
             }), noop);
-            // defer animation-start to avoid problems with transitions on freshly added elements 
+            // defer animation-start to avoid problems with transitions on freshly added elements
             Rx.Observable.timer(1).subscribe(() => {
                 if (runToAdd && runToAdd.length)
                     elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(runToAdd)));

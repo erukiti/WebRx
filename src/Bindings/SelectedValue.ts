@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, isProperty } from "../Core/Utils"
@@ -124,7 +124,7 @@ export default class SelectedValueBinding implements wx.IBindingHandler {
 
         impls.push(new RadioSingleSelectionImpl(domManager));
         impls.push(new OptionSingleSelectionImpl(domManager));
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -132,7 +132,7 @@ export default class SelectedValueBinding implements wx.IBindingHandler {
     public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("selectedValue-binding only operates on elements!");
-        
+
         if (options == null)
             throwError("invalid binding-options!");
 
@@ -140,7 +140,7 @@ export default class SelectedValueBinding implements wx.IBindingHandler {
         let impl: ISelectedValueBindingImpl;
         let implCleanup: Rx.CompositeDisposable;
         let exp = this.domManager.compileBindingOptions(options, module);
-        
+
         function cleanupImpl() {
             if (implCleanup) {
                 implCleanup.dispose();
@@ -176,7 +176,7 @@ export default class SelectedValueBinding implements wx.IBindingHandler {
                         impl.updateElement(el, model);
                     } catch (e) {
                         this.app.defaultExceptionHandler.onNext(e);
-                    } 
+                    }
                 }));
 
                 // wire change-events
@@ -186,17 +186,17 @@ export default class SelectedValueBinding implements wx.IBindingHandler {
                             impl.updateModel(el, model, e);
                         } catch (e) {
                             this.app.defaultExceptionHandler.onNext(e);
-                        } 
+                        }
                     }));
                 } else {
                     emitPropRefHint("SelectedValue", options);
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

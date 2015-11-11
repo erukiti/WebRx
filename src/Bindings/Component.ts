@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, formatString, cloneNodeArray, noop, isDisposable, disposeMembers, isPrimitive } from "../Core/Utils"
@@ -9,7 +9,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -90,7 +90,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
                         if (isDisposable(component.viewModel)) {
                             cleanup.add(component.viewModel);
                         } /* else if(!isPrimitive(component.viewModel)) {
-                            cleanup.add(Rx.Disposable.create(()=> 
+                            cleanup.add(Rx.Disposable.create(()=>
                                 disposeMembers(component.viewModel)));
                         } */
                     }
@@ -103,10 +103,10 @@ export default class ComponentBinding implements wx.IBindingHandler {
                     cleanup.add(disp);
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -155,7 +155,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
             ctx = this.domManager.getDataContext(el);
         }
 
-        // invoke preBindingInit 
+        // invoke preBindingInit
         if (vm && component.preBindingInit && vm.hasOwnProperty(component.preBindingInit)) {
             vm[component.preBindingInit].call(vm, el);
         }
@@ -163,7 +163,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
         // done
         this.domManager.applyBindingsToDescendants(ctx, el);
 
-        // invoke postBindingInit 
+        // invoke postBindingInit
         if (vm && component.postBindingInit && vm.hasOwnProperty(component.postBindingInit)) {
             vm[component.postBindingInit].call(vm, el);
         }

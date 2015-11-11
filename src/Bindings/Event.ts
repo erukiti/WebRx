@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, formatString, cloneNodeArray, noop, unwrapProperty, isProperty } from "../Core/Utils"
@@ -10,7 +10,7 @@ export default class EventBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -31,7 +31,7 @@ export default class EventBinding implements wx.IBindingHandler {
             this.wireEvent(el, token.value, token.key, ctx, state, module);
         });
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

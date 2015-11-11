@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, elementCanBeDisabled, toggleCssClass, unwrapProperty } from "../Core/Utils"
@@ -6,14 +6,14 @@ import { extend, isInUnitTest, args2Array, isFunction, throwError, using, format
 "use strict";
 
 /**
-* Base class for one-way bindings that take a single expression and apply the result to one or more target elements 
+* Base class for one-way bindings that take a single expression and apply the result to one or more target elements
 * @class
 */
 export class SingleOneWayBindingBase implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
   ////////////////////
     // wx.IBinding
@@ -36,10 +36,10 @@ export class SingleOneWayBindingBase implements wx.IBindingHandler {
                 self.applyValue(el, unwrapProperty(x));
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -72,7 +72,7 @@ export class SingleOneWayBindingBase implements wx.IBindingHandler {
 }
 
 /**
-* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements 
+* Base class for one-way bindings that take multiple expressions defined as object literal and apply the result to one or more target elements
 * @class
 */
 export class MultiOneWayBindingBase implements wx.IBindingHandler {
@@ -80,7 +80,7 @@ export class MultiOneWayBindingBase implements wx.IBindingHandler {
         this.domManager = domManager;
         this.app = app;
         this.supportsDynamicValues = supportsDynamicValues;
-    } 
+    }
 
    ////////////////////
     // wx.IBinding
@@ -126,7 +126,7 @@ export class MultiOneWayBindingBase implements wx.IBindingHandler {
             this.subscribe(el, obs, key, state);
         }
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -162,7 +162,7 @@ export class MultiOneWayBindingBase implements wx.IBindingHandler {
                 this.applyValue(el, unwrapProperty(x), key);
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
     }
 

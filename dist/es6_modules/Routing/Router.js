@@ -142,7 +142,7 @@ export class Router {
     reload() {
         let state;
         let params;
-        // reload current state or enter inital root state            
+        // reload current state or enter inital root state
         if (this.current() != null) {
             state = this.current().name;
             params = this.current().params;
@@ -238,7 +238,7 @@ export class Router {
             return this.current().name + path;
         }
         else if (path.indexOf(this.parentPathDirective) === 0) {
-            // parent-relative                
+            // parent-relative
             let parent = this.current().name;
             // can't go further up than root
             if (parent === this.rootStateName)
@@ -247,7 +247,7 @@ export class Router {
             let parts = parent.split(this.pathSeparator);
             for (let i = parts.length - 1; i > 0; i--) {
                 let tmp = parts.slice(0, i).join(this.pathSeparator);
-                // check if parent or sibling relative to current parent exists 
+                // check if parent or sibling relative to current parent exists
                 if (this.get(tmp) || this.get(tmp + path.substr(1))) {
                     path = tmp + path.substr(1);
                     return path;

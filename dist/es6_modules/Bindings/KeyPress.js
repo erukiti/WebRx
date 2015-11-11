@@ -55,7 +55,7 @@ export default class KeyPressBinding {
             });
             this.wireKey(token.value, obs, combinations, ctx, state, module);
         });
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

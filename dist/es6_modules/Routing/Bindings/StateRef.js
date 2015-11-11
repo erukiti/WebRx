@@ -64,7 +64,7 @@ export default class StateRefBinding {
             // initiate state change using latest name and params
             this.router.go(stateName, stateParams, { location: true });
         }));
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

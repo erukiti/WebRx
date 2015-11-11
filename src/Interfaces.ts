@@ -8,7 +8,7 @@ module wx {
 
     /**
     * IUnknown
-    * @interface 
+    * @interface
     **/
     export interface IUnknown {
         queryInterface(iid: string): boolean;
@@ -16,7 +16,7 @@ module wx {
 
     /**
     * Dependency Injector and service locator
-    * @interface 
+    * @interface
     **/
     export interface IInjector {
         register(key: string, factory: Array<any>, singleton?: boolean): IInjector;
@@ -29,7 +29,7 @@ module wx {
 
     /**
     * The WeakMap object is a collection of key/value pairs in which the keys are objects and the values can be arbitrary values. The keys are held using weak references.
-    * @interface 
+    * @interface
     **/
     export interface IWeakMap<TKey extends Object, T> {
         set(key: TKey, value: T): void;
@@ -41,7 +41,7 @@ module wx {
 
     /**
     * The Set object lets you store unique values of any type, whether primitive values or object references.
-    * @interface 
+    * @interface
     **/
     export interface ISet<T> {
         add(value: T): ISet<T>;
@@ -55,7 +55,7 @@ module wx {
 
     /**
     * The Map object is a simple key/value map. Any value (both objects and primitive values) may be used as either a key or a value.
-    * @interface 
+    * @interface
     **/
     export interface IMap<TKey extends Object, T> {
         set(key: TKey, value: T): void;
@@ -71,7 +71,7 @@ module wx {
     /**
     * IObservableProperty combines a function signature for value setting and getting with
     * observables for monitoring value changes
-    * @interface 
+    * @interface
     **/
     export interface IObservableProperty<T> extends Rx.IDisposable {
         (newValue: T): void;
@@ -88,7 +88,7 @@ module wx {
 
     /**
     * Provides information about a changed property value on an object
-    * @interface 
+    * @interface
     **/
     export interface IPropertyChangedEventArgs {
         sender: any; //  { get; private set; }
@@ -97,7 +97,7 @@ module wx {
 
     /**
     * Encapsulates change notifications published by various IObservableList members
-    * @interface 
+    * @interface
     **/
     export interface IListChangeInfo<T> extends IRangeInfo {
         items: T[]; // { get; }
@@ -106,7 +106,7 @@ module wx {
     /**
     * INotifyListItemChanged provides notifications for collection item updates, ie when an object in
     * a list changes.
-    * @interface 
+    * @interface
     **/
     export interface INotifyListItemChanged {
         /**
@@ -136,7 +136,7 @@ module wx {
     /**
     * INotifyListChanged of T provides notifications when the contents
     * of a list are changed (items are added/removed/moved).
-    * @interface 
+    * @interface
     **/
     export interface INotifyListChanged<T> {
         /**
@@ -228,7 +228,7 @@ module wx {
         suppressChangeNotifications(): Rx.IDisposable;
     }
 
-    /**        
+    /**
     /* Represents a read-only collection of objects that can be individually accessed by index.
     /* @interface
     **/
@@ -238,48 +238,48 @@ module wx {
         isReadOnly: boolean;
         toArray(): Array<T>;
     }
-    
-    /**        
+
+    /**
     /* Represents an observable read-only collection of objects that can be individually accessed by index.
     /* @interface
     **/
     export interface IObservableReadOnlyList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
-        /**        
+        /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         /* @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
         /* @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, 
+        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
             selector?: (item: T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
-        /**        
+        /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         /* @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, 
+        project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
             refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
-        /**        
+        /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, 
+        project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
             scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
-        /**        
+        /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
         project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
-        
+
         /**
-        * Creates a paged live-projection of itself. 
+        * Creates a paged live-projection of itself.
         * @param pageSize {number} Initial page-size of the projection
         * @param currentPage {number} Current page of the projection
         **/
-        page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): IObservablePagedReadOnlyList<T>;        
+        page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): IObservablePagedReadOnlyList<T>;
     }
 
     /**
@@ -297,7 +297,7 @@ module wx {
     * IObservableList of T represents a list that can notify when its
     * contents are changed (either items are added/removed, or the object
     * itself changes).
-    * @interface 
+    * @interface
     **/
     export interface IObservableList<T> extends IObservableReadOnlyList<T> {
         isEmpty: IObservableProperty<boolean>;
@@ -336,7 +336,7 @@ module wx {
     * default Observer is wx.app.defaultExceptionHandler - this means, that if
     * you aren't listening to thrownExceptions and one appears, the exception
     * will appear on the UI thread and crash the application.
-    * @interface 
+    * @interface
     **/
     export interface IHandleObservableErrors {
         /**
@@ -351,7 +351,7 @@ module wx {
     * executed (i.e. when Execute is called) via IObservable. Conceptually,
     * this represents an Event, so as a result this IObservable should never
     * onComplete or onError.
-    * @interface 
+    * @interface
     **/
     export interface ICommand<T> extends
         Rx.IDisposable,
@@ -395,7 +395,7 @@ module wx {
 
     /**
     * Data context used in binding operations
-    * @interface 
+    * @interface
     **/
     export interface IDataContext {
         $data: any;
@@ -406,12 +406,12 @@ module wx {
 
     /**
     * Extensible Node state
-    * @interface 
+    * @interface
     **/
     export interface INodeState {
         cleanup: Rx.CompositeDisposable;
         isBound: boolean;   // true of this node has been touched by applyBindings
-        model?: any;        // scope model 
+        model?: any;        // scope model
         module?: any;
     }
 
@@ -466,11 +466,11 @@ module wx {
 
     /**
     * The Dom Manager coordinates everything involving browser DOM-Manipulation
-    * @interface 
+    * @interface
     **/
     export interface IDomManager {
         /**
-        * Applies bindings to the specified node and all of its children using the specified data context 
+        * Applies bindings to the specified node and all of its children using the specified data context
         * @param {IDataContext} ctx The data context
         * @param {Node} rootNode The node to be bound
         **/
@@ -518,7 +518,7 @@ module wx {
 
         /**
         * Initializes a new node state
-        * @param {any} model The model 
+        * @param {any} model The model
         **/
         createNodeState(model?: any): INodeState;
 
@@ -561,7 +561,7 @@ module wx {
 
         /**
         * Evaluates an expression against a data-context and returns the result
-        * @param {IExpressionFunc} exp The source expression 
+        * @param {IExpressionFunc} exp The source expression
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
         * @param {IDataContext} The data context to evaluate the expression against
         * @return {any} A value representing the result of the expression-evaluation
@@ -572,7 +572,7 @@ module wx {
         * Creates an observable that produces values representing the result of the expression.
         * If any observable input of the expression changes, the expression gets re-evaluated
         * and the observable produces a new value.
-        * @param {IExpressionFunc} exp The source expression 
+        * @param {IExpressionFunc} exp The source expression
         * @param {IExpressionFunc} evalObs Allows monitoring of expression evaluation passes (for unit testing)
         * @param {IDataContext} The data context to evaluate the expression against
         * @return {Rx.Observable<any>} A sequence of values representing the result of the last evaluation of the expression
@@ -581,10 +581,10 @@ module wx {
     }
 
     /**
-    * Bindings are markers on a DOM element (such as an attribute or comment) that tell 
-    * WebRx's DOM compiler to attach a specified behavior to that DOM element or even 
+    * Bindings are markers on a DOM element (such as an attribute or comment) that tell
+    * WebRx's DOM compiler to attach a specified behavior to that DOM element or even
     * transform the element and its children.
-    * @interface 
+    * @interface
     **/
     export interface IBindingHandler {
         /**
@@ -599,13 +599,13 @@ module wx {
 
         /**
         * Configures the handler using a handler-specific options object
-        * @param {any} options The handler-specific options 
+        * @param {any} options The handler-specific options
         **/
         configure(options: any): void;
 
         /**
-        * When there are multiple bindings defined on a single DOM element, 
-        * sometimes it is necessary to specify the order in which the bindings are applied. 
+        * When there are multiple bindings defined on a single DOM element,
+        * sometimes it is necessary to specify the order in which the bindings are applied.
         */
         priority: number;
 
@@ -693,7 +693,7 @@ module wx {
 
     /**
     * Represents an engine responsible for converting arbitrary text fragements into a collection of Dom Nodes
-    * @interface 
+    * @interface
     **/
     export interface ITemplateEngine {
         parse(templateSource: string): Node[];
@@ -762,16 +762,16 @@ module wx {
         /**
         * If true will update the url in the location bar, if false will not.
         **/
-        location?: boolean|RouterLocationChangeMode; 
+        location?: boolean|RouterLocationChangeMode;
 
         /**
-        * If true will force transition even if the state or params have not changed, aka a reload of the same state. 
+        * If true will force transition even if the state or params have not changed, aka a reload of the same state.
         **/
         force?: boolean;
     }
 
     export interface IHistory {
-        onPopState: Rx.Observable<PopStateEvent>;        
+        onPopState: Rx.Observable<PopStateEvent>;
 
         location: Location;
         length: number;
@@ -780,7 +780,7 @@ module wx {
         forward(): void;
         replaceState(statedata: any, title: string, url?: string): void;
         pushState(statedata: any, title: string, url?: string): void;
-        
+
         getSearchParameters(query?:string): Object;
     }
 
@@ -788,7 +788,7 @@ module wx {
         /**
         * Transitions to the state inferred from the specified url or the browser's current location
         * This method should be invoked once after registering application states.
-        * @param {string} url If specified the router state will be synced to this value, otherwise to window.location.path 
+        * @param {string} url If specified the router state will be synced to this value, otherwise to window.location.path
         **/
         sync(url?:string): void;
 
@@ -799,35 +799,35 @@ module wx {
         state(config: IRouterStateConfig): IRouter;
 
         /**
-        * Represents the configuration object for the router's 
+        * Represents the configuration object for the router's
         **/
         current: IObservableProperty<IRouterState>;
 
         /**
-        * An observable that notifies of completed view transitions in response to router state changes 
+        * An observable that notifies of completed view transitions in response to router state changes
         **/
         viewTransitions: Rx.Observable<IViewTransition>;
 
         /**
-        * Invoke this method to programatically alter or extend IRouter.current.params. 
-        * Failure to modify params through this method will result in those modifications getting lost after state transitions. 
+        * Invoke this method to programatically alter or extend IRouter.current.params.
+        * Failure to modify params through this method will result in those modifications getting lost after state transitions.
         **/
         updateCurrentStateParams(withParamsAction: (params: any)=> void): void;
 
         /**
         * Method for transitioning to a new state.
-        * @param {string} to Absolute or relative destination state path. 'contact.detail' - will go to the 
+        * @param {string} to Absolute or relative destination state path. 'contact.detail' - will go to the
         * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
         * '.child.grandchild' will go to grandchild state
-        * @param {Object} params A map of the parameters that will be sent to the state. 
-        * Any parameters that are not specified will be inherited from currently defined parameters. 
+        * @param {Object} params A map of the parameters that will be sent to the state.
+        * Any parameters that are not specified will be inherited from currently defined parameters.
         * @param {IStateChangeOptions} options Options controlling how the state transition will be performed
         **/
         go(to: string, params?: Object, options?: IStateChangeOptions): void;    // Rx.Observable<any>
 
         /**
         * An URL generation method that returns the URL for the given state populated with the given params.
-        * @param {string} state Absolute or relative destination state path. 'contact.detail' - will go to the 
+        * @param {string} state Absolute or relative destination state path. 'contact.detail' - will go to the
         * contact.detail state. '^'  will go to a parent state. '^.sibling' - will go to a sibling state and
         * '.child.grandchild' will go to grandchild state
         * @param {Object} params An object of parameter values to fill the state's required parameters.
@@ -835,7 +835,7 @@ module wx {
         url(state: string, params?: {}): string;
 
         /**
-        * A method that force reloads the current state. All resolves are re-resolved, events are not re-fired, 
+        * A method that force reloads the current state. All resolves are re-resolved, events are not re-fired,
         * and components reinstantiated.
         **/
         reload(): void;
@@ -847,16 +847,16 @@ module wx {
         get(state: string): IRouterStateConfig;
 
         /**
-        * Similar to IRouter.includes, but only checks for the full state name. If params is supplied then it will 
-        * be tested for strict equality against the current active params object, so all params must match with none 
+        * Similar to IRouter.includes, but only checks for the full state name. If params is supplied then it will
+        * be tested for strict equality against the current active params object, so all params must match with none
         * missing and no extras.
         * @param {string} state Absolute state path.
         **/
         is(state: string, params?: any, options?: any): any;
 
         /**
-        * A method to determine if the current active state is equal to or is the child of the state stateName. 
-        * If any params are passed then they will be tested for a match as well. Not all the parameters need 
+        * A method to determine if the current active state is equal to or is the child of the state stateName.
+        * If any params are passed then they will be tested for a match as well. Not all the parameters need
         * to be passed, just the ones you'd like to test for equality.
         * @param {string} state Absolute state path.
         **/
@@ -878,18 +878,18 @@ module wx {
     * IMessageBus represents an object that can act as a "Message Bus", a
     * simple way for ViewModels and other objects to communicate with each
     * other in a loosely coupled way.
-    * 
+    *
     * Specifying which messages go where is done via the contract parameter
     **/
     export interface IMessageBus {
         /**
         * Registers a scheduler for the type, which may be specified at
         * runtime, and the contract.
-        * 
+        *
         * If a scheduler is already registered for the specified
         * runtime and contract, this will overrwrite the existing
         * registration.
-        * 
+        *
         * @param {string} contract A unique string to distinguish messages with
         * identical types (i.e. "MyCoolViewModel")
         **/
@@ -898,7 +898,7 @@ module wx {
         /**
         * Listen provides an Observable that will fire whenever a Message is
         * provided for this object via RegisterMessageSource or SendMessage.
-        * 
+        *
         * @param {string} contract A unique string to distinguish messages with
         * identical types (i.e. "MyCoolViewModel")
         **/
@@ -907,7 +907,7 @@ module wx {
         /**
         * Determines if a particular message Type is registered.
         * @param {string} The type of the message.
-        * 
+        *
         * @param {string} contract A unique string to distinguish messages with
         * identical types (i.e. "MyCoolViewModel")
         * @return True if messages have been posted for this message Type.
@@ -918,7 +918,7 @@ module wx {
         * Registers an Observable representing the stream of messages to send.
         * Another part of the code can then call Listen to retrieve this
         * Observable.
-        * 
+        *
         * @param {string} contract A unique string to distinguish messages with
         * identical types (i.e. "MyCoolViewModel")
         **/
@@ -929,7 +929,7 @@ module wx {
         * Consider using RegisterMessageSource instead if you will be sending
         * messages in response to other changes such as property changes
         * or events.
-        * 
+        *
         * @param {T} message The actual message to send
         * @param {string} contract A unique string to distinguish messages with
         * identical types (i.e. "MyCoolViewModel")
@@ -950,82 +950,82 @@ module wx {
     export interface IEventBindingOptions {
         [eventName: string]: (ctx: wx.IDataContext, event: Event) => any|Rx.Observer<Event>|{ command: wx.ICommand<any>; parameter: any };
     }
-    
+
     export interface IForeachAnimationDescriptor {
         itemEnter?: string|wx.IAnimation;
         itemLeave?: string|wx.IAnimation;
     }
-    
+
     export interface IForEachBindingOptions extends IForeachAnimationDescriptor {
         data: any;
         hooks?: IForEachBindingHooks|string;
     }
-    
+
     export interface IForEachBindingHooks {
-        /** 
-        * wx.Is invoked each time the foreach block is duplicated and inserted into the document, 
-        * both when foreach first initializes, and when new entries are added to the associated 
+        /**
+        * wx.Is invoked each time the foreach block is duplicated and inserted into the document,
+        * both when foreach first initializes, and when new entries are added to the associated
         * array later
         **/
         afterRender?(nodes: Node[], data: any): void;
-        
-        /** 
-        * wx.Is like afterRender, except it is invoked only when new entries are added to your array 
+
+        /**
+        * wx.Is like afterRender, except it is invoked only when new entries are added to your array
         * (and not when foreach first iterates over your array’s initial contents).
-        * A common use for afterAdd is to call a method such as jQuery’s $(domNode).fadeIn() 
+        * A common use for afterAdd is to call a method such as jQuery’s $(domNode).fadeIn()
         * so that you get animated transitions whenever items are added
         **/
         afterAdd? (nodes: Node[], data: any, index: number): void;
-        
-        /** 
-        * wx.Is invoked when an array item has been removed, but before the corresponding 
-        * DOM nodes have been removed. wx.If you specify a beforeRemove callback, then it 
-        * becomes your responsibility to remove the DOM nodes. The obvious use case here 
-        * is calling something like jQuery’s $(domNode).fadeOut() to animate the removal 
-        * of the corresponding DOM nodes — in this case, WebRx cannot know how soon 
-        * it is allowed to physically remove the DOM nodes (who knows how long your 
+
+        /**
+        * wx.Is invoked when an array item has been removed, but before the corresponding
+        * DOM nodes have been removed. wx.If you specify a beforeRemove callback, then it
+        * becomes your responsibility to remove the DOM nodes. The obvious use case here
+        * is calling something like jQuery’s $(domNode).fadeOut() to animate the removal
+        * of the corresponding DOM nodes — in this case, WebRx cannot know how soon
+        * it is allowed to physically remove the DOM nodes (who knows how long your
         * animation will take?)
         **/
         beforeRemove? (nodes: Node[], data: any, index: number): void;
-        
-        /** 
-        * wx.Is invoked when an array item has changed position in the array, but before 
-        * the corresponding DOM nodes have been moved. You could use beforeMove 
-        * to store the original screen coordinates of the affected elements so that you 
+
+        /**
+        * wx.Is invoked when an array item has changed position in the array, but before
+        * the corresponding DOM nodes have been moved. You could use beforeMove
+        * to store the original screen coordinates of the affected elements so that you
         * can animate their movements in the afterMove callback.
         **/
         beforeMove? (nodes: Node[], data: any, index: number): void;
-        
-        /** 
-        * wx.Is invoked after an array item has changed position in the array, and after 
+
+        /**
+        * wx.Is invoked after an array item has changed position in the array, and after
         * foreach has updated the DOM to match.
         **/
         afterMove? (nodes: Node[], data: any, index: number): void;
     }
-    
+
     export interface IHasFocusBindingOptions {
         property: any;
         delay: number;
     }
-    
+
     export interface IIfAnimationDescriptor {
         enter?: string|wx.IAnimation;
         leave?: string|wx.IAnimation;
     }
-    
+
     export interface IIfBindingOptions extends IIfAnimationDescriptor {
         condition: string;
     }
-    
+
     export interface IKeyPressBindingOptions {
         [key: string]: (ctx: wx.IDataContext, event: Event) => any|wx.ICommand<any>|{ command: wx.ICommand<any>; parameter: any };
     }
-    
+
     export interface IVisibleBindingOptions {
         useCssClass: boolean;   // instruct the handler to hide/show elements using the supplied css class rather than modifying the elements style property
         hiddenClass: string;    // the css class to apply when the object is hidden
     }
-    
+
     export interface IRadioGroupComponentParams {
         items: any;
         groupName?: string;
@@ -1036,7 +1036,7 @@ module wx {
         afterRender?(nodes: Node[], data: any): void;
         noCache?: boolean;
     }
-    
+
     export interface ISelectComponentParams {
         name?: string;
         items: any;
@@ -1052,22 +1052,22 @@ module wx {
         afterRender?(nodes: Node[], data: any): void;
         noCache?: boolean;
     }
-    
+
     export interface IBrowserProperties {
         version: number;
     }
-    
+
     export interface IIEBrowserProperties extends IBrowserProperties {
         getSelectionChangeObservable(el: HTMLElement): Rx.Observable<Document>;
     }
-    
-    
+
+
     export interface IStateActiveBindingOptions {
         name: string;
         params?: Object;
         cssClass?: string;
     }
-    
+
     export interface IStateRefBindingOptions {
         name: string;
         params?: Object;
@@ -1085,70 +1085,70 @@ module wx {
         xmlHttpRequest?: ()=> XMLHttpRequest;
         promise?: (executor: (resolve: (value?: any | PromiseLike<any>) => void, reject: (reason?: any) => void) => void)=> Promise<any>;
     }
-    
+
     export interface IHttpClient {
         /**
         * Performs a http-get-request
-        * 
-        * @param {string} url The request url 
-        * @param {Object} params Query string parameters to be appended to the request url. Values will be uri-encoded 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {string} url The request url
+        * @param {Object} params Query string parameters to be appended to the request url. Values will be uri-encoded
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         get<T>(url: string, params?: Object, options?: wx.IHttpClientOptions): Rx.IPromise<T>;
 
         /**
         * Performs a http-put-request
-        * 
-        * @param {string} url The request url 
-        * @param {any} data The data to be sent to the server 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {string} url The request url
+        * @param {any} data The data to be sent to the server
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         put<T>(url: string, data: T, options?: wx.IHttpClientOptions): Rx.IPromise<any>;
 
         /**
         * Performs a http-post-request
-        * 
-        * @param {string} url The request url 
-        * @param {any} data The data to be sent to the server 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {string} url The request url
+        * @param {any} data The data to be sent to the server
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         post<T>(url: string, data: T, options?: wx.IHttpClientOptions): Rx.IPromise<any>;
 
         /**
         * Performs a http-patch-request
-        * 
-        * @param {string} url The request url 
-        * @param {any} data The data to be sent to the server 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {string} url The request url
+        * @param {any} data The data to be sent to the server
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         patch<T>(url: string, data: T, options?: wx.IHttpClientOptions): Rx.IPromise<any>;
 
         /**
         * Performs a http-delete-request
-        * 
-        * @param {string} url The request url 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {string} url The request url
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         delete(url: string, options?: wx.IHttpClientOptions): Rx.IPromise<any>;
 
         /**
         * Performs a http-options-request
-        * 
-        * @param {string} url The request url 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {string} url The request url
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         options(url: string, options?: wx.IHttpClientOptions): Rx.IPromise<any>;
 
         /**
         * Performs a http-request according to the specified options
-        * 
-        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration 
+        *
+        * @param {wx.IHttpClientOptions} options Configuration options, overriding the instance's current configuration
         **/
         request<T>(options: wx.IHttpClientOptions): Rx.IPromise<T>;
 
         /**
         * Configures this HttpClient instance
-        * 
+        *
         * @param {wx.IHttpClientOptions} opts The configuration object
         **/
         configure(opts: wx.IHttpClientOptions): void;

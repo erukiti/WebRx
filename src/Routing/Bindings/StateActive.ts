@@ -1,4 +1,4 @@
-﻿/// <reference path="../../Interfaces.ts" />
+/// <reference path="../../Interfaces.ts" />
 
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, toggleCssClass } from "../../Core/Utils"
 
@@ -9,7 +9,7 @@ export default class StateActiveBinding implements wx.IBindingHandler {
         this.domManager = domManager;
         this.router = router;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -79,10 +79,10 @@ export default class StateActiveBinding implements wx.IBindingHandler {
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

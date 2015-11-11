@@ -22,9 +22,9 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
         // IObservablePagedReadOnlyList
         this.pageSize = property(pageSize);
         this.currentPage = property(currentPage || 0);
-        
+
         let updateLengthTrigger = Rx.Observable.merge(
-                this.updateLengthTrigger, 
+                this.updateLengthTrigger,
                 source.lengthChanged)
             .startWith(true)
             .observeOn(Rx.Scheduler.immediate);
@@ -45,7 +45,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
         // isEmptyChanged
         this.isEmptyChanged = whenAny(this.length, (len)=> len == 0)
             .distinctUntilChanged();
-        
+
         // IObservableReadOnlyList
         this.beforeItemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
         this.itemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
@@ -83,13 +83,13 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
 
         this.wireUpChangeNotifications();
     }
-   
+
     //////////////////////////////////
     // IUnknown implementation
 
     public queryInterface(iid: string): boolean {
        return iid === IID.IObservableList || iid === IID.IDisposable;
-    }  
+    }
 
     //////////////////////////////////
     // IObservablePagedReadOnlyList
@@ -102,21 +102,21 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     // IObservableReadOnlyList
 
     public length: wx.IObservableProperty<number>;
-    
+
     public get(index: number): T {
         index = (this.pageSize() * this.currentPage()) + index;
-            
-        return this.source.get(index);    
+
+        return this.source.get(index);
     }
-    
+
     public get isReadOnly(): boolean {
         return true;
     }
-    
+
     public toArray(): Array<T> {
         let start = this.pageSize() * this.currentPage();
         return this.source.toArray().slice(start, start + this.pageSize());
-    }     
+    }
 
     //////////////////////////////////
     // INotifyListChanged
@@ -125,7 +125,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     public listChanged: Rx.Observable<boolean>;
     public isEmptyChanged: Rx.Observable<boolean>;
     public shouldReset: Rx.Observable<any>;
-    
+
     public suppressChangeNotifications(): Rx.IDisposable {
         this.changeNotificationsSuppressed++;
 
@@ -148,7 +148,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
 
     ////////////////////
     // Implementation
-    
+
     public source: wx.IObservableReadOnlyList<T>;
     private disp = new Rx.CompositeDisposable();
 
@@ -289,7 +289,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
             this.publishResetNotification();
         }));
     }
-    
+
     private getPageRange(): wx.IRangeInfo {
         const from = this.currentPage() * this.pageSize();
         const result = { from: from, to: from + this.length() };
@@ -306,11 +306,11 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
 
     private onItemsAdded(e: wx.IListChangeInfo<T>) {
         const page = this.getPageRange();
-        
+
         // items added beneath the window can be ignored
         if(e.from > page.to)
             return;
-            
+
         // adding items before the window results in a reset
         if(e.from < page.from) {
             this.publishBeforeResetNotification();
@@ -319,28 +319,28 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
             // compute relative start index
             const from = e.from - page.from;
             const numItems = Math.min(this.pageSize() - from, e.items.length);
-            
+
             // limit items
             const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
-                
+
             // emit translated notifications
             const er = { from: from, items: items };
-                
-            if (this.beforeItemsAddedSubject.isValueCreated)    
+
+            if (this.beforeItemsAddedSubject.isValueCreated)
                 this.beforeItemsAddedSubject.value.onNext(er);
-        
-            if (this.itemsAddedSubject.isValueCreated)    
+
+            if (this.itemsAddedSubject.isValueCreated)
                 this.itemsAddedSubject.value.onNext(er);
         }
     }
 
     private onItemsRemoved(e: wx.IListChangeInfo<T>) {
         const page = this.getPageRange();
-        
+
         // items added beneath the window can be ignored
         if(e.from > page.to)
             return;
-            
+
         // adding items before the window results in a reset
         if(e.from < page.from) {
             this.publishBeforeResetNotification();
@@ -349,17 +349,17 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
             // compute relative start index
             const from = e.from - page.from;
             const numItems = Math.min(this.pageSize() - from, e.items.length);
-            
+
             // limit items
             const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
-                
+
             // emit translated notifications
             const er = { from: from, items: items };
-                
-            if (this.beforeItemsRemovedSubject.isValueCreated)    
+
+            if (this.beforeItemsRemovedSubject.isValueCreated)
                 this.beforeItemsRemovedSubject.value.onNext(er);
-            
-            if (this.itemsRemovedSubject.isValueCreated)    
+
+            if (this.itemsRemovedSubject.isValueCreated)
                 this.itemsRemovedSubject.value.onNext(er);
         }
     }
@@ -374,7 +374,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
             e.from < page.from && e.to < page.from) {
             return;
         }
-        
+
         // from-index inside page?
         if(e.from >= page.from && e.from < page.to) {
             // to-index as well?
@@ -384,13 +384,13 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
                 to = e.to - page.from;
 
                 er = { from: from, to: to, items: e.items };
-                    
-                if (this.beforeItemsMovedSubject.isValueCreated)    
+
+                if (this.beforeItemsMovedSubject.isValueCreated)
                     this.beforeItemsMovedSubject.value.onNext(er);
-        
-                if (this.itemsMovedSubject.isValueCreated)    
+
+                if (this.itemsMovedSubject.isValueCreated)
                     this.itemsMovedSubject.value.onNext(er);
-                    
+
                 return;
             } else if(e.to >= page.to) {
                 // item was moved out of the page somewhere below window
@@ -402,33 +402,33 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
                 if(from !== lastValidIndex) {
                     er = { from: from, items: e.items };
 
-                    if (this.beforeItemsRemovedSubject.isValueCreated)    
+                    if (this.beforeItemsRemovedSubject.isValueCreated)
                         this.beforeItemsRemovedSubject.value.onNext(er);
 
-                    if (this.itemsRemovedSubject.isValueCreated)    
+                    if (this.itemsRemovedSubject.isValueCreated)
                         this.itemsRemovedSubject.value.onNext(er);
 
                     // generate fake-add notification for last item in page
                     from = this.length() - 1;
                     er = { from: from, items: [this.get(from)] };
-    
-                    if (this.beforeItemsAddedSubject.isValueCreated)    
+
+                    if (this.beforeItemsAddedSubject.isValueCreated)
                         this.beforeItemsAddedSubject.value.onNext(er);
-    
-                    if (this.itemsAddedSubject.isValueCreated)    
+
+                    if (this.itemsAddedSubject.isValueCreated)
                         this.itemsAddedSubject.value.onNext(er);
                 } else {
                     // generate fake-replace notification for last item in page
                     from = this.length() - 1;
                     er = { from: from, items: [this.get(from)] };
-    
-                    if (this.beforeItemReplacedSubject.isValueCreated)    
+
+                    if (this.beforeItemReplacedSubject.isValueCreated)
                         this.beforeItemReplacedSubject.value.onNext(er);
-    
-                    if (this.itemReplacedSubject.isValueCreated)    
-                        this.itemReplacedSubject.value.onNext(er);                    
+
+                    if (this.itemReplacedSubject.isValueCreated)
+                        this.itemReplacedSubject.value.onNext(er);
                 }
-                                                    
+
                 return;
             }
         }
@@ -450,11 +450,11 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
 
         // emit translated notifications
         const er = { from: from, items: e.items };
-        
-        if (this.beforeItemReplacedSubject.isValueCreated)    
+
+        if (this.beforeItemReplacedSubject.isValueCreated)
             this.beforeItemReplacedSubject.value.onNext(er);
-        
-        if (this.itemReplacedSubject.isValueCreated)    
+
+        if (this.itemReplacedSubject.isValueCreated)
             this.itemReplacedSubject.value.onNext(er);
     }
 }

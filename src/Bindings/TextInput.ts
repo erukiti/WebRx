@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, isProperty, toggleCssClass } from "../Core/Utils"
@@ -11,7 +11,7 @@ export default class TextInputBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -19,7 +19,7 @@ export default class TextInputBinding implements wx.IBindingHandler {
     public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
          if (node.nodeType !== 1)
              throwError("textInput-binding only operates on elements!");
-        
+
          if (options == null)
             throwError("invalid binding-options!");
 
@@ -90,16 +90,16 @@ export default class TextInputBinding implements wx.IBindingHandler {
                                 prop(el.value);
                             } catch(e) {
                                 this.app.defaultExceptionHandler.onNext(e);
-                            }                                    
+                            }
                         });
                     }
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -137,7 +137,7 @@ export default class TextInputBinding implements wx.IBindingHandler {
                 // out of the field, and cutting or deleting text using the context menu. 'selectionchange'
                 // can detect all of those except dragging text out of the field, for which we use 'dragend'.
                 result.push(<Rx.Observable<Object>> <any>
-                    env.ie.getSelectionChangeObservable(el).where(doc=> doc.activeElement === el)); 
+                    env.ie.getSelectionChangeObservable(el).where(doc=> doc.activeElement === el));
 
                 result.push(Rx.Observable.fromEvent(el, 'dragend'));
 

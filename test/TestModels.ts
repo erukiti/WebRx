@@ -1,4 +1,4 @@
-﻿/// <reference path="typings/jasmine.d.ts" />
+/// <reference path="typings/jasmine.d.ts" />
 /// <reference path="../src/web.rx.d.ts" />
 
 class TestViewModel {
@@ -26,7 +26,7 @@ class FakeCollectionViewModel {
     }
 
     numberAsString: wx.IObservableProperty<string>;
-    
+
     public get NumberAsString(): string {
         return this.numberAsString();
     }

@@ -29,7 +29,7 @@ export class Command<T> implements wx.ICommand<T>, wx.IUnknown {
             .startWith(this.canExecuteLatest)
             .distinctUntilChanged()
             .publish();
-            
+
         this.canExecuteDisp = canExecuteObs.connect();
         this.canExecuteObservable = canExecuteObs;
 

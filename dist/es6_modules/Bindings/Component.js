@@ -91,7 +91,7 @@ export default class ComponentBinding {
                 this.app.defaultExceptionHandler.onNext(e);
             }
         }));
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -123,13 +123,13 @@ export default class ComponentBinding {
             // refresh context
             ctx = this.domManager.getDataContext(el);
         }
-        // invoke preBindingInit 
+        // invoke preBindingInit
         if (vm && component.preBindingInit && vm.hasOwnProperty(component.preBindingInit)) {
             vm[component.preBindingInit].call(vm, el);
         }
         // done
         this.domManager.applyBindingsToDescendants(ctx, el);
-        // invoke postBindingInit 
+        // invoke postBindingInit
         if (vm && component.postBindingInit && vm.hasOwnProperty(component.postBindingInit)) {
             vm[component.postBindingInit].call(vm, el);
         }

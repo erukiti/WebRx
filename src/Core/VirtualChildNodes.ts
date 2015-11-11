@@ -1,7 +1,7 @@
-﻿"use strict";
+"use strict";
 
 /**
-* VirtualChildNodes implements consisent and predictable manipulation 
+* VirtualChildNodes implements consisent and predictable manipulation
 * of a DOM Node's childNodes collection regardless its the true contents
 * @class
 **/

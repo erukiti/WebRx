@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 
 /// <reference path="../../node_modules/rx/ts/rx.lite.d.ts" />
 /// <reference path="../../node_modules/rx/ts/rx.testing.d.ts" />
@@ -28,7 +28,7 @@ describe("Utils",() => {
         var id1b = wx.getOid(o1);
         expect(id1).toEqual(id1b);
 
-        // should not throw for primitive 
+        // should not throw for primitive
         expect(() => wx.getOid(1)).not.toThrowError();
         expect(() => wx.getOid("foo")).not.toThrowError();
         expect(wx.getOid(1)).toEqual("number:1");
@@ -172,8 +172,8 @@ describe("Utils",() => {
             prop3: wx.property('Apu'),
             obs4: null
         }
-        
-        vm.obs4 = Rx.Observable.return(vm.prop3()); 
+
+        vm.obs4 = Rx.Observable.return(vm.prop3());
 
         var combined3 = wx.whenAny(vm.prop1, vm.prop2, vm.obs4,(prop1, prop2, obs4) => {
             return prop1 + prop2 + obs4;

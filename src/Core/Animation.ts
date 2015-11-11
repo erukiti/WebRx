@@ -113,11 +113,11 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
     let completeToRemove: Array<any>;
 
     if (prepare) {
-        let prepIns: Array<wx.IAnimationCssClassInstruction>; 
+        let prepIns: Array<wx.IAnimationCssClassInstruction>;
 
         if (typeof prepare === "string") {
             prepare = prepare.split(/\s+/).map(x => x.trim()).filter(x => x);
-        } 
+        }
 
         if (typeof prepare[0] === "string") {
             // convert into wx.IAnimationCssClassInstruction
@@ -168,7 +168,7 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
                 return Rx.Observable.timer(duration);
             }), <any> noop);
 
-            // defer animation-start to avoid problems with transitions on freshly added elements 
+            // defer animation-start to avoid problems with transitions on freshly added elements
             Rx.Observable.timer(1).subscribe(() => {
                 if (runToAdd && runToAdd.length)
                     elements.forEach(x => toggleCssClass.apply(null, [x, true].concat(runToAdd)));
@@ -181,7 +181,7 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
         });
     }
 
-    let completeIns: Array<wx.IAnimationCssClassInstruction>; 
+    let completeIns: Array<wx.IAnimationCssClassInstruction>;
 
     if (complete) {
         if (typeof complete === "string") {
@@ -223,23 +223,23 @@ function cssTransitionAnimation(prepare: any, run: any, complete: any): wx.IAnim
 
 /**
  * Registers a CSS-Transition based animation
- * @param {string} prepareTransitionClass The css class(es) to apply before the animation runs. 
- * Both prepareTransitionClass and startTransitionClass will be removed automatically from the 
+ * @param {string} prepareTransitionClass The css class(es) to apply before the animation runs.
+ * Both prepareTransitionClass and startTransitionClass will be removed automatically from the
  * elements targeted by the animation as soon as the transition has ended.
  * @param {string} startTransitionClass The css class(es) to apply to trigger the transition.
  * @param {string} completeTransitionClass The css class(es) to apply to trigger to the element
- * as soon as the animation has ended. 
+ * as soon as the animation has ended.
  * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
  */
 export function animation(prepareTransitionClass: string|Array<string>|Array<wx.IAnimationCssClassInstruction>,
     startTransitionClass: string|Array<string>|Array<wx.IAnimationCssClassInstruction>,
     completeTransitionClass?: string|Array<string>|Array<wx.IAnimationCssClassInstruction>): wx.IAnimation;
- 
+
 /**
  * Registers a scripted animation
  * @param {(element: HTMLElement, params?: any)=> Rx.Observable<any>} run The function that carries out the animation
  * @param {(element: HTMLElement, params?: any)=> void} prepare The function that prepares the targeted elements for the animation
- * @param {(element: HTMLElement, params?: any)=> void} complete The function that performs and cleanup on the targeted elements 
+ * @param {(element: HTMLElement, params?: any)=> void} complete The function that performs and cleanup on the targeted elements
  * after the animation has ended
  * @returns {Rx.Observable<any>} An observable that signals that the animation is complete
  */

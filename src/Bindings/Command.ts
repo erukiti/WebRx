@@ -1,7 +1,7 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
-import { extend, isInUnitTest, args2Array, isFunction, 
+import { extend, isInUnitTest, args2Array, isFunction,
     throwError, formatString, cloneNodeArray, elementCanBeDisabled } from "../Core/Utils"
 import { isCommand } from "../Core/Command"
 
@@ -11,7 +11,7 @@ export default class CommandBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -57,7 +57,7 @@ export default class CommandBinding implements wx.IBindingHandler {
         }
 
         if (paramObservable == null) {
-            paramObservable = Rx.Observable.return<any>(undefined); 
+            paramObservable = Rx.Observable.return<any>(undefined);
         }
 
         state.cleanup.add(Rx.Observable
@@ -84,11 +84,11 @@ export default class CommandBinding implements wx.IBindingHandler {
 
                         // handle input events
                         cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e: Event) => {
-                            // verify that the command can actually execute since we cannot disable 
-                            // all elements - only form elements such as buttons 
+                            // verify that the command can actually execute since we cannot disable
+                            // all elements - only form elements such as buttons
                             if(x.cmd.canExecute(x.param)) {
                                 x.cmd.execute(x.param);
-                            }                                
+                            }
 
                             // prevent default for anchors
                             if (isAnchor) {
@@ -98,10 +98,10 @@ export default class CommandBinding implements wx.IBindingHandler {
                     }
                 } catch (e) {
                     this.app.defaultExceptionHandler.onNext(e);
-                } 
+                }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

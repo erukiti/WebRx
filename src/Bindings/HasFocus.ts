@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, isProperty } from "../Core/Utils"
@@ -10,7 +10,7 @@ export default class HasFocusBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -18,7 +18,7 @@ export default class HasFocusBinding implements wx.IBindingHandler {
     public applyBinding(node: Node, options: string, ctx: wx.IDataContext, state: wx.INodeState, module: wx.IModule): void {
         if (node.nodeType !== 1)
             throwError("hasFocus-binding only operates on elements!");
-        
+
         if (options == null)
             throwError("invalid binding-options!");
 
@@ -73,8 +73,8 @@ export default class HasFocusBinding implements wx.IBindingHandler {
             if (value) {
                 // Note: wx.If the element is currently hidden, we schedule the focus change
                 // to occur "soonish". Technically this is a hack because it hides the fact
-                // that we make tricky assumption about the presence of a "visible" binding 
-                // on the same element who's subscribe handler runs after us 
+                // that we make tricky assumption about the presence of a "visible" binding
+                // on the same element who's subscribe handler runs after us
 
                 if (delay === 0 && el.style.display !== 'none') {
                     el.focus();
@@ -119,10 +119,10 @@ export default class HasFocusBinding implements wx.IBindingHandler {
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

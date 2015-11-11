@@ -13,6 +13,6 @@ export function isList(target: any): boolean {
     if (target == null)
         return false;
 
-    return target instanceof ObservableList || 
+    return target instanceof ObservableList ||
         target instanceof PagedObservableListProjection;
 }

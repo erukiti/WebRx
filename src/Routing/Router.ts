@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { extend, isInUnitTest, args2Array, isFunction, throwError, formatString, cloneNodeArray, isEqual } from "../Core/Utils"
 import { createWeakMap } from "./../Collections/WeakMap"
@@ -33,19 +33,19 @@ export class Router implements wx.IRouter {
                 if(e && e.state) {
                     let state = <IHistoryState> e.state;
                     let stateName = state.stateName;
-    
+
                     if (stateName != null) {
                         // enter state using extracted params
                         this.go(stateName, state.params, { location: false });
-    
+
                         // update title
                         app.title(state.title);
                     }
                 }
             }
-            
+
             catch(e) {
-                app.defaultExceptionHandler.onNext(e);                
+                app.defaultExceptionHandler.onNext(e);
             }
         });
 
@@ -61,7 +61,7 @@ export class Router implements wx.IRouter {
 
     //////////////////////////////////
     // IRouter
-    
+
     public state(config: wx.IRouterStateConfig): wx.IRouter {
         this.registerStateInternal(config);
         return this;
@@ -151,7 +151,7 @@ export class Router implements wx.IRouter {
             name: this.rootStateName,
             url: route("/")
         });
-        
+
         if(enterRootState)
             this.go(this.rootStateName, {}, { location: wx.RouterLocationChangeMode.replace });
     }
@@ -174,7 +174,7 @@ export class Router implements wx.IRouter {
                 return;
             }
         }
-        
+
         // not found, enter root state as fallback
         if(this.current() == null)
             this.reload();
@@ -184,7 +184,7 @@ export class Router implements wx.IRouter {
         let state: string;
         let params: Object;
 
-        // reload current state or enter inital root state            
+        // reload current state or enter inital root state
         if(this.current() != null) {
             state = this.current().name;
             params = this.current().params;
@@ -237,14 +237,14 @@ export class Router implements wx.IRouter {
     public current = property<wx.IRouterState>();
 
     public viewTransitions: Rx.Observable<wx.IViewTransition>;
-    
+
     //////////////////////////////////
     // Implementation
 
     private states: { [name: string]: wx.IRouterStateConfig } = {};
     private root: wx.IRouterStateConfig;
     private domManager: wx.IDomManager;
-    private app: wx.IWebRxApp; 
+    private app: wx.IWebRxApp;
 
     private pathSeparator = ".";
     private parentPathDirective = "^";
@@ -275,7 +275,7 @@ export class Router implements wx.IRouter {
             }
         } else {
             // derive relative route from name
-            if(state.name !== this.rootStateName) 
+            if(state.name !== this.rootStateName)
                 state.url = route(parts[parts.length - 1]);
             else
                 state.url = route("/");
@@ -313,7 +313,7 @@ export class Router implements wx.IRouter {
         if (path.indexOf(this.pathSeparator) === 0) {
             return this.current().name + path;
         } else if (path.indexOf(this.parentPathDirective) === 0) {
-            // parent-relative                
+            // parent-relative
             let parent = this.current().name;
 
             // can't go further up than root
@@ -326,7 +326,7 @@ export class Router implements wx.IRouter {
             for(let i = parts.length - 1; i > 0; i--) {
                 let tmp = parts.slice(0, i).join(this.pathSeparator);
 
-                // check if parent or sibling relative to current parent exists 
+                // check if parent or sibling relative to current parent exists
                 if (this.get(tmp) || this.get(tmp + path.substr(1))) {
                     path = tmp + path.substr(1);
                     return path;
@@ -336,7 +336,7 @@ export class Router implements wx.IRouter {
             // make it root relative
             path = this.rootStateName + path.substr(1);
             return path;
-        } 
+        }
 
         return path;
     }

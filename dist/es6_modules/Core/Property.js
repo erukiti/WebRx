@@ -1,7 +1,7 @@
 /// <reference path="../Interfaces.ts" />
 import IID from "../IID";
-// NOTE: The factory method approach is necessary because it is  
-// currently impossible to implement a Typescript interface 
+// NOTE: The factory method approach is necessary because it is
+// currently impossible to implement a Typescript interface
 // with a function signature in a Typescript class.
 "use strict";
 /**

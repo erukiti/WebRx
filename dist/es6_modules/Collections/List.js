@@ -144,7 +144,7 @@ export class ObservableList {
                 }
             }
             else {
-                var from = this.inner.length; // need to capture this before "inner" gets modified 
+                var from = this.inner.length; // need to capture this before "inner" gets modified
                 if (this.beforeItemsAddedSubject.isValueCreated) {
                     this.beforeItemsAddedSubject.value.onNext({ items: items, from: from });
                 }
@@ -664,7 +664,7 @@ class ObservableListProjection extends ObservableList {
             }
         }
         else {
-            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we 
+            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we
             // receive a Move notification. If it affects ordering it should be picked up by the
             // onItemChange and resorted there instead.
             this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
@@ -701,9 +701,9 @@ class ObservableListProjection extends ObservableList {
                 // caused this event affects the ordering. This gets a little tricky so let's be verbose.
                 let newItem = this.selector(changedItem);
                 if (this.orderer == null) {
-                    // We don't have an orderer so we're currently using the source collection index for sorting 
+                    // We don't have an orderer so we're currently using the source collection index for sorting
                     // meaning that no item change will affect ordering. Look at our current item and see if it's
-                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example 
+                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example
                     // if it's an integer) we'll issue a replace event so that subscribers get the new value.
                     if (!this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
                         super.set(currentDestinationIndex, newItem);
@@ -721,7 +721,7 @@ class ObservableListProjection extends ObservableList {
                         }
                     }
                     else {
-                        // The change is forcing us to reorder. We'll use a move operation if the item hasn't 
+                        // The change is forcing us to reorder. We'll use a move operation if the item hasn't
                         // changed (ie it's the same object) and we'll implement it as a remove and add if the
                         // object has changed (ie the selector is not an identity function).
                         if (this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
@@ -802,7 +802,7 @@ class ObservableListProjection extends ObservableList {
     /// </summary>
     moveSourceIndexInMap(oldSourceIndex, newSourceIndex) {
         if (newSourceIndex > oldSourceIndex) {
-            // Item is moving towards the end of the list, everything between its current position and its 
+            // Item is moving towards the end of the list, everything between its current position and its
             // new position needs to be shifted down one index
             this.shiftSourceIndicesInRange(oldSourceIndex + 1, newSourceIndex + 1, -1);
         }
@@ -825,7 +825,7 @@ class ObservableListProjection extends ObservableList {
         }
     }
     /// <summary>
-    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive). 
+    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive).
     /// </summary>
     shiftSourceIndicesInRange(rangeStart, rangeStop, value) {
         for (let i = 0; i < this.indexToSourceIndexMap.length; i++) {

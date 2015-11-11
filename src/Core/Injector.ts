@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError } from "../Core/Utils"
@@ -48,7 +48,7 @@ class Injector implements wx.IInjector {
                         throwError("Error resolving dependency '{0}' for '{1}': {2}", x, key, e);
                     }
                 });
-                
+
                 // invoke constructor
                 let _args = [null].concat(resolved).concat(args);
                 let ctorFunc = ctor.bind.apply(ctor, _args);
@@ -109,7 +109,7 @@ class Injector implements wx.IInjector {
                 throwError("Error resolving dependency '{0}' for '{1}': {2}", x, Object.getPrototypeOf(ctor), e);
             }
         });
-                
+
         // invoke constructor
         let _args = [null].concat(resolved).concat(args);
         let ctorFunc = ctor.bind.apply(ctor, _args);

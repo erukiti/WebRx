@@ -1,4 +1,4 @@
-﻿/// <reference path="./Interfaces.ts" />
+/// <reference path="./Interfaces.ts" />
 
 import { injector } from "./Core/Injector"
 import { isInUnitTest } from "./Core/Utils"
@@ -35,8 +35,8 @@ import HttpClient from "./Core/HttpClient"
 import { version } from "./Version"
 
 // make sure RxExtensions get installed
-import { install } from "./RxExtensions" 
-install();    
+import { install } from "./RxExtensions"
+install();
 
 "use strict";
 
@@ -102,11 +102,11 @@ class App extends Module implements wx.IWebRxApp {
     public devModeEnable(): void {
         // configure logging
         log.hintEnable = true;
-        
+
         // wire exception logging
         this.defaultExceptionHandler = Rx.Observer.create<Error>(ex => {
             log.error("An onError occurred on an object (usually a computedProperty) that would break a binding or command. To prevent this, subscribe to the thrownExceptions property of your objects: {0}", ex);
-        });    
+        });
     }
 
     public history: wx.IHistory;
@@ -129,10 +129,10 @@ class App extends Module implements wx.IWebRxApp {
             //go: window.history.go,
             pushState: window.history.pushState.bind(window.history),
             replaceState: window.history.replaceState.bind(window.history),
-            
+
             getSearchParameters: (query?:string)=> {
                 query = query || result.location.search.substr(1);
-                
+
                 if(query) {
                     let result = {};
                     let params = query.split("&");
@@ -140,10 +140,10 @@ class App extends Module implements wx.IWebRxApp {
                         var tmp = params[i].split("=");
                         result[tmp[0]] = decodeURIComponent(tmp[1]);
                     }
-            
+
                     return result;
-                } 
-                
+                }
+
                 return {};
             }
         };
@@ -181,7 +181,7 @@ class App extends Module implements wx.IWebRxApp {
 
         return result;
     }
-    
+
     public register() {
         injector.register(res.app, this)    // register with injector
             .register(res.expressionCompiler, ExpressionCompiler)
@@ -217,7 +217,7 @@ class App extends Module implements wx.IWebRxApp {
             .register("bindings.view", [res.domManager, res.router, res.app, ViewBinding], true)
             .register("bindings.sref", [res.domManager, res.router, res.app, StateRefBinding], true)
             .register("bindings.sactive", [res.domManager, res.router, res.app, StateActiveBinding], true);
-        
+
         injector.register("components.radiogroup", [res.templateEngine, RadioGroupComponent])
             .register("components.select", [res.templateEngine, SelectComponent]);
 
@@ -248,10 +248,10 @@ class App extends Module implements wx.IWebRxApp {
             .binding("view", "bindings.view")
             .binding(["sref", "stateRef", "stateref"], "bindings.sref")
             .binding(["sactive", "stateActive", "stateactive"], "bindings.sactive");
-        
+
         this.component("wx-radiogroup", { resolve: "components.radiogroup" })
             .component("wx-select", { resolve: "components.select" });
-            
+
         // register with module-registry
         modules["app"] = <wx.IModuleDescriptor> <any> { instance: this };
     }

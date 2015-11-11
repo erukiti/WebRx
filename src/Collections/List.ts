@@ -185,8 +185,8 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
             }
             // range notification
             else {
-                var from = this.inner.length;   // need to capture this before "inner" gets modified 
-                
+                var from = this.inner.length;   // need to capture this before "inner" gets modified
+
                 if (this.beforeItemsAddedSubject.isValueCreated) {
                     this.beforeItemsAddedSubject.value.onNext({ items: items, from: from });
                 }
@@ -205,7 +205,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
             }
         });
     }
-    
+
     public insertRange(index: number, items: T[]): void {
         if (items == null) {
             throwError("collection");
@@ -250,7 +250,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
             }
         });
     }
-    
+
     public removeAll(items: T[]): void {
         if (items == null) {
             throwError("items");
@@ -320,7 +320,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
     }
 
     public add(item: T): void {
-        this.insertItem(this.inner.length, item);            
+        this.insertItem(this.inner.length, item);
     }
 
     public clear(): void {
@@ -392,7 +392,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
 
     public page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IObservablePagedReadOnlyList<T> {
         return new PagedObservableListProjection<T>(this, pageSize, currentPage, scheduler);
-    }        
+    }
 
     public suppressChangeNotifications(): Rx.IDisposable {
         this.changeNotificationsSuppressed++;
@@ -407,7 +407,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
 
             if (this.changeNotificationsSuppressed === 0) {
                 this.publishBeforeResetNotification();
-                this.publishResetNotification();                    
+                this.publishResetNotification();
             }
         });
     }
@@ -526,7 +526,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
 
         if (this.inner === undefined)
             this.inner = new Array<T>();
-            
+
         this.beforeItemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
         this.itemsAddedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
         this.beforeItemsRemovedSubject = new Lazy<Rx.Subject<wx.IListChangeInfo<T>>>(() => new Rx.Subject<wx.IListChangeInfo<T>>());
@@ -569,13 +569,13 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
 
         this.length = this.lengthChanged.toProperty(this.inner.length);
 
-        this.disposables.add(this.length);            
+        this.disposables.add(this.length);
 
         this.isEmpty = this.lengthChanged
             .select(x => <boolean> (x === 0))
             .toProperty(this.inner.length === 0);
-            
-        this.disposables.add(this.isEmpty);            
+
+        this.disposables.add(this.isEmpty);
     }
 
     private areChangeNotificationsEnabled(): boolean {
@@ -980,7 +980,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
                 this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
             }
         } else {
-            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we 
+            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we
             // receive a Move notification. If it affects ordering it should be picked up by the
             // onItemChange and resorted there instead.
             this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
@@ -988,14 +988,14 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     private onItemsReplaced(e: wx.IListChangeInfo<T>) {
-        const sourceOids = this.isLengthAboveResetThreshold(e.items.length) ? 
-            this.sourceCopy.map(x=> getOid(x)) : 
+        const sourceOids = this.isLengthAboveResetThreshold(e.items.length) ?
+            this.sourceCopy.map(x=> getOid(x)) :
             null;
-        
+
         for(let i = 0; i < e.items.length; i++) {
             let sourceItem = e.items[i];
             this.sourceCopy[e.from + i] = sourceItem;
-            
+
             if(sourceOids)
                 sourceOids[e.from + i] = getOid(sourceItem);
 
@@ -1010,7 +1010,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
 
         for(let i=0;i<sourceIndicesLength;i++) {
             const sourceIndex = sourceIndices[i];
-            
+
             let currentDestinationIndex = this.getIndexFromSourceIndex(sourceIndex);
             let isIncluded = currentDestinationIndex >= 0;
 
@@ -1025,9 +1025,9 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
                 let newItem = this.selector(changedItem);
 
                 if (this.orderer == null) {
-                    // We don't have an orderer so we're currently using the source collection index for sorting 
+                    // We don't have an orderer so we're currently using the source collection index for sorting
                     // meaning that no item change will affect ordering. Look at our current item and see if it's
-                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example 
+                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example
                     // if it's an integer) we'll issue a replace event so that subscribers get the new value.
                     if (!this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
                         super.set(currentDestinationIndex, newItem);
@@ -1043,7 +1043,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
                             super.set(currentDestinationIndex, newItem);
                         }
                     } else {
-                        // The change is forcing us to reorder. We'll use a move operation if the item hasn't 
+                        // The change is forcing us to reorder. We'll use a move operation if the item hasn't
                         // changed (ie it's the same object) and we'll implement it as a remove and add if the
                         // object has changed (ie the selector is not an identity function).
                         if (this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
@@ -1111,24 +1111,24 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
 
         if(sourceOids) {
             const itemOid = getOid(item);
-            
+
             for(let i=0;i<sourceLength;i++) {
                 const oid = sourceOids[i];
-                
+
                 if (itemOid === oid) {
                     indices.push(sourceIndex);
                 }
-    
+
                 sourceIndex++;
             }
         } else {
             for(let i=0;i<sourceLength;i++) {
                 const x = source[i];
-                
+
                 if (this.referenceEquals(x, item)) {
                     indices.push(sourceIndex);
                 }
-    
+
                 sourceIndex++;
             }
         }
@@ -1142,7 +1142,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     /// </summary>
     private moveSourceIndexInMap(oldSourceIndex: number, newSourceIndex: number): void {
         if (newSourceIndex > oldSourceIndex) {
-            // Item is moving towards the end of the list, everything between its current position and its 
+            // Item is moving towards the end of the list, everything between its current position and its
             // new position needs to be shifted down one index
             this.shiftSourceIndicesInRange(oldSourceIndex + 1, newSourceIndex + 1, -1);
         } else {
@@ -1166,7 +1166,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     }
 
     /// <summary>
-    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive). 
+    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive).
     /// </summary>
     private shiftSourceIndicesInRange(rangeStart: number, rangeStop: number, value: number): void {
         for(let i = 0; i < this.indexToSourceIndexMap.length; i++) {
@@ -1183,7 +1183,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         const length = this.source.length();
 
         for(let i=0;i<length;i++) {
-            const sourceItem = this.source.get(i);            
+            const sourceItem = this.source.get(i);
             this.sourceCopy.push(sourceItem);
 
             if (!this._filter || this._filter(sourceItem)) {

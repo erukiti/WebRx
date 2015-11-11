@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { injector } from "./Injector"
@@ -1099,7 +1099,7 @@ function simpleGetterFn1(key0, fullExp): wx.ICompiledExpression {
 
     return (scope: any, locals: any) => {
         scope = ((locals && locals.hasOwnProperty(key0)) ? locals : scope);
-        if (scope == null) 
+        if (scope == null)
             return undefined;
 
         let hooks = getRuntimeHooks(locals);
@@ -1118,7 +1118,7 @@ function simpleGetterFn2(key0, key1, fullExp): wx.ICompiledExpression {
         let hooks = getRuntimeHooks(locals);
         if (hooks && hooks.readFieldHook) {
             scope = (locals && locals.hasOwnProperty(key0)) ? locals : scope;
-            if (scope == null) 
+            if (scope == null)
                 return undefined;
 
             scope = hooks.readFieldHook(scope, key0);
@@ -1184,7 +1184,7 @@ function getterFn(path, options, fullExp): (scope: any, locals?: any, self?: any
     });
     code += "return s;";
 
-    // jshint -W054 
+    // jshint -W054
     let evaledFnGetter = new Function("s", "k", "pw", code); // s=scope, k=locals, pw=promiseWarning
     // jshint +W054 /
     evaledFnGetter.toString = valueFn(code);

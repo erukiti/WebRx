@@ -121,16 +121,16 @@ export default class HttpClient implements wx.IHttpClient {
       xhr.addEventListener(HttpClient.Events.TIMEOUT, () => reject(this.res(xhr)));
 
       for (const k in opts.headers) {
-        if (!{}.hasOwnProperty.call(opts.headers, k)) 
+        if (!{}.hasOwnProperty.call(opts.headers, k))
           continue;
-        
+
         xhr.setRequestHeader(k, opts.headers[k]);
       }
 
       for (const k in opts.events) {
-        if (!{}.hasOwnProperty.call(opts.events, k)) 
+        if (!{}.hasOwnProperty.call(opts.events, k))
           continue;
-        
+
         xhr.addEventListener(k, opts.events[k].bind(null, xhr), false);
       }
 

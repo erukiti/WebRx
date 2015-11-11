@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { createWeakMap } from "../Collections/WeakMap"
 import { createSet, setToArray } from "../Collections/Set"
@@ -76,7 +76,7 @@ export class DomManager implements wx.IDomManager {
                 if (child.nodeType !== 1)
                     continue;
 
-                this.cleanNodeRecursive(child);                
+                this.cleanNodeRecursive(child);
                 this.clearNodeState(child);
             }
         }
@@ -87,7 +87,7 @@ export class DomManager implements wx.IDomManager {
 
         if (value !== '' && this.isObjectLiteralString(value)) {
             return this.compiler.parseObjectLiteral(value);
-        } 
+        }
 
         return [];
     }
@@ -169,7 +169,7 @@ export class DomManager implements wx.IDomManager {
         }
 
         let ctx: wx.IDataContext;
-        
+
         if (models.length > 0) {
             ctx = {
                 $data: models[0],
@@ -203,7 +203,7 @@ export class DomManager implements wx.IDomManager {
 
     public isNodeBound(node: Node): boolean {
         let state = this.nodeState.get(node);
-        
+
         return state != null && !!state.isBound;
     }
 
@@ -258,7 +258,7 @@ export class DomManager implements wx.IDomManager {
             this.app.defaultExceptionHandler.onNext(e);
 
             return Rx.Observable.return(undefined);
-        } 
+        }
 
         // Optimization: If the initial evaluation didn't touch any observables, treat it as constant expression
         if (captured.size === 0) {
@@ -268,13 +268,13 @@ export class DomManager implements wx.IDomManager {
             // wrap it
             return Rx.Observable.return(result);
         }
-        
+
         // create a subject that receives values from all dependencies
         let allSeeingEye = new Rx.Subject<any>();
 
         // associate observables with subscriptions
         let subs = createMap<Rx.Observable<any>, Rx.IDisposable>();
-        
+
         // subscribe initial dependencies to subject
         let arr = setToArray(captured);
         let length = arr.length;
@@ -297,19 +297,19 @@ export class DomManager implements wx.IDomManager {
                     // house-keeping: let go of unused observables
                     let arr = setToArray(captured);
                     let length = arr.length;
-                    
+
                     for(let i=0;i<length;i++) {
                         o = arr[i];
-                        
+
                         if(!capturedNew.has(o)) {
                             let disp = subs.get(o);
                             if(disp != null)
                                 disp.dispose();
-                                
+
                             subs.delete(o);
                         }
                     }
-                    
+
                     // add new ones
                     arr = setToArray(capturedNew);
                     length = arr.length;
@@ -317,7 +317,7 @@ export class DomManager implements wx.IDomManager {
                     for(let i=0;i<length;i++) {
                         o = arr[i];
                         captured.add(o);
-                        
+
                         if(!subs.has(o)) {
                             subs.set(o, o.replay(null, 1).refCount().subscribe(allSeeingEye));
                         }
@@ -341,23 +341,23 @@ export class DomManager implements wx.IDomManager {
 
             return Rx.Disposable.create(()=> {
                 innerDisp.dispose();
-                
+
                 // dispose subscriptions
                 subs.forEach((value, key, map)=> {
-                    if(value) 
+                    if(value)
                         value.dispose()
                 });
-                
+
                 // cleanup
                 subs.clear();
                 subs = null;
-                
+
                 captured.clear();
                 captured = null;
-                
+
                 allSeeingEye.dispose();
                 allSeeingEye = null;
-                
+
                 locals = null;
             });
         });
@@ -422,7 +422,7 @@ export class DomManager implements wx.IDomManager {
             // lookup handlers
             let bindings = _bindings.map(x=> {
                 let handler = module.binding(x.key);
-                
+
                 if (!handler)
                     throwError("binding '{0}' has not been registered.", x.key);
 
@@ -436,7 +436,7 @@ export class DomManager implements wx.IDomManager {
             let hd = bindings.filter(x => x.handler.controlsDescendants).map(x => "'" + x.value + "'");
             if (hd.length > 1) {
                 throwError("bindings {0} are competing for descendants of target element!", hd.join(", "));
-            } 
+            }
 
             result = hd.length > 0;
 
@@ -468,9 +468,9 @@ export class DomManager implements wx.IDomManager {
             if (attr) {
                 bindingText = attr;
             }
-        } 
+        }
 
-        // transform textual binding-definition into a key-value store where 
+        // transform textual binding-definition into a key-value store where
         // the key is the binding name and the value is its options
         if (bindingText) {
             bindingText = bindingText.trim();
@@ -541,7 +541,7 @@ export class DomManager implements wx.IDomManager {
                 }
 
                 result = o[field];
-                
+
                 // intercept access to observable properties
                 if (!noUnwrap && isProperty(result)) {
                     let prop = <wx.IObservableProperty<any>> result;
@@ -595,7 +595,7 @@ export class DomManager implements wx.IDomManager {
                 } else {
                     result = o[index];
                 }
-                
+
                 // intercept access to observable properties
                 if (isProperty(result)) {
                     let prop = <wx.IObservableProperty<any>> result;

@@ -43,7 +43,7 @@ export function info(fmt: string, ...args: any[]) {
 export function hint(fmt: string, ...args: any[]) {
     if(!hintEnable)
         return;
-    
+
     if (args.length) {
         fmt = formatString.apply(null, [fmt].concat(args));
     }

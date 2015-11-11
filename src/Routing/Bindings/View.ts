@@ -1,4 +1,4 @@
-﻿/// <reference path="../../Interfaces.ts" />
+/// <reference path="../../Interfaces.ts" />
 
 import { extend, isInUnitTest, args2Array, unwrapProperty, throwError, noop, formatString, nodeChildrenToArray, isEqual } from "../../Core/Utils"
 import * as log from "../../Core/Log"
@@ -20,7 +20,7 @@ export default class ViewBinding implements wx.IBindingHandler {
         this.domManager = domManager;
         this.router = router;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -58,7 +58,7 @@ export default class ViewBinding implements wx.IBindingHandler {
 
                 if (config != null) {
                     if (!isEqual(currentConfig, config)) {
-                        cleanup.add(this.applyTemplate(viewName, config.component, currentConfig ? currentConfig.component : undefined, 
+                        cleanup.add(this.applyTemplate(viewName, config.component, currentConfig ? currentConfig.component : undefined,
                             config.params, config.animations, el, ctx, module));
 
                         currentConfig = config;
@@ -71,10 +71,10 @@ export default class ViewBinding implements wx.IBindingHandler {
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -177,15 +177,15 @@ export default class ViewBinding implements wx.IBindingHandler {
                 obs = obs.continueWith(enterAnimation.run(el.childNodes))
                     .continueWith(() => enterAnimation.complete(el.childNodes));
             }
-            
+
            // notify world
             obs = obs.continueWith(() => {
                 var transition: wx.IViewTransition = {
                     view: viewName,
                     fromComponent: previousComponentName,
-                    toComponent: componentName 
+                    toComponent: componentName
                 }
-                
+
                 var ri = <IRouterInternal> this.router;
                 ri.viewTransitionsSubject.onNext(transition);
             });

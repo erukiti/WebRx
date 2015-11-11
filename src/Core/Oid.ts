@@ -17,13 +17,13 @@ export function getOid(o: any): string {
 
     // already set?
     let result = o[oidPropertyName];
-    
+
     if(result !== undefined)
         return result;
-    
+
     // assign new one
     result = (oid++).toString();
-    
+
     // store as non-enumerable property to avoid confusing other libraries
     Object.defineProperty(o, oidPropertyName, {
         enumerable: false,

@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
 
@@ -44,7 +44,7 @@ describe('Components', () => {
 
             expect(() => wx.applyBindings(model, el)).not.toThrowError();
             el = <HTMLElement> el.childNodes[0];
-            
+
             expect(el.childNodes.length).toEqual(items.length);
             expect(testutils.nodeChildrenToArray<HTMLElement>(el).filter(x=> x instanceof HTMLOptionElement)
                 .map(x => x.textContent)).toEqual(items.map(x=> x.key));

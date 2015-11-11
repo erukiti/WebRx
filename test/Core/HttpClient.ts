@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-ajax.d.ts" />
 
 /// <reference path="../../node_modules/rx/ts/rx.lite.d.ts" />
@@ -18,7 +18,7 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var responseData = 42;
-        
+
         client.get(requestUrl).then(response=> {
             expect(response).toEqual(responseData);
             done();
@@ -41,7 +41,7 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var responseData = 42;
-        
+
         client.get(requestUrl).then(response=> {
             fail("Promise should have signalled failure");
             done();
@@ -61,7 +61,7 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var responseData = "bar";
-        
+
         client.get(requestUrl, null, { raw: true }).then(response=> {
             expect(response).toEqual(responseData);
             done();
@@ -84,7 +84,7 @@ describe("HttpClient", () => {
         var requestUrl = '/some/cool/url';
         var requestParams = { 'id': 42 };
         var responseData = 42;
-        
+
         client.get(requestUrl, requestParams).then(response=> {
             expect(response).toEqual(responseData);
             done();
@@ -112,7 +112,7 @@ describe("HttpClient", () => {
             params: { 'bar': 'baz' },
             headers: { 'foo': 'bar' },
         }
-        
+
         client.get(requestUrl, requestParams, options).then(response=> {
             expect(response).toEqual(responseData);
             done();
@@ -137,7 +137,7 @@ describe("HttpClient", () => {
         var requestUrl = '/some/cool/url?foo=bar';
         var requestParams = { 'id': 42 };
         var responseData = 42;
-        
+
         client.get(requestUrl, requestParams).then(response=> {
             expect(response).toEqual(responseData);
             done();
@@ -160,7 +160,7 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var requestData = { 'foo': 'bar'};
-        
+
         client.post(requestUrl, requestData).then(response=> {
             done();
         }, (reason)=> {
@@ -182,7 +182,7 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var requestData = { 'foo': 'bar'};
-        
+
         client.put(requestUrl, requestData).then(response=> {
             done();
         }, (reason)=> {
@@ -203,7 +203,7 @@ describe("HttpClient", () => {
     it("delete()", (done) => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
-        
+
         client.delete(requestUrl).then(response=> {
             done();
         }, (reason)=> {
@@ -222,7 +222,7 @@ describe("HttpClient", () => {
     it("options()", (done) => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
-        
+
         client.options(requestUrl).then(response=> {
             done();
         }, (reason)=> {
@@ -242,13 +242,13 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var requestData = { 'foo': 'bar'};
-        
+
         var options: wx.IHttpClientOptions = {
             dump: (data: any)=> {
                 return JSON.stringify(requestData);
             }
         };
-        
+
         client.configure(options);
 
         client.post(requestUrl, { 'foo': 'baz'})
@@ -261,15 +261,15 @@ describe("HttpClient", () => {
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
         var requestUrl = '/some/cool/url';
         var responseData = 'bar';
-        
+
         var options: wx.IHttpClientOptions = {
             load: (data: string)=> {
                 return "foo_" + data;
             }
         };
-        
+
         client.configure(options);
-        
+
         client.get(requestUrl).then(response=> {
             expect(response).toEqual("foo_bar");
             done();
@@ -295,9 +295,9 @@ describe("HttpClient", () => {
         options.dump = (data: any)=> {
             return JSON.stringify(requestData);
         };
-        
+
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
-        
+
         client.post(requestUrl, { 'foo': 'baz'})
 
         expect(jasmine.Ajax.requests.mostRecent().url).toBe(requestUrl);
@@ -314,7 +314,7 @@ describe("HttpClient", () => {
         };
 
         var client = wx.injector.get<wx.IHttpClient>(wx.res.httpClient);
-        
+
         client.get(requestUrl).then(response=> {
             expect(response).toEqual("foo_bar");
             done();

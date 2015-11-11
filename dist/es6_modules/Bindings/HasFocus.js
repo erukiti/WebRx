@@ -59,8 +59,8 @@ export default class HasFocusBinding {
             if (value) {
                 // Note: wx.If the element is currently hidden, we schedule the focus change
                 // to occur "soonish". Technically this is a hack because it hides the fact
-                // that we make tricky assumption about the presence of a "visible" binding 
-                // on the same element who's subscribe handler runs after us 
+                // that we make tricky assumption about the presence of a "visible" binding
+                // on the same element who's subscribe handler runs after us
                 if (delay === 0 && el.style.display !== 'none') {
                     el.focus();
                 }
@@ -104,7 +104,7 @@ export default class HasFocusBinding {
                 this.app.defaultExceptionHandler.onNext(e);
             }
         }));
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

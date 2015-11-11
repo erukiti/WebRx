@@ -97,6 +97,6 @@ RxObsConstructor.startDeferred = (action) => {
     });
 };
 export function install() {
-    // deliberately left blank    
+    // deliberately left blank
 }
 //# sourceMappingURL=RxExtensions.js.map

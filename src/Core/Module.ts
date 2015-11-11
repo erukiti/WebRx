@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { injector } from "./Injector"
@@ -164,7 +164,7 @@ export class Module implements wx.IModule {
             else {
                 // if the component has been registered as resource, resolve it now and update registry
                 let cd = <IComponentDescriptorEx> _cd;
-    
+
                 if (cd.instance) {
                     result = Rx.Observable.return<wx.IComponentDescriptor>(cd.instance);
                 } else if (cd.template) {
@@ -215,7 +215,7 @@ export class Module implements wx.IModule {
 
         if (isFunction(template)) {
             syncResult = template(params);
-            
+
             if(isRxObservable(template))
                 return template;
 

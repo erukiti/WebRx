@@ -1131,8 +1131,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	/// <reference path="../Interfaces.ts" />
 	var IID_1 = __webpack_require__(5);
-	// NOTE: The factory method approach is necessary because it is  
-	// currently impossible to implement a Typescript interface 
+	// NOTE: The factory method approach is necessary because it is
+	// currently impossible to implement a Typescript interface
 	// with a function signature in a Typescript class.
 	"use strict";
 	/**
@@ -2987,7 +2987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                bindingText = attr;
 	            }
 	        }
-	        // transform textual binding-definition into a key-value store where 
+	        // transform textual binding-definition into a key-value store where
 	        // the key is the binding name and the value is its options
 	        if (bindingText) {
 	            bindingText = bindingText.trim();
@@ -3822,7 +3822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            }
 	            else {
-	                var from = _this.inner.length; // need to capture this before "inner" gets modified 
+	                var from = _this.inner.length; // need to capture this before "inner" gets modified
 	                if (_this.beforeItemsAddedSubject.isValueCreated) {
 	                    _this.beforeItemsAddedSubject.value.onNext({ items: items, from: from });
 	                }
@@ -4366,7 +4366,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        else {
-	            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we 
+	            // TODO: Conceptually I feel like we shouldn't concern ourselves with ordering when we
 	            // receive a Move notification. If it affects ordering it should be picked up by the
 	            // onItemChange and resorted there instead.
 	            this.indexToSourceIndexMap[currentDestinationIndex] = newSourceIndex;
@@ -4403,9 +4403,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // caused this event affects the ordering. This gets a little tricky so let's be verbose.
 	                var newItem = this.selector(changedItem);
 	                if (this.orderer == null) {
-	                    // We don't have an orderer so we're currently using the source collection index for sorting 
+	                    // We don't have an orderer so we're currently using the source collection index for sorting
 	                    // meaning that no item change will affect ordering. Look at our current item and see if it's
-	                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example 
+	                    // the exact (reference-wise) same object. If it is then we're done, if it's not (for example
 	                    // if it's an integer) we'll issue a replace event so that subscribers get the new value.
 	                    if (!this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
 	                        _super.prototype.set.call(this, currentDestinationIndex, newItem);
@@ -4423,7 +4423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                        }
 	                    }
 	                    else {
-	                        // The change is forcing us to reorder. We'll use a move operation if the item hasn't 
+	                        // The change is forcing us to reorder. We'll use a move operation if the item hasn't
 	                        // changed (ie it's the same object) and we'll implement it as a remove and add if the
 	                        // object has changed (ie the selector is not an identity function).
 	                        if (this.referenceEquals(newItem, this.get(currentDestinationIndex))) {
@@ -4504,7 +4504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /// </summary>
 	    ObservableListProjection.prototype.moveSourceIndexInMap = function (oldSourceIndex, newSourceIndex) {
 	        if (newSourceIndex > oldSourceIndex) {
-	            // Item is moving towards the end of the list, everything between its current position and its 
+	            // Item is moving towards the end of the list, everything between its current position and its
 	            // new position needs to be shifted down one index
 	            this.shiftSourceIndicesInRange(oldSourceIndex + 1, newSourceIndex + 1, -1);
 	        }
@@ -4527,7 +4527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    };
 	    /// <summary>
-	    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive). 
+	    /// Increases (or decreases) all source indices within the range (lower inclusive, upper exclusive).
 	    /// </summary>
 	    ObservableListProjection.prototype.shiftSourceIndicesInRange = function (rangeStart, rangeStop, value) {
 	        for (var i = 0; i < this.indexToSourceIndexMap.length; i++) {
@@ -5327,8 +5327,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    }
 	                    // handle input events
 	                    cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe(function (e) {
-	                        // verify that the command can actually execute since we cannot disable 
-	                        // all elements - only form elements such as buttons 
+	                        // verify that the command can actually execute since we cannot disable
+	                        // all elements - only form elements such as buttons
 	                        if (x.cmd.canExecute(x.param)) {
 	                            x.cmd.execute(x.param);
 	                        }
@@ -5343,7 +5343,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -5620,7 +5620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -5740,7 +5740,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -5958,7 +5958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -6027,7 +6027,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            obs = observables[i][1];
 	            this.subscribe(el, obs, key, state);
 	        }
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -6270,7 +6270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -6711,7 +6711,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        tokens.forEach(function (token) {
 	            _this.wireEvent(el, token.value, token.key, ctx, state, module);
 	        });
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -6862,7 +6862,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7000,8 +7000,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (value) {
 	                // Note: wx.If the element is currently hidden, we schedule the focus change
 	                // to occur "soonish". Technically this is a hack because it hides the fact
-	                // that we make tricky assumption about the presence of a "visible" binding 
-	                // on the same element who's subscribe handler runs after us 
+	                // that we make tricky assumption about the presence of a "visible" binding
+	                // on the same element who's subscribe handler runs after us
 	                if (delay === 0 && el.style.display !== 'none') {
 	                    el.focus();
 	                }
@@ -7045,7 +7045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7124,7 +7124,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7229,7 +7229,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7319,7 +7319,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	            _this.wireKey(token.value, obs, combinations, ctx, state, module);
 	        });
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7507,7 +7507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7731,7 +7731,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7851,7 +7851,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -7883,13 +7883,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // refresh context
 	            ctx = this.domManager.getDataContext(el);
 	        }
-	        // invoke preBindingInit 
+	        // invoke preBindingInit
 	        if (vm && component.preBindingInit && vm.hasOwnProperty(component.preBindingInit)) {
 	            vm[component.preBindingInit].call(vm, el);
 	        }
 	        // done
 	        this.domManager.applyBindingsToDescendants(ctx, el);
-	        // invoke postBindingInit 
+	        // invoke postBindingInit
 	        if (vm && component.postBindingInit && vm.hasOwnProperty(component.postBindingInit)) {
 	            vm[component.postBindingInit].call(vm, el);
 	        }
@@ -7972,7 +7972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -8054,7 +8054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                _this.app.defaultExceptionHandler.onNext(e);
 	            }
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -8231,7 +8231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // initiate state change using latest name and params
 	            _this.router.go(stateName, stateParams, { location: true });
 	        }));
-	        // release closure references to GC 
+	        // release closure references to GC
 	        state.cleanup.add(Rx.Disposable.create(function () {
 	            // nullify args
 	            node = null;
@@ -8617,7 +8617,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Router.prototype.reload = function () {
 	        var state;
 	        var params;
-	        // reload current state or enter inital root state            
+	        // reload current state or enter inital root state
 	        if (this.current() != null) {
 	            state = this.current().name;
 	            params = this.current().params;
@@ -8714,7 +8714,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this.current().name + path;
 	        }
 	        else if (path.indexOf(this.parentPathDirective) === 0) {
-	            // parent-relative                
+	            // parent-relative
 	            var parent_1 = this.current().name;
 	            // can't go further up than root
 	            if (parent_1 === this.rootStateName)
@@ -8723,7 +8723,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var parts = parent_1.split(this.pathSeparator);
 	            for (var i = parts.length - 1; i > 0; i--) {
 	                var tmp = parts.slice(0, i).join(this.pathSeparator);
-	                // check if parent or sibling relative to current parent exists 
+	                // check if parent or sibling relative to current parent exists
 	                if (this.get(tmp) || this.get(tmp + path.substr(1))) {
 	                    path = tmp + path.substr(1);
 	                    return path;
@@ -9355,7 +9355,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	};
 	function install() {
-	    // deliberately left blank    
+	    // deliberately left blank
 	}
 	exports.install = install;
 	//# sourceMappingURL=RxExtensions.js.map
@@ -9498,7 +9498,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var duration = Math.max(getMaximumTransitionDuration(x) + getMaximumTransitionDelay(x), getKeyframeAnimationDuration(x));
 	                return Rx.Observable.timer(duration);
 	            }), Utils_1.noop);
-	            // defer animation-start to avoid problems with transitions on freshly added elements 
+	            // defer animation-start to avoid problems with transitions on freshly added elements
 	            Rx.Observable.timer(1).subscribe(function () {
 	                if (runToAdd && runToAdd.length)
 	                    elements.forEach(function (x) { return Utils_1.toggleCssClass.apply(null, [x, true].concat(runToAdd)); });

@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../node_modules/rx/ts/rx.lite.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
@@ -12,7 +12,7 @@ describe('DomManager',() => {
     describe('getBindingDefinitions',() => {
         it('smoke-test',() => {
             loadFixtures('templates/Core/DomManager.html');
-            
+
              // stand-alone (no context- or model-references)
             var el = document.querySelector("#stand-alone");
             var def: any = null;
@@ -405,7 +405,7 @@ describe('DomManager',() => {
             result = domManager.expressionToObservable(compiled['text'], ctx).toProperty();
             expect(result()).toEqual("5");
         });
-   
+
         it('does not miss values of expression dependencies when the dependency is hot and fast',() => {
             var def = "{ text: foo }";
             var compiled: any;

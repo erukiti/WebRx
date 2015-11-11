@@ -367,7 +367,7 @@ export class DomManager {
                 bindingText = attr;
             }
         }
-        // transform textual binding-definition into a key-value store where 
+        // transform textual binding-definition into a key-value store where
         // the key is the binding name and the value is its options
         if (bindingText) {
             bindingText = bindingText.trim();

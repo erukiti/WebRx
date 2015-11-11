@@ -41,11 +41,11 @@ export function isPrimitive(target: any): boolean {
 export function queryInterface(target: any, iid: string): boolean {
     if(target == null || isPrimitive(target))
         return false;
-    
+
     var unk = <wx.IUnknown> target;
     if(!isFunction(unk.queryInterface))
         return false;
-    
+
     return unk.queryInterface(iid);
 }
 
@@ -132,12 +132,12 @@ export function unwrapProperty(prop: any) {
     return prop;
 }
 
-export function getObservable<T>(o: any): Rx.Observable<T> {            
+export function getObservable<T>(o: any): Rx.Observable<T> {
     if(isProperty(o)) {
         let prop = <wx.IObservableProperty<T>> o;
         return prop.changed.startWith(prop());
     }
-    
+
     if(isRxObservable(o))
         return o;
 
@@ -216,7 +216,7 @@ export class PropertyInfo<T> {
 
     propertyName: string;
     property: T;
-}    
+}
 
 /**
 * Toggles one ore more css classes on the specified DOM element
@@ -443,7 +443,7 @@ export function nodeChildrenToArray<T>(node: Node): T[] {
 }
 
 /**
-* Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception 
+* Wraps an action in try/finally block and disposes the resource after the action has completed even if it throws an exception
 * (mimics C# using statement)
 * @param {Rx.IDisposable} disp The resource to dispose after action completes
 * @param {() => void} action The action to wrap
@@ -470,7 +470,7 @@ declare function require(modules: string[], successCB: (any) => any, errCB: (err
 */
 export function observableRequire<T>(module: string): Rx.Observable<T> {
     var requireFunc = window["require"];
-    
+
     if (!isFunction(requireFunc))
         throwError("there's no AMD-module loader available (Hint: did you forget to include RequireJS in your project?)");
 
@@ -573,7 +573,7 @@ export function whenAny<TRet, T1, T2, T3, T4, T5, T6, T7, T8>(
  * whenAny allows you to observe whenever the value of one or more properties
  * on an object have changed, providing an initial value when the Observable is set up.
  */
-export function whenAny<TRet>(): Rx.Observable<TRet> {    
+export function whenAny<TRet>(): Rx.Observable<TRet> {
     // no need to invoke combineLatest for the simplest case
     if (arguments.length === 2) {
         return getObservable<TRet>(arguments[0]).select<TRet>(arguments[1]);

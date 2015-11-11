@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, throwError, unwrapProperty, toggleCssClass, elementCanBeDisabled } from "../Core/Utils"
@@ -12,7 +12,7 @@ import { SingleOneWayBindingBase } from "./BindingBase"
 export class TextBinding extends SingleOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
-    } 
+    }
 
     protected applyValue(el: HTMLElement, value: any): void {
         if ((value === null) || (value === undefined))
@@ -64,13 +64,13 @@ export class HiddenBinding extends VisibleBinding {
         super(domManager, app);
 
         this.inverse = true;
-    } 
+    }
 }
 
 export class HtmlBinding extends SingleOneWayBindingBase {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         super(domManager, app);
-    } 
+    }
 
     protected applyValue(el: HTMLElement, value: any): void {
         if ((value === null) || (value === undefined))

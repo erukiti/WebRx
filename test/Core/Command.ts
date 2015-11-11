@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../TestUtils.ts" />
 /// <reference path="../../node_modules/rx/ts/rx.virtualtime.d.ts" />
 /// <reference path="../../node_modules/rx/ts/rx.testing.d.ts" />
@@ -74,7 +74,7 @@ describe("Command", () => {
                 expect(x).toEqual(fixture.canExecute(null));
             });
 
-            // N.B. We check against '5' instead of 6 because we're supposed to 
+            // N.B. We check against '5' instead of 6 because we're supposed to
             // suppress changes that aren't actually changes i.e. false => false
             sched.advanceTo(10 * 1000);
             return changes_as_observable;
@@ -360,7 +360,7 @@ describe("Command", () => {
         // test wx.command() overload
         var thisWas: any = undefined;
         // WARNING: don't convert this to a lamba or the test will suddenly fail due to Typescript's this-capturing
-        var command = wx.command(function (_) { thisWas = this }, Rx.Observable.return(true), vm);   
+        var command = wx.command(function (_) { thisWas = this }, Rx.Observable.return(true), vm);
         command.execute(null);
         expect(thisWas).toBe(vm);
 

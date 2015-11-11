@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, nodeChildrenToArray, unwrapProperty } from "../Core/Utils"
@@ -9,7 +9,7 @@ export class IfBinding implements wx.IBindingHandler {
     constructor(domManager: wx.IDomManager, app: wx.IWebRxApp) {
         this.domManager = domManager;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -76,10 +76,10 @@ export class IfBinding implements wx.IBindingHandler {
                 initialApply = false;
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -151,19 +151,19 @@ export class IfBinding implements wx.IBindingHandler {
                 removeOldElements();
             }
         }
-        
+
         if(value) {
             let nodes = template.map(x => x.cloneNode(true));
 
             if(obs) {
-                obs = obs.continueWith(()=> {                    
+                obs = obs.continueWith(()=> {
                     if (enterAnimation)
                         enterAnimation.prepare(nodes);
-        
+
                     for(let i= 0; i < template.length; i++) {
                         el.appendChild(nodes[i]);
                     }
-        
+
                     this.domManager.applyBindingsToDescendants(ctx, el);
                 });
 
@@ -173,16 +173,16 @@ export class IfBinding implements wx.IBindingHandler {
                 }
             }
 
-            else {            
+            else {
                 if (enterAnimation)
                     enterAnimation.prepare(nodes);
-    
+
                 for(let i= 0; i < template.length; i++) {
                     el.appendChild(nodes[i]);
                 }
-    
+
                 this.domManager.applyBindingsToDescendants(ctx, el);
-    
+
                 if (enterAnimation) {
                     obs = enterAnimation.run(nodes)
                         .continueWith(() => enterAnimation.complete(nodes));
@@ -199,5 +199,5 @@ export class NotIfBinding extends IfBinding {
         super(domManager, app);
 
         this.inverse = true;
-    } 
+    }
 }

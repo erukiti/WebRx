@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/ix.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
 /// <reference path="../TestUtils.ts" />
@@ -207,7 +207,7 @@ describe("Observable List", () => {
         fixture.removeAt(0);
         fixture.removeAt(0);
 
-        // We've completely removed item1, we shouldn't be seeing any 
+        // We've completely removed item1, we shouldn't be seeing any
         // notifications from it
         item1.IsOnlyOneWord("Bamf");
         expect(2).toEqual(output.length);
@@ -557,7 +557,7 @@ describe("Projected Observable List", () => {
         expect(Ix.Enumerable.fromArray(source.toArray()).orderByDescending(x => x).toArray()).toEqual(reverseNested.toArray());
         expect(Ix.Enumerable.fromArray(source.toArray()).orderBy(x => x).toArray()).toEqual(sortedNested.toArray());
     });
-    
+
     it("should understand move even when sorted", () => {
         var sanity = ["a", "b", "c", "d", "e", "f"];
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
@@ -598,7 +598,7 @@ describe("Projected Observable List", () => {
             sourceNotifications = [];
         }
     });
-    
+
     it("should understand dummy move signal", () => {
         var sanity = ["a", "b", "c", "d", "e", "f"];
         var source = wx.list(["a", "b", "c", "d", "e", "f"]);
@@ -651,7 +651,7 @@ describe("Projected Observable List", () => {
     });
 
     /// <summary>
-    /// This test is a bit contrived and only exists to verify that a particularly gnarly bug doesn't get 
+    /// This test is a bit contrived and only exists to verify that a particularly gnarly bug doesn't get
     /// reintroduced because it's hard to reason about the removal logic in derived observable lists and it might
     /// be tempting to try and reorder the shiftIndices operation in there.
     /// </summary>
@@ -804,177 +804,177 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
         it("length smoke-test", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-    
+
             // source is empty
             expect(0).toEqual(paged.length());
-    
-            // fill source        
+
+            // fill source
             source.addRange(Ix.Enumerable.range(1, 110).toArray());
-    
+
             // paged length should match pagesize now
             expect(paged.pageSize()).toEqual(paged.length());
-            
+
             paged.currentPage(1);
-    
-            // paged length should still match pagesize 
+
+            // paged length should still match pagesize
             expect(paged.pageSize()).toEqual(paged.length());
-    
+
             // move current page partially outside of source range
             paged.currentPage(5);
-    
+
             expect(10).toEqual(paged.length());
-    
+
             // move current page totally outside of source range
             paged.currentPage(6);
-    
+
             expect(0).toEqual(paged.length());
         });
-    
+
         it("length and pageCount should be up-to-date when a reset is issued", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-    
+
             let length = 0;
             let pageCount = 0;
-            
-            paged.shouldReset.subscribe(x=> { 
+
+            paged.shouldReset.subscribe(x=> {
                 length = paged.length();
                 pageCount = paged.pageCount();
             });
-    
+
             // source is empty
             expect(0).toEqual(paged.length());
-    
-            // fill source        
+
+            // fill source
             source.addRange(Ix.Enumerable.range(1, 30).toArray());
-    
+
             expect(length).toEqual(20);
             expect(pageCount).toEqual(2);
         });
-    
+
         it("pageCount smoke-test", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-    
+
             // source is empty
             expect(0).toEqual(paged.pageCount());
-    
-            // fill source        
+
+            // fill source
             source.addRange(Ix.Enumerable.range(1, 100).toArray());
-    
+
             expect(5).toEqual(paged.pageCount());
-    
+
             // fill more
             source.addRange(Ix.Enumerable.range(1, 10).toArray());
             expect(6).toEqual(paged.pageCount());
-    
+
             // cldar
             source.clear();
             expect(0).toEqual(paged.pageCount());
         });
-    
+
         it("toArray smoke-test", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-    
-            // fill source        
+
+            // fill source
             source.addRange(Ix.Enumerable.range(1, 110).toArray());
-    
+
             // check default page
             expect(paged.toArray()).toEqual(Ix.Enumerable.range(1, 20).toArray());
-            
+
             paged.currentPage(2);
             expect(paged.toArray()).toEqual(Ix.Enumerable.range(41, 20).toArray());
         });
-    
+
         it("get smoke-test", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-            
-            // fill source        
+
+            // fill source
             source.addRange(Ix.Enumerable.range(1, 110).toArray());
-    
+
             expect(paged.get(2)).toEqual(3);
-    
+
             paged.currentPage(2);
             expect(paged.get(3)).toEqual(44);
         });
-    
+
         it("reset notification test", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-    
+
             let resetCount = 0;
             paged.shouldReset.subscribe(x=> resetCount++);
-            
-            source.reset();        
+
+            source.reset();
             expect(resetCount).toEqual(1);
-    
+
             source.addRange(Ix.Enumerable.range(1, 110).toArray());
             expect(resetCount).toEqual(2);
-    
+
             source.clear();
             expect(resetCount).toEqual(3);
         });
-    
+
         it("isEmpty smoke-test",() => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
-    
+
             let count = 0;
             let value: boolean;
             paged.isEmptyChanged.subscribe(x=> { count++; value = x });
-    
+
             source.addRange(Ix.Enumerable.range(1, 110).toArray());
             source.addRange(Ix.Enumerable.range(1, 10).toArray());
             expect(count).toEqual(2);
             expect(value).toBeFalsy();
         });
-    
+
         it("changing pageSize or currentPage should result in a reset notification",() => {
             let source = wx.list<number>();
             source.addRange(Ix.Enumerable.range(1, 110).toArray());
             let paged = sourceTransformer(source).page(20);
-    
+
             let count = 0;
             paged.shouldReset.subscribe(x=> { count++; });
-    
+
             expect(count).toEqual(0);
-    
+
             paged.pageSize(10);
             expect(count).toEqual(1);
-    
+
             paged.currentPage(1);
             expect(count).toEqual(2);
         });
-    
+
         it("itemsAdded smoke-test", () => {
             let source = wx.list<number>();
             source.addRange(Ix.Enumerable.range(1, 100).toArray());
-    
+
             let paged = sourceTransformer(source).page(20, 2);
             let e: wx.IListChangeInfo<number>;
-    
+
             let resetCount = 0;
             paged.shouldReset.subscribe(x=> resetCount++);
-    
+
             let addedCount = 0;
             paged.itemsAdded.subscribe(x=> { e = x; addedCount++ });
-    
+
             expect(resetCount).toEqual(0);
             expect(addedCount).toEqual(0);
             expect(e).toBe(undefined);
-            
+
             // adding items to source after the current page window should result in no-notifications
             source.insert(80, 42);
             expect(resetCount).toEqual(0);
             expect(addedCount).toEqual(0);
-    
+
             // adding items to source before the current page window should result in a reset
             source.insert(10, 42);
             expect(resetCount).toEqual(1);
             expect(addedCount).toEqual(0);
-    
+
             // adding an item to the source inside the current page window should result in itemsAdded notification with correct index and item.length
             source.insert(50, 42);
             expect(resetCount).toEqual(1);
@@ -983,48 +983,48 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(e.from).toEqual(10);
             expect(e.items).toBeDefined();
             expect(e.items.length).toEqual(1);
-    
+
             // adding items to the source inside the current page window should result in itemsAdded notification with correct index and item.length
             e = undefined;
             let items = Ix.Enumerable.range(1000, 12).toArray();
             source.insertRange(50, items);
-            expect(resetCount).toEqual(1);            
+            expect(resetCount).toEqual(1);
             expect(addedCount).toEqual(isProjected ? 12: 2);
             expect(e).toBeDefined();
             expect(e.from).toEqual(isProjected ? 20 : 10);
             expect(e.items).toBeDefined();
-            
+
             if(!isProjected)
                 expect(e.items).toEqual(items.slice(0, 10));
         });
-    
+
         it("itemsRemoved smoke-test", () => {
             let source = wx.list<number>();
             source.addRange(Ix.Enumerable.range(1, 100).toArray());
-    
+
             let paged = sourceTransformer(source).page(20, 2);
             let e: wx.IListChangeInfo<number>;
-    
+
             let resetCount = 0;
             paged.shouldReset.subscribe(x=> resetCount++);
-    
+
             let removedCount = 0;
             paged.itemsRemoved.subscribe(x=> { e = x; removedCount++ });
-    
+
             expect(resetCount).toEqual(0);
             expect(removedCount).toEqual(0);
             expect(e).toBe(undefined);
-            
+
             // removing items from source after the current page window should result in no-notifications
             source.removeAt(80);
             expect(resetCount).toEqual(0);
             expect(removedCount).toEqual(0);
-    
+
             // removing items from source before the current page window should result in a reset
             source.removeAt(10);
             expect(resetCount).toEqual(1);
             expect(removedCount).toEqual(0);
-    
+
             // removing an item from the source inside the current page window should result in itemsAdded notification with correct index and item.length
             source.removeAt(50);
             expect(resetCount).toEqual(1);
@@ -1033,7 +1033,7 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(e.from).toEqual(10);
             expect(e.items).toBeDefined();
             expect(e.items.length).toEqual(1);
-    
+
             // removing items from the source inside the current page window should result in itemsAdded notification with correct index and item.length
             e = undefined;
             source.removeRange(50, 12);
@@ -1044,34 +1044,34 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(e.items).toBeDefined();
             expect(e.items.length).toEqual(isProjected ? 1 : 10);
         });
-    
+
         it("itemsReplaced smoke-test", () => {
             let source = wx.list<number>();
             source.addRange(Ix.Enumerable.range(1, 100).toArray());
-    
+
             let paged = sourceTransformer(source).page(20, 2);
             let e: wx.IListChangeInfo<number>;
-    
+
             let resetCount = 0;
             paged.shouldReset.subscribe(x=> resetCount++);
-    
+
             let replacedCount = 0;
             paged.itemReplaced.subscribe(x=> { e = x; replacedCount++ });
-    
+
             expect(resetCount).toEqual(0);
             expect(replacedCount).toEqual(0);
             expect(e).toBe(undefined);
-            
+
             // replacing an item in source after the current page window should result in no-notifications
             source.set(80, 0);
             expect(resetCount).toEqual(0);
             expect(replacedCount).toEqual(0);
-    
+
             // replacing an item in source before the current page window should result in a reset
             source.set(10, 0);
             expect(resetCount).toEqual(0);
             expect(replacedCount).toEqual(0);
-    
+
             // replacing an item in the source inside the current page window should result in itemsAdded notification with correct index and item.length
             source.set(50, 0);
             expect(resetCount).toEqual(0);
@@ -1080,7 +1080,7 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(e.from).toEqual(10);
             expect(e.items).toBeDefined();
             expect(e.items.length).toEqual(1);
-    
+
             // replacing an item in the source inside the current page window should result in itemsAdded notification with correct index and item.length
             e = undefined;
             source.set(50, 6969);
@@ -1092,71 +1092,71 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(e.items.length).toEqual(1);
             expect(paged.get(10)).toEqual(6969);
         });
-    
+
         it("itemsMoved smoke-test", () => {
             let source = wx.list<number>();
             source.addRange(Ix.Enumerable.range(1, 30).toArray());
-    
+
             let paged = sourceTransformer(source).page(10, 1);
             let e: wx.IListChangeInfo<number>;
             let eReplaced: wx.IListChangeInfo<number>;
             let eAdded: wx.IListChangeInfo<number>;
-    
+
             let resetCount = 0;
             paged.shouldReset.subscribe(x=> resetCount++);
-    
+
             let removedCount = 0;
             paged.itemsRemoved.subscribe(x=> { e = x; removedCount++ });
-    
+
             let movedCount = 0;
             paged.itemsMoved.subscribe(x=> { e = x; movedCount++ });
-    
+
             let replacedCount = 0;
             paged.itemReplaced.subscribe(x=> { eReplaced = x; replacedCount++ });
-    
+
             let addedCount = 0;
             paged.itemsAdded.subscribe(x=> { eAdded = x; addedCount++ });
-    
+
             expect(resetCount).toEqual(0);
             expect(removedCount).toEqual(0);
             expect(e).toBe(undefined);
-            
+
             // a move with both from- and to-index below the current window should be ignored
             source.move(25, 26);
             expect(resetCount).toEqual(0);
             expect(removedCount).toEqual(0);
             expect(movedCount).toEqual(0);
-    
+
             // a move with both from- and to-index above the current window should be ignored as well
             source.move(5, 6);
             expect(resetCount).toEqual(0);
             expect(removedCount).toEqual(0);
             expect(movedCount).toEqual(0);
-    
+
             // a move with a from-index above the window and to-index below it should result in a reset
             source.move(5, 26);
             expect(resetCount).toEqual(1);
             expect(removedCount).toEqual(0);
             expect(movedCount).toEqual(0);
-    
+
             // a move with a from-index above the window and to-index inside it should result in a reset
             source.move(5, 16);
             expect(resetCount).toEqual(2);
             expect(removedCount).toEqual(0);
             expect(movedCount).toEqual(0);
-    
+
             // a move with both from- and and to-index inside it should result in a move
             source.move(17, 19);
             expect(resetCount).toEqual(2);
             expect(removedCount).toEqual(0);
             expect(movedCount).toEqual(1);
-            
+
             expect(e).toBeDefined();
             expect(e.from).toEqual(7);
             expect(e.to).toEqual(9);
             expect(e.items).toBeDefined();
             expect(e.items.length).toEqual(1);
-    
+
             // a move with a from-index inside the window and to-index below it should result in a remove followed by add
             e = undefined;
             source.move(17, 25);
@@ -1164,13 +1164,13 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(removedCount).toEqual(1);
             expect(movedCount).toEqual(1);
             expect(addedCount).toEqual(1);
-    
+
             expect(e).toBeDefined();
             expect(e.from).toEqual(7);
-            
+
             expect(eAdded).toBeDefined();
-            expect(eAdded.from).toEqual(9);        
-    
+            expect(eAdded.from).toEqual(9);
+
             // a move with a from-index at the bottom of the window and to-index below it should result in a replace for the last item
             e = undefined;
             eReplaced = undefined;
@@ -1181,34 +1181,34 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(movedCount).toEqual(1);
             expect(replacedCount).toEqual(1);
             expect(addedCount).toEqual(1);
-    
+
             expect(e).not.toBeDefined();
-            
+
             expect(eReplaced).toBeDefined();
-            expect(eReplaced.from).toEqual(9);        
+            expect(eReplaced.from).toEqual(9);
         });
-    
+
         it("itemsMoved forEach-Binding edge-case test", () => {
             loadFixtures('templates/Bindings/ForEach.html');
-    
+
             let source = wx.list<number>();
             source.addRange(Ix.Enumerable.range(1, 30).toArray());
-    
+
             let paged = sourceTransformer(source).page(10, 1);
-    
+
             var el = <HTMLElement> document.getElementById("foreach-list-scalar");
             expect(() => wx.applyBindings({ src: paged }, el)).not.toThrowError();
-    
+
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
-    
+
             // a move with both from- and and to-index inside it should result in a move
             source.move(17, 19);
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
-    
+
             // a move with a from-index inside the window and to-index below it should result in a remove followed by replace
             source.move(17, 25);
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());
-    
+
             // a move with a from-index at the bottom of the window and to-index below it should result in a replace for the last item
             source.move(19, 25);
             expect($(el).children().map((index, node) => parseInt(node.textContent)).get()).toEqual(paged.toArray());

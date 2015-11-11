@@ -1,4 +1,4 @@
-﻿/// <reference path="../../Interfaces.ts" />
+/// <reference path="../../Interfaces.ts" />
 
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, unwrapProperty, toggleCssClass } from "../../Core/Utils"
 
@@ -9,7 +9,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
         this.domManager = domManager;
         this.router = router;
         this.app = app;
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -23,7 +23,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
 
         let el = <HTMLElement> node;
         let isAnchor = el.tagName.toLowerCase() === "a";
-        let anchor = isAnchor ? <HTMLAnchorElement> el : undefined;                    
+        let anchor = isAnchor ? <HTMLAnchorElement> el : undefined;
         let compiled = this.domManager.compileBindingOptions(options, module);
         let exp: wx.ICompiledExpression;
         let observables: Array<Rx.Observable<any>> = [];
@@ -68,7 +68,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
                 }
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
         // subscribe to anchor's click event
@@ -79,7 +79,7 @@ export default class StateRefBinding implements wx.IBindingHandler {
             this.router.go(stateName, stateParams, { location: true });
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

@@ -130,5 +130,5 @@ RxObsConstructor.startDeferred = <T>(action: () => T): Rx.Observable<T> => {
 }
 
 export function install() {
-    // deliberately left blank    
+    // deliberately left blank
 }

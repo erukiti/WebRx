@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import { extend, throwError,  } from "../Core/Utils"
 import { createWeakMap } from "./../Collections/WeakMap"
@@ -75,7 +75,7 @@ export class RouteMatcher implements wx.IRoute {
                     params[param] = value;
                 }
                 return params;
-            } 
+            }
 
             // Build path by inserting the given params into the route.
             this.stringify = (params) => {
@@ -92,7 +92,7 @@ export class RouteMatcher implements wx.IRoute {
                 }
                 // Missing params should be replaced with empty string.
                 return result.replace(reParam, "");
-            } 
+            }
 
         } else {
             // RegExp route was passed. This is super-simple.
@@ -153,7 +153,7 @@ export class RouteMatcher implements wx.IRoute {
 
     private route: string;
     private rules: Object;
-            
+
     // Test to see if a value matches the corresponding rule.
     private validateRule(rule, value) {
         // For a given rule, get the first letter of the string name of its

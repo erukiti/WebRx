@@ -51,7 +51,7 @@ function isFunction(o: any): boolean {
 
 var proto: wx.IWeakMap<any, any> = window["WeakMap"] !== undefined ? <any> WeakMap.prototype : undefined;
 
-var hasNativeSupport = isFunction(window["WeakMap"]) && 
+var hasNativeSupport = isFunction(window["WeakMap"]) &&
     isFunction(proto.set) && isFunction(proto.get) &&
     isFunction(proto.delete) && isFunction(proto.has);
 

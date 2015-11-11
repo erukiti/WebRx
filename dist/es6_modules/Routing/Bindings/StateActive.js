@@ -65,7 +65,7 @@ export default class StateActiveBinding {
                 this.app.defaultExceptionHandler.onNext(e);
             }
         }));
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

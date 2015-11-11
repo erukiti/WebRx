@@ -132,6 +132,17 @@ module.exports = function (grunt) {
                 }
             }
         },
+        
+        trimtrailingspaces: {
+            main: {
+                src: ['src/**/*.ts', 'test/**/*.ts'],
+                options: {
+                    filter: 'isFile',
+                    encoding: 'utf8',
+                    failIfTrimmed: false
+                }
+            }
+        },
 
         copy: {
             dist: {
@@ -237,6 +248,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-trimtrailingspaces');
     grunt.loadNpmTasks('grunt-bump');
     grunt.loadNpmTasks('grunt-nuget');
     grunt.loadNpmTasks('grunt-typedoc');
@@ -255,7 +267,7 @@ module.exports = function (grunt) {
     grunt.registerTask("default", ["clean:build", "gen-ver", "ts:default"]);
     grunt.registerTask("test", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default"]);
     grunt.registerTask("debug", ["gen-ver", "shell:tsc_src_es5", "madge:src", "webpack:webrx", "shell:tsc_specs", "jasmine:default:build", "connect", "watch"]);
-    grunt.registerTask("build-dist", ["gen-ver", "clean:build", "shell:tsc_src_es5", "shell:tsc_src_es6", "madge:src", "webpack:webrx", "clean:dist", "copy:dist", "uglify:dist", "compress:dist"]);
+    grunt.registerTask("build-dist", ["gen-ver", "trimtrailingspaces", "clean:build", "shell:tsc_src_es5", "shell:tsc_src_es6", "madge:src", "webpack:webrx", "clean:dist", "copy:dist", "uglify:dist", "compress:dist"]);
     grunt.registerTask("dist", ["gen-ver", "build-dist", "shell:tsc_specs", "jasmine:dist"]);
     grunt.registerTask("xtest", ["gen-ver", "shell:tsc_src_es5", "shell:tsc_specs", "jasmine:default:build", "connect", "saucelabs-jasmine"]);
 

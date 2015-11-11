@@ -1,4 +1,4 @@
-﻿/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
+/// <reference path="../../node_modules/typescript/lib/lib.es6.d.ts" />
 /// <reference path="../Interfaces.ts" />
 
 import { getOid } from "../Core/Oid"
@@ -71,7 +71,7 @@ class MapEmulated<TKey extends Object, T> implements wx.IMap<TKey, T> {
             callback.call(this, value, key, this);
         }
     }
-    
+
     public get isEmulated(): boolean {
         return true;
     }

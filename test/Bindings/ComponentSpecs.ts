@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
 
@@ -196,7 +196,7 @@ describe('Bindings', () => {
 
             var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
-            
+
             expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
 
@@ -246,7 +246,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: { instance: { foo: 'bar' } } 
+                viewModel: { instance: { foo: 'bar' } }
             });
 
 
@@ -263,7 +263,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: { observable: Rx.Observable.return<any>({ foo: 'bar' }) } 
+                viewModel: { observable: Rx.Observable.return<any>({ foo: 'bar' }) }
             });
 
 
@@ -280,7 +280,7 @@ describe('Bindings', () => {
 
             wx.app.component("test1", {
                 template: template,
-                viewModel: { observable: Rx.Observable.return<any>(function(arg: any) { this.foo = 'bar'; }) } 
+                viewModel: { observable: Rx.Observable.return<any>(function(arg: any) { this.foo = 'bar'; }) }
             });
 
 
@@ -403,7 +403,7 @@ describe('Bindings', () => {
             var elementArg = false;
 
             var vm: any;
-            
+
             vm = {
                 init: function(el: HTMLElement) {   // don't convert this to a lamba or the test will suddenly fail due to Typescript's this-capturing
                     invoked = true;
@@ -431,9 +431,9 @@ describe('Bindings', () => {
 
             var template = '<span>foo</span>';
             let disposed = false;
-            
+
             function vm() {
-                this.dispose = ()=> disposed = true;    
+                this.dispose = ()=> disposed = true;
             }
 
             wx.app.component("test1", {
@@ -458,9 +458,9 @@ describe('Bindings', () => {
             let disposed = false;
 
             function vm() {
-                this.disposable = Rx.Disposable.create(()=> disposed = true);    
+                this.disposable = Rx.Disposable.create(()=> disposed = true);
             }
-            
+
             wx.app.component("test1", {
                 template: template,
                 viewModel: vm
@@ -474,6 +474,6 @@ describe('Bindings', () => {
             wx.cleanNode(el);
             expect(disposed).toBeTruthy();
         });
-*/        
+*/
     });
 });

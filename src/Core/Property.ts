@@ -2,8 +2,8 @@
 
 import IID from "../IID"
 
-// NOTE: The factory method approach is necessary because it is  
-// currently impossible to implement a Typescript interface 
+// NOTE: The factory method approach is necessary because it is
+// currently impossible to implement a Typescript interface
 // with a function signature in a Typescript class.
 
 "use strict";
@@ -34,7 +34,7 @@ export function property<T>(initialValue?: T): wx.IObservableProperty<T> {
     accessor.queryInterface = (iid: string)=> {
        return iid === IID.IObservableProperty || iid === IID.IDisposable;
     }
-    
+
     //////////////////////////////////
     // IDisposable implementation
 

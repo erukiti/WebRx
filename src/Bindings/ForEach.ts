@@ -1,4 +1,4 @@
-﻿/// <reference path="../RxExtensions.d.ts" />
+/// <reference path="../RxExtensions.d.ts" />
 
 import IID from "../IID"
 import { extend, isInUnitTest, args2Array, isFunction, throwError, using, formatString, cloneNodeArray, noop } from "../Core/Utils"
@@ -30,7 +30,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
             let state = <IForEachNodeState> domManager.getNodeState(node);
             ctx.$index = state.index;
         });
-    } 
+    }
 
     ////////////////////
     // wx.IBinding
@@ -118,10 +118,10 @@ export default class ForEachBinding implements wx.IBindingHandler {
                 initialApply = false;
             } catch (e) {
                 this.app.defaultExceptionHandler.onNext(e);
-            } 
+            }
         }));
 
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -188,7 +188,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
         let cbData = <any> {
             item: item
         }
-        
+
         if (indexTrigger) {
             _index = this.createIndexPropertyForNode(proxy, nodes[0], index, indexTrigger, template.length);
             cbData.indexDisp = new RefCountDisposeWrapper(_index, 0);
@@ -196,7 +196,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
 
         cbData.index = _index;
 
-        if (enterAnimation != null) 
+        if (enterAnimation != null)
             enterAnimation.prepare(nodes);
 
         proxy.appendChilds(nodes, cbData);
@@ -385,7 +385,7 @@ export default class ForEachBinding implements wx.IBindingHandler {
             }
         }
     }
-    
+
     protected observeList(proxy: VirtualChildNodes, ctx: wx.IDataContext, template: Array<Node>,
         cleanup: Rx.CompositeDisposable, list: wx.IObservableList<any>, hooks: wx.IForEachBindingHooks,
         animations: wx.IForeachAnimationDescriptor, indexTrigger: Rx.Subject<any>) {

@@ -31,7 +31,7 @@ export class SingleOneWayBindingBase {
                 this.app.defaultExceptionHandler.onNext(e);
             }
         }));
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
@@ -97,7 +97,7 @@ export class MultiOneWayBindingBase {
             obs = observables[i][1];
             this.subscribe(el, obs, key, state);
         }
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;

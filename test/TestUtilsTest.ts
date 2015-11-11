@@ -1,4 +1,4 @@
-﻿/// <reference path="typings/jasmine.d.ts" />
+/// <reference path="typings/jasmine.d.ts" />
 /// <reference path="TestUtils.ts" />
 
 describe("TestUtils",() => {
@@ -11,7 +11,7 @@ describe("TestUtils",() => {
         var disp = new Rx.CompositeDisposable();
         sub.onNext(1);
         expect(track.count).toEqual(0);
- 
+
         disp.add(track.observable.subscribe(x => { }));
         expect(track.count).toEqual(1);
         disp.add(track.observable.subscribe(x => { }));

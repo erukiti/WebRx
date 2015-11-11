@@ -1,4 +1,4 @@
-﻿/// <reference path="../Interfaces.ts" />
+/// <reference path="../Interfaces.ts" />
 
 import {  formatString } from "../Core/Utils"
 
@@ -65,7 +65,7 @@ export default class SelectComponent implements wx.IComponentDescriptor {
         let itemAttrs: Array<{ key: string; value: string }> = [];
 
         bindings.push({ key: "foreach", value: "{ data: items, hooks: hooks }" });
-        
+
         // cssClass
         if(params.cssClass !== undefined)
             params.cssClass = ' ' + params.cssClass;

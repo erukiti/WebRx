@@ -1,4 +1,4 @@
-﻿/// <reference path="../typings/jasmine.d.ts" />
+/// <reference path="../typings/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery.d.ts" />
 /// <reference path="../../src/web.rx.d.ts" />
 /// <reference path="../TestUtils.ts" />
@@ -13,7 +13,7 @@ describe('HtmlTemplateEngine',() => {
 
         var html;
         expect(engine.parse("")).toEqual([]);
-        
+
         var nodes = engine.parse($("#fixture1")[0].innerHTML);
         expect(nodes.length).toEqual(3);
         expect(Array.isArray(nodes)).toBeTruthy();
@@ -22,7 +22,7 @@ describe('HtmlTemplateEngine',() => {
         expect(engine.parse($("#fixture1")[0].innerHTML).map(x=> x.toString()).join()).toEqual(
             jQuery["parseHTML"]($("#fixture1")[0].innerHTML).map(x=> x.toString()).join());
 
-        html = "<script>undefined()</script>";  // "Ignore scripts by default" 
+        html = "<script>undefined()</script>";  // "Ignore scripts by default"
         var parsed = engine.parse(html);
         expect(parsed.length).toEqual(0);
 

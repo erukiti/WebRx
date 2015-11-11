@@ -65,8 +65,8 @@ export default class CommandBinding {
                     }
                     // handle input events
                     cleanup.add(Rx.Observable.fromEvent(el, "click").subscribe((e) => {
-                        // verify that the command can actually execute since we cannot disable 
-                        // all elements - only form elements such as buttons 
+                        // verify that the command can actually execute since we cannot disable
+                        // all elements - only form elements such as buttons
                         if (x.cmd.canExecute(x.param)) {
                             x.cmd.execute(x.param);
                         }
@@ -81,7 +81,7 @@ export default class CommandBinding {
                 this.app.defaultExceptionHandler.onNext(e);
             }
         }));
-        // release closure references to GC 
+        // release closure references to GC
         state.cleanup.add(Rx.Disposable.create(() => {
             // nullify args
             node = null;
