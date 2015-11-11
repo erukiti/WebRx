@@ -4,8 +4,6 @@
         "declaration": true,
         "removeComments": false,
         "preserveConstEnums": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
         "rootDir": "../src",
         "target": "ES5",
         "sourceMap": true
