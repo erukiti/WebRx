@@ -2,6 +2,7 @@
 [![Bower version](https://img.shields.io/bower/v/WebRx.svg)](https://github.com/WebRxJS/WebRx)
 [![NPM version](https://img.shields.io/npm/v/webrx.svg)](https://www.npmjs.com/package/webrx)
 [![NuGet version](https://img.shields.io/nuget/v/WebRx.svg)](https://www.nuget.org/packages/WebRx/)
+[![Downloads](https://img.shields.io/npm/dm/webrx.svg)](https://www.npmjs.com/package/webrx)
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/WebRxJS/WebRxJS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # <img src="http://webrxjs.org/images/Logo.png" height="32" /> WebRx
