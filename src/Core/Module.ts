@@ -35,6 +35,7 @@ export class Module implements wx.IModule {
 
     public component(name: string, component: wx.IComponentDescriptor): wx.IComponentRegistry {
         this.components[name] = <IComponentDescriptorEx> component;
+        this.componentRegisteredSubject.onNext(name);
         return this;
     }
 
@@ -151,6 +152,9 @@ export class Module implements wx.IModule {
     private components: { [name: string]: IComponentDescriptorEx|Rx.Observable<wx.IComponentDescriptor>|Rx.IPromise<wx.IComponentDescriptor> } = {};
     private expressionFilters: { [index: string]: wx.IExpressionFilter; } = {};
     private animations: { [index: string]: wx.IAnimation; } = {};
+    
+    private componentRegisteredSubject = new Rx.Subject<string>();
+    private componentRegistered = this.componentRegisteredSubject.asObservable();
 
     private instantiateComponent(name: string): Rx.Observable<wx.IComponentDescriptor> {
         let _cd = this.components[name];
@@ -177,7 +181,11 @@ export class Module implements wx.IModule {
                 }
             }
         } else {
-            result = Rx.Observable.return<wx.IComponentDescriptor>(undefined);
+            log.hint(`Component Loader: Loading component '${name}' deferred (not registered yet)`);
+            
+            result = this.componentRegistered
+                .where(x=> x == name)
+                .selectMany(_=> this.instantiateComponent(name));
         }
 
         return result.do(x => this.components[name] = { instance: x }); // cache descriptor

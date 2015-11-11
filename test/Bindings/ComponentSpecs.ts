@@ -450,30 +450,40 @@ describe('Bindings', () => {
             expect(disposed).toBeTruthy();
         });
 
-/*
-        it("Disposes a component viewmodel's members if the viewmodel itself is not disposable",() => {
+        it("Loads a component from an observable returning a descriptor",() => {
             loadFixtures('templates/Bindings/Component.html');
 
-            var template = '<span>foo</span>';
-            let disposed = false;
+            var template = "<span data-bind='text: foo'>invalid</span>";
 
-            function vm() {
-                this.disposable = Rx.Disposable.create(()=> disposed = true);
-            }
-
-            wx.app.component("test1", {
+            let descriptor = {
                 template: template,
-                viewModel: vm
-            });
+                viewModel: { observable: Rx.Observable.return<any>({ foo: 'bar' }) }
+            };
 
-            expect(disposed).toBeFalsy();
+            wx.app.component("test1", Rx.Observable.return(descriptor));
 
-            var el = <HTMLElement> document.querySelector("#fixture1");
+            var el = <HTMLElement> document.querySelector("#fixture2");
             expect(() => wx.applyBindings(undefined, el)).not.toThrow();
 
-            wx.cleanNode(el);
-            expect(disposed).toBeTruthy();
+            expect((<HTMLElement> el.children[0]).childNodes[0].textContent).toEqual('bar');
         });
-*/
+
+        it("Loads a component which is registered in the future (deferred loading)",(done) => {
+            loadFixtures('templates/Bindings/Component.html');
+
+            var el = <HTMLElement> document.querySelector("#fixture6");
+            expect(() => wx.applyBindings(undefined, el)).not.toThrow();
+
+            // register component _after_ applyBindings
+            let descriptor: wx.IComponentDescriptor = {
+                template: "<span>foo</span>",
+                viewModel: function(params) {
+                    console.log("in const");
+                    done();
+                }
+            };
+
+            wx.app.component("test-deferred", descriptor);
+        });
     });
 });
