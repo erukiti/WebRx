@@ -39,7 +39,7 @@ bower install WebRx
 npm install rx@">=4.0.0 <5.0.0" --save-dev
 npm install webrx --save-dev
 ```
-- or download the [latest release as zip](http://webrxjs.org/downloads/web.rx.zip)
+- or download the [latest release as zip](https://github.com/WebRxJS/WebRx/raw/master/dist/web.rx.zip)
 
 Make sure to include script-references to rx.all.js **before** web.rx.js when integrating WebRx into your projects.
 
