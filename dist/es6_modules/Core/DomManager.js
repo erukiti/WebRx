@@ -309,19 +309,19 @@ export class DomManager {
             this.setNodeState(el, state);
         }
         else if (state.isBound) {
-            throwError("an element must not be bound multiple times!");
+            throwError("an element may be bound multiple times!");
         }
         let _bindings;
         let tagName = el.tagName.toLowerCase();
         // check if tag represents a component
         if (module.hasComponent(tagName) || this.app.hasComponent(tagName)) {
-            // when a component is referenced by element, we just apply a virtual 'component' binding
+            // when a component is referenced as custom-element, apply a virtual 'component' binding
             let params = el.getAttribute(DomManager.paramsAttributename);
             let componentReference;
             if (params)
-                componentReference = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomManager.paramsAttributename) + "} }";
+                componentReference = `{ name: '${tagName}', params: { ${el.getAttribute(DomManager.paramsAttributename)} }}`;
             else
-                componentReference = "{ name: '" + tagName + "' }";
+                componentReference = `{ name: '${tagName}' }`;
             _bindings = [{ key: 'component', value: componentReference }];
         }
         else {

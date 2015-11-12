@@ -4,7 +4,7 @@ import { PagedObservableListProjection } from "./ListPaged";
 "use strict";
 /**
 * Determines if target is an instance of a IObservableList
-* @param {any} target
+* @param {any} target The object to test
 */
 export function isList(target) {
     if (target == null)

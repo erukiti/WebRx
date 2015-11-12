@@ -1,4 +1,10 @@
 /// <reference path="../Interfaces.d.ts" />
+/**
+* PagedObservableListProjection implements a virtual paging projection over
+* an existing observable list. The class solely relies on index translation
+* and change notifications from its upstream source. It does not maintain data.
+* @class
+*/
 export declare class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyList<T>, wx.IUnknown {
     constructor(source: wx.IObservableReadOnlyList<T>, pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler);
     queryInterface(iid: string): boolean;

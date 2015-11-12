@@ -246,7 +246,7 @@ declare module wx {
     }
 
     /**
-    * Represents a paged observable read-only collection of objects that can be individually accessed by index.
+    * IObservablePagedReadOnlyList represents a virtual paging projection over an existing observable list
     * @interface
     **/
     interface IObservablePagedReadOnlyList<T> extends IList<T>, INotifyListChanged<T> {

@@ -5,6 +5,12 @@ import Lazy from "./../Core/Lazy";
 import { createScheduledSubject } from "./../Core/ScheduledSubject";
 import { property } from "../Core/Property";
 "use strict";
+/**
+* PagedObservableListProjection implements a virtual paging projection over
+* an existing observable list. The class solely relies on index translation
+* and change notifications from its upstream source. It does not maintain data.
+* @class
+*/
 export class PagedObservableListProjection {
     constructor(source, pageSize, currentPage, scheduler) {
         this.disp = new Rx.CompositeDisposable();
@@ -59,7 +65,7 @@ export class PagedObservableListProjection {
         return iid === IID.IObservableList || iid === IID.IDisposable;
     }
     get(index) {
-        index = (this.pageSize() * this.currentPage()) + index;
+        index = this.pageSize() * this.currentPage() + index;
         return this.source.get(index);
     }
     get isReadOnly() {
@@ -67,7 +73,7 @@ export class PagedObservableListProjection {
     }
     toArray() {
         let start = this.pageSize() * this.currentPage();
-        return this.source.toArray().slice(start, start + this.pageSize());
+        return this.source.toArray().slice(start, start + this.length());
     }
     suppressChangeNotifications() {
         this.changeNotificationsSuppressed++;
@@ -186,7 +192,7 @@ export class PagedObservableListProjection {
         else {
             // compute relative start index
             const from = e.from - page.from;
-            const numItems = Math.min(this.pageSize() - from, e.items.length);
+            const numItems = Math.min(this.length() - from, e.items.length);
             // limit items
             const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
             // emit translated notifications
@@ -210,7 +216,7 @@ export class PagedObservableListProjection {
         else {
             // compute relative start index
             const from = e.from - page.from;
-            const numItems = Math.min(this.pageSize() - from, e.items.length);
+            const numItems = Math.min(this.length() - from, e.items.length);
             // limit items
             const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
             // emit translated notifications

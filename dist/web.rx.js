@@ -2929,17 +2929,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.setNodeState(el, state);
 	        }
 	        else if (state.isBound) {
-	            Utils_1.throwError("an element must not be bound multiple times!");
+	            Utils_1.throwError("an element may be bound multiple times!");
 	        }
 	        var _bindings;
 	        var tagName = el.tagName.toLowerCase();
 	        // check if tag represents a component
 	        if (module.hasComponent(tagName) || this.app.hasComponent(tagName)) {
-	            // when a component is referenced by element, we just apply a virtual 'component' binding
+	            // when a component is referenced as custom-element, apply a virtual 'component' binding
 	            var params = el.getAttribute(DomManager.paramsAttributename);
 	            var componentReference;
 	            if (params)
-	                componentReference = "{ name: '" + tagName + "', params: {" + el.getAttribute(DomManager.paramsAttributename) + "} }";
+	                componentReference = "{ name: '" + tagName + "', params: { " + el.getAttribute(DomManager.paramsAttributename) + " }}";
 	            else
 	                componentReference = "{ name: '" + tagName + "' }";
 	            _bindings = [{ key: 'component', value: componentReference }];
@@ -3585,7 +3585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	/**
 	* Determines if target is an instance of a IObservableList
-	* @param {any} target
+	* @param {any} target The object to test
 	*/
 	function isList(target) {
 	    if (target == null)
@@ -4795,6 +4795,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var ScheduledSubject_1 = __webpack_require__(20);
 	var Property_1 = __webpack_require__(8);
 	"use strict";
+	/**
+	* PagedObservableListProjection implements a virtual paging projection over
+	* an existing observable list. The class solely relies on index translation
+	* and change notifications from its upstream source. It does not maintain data.
+	* @class
+	*/
 	var PagedObservableListProjection = (function () {
 	    function PagedObservableListProjection(source, pageSize, currentPage, scheduler) {
 	        this.disp = new Rx.CompositeDisposable();
@@ -4853,7 +4859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return iid === IID_1.default.IObservableList || iid === IID_1.default.IDisposable;
 	    };
 	    PagedObservableListProjection.prototype.get = function (index) {
-	        index = (this.pageSize() * this.currentPage()) + index;
+	        index = this.pageSize() * this.currentPage() + index;
 	        return this.source.get(index);
 	    };
 	    Object.defineProperty(PagedObservableListProjection.prototype, "isReadOnly", {
@@ -4865,7 +4871,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    PagedObservableListProjection.prototype.toArray = function () {
 	        var start = this.pageSize() * this.currentPage();
-	        return this.source.toArray().slice(start, start + this.pageSize());
+	        return this.source.toArray().slice(start, start + this.length());
 	    };
 	    PagedObservableListProjection.prototype.suppressChangeNotifications = function () {
 	        var _this = this;
@@ -5026,7 +5032,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            // compute relative start index
 	            var from = e.from - page.from;
-	            var numItems = Math.min(this.pageSize() - from, e.items.length);
+	            var numItems = Math.min(this.length() - from, e.items.length);
 	            // limit items
 	            var items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
 	            // emit translated notifications
@@ -5050,7 +5056,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            // compute relative start index
 	            var from = e.from - page.from;
-	            var numItems = Math.min(this.pageSize() - from, e.items.length);
+	            var numItems = Math.min(this.length() - from, e.items.length);
 	            // limit items
 	            var items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
 	            // emit translated notifications
