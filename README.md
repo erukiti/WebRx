@@ -24,22 +24,22 @@ The framework is built on top of [ReactiveX for Javascript (RxJs)](http://reacti
 - Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
 - Developed in [TypeScript](http://www.typescriptlang.org/) but designed from the ground up to be just as easily consumable in plain Javascript.
 
-#### Installation
+#### How to install
 
-- NuGet Installation
+##### NuGet
 ```bash
 PM> Install-Package WebRx
 ```
-- Bower Installation
+##### Bower
 ```bash
 bower install WebRx
 ```
-- NPM Installation
+##### NPM
 ```bash
 npm install rx@">=4.0.0 <5.0.0" --save-dev
 npm install webrx --save-dev
 ```
-- or download the [latest release as zip](https://github.com/WebRxJS/WebRx/raw/master/dist/web.rx.zip)
+or download the [latest release as zip](https://github.com/WebRxJS/WebRx/raw/master/dist/web.rx.zip)
 
 Make sure to include script-references to rx.all.js **before** web.rx.js when integrating WebRx into your projects.
 
