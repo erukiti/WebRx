@@ -110,7 +110,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     public length: wx.IObservableProperty<number>;
 
     public get(index: number): T {
-        index = (this.pageSize() * this.currentPage()) + index;
+        index = this.pageSize() * this.currentPage() + index;
 
         return this.source.get(index);
     }
@@ -121,7 +121,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
 
     public toArray(): Array<T> {
         let start = this.pageSize() * this.currentPage();
-        return this.source.toArray().slice(start, start + this.pageSize());
+        return this.source.toArray().slice(start, start + this.length());
     }
 
     //////////////////////////////////
@@ -324,7 +324,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
         } else {
             // compute relative start index
             const from = e.from - page.from;
-            const numItems = Math.min(this.pageSize() - from, e.items.length);
+            const numItems = Math.min(this.length() - from, e.items.length);
 
             // limit items
             const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
@@ -354,7 +354,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
         } else {
             // compute relative start index
             const from = e.from - page.from;
-            const numItems = Math.min(this.pageSize() - from, e.items.length);
+            const numItems = Math.min(this.length() - from, e.items.length);
 
             // limit items
             const items = e.items.length !== numItems ? e.items.slice(0, numItems) : e.items;
