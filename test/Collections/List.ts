@@ -796,6 +796,33 @@ describe("Projected Observable List", () => {
 
 function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTransformer:(src:wx.IProjectableObservableReadOnlyList<number>)=> wx.IProjectableObservableReadOnlyList<number>) {
     describe("Paged Observable List - " + fixturePostfix, () => {
+        it("length property is not ambiguous", () => {
+            let source = wx.list<number>();
+            let paged = sourceTransformer(source).page(20);
+
+            expect(0).toEqual(paged.length());
+            var list = paged.toArray();
+            expect(0).toEqual(list.length);
+        });
+
+        it("indexer is not ambiguous",() => {
+            let source = wx.list<number>([ 0, 1 ]);
+            let paged = sourceTransformer(source).page(20);
+
+            expect(0).toEqual(paged.get(0));
+        });
+
+        it("length changed fires when clearing source",() => {
+            let source = wx.list<Object>([new Object()]);
+            let items = sourceTransformer(<any> source).page(20);
+            var lengthChanged = false;
+            items.lengthChanged.subscribe(_ => { lengthChanged = true; });
+
+            source.clear();
+
+            expect(lengthChanged).toBeTruthy();
+        });
+
         it("length smoke-test", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
@@ -825,26 +852,35 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
             expect(0).toEqual(paged.length());
         });
 
-        it("length and pageCount should be up-to-date when a reset is issued", () => {
+        it("length, pageCount and isEmpty should be up-to-date when a reset is issued", () => {
             let source = wx.list<number>();
             let paged = sourceTransformer(source).page(20);
 
-            let length = 0;
-            let pageCount = 0;
+            let length = paged.length();
+            let pageCount = paged.pageCount();
+            let isEmpty = paged.isEmpty();
+            let notifyCount = 0;
 
             paged.shouldReset.subscribe(x=> {
                 length = paged.length();
                 pageCount = paged.pageCount();
+                isEmpty = paged.isEmpty();
+                notifyCount++;
             });
 
             // source is empty
-            expect(0).toEqual(paged.length());
+            expect(notifyCount).toEqual(0);
+            expect(length).toEqual(0);
+            expect(pageCount).toEqual(0);
+            expect(isEmpty).toBeTruthy();
 
             // fill source
             source.addRange(Ix.Enumerable.range(1, 30).toArray());
 
+            expect(notifyCount).toEqual(1);
             expect(length).toEqual(20);
             expect(pageCount).toEqual(2);
+            expect(isEmpty).toBeFalsy();
         });
 
         it("pageCount smoke-test", () => {
@@ -880,6 +916,10 @@ function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTrans
 
             paged.currentPage(2);
             expect(paged.toArray()).toEqual(Ix.Enumerable.range(41, 20).toArray());
+
+            paged.currentPage(5);
+            expect(paged.length()).toEqual(10);
+            expect(paged.toArray()).toEqual(Ix.Enumerable.range(101, 10).toArray());
         });
 
         it("get smoke-test", () => {
