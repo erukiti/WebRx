@@ -17,11 +17,6 @@ describe("Observable List", () => {
         expect(0).toEqual(list.length);
     });
 
-    it("shouldn't be read-only",() => {
-        var obsList = wx.list<number>();
-        expect(obsList.isReadOnly).toBeFalsy();
-    });
-
     it("indexer is not ambiguous",() => {
         var obsList = wx.list<number>([ 0, 1 ]);
         expect(0).toEqual(obsList.get(0));

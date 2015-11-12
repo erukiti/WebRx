@@ -13,6 +13,8 @@ import { property } from "../Core/Property";
 */
 export class PagedObservableListProjection {
     constructor(source, pageSize, currentPage, scheduler) {
+        ////////////////////
+        // Implementation
         this.disp = new Rx.CompositeDisposable();
         this.changeNotificationsSuppressed = 0;
         this.resetSubject = new Rx.Subject();

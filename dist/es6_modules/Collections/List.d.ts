@@ -7,7 +7,6 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     constructor(initialContents?: Array<T>, resetChangeThreshold?: number, scheduler?: Rx.IScheduler);
     queryInterface(iid: string): boolean;
     dispose(): void;
-    isReadOnly: boolean;
     itemsAdded: Rx.Observable<wx.IListChangeInfo<T>>;
     beforeItemsAdded: Rx.Observable<wx.IListChangeInfo<T>>;
     itemsRemoved: Rx.Observable<wx.IListChangeInfo<T>>;

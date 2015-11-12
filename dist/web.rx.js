@@ -3650,16 +3650,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.clearAllPropertyChangeWatchers();
 	        this.disposables.dispose();
 	    };
-	    Object.defineProperty(ObservableList.prototype, "isReadOnly", {
+	    Object.defineProperty(ObservableList.prototype, "itemsAdded", {
 	        ////////////////////
 	        /// IObservableList<T>
-	        get: function () {
-	            return false;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(ObservableList.prototype, "itemsAdded", {
 	        get: function () {
 	            if (!this._itemsAdded)
 	                this._itemsAdded = this.itemsAddedSubject.value.asObservable();
@@ -4803,6 +4796,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 	var PagedObservableListProjection = (function () {
 	    function PagedObservableListProjection(source, pageSize, currentPage, scheduler) {
+	        ////////////////////
+	        // Implementation
 	        this.disp = new Rx.CompositeDisposable();
 	        this.changeNotificationsSuppressed = 0;
 	        this.resetSubject = new Rx.Subject();

@@ -8,6 +8,7 @@
 export declare class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyList<T>, wx.IUnknown {
     constructor(source: wx.IObservableReadOnlyList<T>, pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler);
     queryInterface(iid: string): boolean;
+    source: wx.IObservableReadOnlyList<T>;
     pageSize: wx.IObservableProperty<number>;
     currentPage: wx.IObservableProperty<number>;
     pageCount: wx.IObservableProperty<number>;
@@ -21,7 +22,6 @@ export declare class PagedObservableListProjection<T> implements wx.IObservableP
     shouldReset: Rx.Observable<any>;
     suppressChangeNotifications(): Rx.IDisposable;
     dispose(): void;
-    source: wx.IObservableReadOnlyList<T>;
     private disp;
     private changeNotificationsSuppressed;
     private resetSubject;

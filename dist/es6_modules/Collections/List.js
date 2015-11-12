@@ -43,9 +43,6 @@ export class ObservableList {
     }
     ////////////////////
     /// IObservableList<T>
-    get isReadOnly() {
-        return false;
-    }
     get itemsAdded() {
         if (!this._itemsAdded)
             this._itemsAdded = this.itemsAddedSubject.value.asObservable();

@@ -201,7 +201,6 @@ declare module wx {
     interface IList<T> {
         length: IObservableProperty<number>;
         get(index: number): T;
-        isReadOnly: boolean;
         toArray(): Array<T>;
     }
     /**

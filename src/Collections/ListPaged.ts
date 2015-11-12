@@ -100,6 +100,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     //////////////////////////////////
     // IObservablePagedReadOnlyList
 
+    public source: wx.IObservableReadOnlyList<T>;
     public pageSize: wx.IObservableProperty<number>;
     public currentPage: wx.IObservableProperty<number>;
     public pageCount: wx.IObservableProperty<number>;
@@ -155,9 +156,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     ////////////////////
     // Implementation
 
-    public source: wx.IObservableReadOnlyList<T>;
     private disp = new Rx.CompositeDisposable();
-
     private changeNotificationsSuppressed: number = 0;
     private resetSubject = new Rx.Subject<any>();
     private beforeResetSubject = new Rx.Subject<any>();

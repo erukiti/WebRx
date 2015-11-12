@@ -44,10 +44,6 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
     ////////////////////
     /// IObservableList<T>
 
-    public get isReadOnly(): boolean {
-        return false;
-    }
-
     public get itemsAdded(): Rx.Observable<wx.IListChangeInfo<T>> {
         if (!this._itemsAdded)
             this._itemsAdded = this.itemsAddedSubject.value.asObservable();

@@ -198,7 +198,6 @@ declare module wx {
     interface IList<T> {
         length: IObservableProperty<number>;
         get(index: number): T;
-        isReadOnly: boolean;
         toArray(): Array<T>;
     }
 
@@ -265,6 +264,7 @@ declare module wx {
     interface IObservableList<T> extends IObservableReadOnlyList<T> {
         isEmpty: IObservableProperty<boolean>;
         set(index: number, item: T): any;
+
         add(item: T): void;
         push(item: T): void;
         clear(): void;
@@ -279,6 +279,7 @@ declare module wx {
         removeAll(items: Array<T>): void;
         removeRange(index: number, count: number): void;
         reset(contents?: Array<T>): void;
+
         sort(comparison: (a: T, b: T) => number): void;
         forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
         map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
