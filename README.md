@@ -13,16 +13,16 @@ The framework is written in [Typescript](http://www.typescriptlang.org/) and bui
 
 #### Features
 
-- Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
 - [Documentation](http://webrxjs.org/docs)
-- Developed in [TypeScript](http://www.typescriptlang.org/) but designed to be just as easily consumable in plain Javascript.
-- Declarative Two-way data-binding
-- Powerful observable collection processing including filtering- and re-orderering projections and paging
-- Supports self-contained, reusable *Components*
-- Out-of-the box support for *Modules* to facilitate code-reuse and separation of concerns
-- Integrated state-based routing engine inspired by Angular's [UI-Router](https://github.com/angular-ui/ui-router)
-- No dependencies besides [RxJS](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/libraries/rx.complete.md)
-- Compact (~25Kb minified & compressed)
+- Declarative Two-way Data-Binding
+- Powerful Collection-Processing including Filtering- and Re-ordering Projections and Paging
+- Supports self-contained and reusable *Components*
+- State-based Router
+- Lightweight Message-Bus for loosely coupled inter-component communication
+- No dependencies other than [RxJS](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/libraries/rx.complete.md)
+- Compact (~30Kb minified & compressed)
+- Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
+- Developed in [TypeScript](http://www.typescriptlang.org/) but designed from the ground up to be just as easily consumable in plain Javascript.
 
 #### Installation
 
