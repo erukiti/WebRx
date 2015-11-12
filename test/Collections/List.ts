@@ -794,7 +794,7 @@ describe("Projected Observable List", () => {
     });
 });
 
-function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTransformer:(src:wx.IObservableReadOnlyList<number>)=> wx.IObservableReadOnlyList<number>) {
+function pagedTestImpl(fixturePostfix: string, isProjected: boolean, sourceTransformer:(src:wx.IProjectableObservableReadOnlyList<number>)=> wx.IProjectableObservableReadOnlyList<number>) {
     describe("Paged Observable List - " + fixturePostfix, () => {
         it("length smoke-test", () => {
             let source = wx.list<number>();

@@ -124,6 +124,9 @@ export class ObservableList {
             this.propertyChangeWatchers = null;
         }
     }
+    get isReadOnly() {
+        return false;
+    }
     addRange(items) {
         if (items == null) {
             throwError("items");

@@ -157,6 +157,10 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
         }
     }
 
+    public get isReadOnly(): boolean {
+        return false;
+    }
+
     public length: wx.IObservableProperty<number>;
 
     public addRange(items: T[]): void {
@@ -353,15 +357,15 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
     }
 
     public project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number,
-        selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<TNew>;
+        selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<TNew>;
 
     public project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number,
-        refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+        refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<T>;
 
     public project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>,
-        scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+        scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<T>;
 
-    public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
+    public project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<T>;
 
     public project(): any {
         let args = args2Array(arguments);
@@ -386,7 +390,7 @@ export class ObservableList<T> implements wx.IObservableList<T>, Rx.IDisposable,
         return new ObservableListProjection<any, any>(<any> this, filter, orderer, selector, args.shift(), args.shift());
     }
 
-    public page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IObservablePagedReadOnlyList<T> {
+    public page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IPagedObservableReadOnlyList<T> {
         return new PagedObservableListProjection<T>(this, pageSize, currentPage, scheduler);
     }
 
@@ -741,7 +745,7 @@ export function list<T>(initialContents?: Array<T>, resetChangeThreshold: number
 }
 
 class ObservableListProjection<T, TValue> extends ObservableList<TValue> implements wx.IObservableReadOnlyList<TValue> {
-    constructor(source: wx.IObservableReadOnlyList<T>, filter?: (item: T) => boolean,
+    constructor(source: wx.IProjectableObservableReadOnlyList<T>, filter?: (item: T) => boolean,
         orderer?: (a: TValue, b: TValue) => number, selector?: (T) => TValue,
         refreshTrigger?: Rx.Observable<any>, scheduler?: Rx.IScheduler) {
         super();
@@ -836,7 +840,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
     ////////////////////
     // Implementation
 
-    private source: wx.IObservableReadOnlyList<T>;
+    private source: wx.IProjectableObservableReadOnlyList<T>;
     private selector: (T) => TValue;
     private _filter: (item: T) => boolean;
     private orderer: (a: TValue, b: TValue) => number;

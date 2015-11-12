@@ -22,6 +22,7 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     itemChanged: Rx.Observable<wx.IPropertyChangedEventArgs>;
     shouldReset: Rx.Observable<any>;
     changeTrackingEnabled: boolean;
+    isReadOnly: boolean;
     length: wx.IObservableProperty<number>;
     addRange(items: T[]): void;
     insertRange(index: number, items: T[]): void;
@@ -37,11 +38,11 @@ export declare class ObservableList<T> implements wx.IObservableList<T>, Rx.IDis
     insert(index: number, item: T): void;
     removeAt(index: number): void;
     move(oldIndex: any, newIndex: any): void;
-    project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<TNew>;
-    project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
-    project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
-    project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IObservableReadOnlyList<T>;
-    page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IObservablePagedReadOnlyList<T>;
+    project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<TNew>;
+    project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<T>;
+    project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<T>;
+    project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): wx.IProjectableObservableReadOnlyList<T>;
+    page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): wx.IPagedObservableReadOnlyList<T>;
     suppressChangeNotifications(): Rx.IDisposable;
     get(index: number): T;
     set(index: number, item: T): void;

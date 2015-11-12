@@ -3797,6 +3797,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(ObservableList.prototype, "isReadOnly", {
+	        get: function () {
+	            return false;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    ObservableList.prototype.addRange = function (items) {
 	        var _this = this;
 	        if (items == null) {
@@ -4805,7 +4812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.updateLengthTrigger = new Rx.Subject();
 	        this.source = source;
 	        this.scheduler = scheduler || (Utils_1.isRxScheduler(currentPage) ? currentPage : Rx.Scheduler.immediate);
-	        // IObservablePagedReadOnlyList
+	        // IPagedObservableReadOnlyList
 	        this.pageSize = Property_1.property(pageSize);
 	        this.currentPage = Property_1.property(currentPage || 0);
 	        var updateLengthTrigger = Rx.Observable.merge(this.updateLengthTrigger, source.lengthChanged)
@@ -4820,6 +4827,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	            .distinctUntilChanged()
 	            .toProperty();
 	        this.disp.add(this.length);
+	        this.isEmpty = this.lengthChanged
+	            .select(function (x) { return x === 0; })
+	            .toProperty(this.length() === 0);
+	        this.disp.add(this.isEmpty);
 	        // isEmptyChanged
 	        this.isEmptyChanged = Utils_1.whenAny(this.length, function (len) { return len == 0; })
 	            .distinctUntilChanged();
@@ -4864,9 +4875,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        enumerable: true,
 	        configurable: true
 	    });
+	    PagedObservableListProjection.prototype.indexOf = function (item) {
+	        return this.toArray().indexOf(item);
+	    };
+	    PagedObservableListProjection.prototype.contains = function (item) {
+	        return this.indexOf(item) !== -1;
+	    };
 	    PagedObservableListProjection.prototype.toArray = function () {
 	        var start = this.pageSize() * this.currentPage();
 	        return this.source.toArray().slice(start, start + this.length());
+	    };
+	    PagedObservableListProjection.prototype.forEach = function (callbackfn, thisArg) {
+	        this.toArray().forEach(callbackfn, thisArg);
+	    };
+	    PagedObservableListProjection.prototype.map = function (callbackfn, thisArg) {
+	        return this.toArray().map(callbackfn, thisArg);
+	    };
+	    PagedObservableListProjection.prototype.filter = function (callbackfn, thisArg) {
+	        return this.toArray().filter(callbackfn, thisArg);
+	    };
+	    PagedObservableListProjection.prototype.some = function (callbackfn, thisArg) {
+	        return this.toArray().some(callbackfn, thisArg);
+	    };
+	    PagedObservableListProjection.prototype.every = function (callbackfn, thisArg) {
+	        return this.toArray().every(callbackfn, thisArg);
 	    };
 	    PagedObservableListProjection.prototype.suppressChangeNotifications = function () {
 	        var _this = this;

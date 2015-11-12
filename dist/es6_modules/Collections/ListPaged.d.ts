@@ -5,7 +5,7 @@
 * and change notifications from its upstream source. It does not maintain data.
 * @class
 */
-export declare class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyList<T>, wx.IUnknown {
+export declare class PagedObservableListProjection<T> implements wx.IPagedObservableReadOnlyList<T>, wx.IUnknown {
     constructor(source: wx.IObservableReadOnlyList<T>, pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler);
     queryInterface(iid: string): boolean;
     source: wx.IObservableReadOnlyList<T>;
@@ -15,7 +15,15 @@ export declare class PagedObservableListProjection<T> implements wx.IObservableP
     length: wx.IObservableProperty<number>;
     get(index: number): T;
     isReadOnly: boolean;
+    isEmpty: wx.IObservableProperty<boolean>;
+    indexOf(item: T): number;
+    contains(item: T): boolean;
     toArray(): Array<T>;
+    forEach(callbackfn: (value: T, from: number, array: T[]) => void, thisArg?: any): void;
+    map<U>(callbackfn: (value: T, from: number, array: T[]) => U, thisArg?: any): U[];
+    filter(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): T[];
+    some(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): boolean;
+    every(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): boolean;
     listChanging: Rx.Observable<boolean>;
     listChanged: Rx.Observable<boolean>;
     isEmptyChanged: Rx.Observable<boolean>;

@@ -20,12 +20,12 @@ import { property } from "../Core/Property"
 * and change notifications from its upstream source. It does not maintain data.
 * @class
 */
-export class PagedObservableListProjection<T> implements wx.IObservablePagedReadOnlyList<T>, wx.IUnknown {
+export class PagedObservableListProjection<T> implements wx.IPagedObservableReadOnlyList<T>, wx.IUnknown {
     constructor(source: wx.IObservableReadOnlyList<T>, pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler) {
         this.source = source;
         this.scheduler = scheduler || (isRxScheduler(currentPage) ? <Rx.IScheduler> <any> currentPage : Rx.Scheduler.immediate);
 
-        // IObservablePagedReadOnlyList
+        // IPagedObservableReadOnlyList
         this.pageSize = property(pageSize);
         this.currentPage = property(currentPage || 0);
 
@@ -47,6 +47,12 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
             .toProperty();
 
         this.disp.add(this.length);
+
+        this.isEmpty = this.lengthChanged
+            .select(x => x === 0)
+            .toProperty(this.length() === 0);
+
+        this.disp.add(this.isEmpty);
 
         // isEmptyChanged
         this.isEmptyChanged = whenAny(this.length, (len)=> len == 0)
@@ -98,7 +104,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     }
 
     //////////////////////////////////
-    // IObservablePagedReadOnlyList
+    // IPagedObservableReadOnlyList
 
     public source: wx.IObservableReadOnlyList<T>;
     public pageSize: wx.IObservableProperty<number>;
@@ -106,7 +112,7 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
     public pageCount: wx.IObservableProperty<number>;
 
     //////////////////////////////////
-    // IObservableReadOnlyList
+    // IList
 
     public length: wx.IObservableProperty<number>;
 
@@ -120,9 +126,42 @@ export class PagedObservableListProjection<T> implements wx.IObservablePagedRead
         return true;
     }
 
+    //////////////////////////////////
+    // IObservableReadOnlyList
+
+    public isEmpty: wx.IObservableProperty<boolean>;
+
+    public indexOf(item: T): number {
+        return this.toArray().indexOf(item);
+    }
+
+    public contains(item: T): boolean {
+        return this.indexOf(item) !== -1;
+    }
+
     public toArray(): Array<T> {
         let start = this.pageSize() * this.currentPage();
         return this.source.toArray().slice(start, start + this.length());
+    }
+
+    public forEach(callbackfn: (value: T, from: number, array: T[]) => void, thisArg?: any): void {
+        this.toArray().forEach(callbackfn, thisArg);
+    }
+
+    public map<U>(callbackfn: (value: T, from: number, array: T[]) => U, thisArg?: any): U[] {
+        return this.toArray().map(callbackfn, thisArg);
+    }
+
+    public filter(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): T[] {
+        return this.toArray().filter(callbackfn, thisArg);
+    }
+
+    public some(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): boolean {
+        return this.toArray().some(callbackfn, thisArg);
+    }
+
+    public every(callbackfn: (value: T, from: number, array: T[]) => boolean, thisArg?: any): boolean {
+        return this.toArray().every(callbackfn, thisArg);
     }
 
     //////////////////////////////////

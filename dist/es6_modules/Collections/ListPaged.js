@@ -22,7 +22,7 @@ export class PagedObservableListProjection {
         this.updateLengthTrigger = new Rx.Subject();
         this.source = source;
         this.scheduler = scheduler || (isRxScheduler(currentPage) ? currentPage : Rx.Scheduler.immediate);
-        // IObservablePagedReadOnlyList
+        // IPagedObservableReadOnlyList
         this.pageSize = property(pageSize);
         this.currentPage = property(currentPage || 0);
         let updateLengthTrigger = Rx.Observable.merge(this.updateLengthTrigger, source.lengthChanged)
@@ -37,6 +37,10 @@ export class PagedObservableListProjection {
             .distinctUntilChanged()
             .toProperty();
         this.disp.add(this.length);
+        this.isEmpty = this.lengthChanged
+            .select(x => x === 0)
+            .toProperty(this.length() === 0);
+        this.disp.add(this.isEmpty);
         // isEmptyChanged
         this.isEmptyChanged = whenAny(this.length, (len) => len == 0)
             .distinctUntilChanged();
@@ -73,9 +77,30 @@ export class PagedObservableListProjection {
     get isReadOnly() {
         return true;
     }
+    indexOf(item) {
+        return this.toArray().indexOf(item);
+    }
+    contains(item) {
+        return this.indexOf(item) !== -1;
+    }
     toArray() {
         let start = this.pageSize() * this.currentPage();
         return this.source.toArray().slice(start, start + this.length());
+    }
+    forEach(callbackfn, thisArg) {
+        this.toArray().forEach(callbackfn, thisArg);
+    }
+    map(callbackfn, thisArg) {
+        return this.toArray().map(callbackfn, thisArg);
+    }
+    filter(callbackfn, thisArg) {
+        return this.toArray().filter(callbackfn, thisArg);
+    }
+    some(callbackfn, thisArg) {
+        return this.toArray().some(callbackfn, thisArg);
+    }
+    every(callbackfn, thisArg) {
+        return this.toArray().every(callbackfn, thisArg);
     }
     suppressChangeNotifications() {
         this.changeNotificationsSuppressed++;

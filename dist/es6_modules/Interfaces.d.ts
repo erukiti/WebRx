@@ -202,12 +202,27 @@ declare module wx {
         length: IObservableProperty<number>;
         get(index: number): T;
         toArray(): Array<T>;
+        isReadOnly: boolean;
     }
     /**
     /* Represents an observable read-only collection of objects that can be individually accessed by index.
     /* @interface
     **/
-    interface IObservableReadOnlyList<T> extends IList<T>, INotifyListChanged<T>, INotifyListItemChanged {
+    interface IObservableReadOnlyList<T> extends IList<T>, INotifyListChanged<T> {
+        isEmpty: IObservableProperty<boolean>;
+        contains(item: T): boolean;
+        indexOf(item: T): number;
+        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
+        map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
+        filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
+        every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+        some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
+    }
+    /**
+    /* Represents an observable read-only collection which can be projected and paged
+    /* @interface
+    **/
+    interface IProjectableObservableReadOnlyList<T> extends IObservableReadOnlyList<T>, INotifyListItemChanged {
         /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
@@ -215,37 +230,37 @@ declare module wx {
         /* @param selector {(T) => TNew} A function that will be run on each item to project it to a different type
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (item: T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<TNew>;
+        project<TNew, TDontCare>(filter?: (item: T) => boolean, orderer?: (a: TNew, b: TNew) => number, selector?: (item: T) => TNew, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IProjectableObservableReadOnlyList<TNew>;
         /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         /* @param orderer {(a: TNew, b: TNew) => number} A comparator method to determine the ordering of the resulting collection
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        project<TDontCare>(filter?: (item: T) => boolean, orderer?: (a: T, b: T) => number, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IProjectableObservableReadOnlyList<T>;
         /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param filter {(item: T) => boolean} A filter to determine whether to exclude items in the derived collection
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        project<TDontCare>(filter?: (item: T) => boolean, refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IProjectableObservableReadOnlyList<T>;
         /**
         /* Creates a live-projection of itself that can be filtered, re-ordered and mapped.
         /* @param refreshTrigger {Rx.Observable<TDontCare>} When this Observable is signalled, the derived collection will be manually reordered/refiltered.
         **/
-        project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IObservableReadOnlyList<T>;
+        project<TDontCare>(refreshTrigger?: Rx.Observable<TDontCare>, scheduler?: Rx.IScheduler): IProjectableObservableReadOnlyList<T>;
         /**
         * Creates a paged live-projection of itself.
         * @param pageSize {number} Initial page-size of the projection
         * @param currentPage {number} Current page of the projection
         **/
-        page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): IObservablePagedReadOnlyList<T>;
+        page(pageSize: number, currentPage?: number, scheduler?: Rx.IScheduler): IPagedObservableReadOnlyList<T>;
     }
     /**
     * IObservablePagedReadOnlyList represents a virtual paging projection over an existing observable list
     * @interface
     **/
-    interface IObservablePagedReadOnlyList<T> extends IList<T>, INotifyListChanged<T> {
+    interface IPagedObservableReadOnlyList<T> extends IObservableReadOnlyList<T> {
         source: IObservableReadOnlyList<T>;
         pageSize: IObservableProperty<number>;
         currentPage: IObservableProperty<number>;
@@ -257,15 +272,12 @@ declare module wx {
     * itself changes).
     * @interface
     **/
-    interface IObservableList<T> extends IObservableReadOnlyList<T> {
-        isEmpty: IObservableProperty<boolean>;
+    interface IObservableList<T> extends IProjectableObservableReadOnlyList<T> {
         set(index: number, item: T): any;
         add(item: T): void;
         push(item: T): void;
         clear(): void;
-        contains(item: T): boolean;
         remove(item: T): boolean;
-        indexOf(item: T): number;
         insert(index: number, item: T): void;
         removeAt(index: number): void;
         addRange(collection: Array<T>): void;
@@ -275,11 +287,6 @@ declare module wx {
         removeRange(index: number, count: number): void;
         reset(contents?: Array<T>): void;
         sort(comparison: (a: T, b: T) => number): void;
-        forEach(callbackfn: (value: T, index: number, array: T[]) => void, thisArg?: any): void;
-        map<U>(callbackfn: (value: T, index: number, array: T[]) => U, thisArg?: any): U[];
-        filter(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): T[];
-        every(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
-        some(callbackfn: (value: T, index: number, array: T[]) => boolean, thisArg?: any): boolean;
     }
     /**
     * This interface is implemented by RxUI objects which are given
