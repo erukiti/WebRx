@@ -14,11 +14,11 @@ The framework is written in [Typescript](http://www.typescriptlang.org/) and bui
 #### Features
 
 - [Documentation](http://webrxjs.org/docs)
-- Declarative Two-way Data-Binding
-- Powerful Collection-Processing including Filtering- and Re-ordering Projections and Paging
-- Supports self-contained and reusable *Components*
-- State-based Router
-- Lightweight Message-Bus for loosely coupled inter-component communication
+- Declarative Two-way [Data-Binding](http://webrxjs.org/docs/binding-syntax.html)
+- Powerful [Collection-Processing](http://webrxjs.org/docs/observable-lists.html) including Filtering- and Re-ordering Projections and Paging
+- Supports self-contained and reusable [*Components*](http://webrxjs.org/docs/component-overview.html)
+- State-based [Router](http://webrxjs.org/docs/routing-overview.html)
+- Lightweight [Message-Bus](http://webrxjs.org/docs/message-bus.html) for loosely coupled inter-component communication
 - No dependencies other than [RxJS](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/libraries/rx.complete.md)
 - Compact (~30Kb minified & compressed)
 - Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
