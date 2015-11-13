@@ -92,7 +92,7 @@ export default class KeyPressBinding implements wx.IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;

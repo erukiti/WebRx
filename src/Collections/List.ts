@@ -966,7 +966,7 @@ class ObservableListProjection<T, TValue> extends ObservableList<TValue> impleme
         if (this.orderer == null) {
             // We mirror the order of the source collection so we'll perform the same move operation
             // as the source. As is the case with when we have an orderer we don't test whether or not
-            // the item should be included or not here. wx.If it has been included at some point it'll
+            // the item should be included or not here. If it has been included at some point it'll
             // stay included until onItemChanged picks up a change which filters it.
             let newDestinationIndex = ObservableListProjection.newPositionForExistingItem2(
                 this.indexToSourceIndexMap, newSourceIndex, currentDestinationIndex);

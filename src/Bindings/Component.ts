@@ -130,7 +130,7 @@ export default class ComponentBinding implements wx.IBindingHandler {
     public controlsDescendants = true;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;

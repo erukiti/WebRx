@@ -23,9 +23,9 @@ if (_window.opera && _window.opera.version) {
     opera = { version: parseInt(_window.opera.version()) };
 }
 
-// Detect wx.IE versions for bug workarounds (uses wx.IE conditionals, not UA string, for robustness)
-// Note that, since wx.IE 10 does not support conditional comments, the following logic only detects wx.IE < 10.
-// Currently this is by design, since wx.IE 10+ behaves correctly when treated as a standard browser.
+// Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
+// Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
+// Currently this is by design, since IE 10+ behaves correctly when treated as a standard browser.
 let version = document && (function () {
     let version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
 
@@ -41,7 +41,7 @@ if (version) {
     ie = <wx.IIEBrowserProperties> { version: version };
 
     if (version < 10) {
-        // for wx.IE9 and lower, provide an accessor for document scoped
+        // for IE9 and lower, provide an accessor for document scoped
         // observables which allow monitoring the selectionchange event
         let map = createWeakMap<Document, Rx.Observable<Document>>();
 

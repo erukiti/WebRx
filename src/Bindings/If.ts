@@ -105,7 +105,7 @@ export class IfBinding implements wx.IBindingHandler {
     public controlsDescendants = true;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected inverse: boolean = false;
     protected domManager: wx.IDomManager;

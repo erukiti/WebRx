@@ -61,7 +61,7 @@ export class SingleOneWayBindingBase implements wx.IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;
@@ -151,7 +151,7 @@ export class MultiOneWayBindingBase implements wx.IBindingHandler {
     protected supportsDynamicValues = false;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;

@@ -114,7 +114,7 @@ export default class ValueBinding implements wx.IBindingHandler {
     public priority = 5;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;

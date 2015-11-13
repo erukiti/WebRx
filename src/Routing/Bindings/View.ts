@@ -94,7 +94,7 @@ export default class ViewBinding implements wx.IBindingHandler {
     public controlsDescendants = true;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;

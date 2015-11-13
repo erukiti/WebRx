@@ -53,7 +53,7 @@ export default class EventBinding implements wx.IBindingHandler {
     public priority = 0;
 
     ////////////////////
-    // wx.Implementation
+    // Implementation
 
     protected domManager: wx.IDomManager;
     protected app: wx.IWebRxApp;
