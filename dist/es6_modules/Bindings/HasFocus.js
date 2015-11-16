@@ -39,7 +39,7 @@ export default class HasFocusBinding {
             }
         }
         function handleElementFocusChange(isFocused) {
-            // wx.If possible, ignore which event was raised and determine focus state using activeElement,
+            // If possible, ignore which event was raised and determine focus state using activeElement,
             // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
             let ownerDoc = el.ownerDocument;
             if ("activeElement" in ownerDoc) {
@@ -48,7 +48,7 @@ export default class HasFocusBinding {
                     active = ownerDoc.activeElement;
                 }
                 catch (e) {
-                    // wx.IE9 throws if you access activeElement during page load (see issue #703)
+                    // IE9 throws if you access activeElement during page load (see issue #703)
                     active = ownerDoc.body;
                 }
                 isFocused = (active === el);
@@ -57,7 +57,7 @@ export default class HasFocusBinding {
         }
         function updateElement(value) {
             if (value) {
-                // Note: wx.If the element is currently hidden, we schedule the focus change
+                // Note: If the element is currently hidden, we schedule the focus change
                 // to occur "soonish". Technically this is a hack because it hides the fact
                 // that we make tricky assumption about the presence of a "visible" binding
                 // on the same element who's subscribe handler runs after us

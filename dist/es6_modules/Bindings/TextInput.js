@@ -102,13 +102,13 @@ export default class TextInputBinding {
         let result = [];
         if (env.ie && env.ie.version < 10) {
             if (env.ie.version <= 9) {
-                // wx.Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
+                // Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
                 // the backspace, delete, or ctrl-x keys, clicking the 'x' to clear the input, dragging text
                 // out of the field, and cutting or deleting text using the context menu. 'selectionchange'
                 // can detect all of those except dragging text out of the field, for which we use 'dragend'.
                 result.push(env.ie.getSelectionChangeObservable(el).where(doc => doc.activeElement === el));
                 result.push(Rx.Observable.fromEvent(el, 'dragend'));
-                // wx.IE 9 does support 'input', but since it doesn't fire it when
+                // IE 9 does support 'input', but since it doesn't fire it when
                 // using autocomplete, we'll use 'propertychange' for it also.
                 result.push(Rx.Observable.fromEvent(el, 'input'));
                 result.push(Rx.Observable.fromEvent(el, 'propertychange').where(e => e.propertyName === 'value'));

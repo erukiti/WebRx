@@ -3508,20 +3508,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	if (_window.opera && _window.opera.version) {
 	    exports.opera = { version: parseInt(_window.opera.version()) };
 	}
-	// Detect wx.IE versions for bug workarounds (uses wx.IE conditionals, not UA string, for robustness)
-	// Note that, since wx.IE 10 does not support conditional comments, the following logic only detects wx.IE < 10.
-	// Currently this is by design, since wx.IE 10+ behaves correctly when treated as a standard browser.
+	// Detect IE versions for bug workarounds (uses IE conditionals, not UA string, for robustness)
+	// Note that, since IE 10 does not support conditional comments, the following logic only detects IE < 10.
+	// Currently this is by design, since IE 10+ behaves correctly when treated as a standard browser.
 	var version = document && (function () {
 	    var version = 3, div = document.createElement('div'), iElems = div.getElementsByTagName('i');
 	    // Keep constructing conditional HTML blocks until we hit one that resolves to an empty fragment
-	    while (div.innerHTML = '<!--[if gt wx.IE ' + (++version) + ']><i></i><![endif]-->',
+	    while (div.innerHTML = '<!--[if gt IE ' + (++version) + ']><i></i><![endif]-->',
 	        iElems[0]) { }
 	    return version > 4 ? version : undefined;
 	}());
 	if (version) {
 	    exports.ie = { version: version };
 	    if (version < 10) {
-	        // for wx.IE9 and lower, provide an accessor for document scoped
+	        // for IE9 and lower, provide an accessor for document scoped
 	        // observables which allow monitoring the selectionchange event
 	        var map = WeakMap_1.createWeakMap();
 	        exports.ie.getSelectionChangeObservable = function (el) {
@@ -4353,7 +4353,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (this.orderer == null) {
 	            // We mirror the order of the source collection so we'll perform the same move operation
 	            // as the source. As is the case with when we have an orderer we don't test whether or not
-	            // the item should be included or not here. wx.If it has been included at some point it'll
+	            // the item should be included or not here. If it has been included at some point it'll
 	            // stay included until onItemChanged picks up a change which filters it.
 	            var newDestinationIndex = ObservableListProjection.newPositionForExistingItem2(this.indexToSourceIndexMap, newSourceIndex, currentDestinationIndex);
 	            if (newDestinationIndex !== currentDestinationIndex) {
@@ -5712,7 +5712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.priority = 50;
 	        this.controlsDescendants = true;
 	        ////////////////////
-	        // wx.Implementation
+	        // Implementation
 	        this.inverse = false;
 	        this.domManager = domManager;
 	        this.app = app;
@@ -7013,7 +7013,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	        function handleElementFocusChange(isFocused) {
-	            // wx.If possible, ignore which event was raised and determine focus state using activeElement,
+	            // If possible, ignore which event was raised and determine focus state using activeElement,
 	            // as this avoids phantom focus/blur events raised when changing tabs in modern browsers.
 	            var ownerDoc = el.ownerDocument;
 	            if ("activeElement" in ownerDoc) {
@@ -7022,7 +7022,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    active = ownerDoc.activeElement;
 	                }
 	                catch (e) {
-	                    // wx.IE9 throws if you access activeElement during page load (see issue #703)
+	                    // IE9 throws if you access activeElement during page load (see issue #703)
 	                    active = ownerDoc.body;
 	                }
 	                isFocused = (active === el);
@@ -7031,7 +7031,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        function updateElement(value) {
 	            if (value) {
-	                // Note: wx.If the element is currently hidden, we schedule the focus change
+	                // Note: If the element is currently hidden, we schedule the focus change
 	                // to occur "soonish". Technically this is a hack because it hides the fact
 	                // that we make tricky assumption about the presence of a "visible" binding
 	                // on the same element who's subscribe handler runs after us
@@ -7560,13 +7560,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var result = [];
 	        if (env.ie && env.ie.version < 10) {
 	            if (env.ie.version <= 9) {
-	                // wx.Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
+	                // Internet Explorer 9 doesn't fire the 'input' event when deleting text, including using
 	                // the backspace, delete, or ctrl-x keys, clicking the 'x' to clear the input, dragging text
 	                // out of the field, and cutting or deleting text using the context menu. 'selectionchange'
 	                // can detect all of those except dragging text out of the field, for which we use 'dragend'.
 	                result.push(env.ie.getSelectionChangeObservable(el).where(function (doc) { return doc.activeElement === el; }));
 	                result.push(Rx.Observable.fromEvent(el, 'dragend'));
-	                // wx.IE 9 does support 'input', but since it doesn't fire it when
+	                // IE 9 does support 'input', but since it doesn't fire it when
 	                // using autocomplete, we'll use 'propertychange' for it also.
 	                result.push(Rx.Observable.fromEvent(el, 'input'));
 	                result.push(Rx.Observable.fromEvent(el, 'propertychange').where(function (e) { return e.propertyName === 'value'; }));
@@ -9281,7 +9281,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 52 */
 /***/ function(module, exports) {
 
-	exports.version = '1.4.2';
+	exports.version = '1.4.3';
 	//# sourceMappingURL=Version.js.map
 
 /***/ },

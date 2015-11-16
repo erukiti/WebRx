@@ -6,7 +6,7 @@ export class IfBinding {
         this.priority = 50;
         this.controlsDescendants = true;
         ////////////////////
-        // wx.Implementation
+        // Implementation
         this.inverse = false;
         this.domManager = domManager;
         this.app = app;
