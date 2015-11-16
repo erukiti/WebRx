@@ -22,7 +22,6 @@ The framework is built on top of [ReactiveX for Javascript (RxJs)](http://reacti
 - No dependencies other than [RxJS](https://github.com/Reactive-Extensions/RxJS/blob/master/doc/libraries/rx.complete.md)
 - Compact (~30Kb minified & compressed)
 - Tested with IE9+, Firefox 5+, Chrome 5+, Safari 5+, Android Browser 4.0+, iOS Safari 5.0+
-- Developed in [TypeScript](http://www.typescriptlang.org/) but designed from the ground up to be just as easily consumable in plain Javascript.
 
 #### How to install
 
